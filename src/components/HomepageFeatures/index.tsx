@@ -45,7 +45,7 @@ const FeatureList: FeatureItem[] = [
 
 function Feature({title, imgName, description}: FeatureItem) {
   const { colorMode } = useColorMode();
-  const imgSrc = require(`@site/static/img/${imgName}-${colorMode}.svg`).default;
+  const imgSrc = require(`@site/static/img/${imgName}-${colorMode}.png`).default;
 
   return (
     <div className={clsx('col col--4')}>

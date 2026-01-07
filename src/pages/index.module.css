@@ -5,19 +5,20 @@
 
 .heroBanner {
   padding: 4rem 0;
-  text-align: center;
+  text-align: left;
   position: relative;
   overflow: hidden;
+  height: 50vh;
 
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 
-  background-image: url('/img/banner-light.svg');
+  background-image: url('/img/banner-light.png');
 }
 
 :global([data-theme='dark']) .heroBanner {
-  background-image: url('/img/banner-dark.svg');
+  background-image: url('/img/banner-dark.png');
 }
 
 @media screen and (max-width: 996px) {
@@ -28,6 +29,11 @@
 
 .buttons {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: left;
 }
+
+:global([data-theme='light']) .buttons :global(.button--secondary) {
+  color:rgb(10, 61, 228);
+  font-weight: 500; 
+};
