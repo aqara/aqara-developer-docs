@@ -19,6 +19,7 @@
 
 :global([data-theme='dark']) .heroBanner {
   background-image: url('/img/banner-dark.png');
+  color: white;
 }
 
 @media screen and (max-width: 996px) {
@@ -34,6 +35,13 @@
 }
 
 :global([data-theme='light']) .buttons :global(.button--secondary) {
-  color:rgb(10, 61, 228);
-  font-weight: 500; 
-};
+  color: rgb(10, 61, 228);
+  font-weight: 500;
+  font-size: 16px !important;
+}
+
+:global([data-theme='dark']) .heroBanner .buttons :global(.button--secondary) {
+  color: rgb(10, 61, 228) !important;
+  font-weight: 500;
+  font-size: 16px !important;
+}

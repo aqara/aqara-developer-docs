@@ -42,6 +42,13 @@ const config: Config = {
     }
   },
 
+  // Enable Mermaid diagrams in Markdown and add the theme
+  markdown: {
+    mermaid: true,
+  },
+
+  themes: ['@docusaurus/theme-mermaid'],
+
   presets: [
     [
       'classic',
