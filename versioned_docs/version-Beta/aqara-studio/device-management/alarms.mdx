@@ -4,7 +4,7 @@ In device management for smart home systems, Aqara Studio lets you flexibly conf
 
 ## Alarm Configuration Steps
 
-1. Go to the **Device** page. In the device tree on the left, find the function point folder you want to view.
+1. Go to the **Devices** page. In the device tree on the left, find the function point folder you want to view.
 2. Double-click this folder to switch to the function point's **Essential** tab.
 3. Find the **Alarm config** section and click the **+** button.
 4. In the popup, set the following parameters:
@@ -19,17 +19,72 @@ In device management for smart home systems, Aqara Studio lets you flexibly conf
     | To Off Normal Text | The message shown to the user when the alarm is triggered.                                        |
     | To Normal Text | The message shown to the user after recovery.                                                     |
 
+    The diagram below illustrates the effect of delay time, normal delay time, user confirmation of alarms, and the status of alarm rule activation on the overall alarm timeline:
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/alarm-status.png" alt="Alarm State Timeline" />
+
     For numeric function points, there are also these parameters:
 
     | Parameter         | Description                                                                 |
     |-------------------|-----------------------------------------------------------------------------|
     | Limit Enabled     | Choose to enable the lower limit, upper limit, or both.                      |
-    | Low Limit       | The lowest normal value allowed.                                             |
-    | High Limit       | The highest normal value allowed.                                            |
-    | Deadband         | A range centered on the upper or lower limit. Changes within ± this threshold will not cause a system response or output. This helps avoid chattering and false alarms. |
+    | Low Limit       | The lowest allowed normal value. When the device reading drops below the low limit, the alarm state changes to abnormal (LOW_LIMIT).                                            |
+    | High Limit      | The highest allowed normal value. When the device reading exceeds the high limit, the alarm state changes to abnormal (HIGH_LIMIT).                                           |
+    | Deadband        | It is used to prevent frequent state switching due to small fluctuations near the threshold. <ul><li>When the low limit is enabled: Once the reading drops to the low limit and becomes abnormal, the state will only return to normal when the reading rises above the lower limit plus the deadband.</li><li>When the high limit is enabled: Once the reading rises to the high limit and becomes abnormal, the state will only return to normal when the reading drops below the high limit minus the deadband.</li></ul> |
+
+    The diagram below shows how the alarm state responds as the device reading crosses the low and high limits, as well as when it returns to the recovery points (low limit + deadban, and high limit - deadband).
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/states-for-numeric-points.jpg" alt="Alarm status for numeric readings" />
 
     After setting the parameters, click Confirm. You will see a new card in the **Alarm config** section.
 5. Toggle the switch on the card to enable the alarm configuration.
+6. After the alarm config is enabled, once the function point value meets the configured alarm rule, the alarm configuration card will automatically display the alarm prompt, status, occurrence time, and an acknowledge button. You can click the acknowledge button to quickly confirm the alarm.
+    :::tip
+    You can also visit the [Alarms](./../alarm-management.mdx) to view detailed alarm information, such as alarm data, recovery time, acknowledgment time, and more.
+    :::
+
+## Alarm Lifecycle
+
+In the **Alarm Config** section of the function point configuration page, you can view the current status of alarms in real time via the alarm config card and clearly track which stage of the alarm lifecycle it is in.
+
+The alarm lifecycle is divided into four stages: "Warning-Pending Confirmation", "Warning-Confirmed", "Alarm Recovery-Pending confirmation", and "Alarm closed". Transitions between these stages depend both on whether the alarm has recovered to normal and on whether the user has confirmed it. The whole process is illustrated below:
+
+```mermaid
+flowchart TD
+    style A fill:#f8d7da,stroke:#c62828,color:#000,font-weight:bold
+    style B fill:#f8d7da,stroke:#c62828,color:#000,font-weight:bold
+    style C fill:#fff3cd,stroke:#f57c00,color:#000
+    style D fill:#ffffff,stroke:#616161,color:#000
+
+    A[<b>Warning-<br/>Pending Confirmation</b>]
+    B[<b>Warning-<br/>Confirmed</b>]
+    C[<b>Alarm Recovery-<br/>Pending confirmation</b>]
+    D[<b>Alarm closed</b>]
+
+    %% Adjust arrow meanings/positions
+    A -- Click **Confirm alarm** --> B
+    A -- Alarm recovery --> C
+    B -- Alarm recovery --> D
+    C -- Click **Confirm alarm** --> D
+
+    %% Class label
+    A:::red
+    B:::red
+    C:::orange
+    D:::whitebg
+
+    classDef red fill:#f8d7da,stroke:#c62828,color:#000,font-weight:bold
+    classDef orange fill:#fff3cd,stroke:#f57c00,color:#000
+    classDef whitebg fill:#ffffff,stroke:#616161,color:#000
+```
+
+Stage explanations:
+
+- **Warning-Pending Confirmation**: A new alarm is generated, and the user has not yet confirmed it, indicating that the alarm requires attention and handling.
+- **Warning-Confirmed**: The alarm still exists, but the user is aware of it, indicating that the alarm is being dealt with.
+- **Alarm Recovery-Pending confirmation**: The alarm has recovered to normal, but the user has not confirmed it yet. This means the event will only be fully closed after user confirmation.
+- **Alarm closed**: The alarm has recovered to normal and also been confirmed by the user. The alarm is now closed.
+
 
 ## FAQ
 
