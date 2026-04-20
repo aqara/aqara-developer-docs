@@ -2,26 +2,27 @@
 
 ## Overview
 
-Aqara provides an OpenClaw skill for integrating Aqara Studio capabilities. In the OpenClaw Web UI, you only need to input the specified instruction text to automatically install and configure the skill, enabling you to:
 
-- Access and manage all devices connected to Aqara Studio
-- Query device status, space lists, and other information using natural language
-- Seamlessly control devices and retrieve data via OpenClaw
+Aqara provides an OpenClaw skill for integrating Aqara Studio capabilities. Once installed, you can achieve the following in the OpenClaw Web UI:
+
+- List devices, count the number of devices, read device status, and control devices;
+- List spaces, create or rename spaces, and move devices between spaces;
+- Create automations, view automations, update automation configurations, enable or disable automations, and delete automations.
 
 The entire process requires no coding. You only need to configure the necessary information, making it easy to comprehensively manage Aqara devices and bringing great convenience to your smart space management.
 
-## Process
+## Install the Skill
 
-1. Open your local OpenClaw Web UI.
-2. In the left sidebar, select **Chat** and input the following text in the chat box:
+1. Install the [Aqara OpenAPI Local](https://clawhub.ai/aqara/aqara-open-api-local) Skill for your OpenClaw.
 
-    ```txt
-    Fetch and follow instructions from https://cdn.aqara.com/cdn/common/mainland/static/docs/OPENCLAW_OPEN_API_INSTALL.md 
-    ```
+2. Open your local OpenClaw Web UI. Click **Skills** on the left sidebar. If you see `aqara-open-api-local` listed under **WORKSPACE SKILLS**, the installation was successful.
 
-    ![Send the text to ask Assistant to install Aqara OpenAPI](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/openclaw-instruction-command.png)
+    ![Confirm whether Aqara API is installed](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenClaw-Skills.png)
 
-3. According to the Assistant’s instructions, provide `AQARA_ENDPOINT_URL` and `AQARA_OPEN_API_TOKEN`.
+## Configure the Skill
+
+1. Open your local OpenClaw Web UI and issue a command to the Assistant, such as "How many devices are integrated in Aqara Studio?"
+2. The Assistant will then attempt to communicate with Aqara Studio, and will prompt you to provide `AQARA_ENDPOINT_URL` and `AQARA_OPEN_API_TOKEN` for authentication.
 
     :::tip
     - `AQARA_ENDPOINT_URL` is the [HTTP Request URL](./api-references/data-export-api-v1.mdx#http-request) of Aqara Studio, usually ending with `/open/api/v1`.
@@ -31,12 +32,7 @@ The entire process requires no coding. You only need to configure the necessary 
     ![Enter URL and token](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/openclaw-url-and-token.png)
 
 4. After submitting the above information, OpenClaw will automatically complete the required configuration. It may automatically reload or restart the service. Please wait patiently.
-
-5. Once OpenClaw has finished starting up, click **Skills** in the left sidebar. If you see `aqara-open-api` listed under **WORKSPACE SKILLS**, the plugin has been successfully installed.
-
-    ![Confirm whether the Aqara API has been installed](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/openclaw-confirmation.png)
-
-6. You can now view and manage all devices connected to Aqara Studio in real time through OpenClaw, achieving efficient device monitoring and convenient control.
+5. After the service is successfully configured, you can now view and manage all devices connected to Aqara Studio in real time through OpenClaw, achieving efficient device monitoring and convenient control.
 
     For example, you can ask the assistant: How many devices are integrated in Aqara Studio?
 

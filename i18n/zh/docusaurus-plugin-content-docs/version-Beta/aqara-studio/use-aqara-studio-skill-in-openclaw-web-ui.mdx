@@ -2,26 +2,26 @@
 
 ## 功能概述
 
-Aqara 提供了用于集成 Aqara Studio 能力的 OpenClaw 插件。在 OpenClaw Web UI 中，您只需输入指定的指令文本，即可自动完成 Skill 的安装和配置，从而实现：
+Aqara 提供了用于集成 Aqara Studio 能力的 OpenClaw skill。 OpenClaw Web UI 中实现：
 
-- 访问并管理 Aqara Studio 内所有已接入设备
-- 通过自然语言查询设备状态、空间列表等信息
-- 利用 OpenClaw 无缝完成设备控制和数据获取
+- 列出设备、统计设备数量、读取状态、控制设备；
+- 列出空间、创建或重命名空间、在空间之间移动设备；
+- 创建自动化、查看自动化、更新自动化配置、启用或禁用自动化、删除自动化。
 
 整个过程无需编写代码，仅需简单配置必要的信息，即可实现对 Aqara 设备的全局管控，为您的智能空间管理带来极大便利。
 
-## 流程
+## 安装 Skill
 
-1. 打开您本地的 OpenClaw Web UI。
-2. 在左边侧边栏选择 **Chat**，在输入框提供以下文本：
+1. 为您的 OpenClaw 安装 [Aqara OpenAPI Local](https://clawhub.ai/aqara/aqara-open-api-local) Skill。
 
-    ```txt
-    Fetch and follow instructions from https://cdn.aqara.com/cdn/common/mainland/static/docs/OPENCLAW_OPEN_API_INSTALL.md 
-    ```
+2. 打开您本地的 OpenClaw Web UI。在左侧边栏点击 **Skills**，若在 **WORKSPACE SKILLS** 列表中能看到 `aqara-open-api-local`，则说明安装成功。
 
-    ![输入文本要求 Assistant 安装 Aqara OpenAPI](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/openclaw-instruction-command.png)
+    ![确认 Aqara API 是否已安装](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenClaw-Skills.png)
 
-3. 根据 Assistant 指令，向其提供 `AQARA_ENDPOINT_URL` 和 `AQARA_OPEN_API_TOKEN`。
+## 配置 Skill
+
+1. 打开您本地的 OpenClaw Web UI，向 Assistant 发出指令，如“Aqara Studio 内集成了多少设备？”
+2. 此时，Assistant 尝试向 Aqara Studio 发起请求，会要求您提供 `AQARA_ENDPOINT_URL` 和 `AQARA_OPEN_API_TOKEN`，用作鉴权。
 
     :::tip
     - `AQARA_ENDPOINT_URL` 为 Aqara Studio 的 [HTTP 请求 URL](./api-references/data-export-api-v1.mdx#http-请求)，通常以 `/open/api/v1` 结尾
@@ -31,15 +31,7 @@ Aqara 提供了用于集成 Aqara Studio 能力的 OpenClaw 插件。在 OpenCla
     ![输入 url 和 token](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/openclaw-url-and-token.png)
 
 4. 提交上述信息后，OpenClaw 会自动完成所需配置，并可能自动重载或重启服务，请耐心等待。
-
-5. 当 OpenClaw 启动完成后，在左侧边栏点击 **Skills**，若在 **WORKSPACE SKILLS** 列表中能看到 `aqara-open-api`，则说明插件安装成功。
-
-    ![确认 Aqara API 是否已安装](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/openclaw-confirmation.png)
-
-6. 您即可通过 OpenClaw 实时查看和管理 Aqara Studio 已接入的所有设备，实现高效的设备监控与便捷控制。
-
-    例如，向 Assistant 提问：Aqara Studio 内集成了多少设备？
-
+5. 服务配置成功后，您即可通过 OpenClaw 实时查看和管理 Aqara Studio 已接入的所有设备，实现高效的设备监控与便捷控制。
     ![提问集成设备数量](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/openclaw-query-device-list.png)
 
 
@@ -56,8 +48,3 @@ Aqara 提供了用于集成 Aqara Studio 能力的 OpenClaw 插件。在 OpenCla
 2. Assistant 会将 openclaw.json 文件的内容展示在对话框中，您可以在其中查找到已配置的 `AQARA_ENDPOINT_URL` 和 `AQARA_OPEN_API_TOKEN`。
 
     ![查看 URL 和 Token](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/openclaw-check-info.png)
-
-
-
-
-
