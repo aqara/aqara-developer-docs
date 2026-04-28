@@ -11,7 +11,7 @@ By calling this API, you can query trait information that can be used for automa
 | type         | String  | ✓        | Message type for the request, must be `QueryAutomationCapabilitiesRequest`.    |
 | version      | String  | ✓        | API version, must be `v1`.                                                                   |
 | msgId        | String  | ✓        | Request ID defined by you.                                                                   |
-| data         | String  | ✓        | Pass an empty string here.                                                                   |
+| data         | Object  | ✗        | Pass an empty object here.                                                                   |
 
 #### Example Request
 
@@ -22,7 +22,7 @@ Below is a sample request body for `QueryAutomationCapabilitiesRequest`:
     "type": "QueryAutomationCapabilitiesRequest",
     "version": "v1",
     "msgId": "1751609244328",
-    "data": ""
+    "data": {}
 }
 ```
 
@@ -314,7 +314,7 @@ By calling this API, you can modify the name and enabled status of an existing a
 | data.name | String | ✗ | The new name. |
 | data.enabled | Boolean | ✗ | The new enabled status. `true` means enabled. `false` means disabled. |
 | data.config | Object | ✗ | The new JSON automation script. |
-| data.updateMask | Array of String | List of parameter names to be updated. Only the following fields are supported: <ul><li>`"name"`</li><li>`"enabled"`</li><li>`"config"`</li></ul> Please make sure each item in <code>updateMask</code> has a corresponding new value provided in the data object. |
+| data.updateMask | Array of String | ✓ | List of parameter names to be updated. Only the following fields are supported: <ul><li>`"name"`</li><li>`"enabled"`</li><li>`"config"`</li></ul> Please make sure each item in <code>updateMask</code> has a corresponding new value provided in the data object. |
 
 #### Example Request
 
@@ -354,10 +354,10 @@ The following is an example response for `UpdateAutomationResponse`:
 ```json
 {
     "type": "UpdateAutomationResponse",
-	"version": "v1",
-	"msgId": "1751609244328",
-	"code": 0,
-	"message": "",
+    "version": "v1",
+    "msgId": "1751609244328",
+    "code": 0,
+    "message": "",
     "data": ""
 }
 ```
@@ -379,7 +379,6 @@ By calling this API, you can update the enable status of multiple automations at
 
 #### Example Request
 
-以下为 `UpdateAutomationStatusRequest` 的请求体示例：
 Below is a example request body for `UpdateAutomationStatusRequest`:
 
 ```json
@@ -450,15 +449,15 @@ By calling this API, you can get a paginated list of automation summaries, inclu
 
 #### Example Request   
 
-Below is a sample request body for `GetScriptAutomationListRequest`:
+Below is a sample request body for `GetAutomationListRequest`:
 
 ```json
 {
-    "type": "GetScriptAutomationListRequest",
+    "type": "GetAutomationListRequest",
     "version": "v1",
     "msgId": "1751609244328",
     "data": {
-        "definitionTypes": "SCRIPT_JSON",
+        "definitionTypes": ["SCRIPT_JSON"],
         "pageNum":1,
         "pageSize":2
     }
@@ -641,10 +640,10 @@ Below is an example request body for `DeleteAutomationRequest`:
 ```json
 {
     "type": "DeleteAutomationResponse",
-	"version":"v1",
-	"msgId":"1751609244328",
-	"code":0,
-	"message":"",
+    "version": "v1",
+    "msgId": "1751609244328",
+    "code": 0,
+    "message": "",
     "data": {
         "successIds": [
             "auto_15b0b4d_1273030749213163"

@@ -11,7 +11,7 @@
 | type        | String  | ✓      | 请求的消息类型，必需为 `QueryAutomationCapabilitiesRequest`。 |
 | version     | String  | ✓      | 请求接口版本号，必需为 `v1`。                     |
 | msgId       | String  | ✓      | 由您定义的请求 ID。                                |
-| data        | String  | ✓      | 此处传空字符串。                                        |
+| data        | Object  | ✗      | 此处传空对象。                                        |
 
 #### 请求参数示例
 
@@ -22,7 +22,7 @@
     "type": "QueryAutomationCapabilitiesRequest",
     "version": "v1",
     "msgId": "1751609244328",
-    "data": ""
+    "data": {}
 }
 ```
 
@@ -287,10 +287,10 @@
 ```json
 {
     "type": "CreateAutomationResponse",
-	"version": "v1",
-	"msgId": "1751609244328",
-	"code": 0,
-	"message": "",
+    "version": "v1",
+    "msgId": "1751609244328",
+    "code": 0,
+    "message": "",
     "data": "auto_15b0cde_127312348967862272"
 }
 ```
@@ -312,7 +312,7 @@
 | data.name | String | ✗ | 新的名称。 |
 | data.enabled | Boolean | ✗ | 新的启用状态。`true` 表示启用，`false` 表示禁用。 |
 | data.config | Object | ✗ | 新的 JSON 自动化脚本。 |
-| data.updateMask | Array of String | 需更新的参数名称列表，仅支持以下字段：<ul><li>`"name"`</li><li>`"enabled"`</li><li>`"config"`</li></ul>请确保 <code>updateMask</code> 中的每一项都已在 data 对象中正确提供新值。 |
+| data.updateMask | Array of String | ✓ |  需更新的参数名称列表，仅支持以下字段：<ul><li>`"name"`</li><li>`"enabled"`</li><li>`"config"`</li></ul>请确保 <code>updateMask</code> 中的每一项都已在 data 对象中正确提供新值。 |
 
 #### 请求参数示例
 
@@ -352,10 +352,10 @@
 ```json
 {
     "type": "UpdateAutomationResponse",
-	"version": "v1",
-	"msgId": "1751609244328",
-	"code": 0,
-	"message": "",
+    "version": "v1",
+    "msgId": "1751609244328",
+    "code": 0,
+    "message": "",
     "data": ""
 }
 ```
@@ -443,15 +443,15 @@
 
 #### 请求参数示例   
 
-以下为 `GetScriptAutomationListRequest` 的请求体示例：
+以下为 `GetAutomationListRequest` 的请求体示例：
 
 ```json
 {
-    "type": "GetScriptAutomationListRequest",
+    "type": "GetAutomationListRequest",
     "version": "v1",
     "msgId": "1751609244328",
     "data": {
-        "definitionTypes": "SCRIPT_JSON",
+        "definitionTypes": ["SCRIPT_JSON"],
         "pageNum":1,
         "pageSize":2
     }
@@ -634,10 +634,10 @@
 ```json
 {
     "type": "DeleteAutomationResponse",
-	"version":"v1",
-	"msgId":"1751609244328",
-	"code":0,
-	"message":"",
+    "version": "v1",
+    "msgId": "1751609244328",
+    "code": 0,
+    "message": "",
     "data": {
         "successIds": [
             "auto_15b0b4d_1273030749213163"
