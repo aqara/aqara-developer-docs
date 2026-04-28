@@ -1,0 +1,36 @@
+# Matter 设备接入
+
+:::tip
+本文档仅适用于 **网关融合形态**的 Aqara Studio。
+:::
+
+本文说明如何将 Matter 设备接入 Aqara Studio。
+
+:::tip
+Aqara Studio 支持接入 Aqara 及第三方品牌的 Matter 设备。
+:::
+
+## 流程
+
+1. 在左侧侧边栏点击进入**设备管理**页面，选择 `Matter`，进入管理界面。   
+    ![选择 Matter](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Devices-Matter.png)
+2. 进入`添加设备`选项卡，在**选择网关**下拉框中选择目标网关。   
+    ![选择网关](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Matter-SelectGateway.png)  
+3. 单击 **配置** 按钮，在弹窗中填写子设备需接入的 Wi-Fi 信息，并完成保存。   
+    ![配置 Wi-Fi 信息](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Matter-WiFiConfiguration.png)
+4. 将子设备开启入网模式，并输入该设备的 11 位 Matter 配对码。单击**校验并添加**。
+    ![输入配对码](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Matter-InputPairingCode.png)
+5. 子设备接入成功后，将在**已添加设备**列表中显示该子设备。
+
+## 下一步
+
+接下来，您可以直接 [查看该设备的详情和控制该设备](./../device-management/basic-information.mdx)，还可以利用该设备 [编排自动化逻辑](./../automation.mdx) 了。
+
+## 常见问题
+
+### 支持双协议或多协议的 Aqara 设备如何通过 Matter 接入？
+
+当您的 Aqara 设备同时支持 Matter 及其他协议时，通过 Matter 接入的步骤如下：
+
+- 若设备当前已处于 Matter 协议模式，可直接参考本文档流程接入。
+- 若设备当前使用的是其他协议，请先在 Aqara Home App 中将设备切换到 Matter 协议模式，完成后再参考本文档流程接入。

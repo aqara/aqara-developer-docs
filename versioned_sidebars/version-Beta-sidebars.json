@@ -36,6 +36,7 @@
                 "items": [
                   "aqara-studio/device-integration/aqara",
                   "aqara-studio/device-integration/zigbee",
+                  "aqara-studio/device-integration/matter",
                   "aqara-studio/device-integration/home-assistant",
                   "aqara-studio/device-integration/modbus-tcp",
                   "aqara-studio/device-integration/bacnet",
@@ -154,7 +155,8 @@
                 "aqara-studio/remote-access",
                 "aqara-studio/system-update",
                 "aqara-studio/technical-support",
-                "aqara-studio/local-domain-name-access"
+                "aqara-studio/local-domain-name-access",
+                "aqara-studio/wireless-connection"
               ]
           }
         ]      
