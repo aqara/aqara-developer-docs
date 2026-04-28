@@ -1,0 +1,33 @@
+# Matter
+
+:::tip
+This document is only applicable to the **hub-integrated model** of Aqara Studio.
+:::
+
+This document explains how to connect Matter devices to Aqara Studio.
+
+## Process
+
+1. In the left sidebar, click to enter the **Devices** page. Select `Matter` to open the management page.
+    ![Select Matter](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Devices-Matter.png)
+2. Go to the `Add Device` tab. In the **Select gateway** dropdown, select the gateway to which you want to bind sub-devices.   
+    ![Select Gateway](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Matter-SelectGateway.png)
+3. Click the **Configuration** button to set up Wi-Fi information for the sub-device.   
+    ![Configuration](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Matter-WiFiConfiguration.png)
+4. Put the sub-device into pairing mode, and enter its 11-digit Matter pairing code. Click **Verify and Add**.
+    ![Input Pairing Code](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Matter-InputPairingCode.png)
+5. Once the sub-device is successfully found and bound, it will appear in the **Device added** list.
+
+## Next Steps
+
+Now, you can [view details and control the device](./../device-management/basic-information.mdx), or [use the device in automation](./../automation.mdx).
+
+
+## FAQ
+
+### How do I connect Aqara devices that support dual-protocol or multi-protocol by Matter?
+
+If your Aqara device supports Matter as well as other protocols, please follow these steps to connect via Matter:
+
+- If the device is already in Matter mode, you can connect following the process described in this document.
+- If the device uses another protocol, first switch the device to Matter mode on the Aqara Home App. After switching, follow this document’s process to connect.

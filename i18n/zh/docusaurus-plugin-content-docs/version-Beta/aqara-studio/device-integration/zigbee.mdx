@@ -6,6 +6,10 @@
 
 本文说明如何将 Zigbee 设备接入 Aqara Studio。
 
+:::tip
+在接入 Zigbee 设备前，建议先查看 [可接入 Aqara 设备清单](./../overview/compatible-aqara-devices.mdx)，以确认您的设备是否已获得支持。
+:::
+
 ## 流程
 
 1. 在左侧侧边栏点击进入**设备管理**页面。选择 `Zigbee`，进入管理界面。
@@ -23,3 +27,12 @@
 ## 下一步
 
 接下来，您可以直接 [查看该设备的详情和控制该设备](./../device-management/basic-information.mdx)，还可以利用该设备 [编排自动化逻辑](./../automation.mdx) 了。
+
+## 常见问题
+
+### 支持双协议或多协议的 Aqara 设备如何通过 Zigbee 接入？
+
+当您的 Aqara 设备同时支持 Zigbee 及其他协议时，通过 Zigbee 接入的步骤如下：
+
+- 若设备当前已处于 Zigbee 协议模式，可直接参考本文档流程接入。
+- 若设备当前使用的是其他协议，请先在 Aqara Home App 中将设备切换到 Zigbee 协议模式，完成后再参考本文档流程接入。
