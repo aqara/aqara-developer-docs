@@ -13,16 +13,15 @@ The entire process requires no coding. You only need to configure the necessary 
 
 ## Install the Skill
 
-1. Install the [Aqara OpenAPI Local](https://clawhub.ai/aqara/aqara-open-api-local) Skill for your OpenClaw.
+1. Install the [Aqara OpenAPI Local](https://clawhub.ai/aqara/aqara-open-api-local) Skill for your OpenClaw. For example, you can directly enter `Install Aqara OpenAPI Local Skill` in the input box, and the Assistant will start installing the Skill.
 
-2. Open your local OpenClaw Web UI. Click **Skills** on the left sidebar. If you see `aqara-open-api-local` listed under **WORKSPACE SKILLS**, the installation was successful.
+2. After installation, click **Skills** on the left sidebar. If you see `aqara-open-api-local` listed under **WORKSPACE SKILLS**, the installation was successful.
 
     ![Confirm whether Aqara API is installed](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenClaw-Skills.png)
 
 ## Configure the Skill
 
-1. Open your local OpenClaw Web UI and issue a command to the Assistant, such as "How many devices are integrated in Aqara Studio?"
-2. The Assistant will then attempt to communicate with Aqara Studio, and will prompt you to provide `AQARA_ENDPOINT_URL` and `AQARA_OPEN_API_TOKEN` for authentication.
+1. After installation, the Assistant will prompt you to provide `AQARA_ENDPOINT_URL` and `AQARA_OPEN_API_TOKEN` for authentication.
 
     :::tip
     - `AQARA_ENDPOINT_URL` is the [HTTP Request URL](./api-references/data-export-api-v1.mdx#http-request) of Aqara Studio, usually ending with `/open/api/v1`.
@@ -31,8 +30,9 @@ The entire process requires no coding. You only need to configure the necessary 
 
     ![Enter URL and token](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/openclaw-url-and-token.png)
 
-4. After submitting the above information, OpenClaw will automatically complete the required configuration. It may automatically reload or restart the service. Please wait patiently.
-5. After the service is successfully configured, you can now view and manage all devices connected to Aqara Studio in real time through OpenClaw, achieving efficient device monitoring and convenient control.
+    After submitting the above information, OpenClaw will automatically complete the required configuration. 
+
+2. After the service is successfully configured, you can now view and manage all devices connected to Aqara Studio in real time through OpenClaw, achieving efficient device monitoring and convenient control.
 
     For example, you can ask the assistant: How many devices are integrated in Aqara Studio?
 

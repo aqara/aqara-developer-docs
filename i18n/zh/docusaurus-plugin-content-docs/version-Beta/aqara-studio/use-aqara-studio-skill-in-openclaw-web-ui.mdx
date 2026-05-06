@@ -12,16 +12,15 @@ Aqara 提供了用于集成 Aqara Studio 能力的 OpenClaw skill。 OpenClaw We
 
 ## 安装 Skill
 
-1. 为您的 OpenClaw 安装 [Aqara OpenAPI Local](https://clawhub.ai/aqara/aqara-open-api-local) Skill。
+1. 为您的 OpenClaw 安装 [Aqara OpenAPI Local](https://clawhub.ai/aqara/aqara-open-api-local) Skill。例如，您可以直接在输入框中输入 `安装 Aqara OpenAPI Local Skill`。Assistant 即会开始安装 Skill。
 
-2. 打开您本地的 OpenClaw Web UI。在左侧边栏点击 **Skills**，若在 **WORKSPACE SKILLS** 列表中能看到 `aqara-open-api-local`，则说明安装成功。
+2. 安装完成后，在左侧边栏点击 **Skills**，若在 **WORKSPACE SKILLS** 列表中能看到 `aqara-open-api-local`，则说明安装成功。
 
     ![确认 Aqara API 是否已安装](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenClaw-Skills.png)
 
 ## 配置 Skill
 
-1. 打开您本地的 OpenClaw Web UI，向 Assistant 发出指令，如“Aqara Studio 内集成了多少设备？”
-2. 此时，Assistant 尝试向 Aqara Studio 发起请求，会要求您提供 `AQARA_ENDPOINT_URL` 和 `AQARA_OPEN_API_TOKEN`，用作鉴权。
+1. 安装完成后，Assistant 会要求您提供 `AQARA_ENDPOINT_URL` 和 `AQARA_OPEN_API_TOKEN`，用作鉴权。
 
     :::tip
     - `AQARA_ENDPOINT_URL` 为 Aqara Studio 的 [HTTP 请求 URL](./api-references/data-export-api-v1.mdx#http-请求)，通常以 `/open/api/v1` 结尾
@@ -30,8 +29,11 @@ Aqara 提供了用于集成 Aqara Studio 能力的 OpenClaw skill。 OpenClaw We
 
     ![输入 url 和 token](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/openclaw-url-and-token.png)
 
-4. 提交上述信息后，OpenClaw 会自动完成所需配置，并可能自动重载或重启服务，请耐心等待。
-5. 服务配置成功后，您即可通过 OpenClaw 实时查看和管理 Aqara Studio 已接入的所有设备，实现高效的设备监控与便捷控制。
+    提交上述信息后，OpenClaw 会自动完成所需配置。
+2. 服务配置成功后，您即可通过 OpenClaw 实时查看和管理 Aqara Studio 已接入的所有设备，实现高效的设备监控与便捷控制。
+
+    例如，你可以提问：Aqara Studio 内集成了多少设备？
+    
     ![提问集成设备数量](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/openclaw-query-device-list.png)
 
 
