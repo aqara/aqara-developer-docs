@@ -119,10 +119,6 @@ const config: Config = {
           position: 'right',
         },
         {
-          type: 'docsVersionDropdown',
-          position: 'left',
-        },
-        {
           type: 'search',
           position: 'left', // search to left
         },
