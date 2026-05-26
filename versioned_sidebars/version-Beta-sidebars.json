@@ -80,36 +80,6 @@
                           "aqara-studio/flow/condition",
                           "aqara-studio/flow/action"
                       ]
-                    },
-                    {
-                      "type": "category",
-                      "label": "Logic",
-                      "link": {
-                          "type": "doc",
-                          "id": "aqara-studio/logic/logic-introduction"
-                      },
-                      "collapsed": true,
-                      "items": [
-                          {
-                          "type": "category",
-                          "label": "Blocks",
-                          "link": {
-                              "type": "generated-index",
-                              "keywords": ["blocks"]
-                          },
-                          "collapsed": true,
-                          "items": [
-                              "aqara-studio/logic/blocks/variables-blocks",
-                              "aqara-studio/logic/blocks/logic-blocks",
-                              "aqara-studio/logic/blocks/math-blocks",
-                              "aqara-studio/logic/blocks/timer-blocks",
-                              "aqara-studio/logic/blocks/select-blocks",
-                              "aqara-studio/logic/blocks/other-blocks",
-                              "aqara-studio/logic/blocks/string-blocks",
-                              "aqara-studio/logic/blocks/script-blocks"
-                          ]
-                          }
-                      ]
                     }
                 ]
               },

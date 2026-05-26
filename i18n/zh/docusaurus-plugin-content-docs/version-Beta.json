@@ -31,10 +31,6 @@
     "message": "Flow",
     "description": "The label for category 'Flow' in sidebar 'aqaraStudioSidebar'"
   },
-  "sidebar.aqaraStudioSidebar.category.Logic": {
-    "message": "Logic",
-    "description": "The label for category 'Logic' in sidebar 'aqaraStudioSidebar'"
-  },
   "sidebar.aqaraStudioSidebar.category.Blocks": {
     "message": "逻辑块",
     "description": "The label for category 'Blocks' in sidebar 'aqaraStudioSidebar'"
