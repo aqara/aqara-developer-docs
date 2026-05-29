@@ -1,14 +1,20 @@
-# 通过局域网域名访问
+# 通过主机访域名访问
 
 ## 功能概述
 
-为简化访问，平台为 Aqara Studio 提供了一个专属的局域网域名（HTTP）。您无需记忆或查询可能变化的局域网 IP，只需在浏览器中输入该域名，即可稳定便捷地访问 Aqara Studio。
+为简化访问，平台为 Aqara Studio 提供了一个专属的主机访问域名（HTTP）。您无需记忆或查询可能变化的局域网 IP，只需在浏览器中输入该域名，即可稳定便捷地访问 Aqara Studio。
 
-## 流程
+## 获取主机访问域名
 
-通过局域网域名访问平台的操作流程如下：
+您可以通过以下任意方式获取主机访问域名：
+- **方法一**：从设备（如智慧边端 M300）侧边即可找到主机访问域名。
+- **方法二**：从 Aqara Studio 获取。
+    1. 在左侧导航栏点击 **设置**。
+    2. 在 **设置** 页面的侧边栏点击 **关于**。
+    3. 找到并复制 **主机访问域名** 的值。
 
-1. 在左侧导航栏点击 **设置**。
-2. 在 **设置** 页面的侧边栏点击 **关于**。
-3. 查找并复制 **主机访问域名**。
-4. 在浏览器地址栏输入 `http://` 加上该域名（如：`http://aqarastudio.local`），即可快速访问 Aqara Studio 平台。
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/LocalDomainName-GetHostDomainNameAddress.png" alt="获取主机访问域名" style={{width: '80%'}} />
+
+## 使用主机访问域名访问 Aqara Studio
+
+在浏览器地址栏输入 `http://` 加上该域名（如：`http://aqarastudio-xxxx.local`），即可快速访问 Aqara Studio 平台。
