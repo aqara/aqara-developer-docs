@@ -11,7 +11,7 @@
 | type        | String  | ✓      | 请求的消息类型，必需为 `QueryAutomationCapabilitiesRequest`。 |
 | version     | String  | ✓      | 请求接口版本号，必需为 `v1`。                     |
 | msgId       | String  | ✓      | 由您定义的请求 ID。                                |
-| data        | Object  | ✗      | 此处传空对象。                                        |
+| data        | Object  | ✓      | 此处传空对象。                                        |
 
 #### 请求参数示例
 
@@ -352,10 +352,10 @@
 ```json
 {
     "type": "UpdateAutomationResponse",
-    "version": "v1",
-    "msgId": "1751609244328",
-    "code": 0,
-    "message": "",
+	"version": "v1",
+	"msgId": "1751609244328",
+	"code": 0,
+	"message": "",
     "data": ""
 }
 ```

@@ -42,3 +42,48 @@
   order: -1 !important;
 }
 
+.api-method > .menu__link::before,
+.menu__link.api-method::before {
+  border-radius: 0.25rem;
+  color: #fff;
+  display: inline-block;
+  flex: 0 0 auto;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-right: 0.4rem;
+  min-width: 2.3rem;
+  padding: 0.2rem 0.25rem;
+  text-align: center;
+}
+
+.api-method.get > .menu__link::before,
+.menu__link.api-method.get::before {
+  background: var(--ifm-color-primary);
+  content: "GET";
+}
+
+.api-method.post > .menu__link::before,
+.menu__link.api-method.post::before {
+  background: var(--ifm-color-success);
+  content: "POST";
+}
+
+.api-method.put > .menu__link::before,
+.menu__link.api-method.put::before {
+  background: var(--ifm-color-info);
+  content: "PUT";
+}
+
+.api-method.patch > .menu__link::before,
+.menu__link.api-method.patch::before {
+  background: var(--ifm-color-warning);
+  content: "PATCH";
+}
+
+.api-method.delete > .menu__link::before,
+.menu__link.api-method.delete::before {
+  background: var(--ifm-color-danger);
+  content: "DELETE";
+}
+

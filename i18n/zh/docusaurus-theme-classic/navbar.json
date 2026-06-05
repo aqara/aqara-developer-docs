@@ -26,5 +26,9 @@
   "item.label.Aqara Studio": {
     "message": "Aqara Studio",
     "description": "Navbar item with label Aqara Studio"
+  },
+  "item.label.Aqara Developer": {
+    "message": "Aqara Developer",
+    "description": "Navbar item with label Aqara Developer"
   }
 }
