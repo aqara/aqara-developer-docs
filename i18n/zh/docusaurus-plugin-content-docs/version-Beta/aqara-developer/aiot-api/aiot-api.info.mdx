@@ -1,0 +1,60 @@
+---
+id: aiot-api
+title: "AIOT API"
+description: "AIOT API 开放接口文档"
+sidebar_label: Introduction
+sidebar_position: 0
+hide_title: true
+custom_edit_url: null
+---
+
+import ApiLogo from "@theme/ApiLogo";
+import Heading from "@theme/Heading";
+import SchemaTabs from "@theme/SchemaTabs";
+import TabItem from "@theme/TabItem";
+import Export from "@theme/ApiExplorer/Export";
+
+<span
+  className={"theme-doc-version-badge badge badge--secondary"}
+  children={"Version: v4"}
+>
+</span>
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"AIOT API"}
+>
+</Heading>
+
+
+
+AIOT API 开放接口文档
+
+## 公共请求头
+所有接口均需携带以下 Header 参数（由客户端统一附加）：   
+| Header | 必填 | 说明 |
+|--------|------|------|
+| Accesstoken | String | 否   | 通过授权获取的访问 Token。        |
+| Appid       | String | 是   | 在 [Aqara 开发者平台](https://developer.aqara.com) 创建应用时分配的 App ID。 |
+| Keyid       | String | 是   | 在 [Aqara 开发者平台](https://developer.aqara.com) 创建应用时分配的 Key ID。                   |
+| Nonce       | String | 是   | 随机字符串，每次请求都不同。     |
+| Time        | String | 是   | 请求时间戳，单位毫秒。           |
+| Sign | 是 | 请求签名。如需了解签名生成方法，请参考 [Sign 生成规则](https://opendoc.aqara.cn/docs/%E4%BA%91%E5%BC%80%E5%8F%91/API%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/Sign%E7%94%9F%E6%88%90%E8%A7%84%E5%88%99.html)。 |
+| Lang        | Enum   | 否   | 语言，默认英文，'zh', 'en'     |
+
+
+<div
+  style={{"marginBottom":"var(--ifm-paragraph-margin-bottom)"}}
+>
+  <h3
+    style={{"marginBottom":"0.25rem"}}
+  >
+    Terms of Service
+  </h3><a
+    href={"https://domain.com/terms"}
+  >
+    {'https://domain.com/terms'}
+  </a>
+</div>
+      

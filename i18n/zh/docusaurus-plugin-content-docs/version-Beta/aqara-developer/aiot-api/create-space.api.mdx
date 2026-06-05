@@ -1,0 +1,71 @@
+---
+id: create-space
+title: "创建空间"
+description: "创建一个空间。当 parentSpaceId 为空时创建顶级空间；不为空时，在该空间下创建子空间。"
+sidebar_label: "创建空间"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "post api-method"
+info_path: i18n/zh/docusaurus-plugin-content-docs/version-Beta/aqara-developer/aiot-api/aiot-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"创建空间"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/spaces"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+创建一个空间。当 parentSpaceId 为空时创建顶级空间；不为空时，在该空间下创建子空间。
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"Accesstoken","in":"header","required":false,"schema":{"type":"string","example":"{{Accesstoken}}"},"description":"通过授权获取的访问 Token。"},{"name":"Appid","in":"header","required":true,"schema":{"type":"string","example":"{{Appid}}"},"description":"在 [Aqara 开发者平台](https://developer.aqara.com/) 创建应用时分配的 App ID。"},{"name":"Keyid","in":"header","required":true,"schema":{"type":"string","example":"{{Keyid}}"},"description":"在 [Aqara 开发者平台](https://developer.aqara.com/) 创建应用时分配的 Key ID。"},{"name":"Nonce","in":"header","required":true,"schema":{"type":"string","example":"{{Nonce}}"},"description":"随机字符串，每次请求都不同。"},{"name":"Time","in":"header","required":true,"schema":{"type":"string","example":"{{Time}}"},"description":"请求时间戳，单位毫秒。"},{"name":"Sign","in":"header","required":true,"schema":{"type":"string","example":"{{Sign}}"},"description":"请求签名。如需了解签名生成方法，请参考 [Sign 生成规则](https://opendoc.aqara.cn/docs/%E4%BA%91%E5%BC%80%E5%8F%91/API%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/Sign%E7%94%9F%E6%88%90%E8%A7%84%E5%88%99.html)。"},{"name":"Lang","in":"header","required":false,"schema":{"type":"string","enum":["zh","en"],"example":"en"},"description":"语言，默认英文。支持 'zh', 'en' 两种语言。"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["name"],"properties":{"parentSpaceId":{"type":"string","nullable":true,"description":"父空间 ID ；为空时创建顶级空间。"},"name":{"type":"string","minLength":1,"description":"空间名称，不能为空字符串。"},"settings":{"type":"object","description":"空间配置属性。","properties":{"gmtTimeZone":{"type":"string","description":"标准 GMT 格式时区，如 GMT+08:00。","example":"GMT+08:00"},"locationId":{"type":"string","nullable":true,"description":"家庭位置标识，支持经纬度串（如 \"123.456,78.90\"）或城市编码（如 \"30372\"）。","example":"123.456,78.90"},"autoAdjustDst":{"type":"boolean","default":true,"description":"是否自动适应夏令时（Daylight Saving Time）。"}},"title":"SpaceSettings"}},"example":{"parentSpaceId":"space-home-001","name":"客厅","settings":{"gmtTimeZone":"GMT+08:00","locationId":"123.456,78.90","autoAdjustDst":true}},"title":"CreateSpaceRequest"},"example":{"parentSpaceId":"space-home-001","name":"客厅","settings":{"gmtTimeZone":"GMT+08:00","locationId":"123.456,78.90","autoAdjustDst":true}}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"请求发起成功","content":{"application/json":{"schema":{"allOf":[{"type":"object","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型。"},"version":{"type":"string","description":"接口版本。","example":"v4"},"msgId":{"type":"string","description":"消息 ID。"},"code":{"type":"integer","description":"业务状态码，0 表示成功。"},"message":{"type":"string","description":"提示信息。"}},"title":"BaseResponse"},{"type":"object","properties":{"data":{"type":"string","description":"新创建的空间 ID。"}}}],"example":{"type":"CreateSpaceResponse","version":"v4","msgId":"a1b2c3d4-e5f6-7890-abcd-000000000006","code":0,"message":"success","data":"space-livingroom-001"},"title":"CreateSpaceResponse"}}}},"400":{"description":"请求参数错误","content":{"application/json":{"schema":{"example":{"type":"ErrorMessage","version":"v4","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 xxx 不能为空"},"description":"错误响应，错误信息通过 code 与 message 提供","allOf":[{"type":"object","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型。"},"version":{"type":"string","description":"接口版本。","example":"v4"},"msgId":{"type":"string","description":"消息 ID。"},"code":{"type":"integer","description":"业务状态码，0 表示成功。"},"message":{"type":"string","description":"提示信息。"}},"title":"BaseResponse"}],"title":"ErrorResponse"}}}},"401":{"description":"未认证或认证失效","content":{"application/json":{"schema":{"example":{"type":"ErrorMessage","version":"v4","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000002","code":401,"message":"token 已过期，请重新生成 token"},"description":"错误响应，错误信息通过 code 与 message 提供","allOf":[{"type":"object","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型。"},"version":{"type":"string","description":"接口版本。","example":"v4"},"msgId":{"type":"string","description":"消息 ID。"},"code":{"type":"integer","description":"业务状态码，0 表示成功。"},"message":{"type":"string","description":"提示信息。"}},"title":"BaseResponse"}],"title":"ErrorResponse"}}}},"403":{"description":"无权限访问","content":{"application/json":{"schema":{"example":{"type":"ErrorMessage","version":"v4","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000003","code":403,"message":"无权限访问该资源"},"description":"错误响应，错误信息通过 code 与 message 提供","allOf":[{"type":"object","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型。"},"version":{"type":"string","description":"接口版本。","example":"v4"},"msgId":{"type":"string","description":"消息 ID。"},"code":{"type":"integer","description":"业务状态码，0 表示成功。"},"message":{"type":"string","description":"提示信息。"}},"title":"BaseResponse"}],"title":"ErrorResponse"}}}},"404":{"description":"资源不存在","content":{"application/json":{"schema":{"example":{"type":"ErrorMessage","version":"v4","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000004","code":404,"message":"资源不存在"},"description":"错误响应，错误信息通过 code 与 message 提供","allOf":[{"type":"object","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型。"},"version":{"type":"string","description":"接口版本。","example":"v4"},"msgId":{"type":"string","description":"消息 ID。"},"code":{"type":"integer","description":"业务状态码，0 表示成功。"},"message":{"type":"string","description":"提示信息。"}},"title":"BaseResponse"}],"title":"ErrorResponse"}}}},"429":{"description":"请求频率过高","content":{"application/json":{"schema":{"example":{"type":"ErrorMessage","version":"v4","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000005","code":429,"message":"请求频率过高"},"description":"错误响应，错误信息通过 code 与 message 提供","allOf":[{"type":"object","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型。"},"version":{"type":"string","description":"接口版本。","example":"v4"},"msgId":{"type":"string","description":"消息 ID。"},"code":{"type":"integer","description":"业务状态码，0 表示成功。"},"message":{"type":"string","description":"提示信息。"}},"title":"BaseResponse"}],"title":"ErrorResponse"}}}},"500":{"description":"服务内部错误","content":{"application/json":{"schema":{"example":{"type":"ErrorMessage","version":"v4","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000006","code":500,"message":"服务内部异常"},"description":"错误响应，错误信息通过 code 与 message 提供","allOf":[{"type":"object","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型。"},"version":{"type":"string","description":"接口版本。","example":"v4"},"msgId":{"type":"string","description":"消息 ID。"},"code":{"type":"integer","description":"业务状态码，0 表示成功。"},"message":{"type":"string","description":"提示信息。"}},"title":"BaseResponse"}],"title":"ErrorResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

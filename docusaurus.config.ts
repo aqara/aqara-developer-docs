@@ -47,7 +47,7 @@ const config: Config = {
     mermaid: true,
   },
 
-  themes: ['@docusaurus/theme-mermaid'],
+  themes: ['@docusaurus/theme-mermaid', 'docusaurus-theme-openapi-docs'],
 
   presets: [
     [
@@ -55,6 +55,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
+          docItemComponent: '@theme/ApiItem',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
@@ -79,6 +80,55 @@ const config: Config = {
 
   // Add local search plugin
   plugins: [
+    [
+      'docusaurus-plugin-openapi-docs',
+      {
+        id: 'openapi',
+        docsPluginId: 'classic',
+        config: {
+          dataExportApi: {
+            specPath: 'openapi/data-export-api/en/data-export-api.yaml',
+            outputDir:
+              'versioned_docs/version-Beta/aqara-developer/data-export-api',
+            sidebarOptions: {
+              groupPathsBy: 'tag',
+              categoryLinkSource: 'tag',
+              sidebarCollapsed: false,
+            },
+          },
+          aiotApi: {
+            specPath: 'openapi/aiot-api/en/aiot-api.yaml',
+            outputDir:
+              'versioned_docs/version-Beta/aqara-developer/aiot-api',
+            sidebarOptions: {
+              groupPathsBy: 'tag',
+              categoryLinkSource: 'tag',
+              sidebarCollapsed: false,
+            },
+          },
+          aiotApiZh: {
+            specPath: 'openapi/aiot-api/zh/aiot-api.yaml',
+            outputDir:
+              'i18n/zh/docusaurus-plugin-content-docs/version-Beta/aqara-developer/aiot-api',
+            sidebarOptions: {
+              groupPathsBy: 'tag',
+              categoryLinkSource: 'tag',
+              sidebarCollapsed: false,
+            },
+          },
+          dataExportApiZh: {
+            specPath: 'openapi/data-export-api/zh/data-export-api.yaml',
+            outputDir:
+              'i18n/zh/docusaurus-plugin-content-docs/version-Beta/aqara-developer/data-export-api',
+            sidebarOptions: {
+              groupPathsBy: 'tag',
+              categoryLinkSource: 'tag',
+              sidebarCollapsed: false,
+            },
+          },
+        },
+      },
+    ],
     [
       '@easyops-cn/docusaurus-search-local',
       {
@@ -105,7 +155,8 @@ const config: Config = {
           label: "Docs",
           position: "left",
           items: [
-            { label: "Aqara Studio", to: "docs/aqara-studio/overview/introduction" },
+            { label: "Aqara Studio", to: "docs/aqara-studio/overview/introduction", activeBasePath: "docs/aqara-studio" },
+            { label: "Aqara Developer", to: "docs/aqara-developer/aiot-api/get-space", activeBasePath: "docs/aqara-developer" },
           ],
         },
 

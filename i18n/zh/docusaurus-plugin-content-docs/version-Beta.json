@@ -70,5 +70,37 @@
   "sidebar.aqaraStudioSidebar.category.Reference": {
     "message": "参考信息",
     "description": "The label for category 'Reference' in sidebar 'aqaraStudioSidebar'"
+  },  
+  "sidebar.aqaraDeveloperSidebar.category.Local API for Studio": {
+    "message": "Studio 本地 API",
+    "description": "The label for category 'Local API for Studio' in sidebar 'aqaraDeveloperSidebar'"
+  },
+  "sidebar.aqaraDeveloperSidebar.category.Auth": {
+    "message": "鉴权",
+    "description": "The label for category 'Auth' in sidebar 'aqaraDeveloperSidebar'"
+  },
+  "sidebar.aqaraDeveloperSidebar.category.local-api-space": {
+    "message": "空间",
+    "description": "The label for category 'Space' in sidebar 'aqaraDeveloperSidebar'"
+  },
+  "sidebar.aqaraDeveloperSidebar.category.local-api-device": {
+    "message": "设备",
+    "description": "The label for category 'Device' in sidebar 'aqaraDeveloperSidebar'"
+  },
+  "sidebar.aqaraDeveloperSidebar.category.cloud-api-space": {
+    "message": "空间",
+    "description": "The label for category 'Space' in sidebar 'aqaraDeveloperSidebar'"
+  },
+  "sidebar.aqaraDeveloperSidebar.category.cloud-api-device": {
+    "message": "设备",
+    "description": "The label for category 'Device' in sidebar 'aqaraDeveloperSidebar'"
+  },
+  "sidebar.aqaraDeveloperSidebar.category.Subscription": {
+    "message": "订阅",
+    "description": "The label for category 'Subscription' in sidebar 'aqaraDeveloperSidebar'"
+  },
+  "sidebar.aqaraDeveloperSidebar.category.Automation": {
+    "message": "自动化",
+    "description": "The label for category 'Automation' in sidebar 'aqaraDeveloperSidebar'"
   }
 }

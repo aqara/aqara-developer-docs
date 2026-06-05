@@ -1,0 +1,1812 @@
+openapi: 3.0.3
+info:
+  title: AIOT API
+  termsOfService: https://domain.com/terms
+  x-internal: true
+  description: |
+    AIOT API Documentation
+
+    ## Common Request Headers
+    All APIs require the following header parameters (to be attached uniformly by the client):   
+    | Header         | Required | Description                  |
+    | -------------- | -------- | ---------------------------- |
+    | Accesstoken | String | No  | Access token obtained via authorization. |
+    | Appid       | String | Yes | App ID assigned when creating an application on the [Aqara Developer Platform](https://developer.aqara.com). |
+    | Keyid       | String | Yes | Key ID assigned when creating an application on the [Aqara Developer Platform](https://developer.aqara.com). |
+    | Nonce       | String | Yes | Random string, should be different for each request. |
+    | Time        | String | Yes | Request timestamp in milliseconds. |
+    | Sign        | Yes    | Request signature. For signature generation method, please refer to [Sign Generation Rules](https://opendoc.aqara.com/en/docs/developmanual/apiIntroduction/signGenerationRules.html). |
+    | Lang        | Enum   | No  | Language, default is English, possible values: 'zh', 'en' |
+    
+  version: v4
+
+servers:
+  - url: '{host}/v4.0/open/api'
+    description: AIOT API Endpoint
+    variables:
+      host:
+        description: Please enter the Open Platform API server domain.
+        enum:
+          - 'https://open-cn.aqara.com'
+          - 'https://open-usa.aqara.com'
+          - 'https://open-kr.aqara.com'
+          - 'https://open-ru.aqara.com'
+          - 'https://open-ger.aqara.com'
+          - 'https://open-sg.aqara.com'
+        default: 'https://open-usa.aqara.com'
+
+tags:
+  - name: Space
+    description: Space management APIs
+  - name: Device
+    description: Device query, property read/write, and command execution APIs
+  - name: Subscription
+    description: Subscription APIs (MQTT, etc.)
+
+paths:
+   
+  # ────────────────────────────────────────────────────────────────
+  # List Spaces
+  # ────────────────────────────────────────────────────────────────
+  /spaces:
+    get:
+      tags: [Space]
+      summary: List Spaces
+      description: List all child spaces under the specified parent space. Optionally include the parent space itself to flexibly meet diverse hierarchical querying needs.
+      operationId: getSpaces
+      x-skill-intent: space.list
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters:
+        - $ref: '#/components/parameters/Accesstoken'
+        - $ref: '#/components/parameters/Appid'
+        - $ref: '#/components/parameters/Keyid'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Time'
+        - $ref: '#/components/parameters/Sign'
+        - $ref: '#/components/parameters/Lang'
+        - name: parentSpaceId
+          in: query
+          description: Parent space ID. If empty, the response will return all top-level spaces (spaces without a parent, i.e., root nodes of the space tree).
+          required: false
+          schema:
+            type: string
+        - name: needChildren
+          in: query
+          description: Whether to query for child spaces under the parent space. If parentSpaceId is not empty and needChildren is false, child spaces will not be returned (the parent space itself may be returned only when needParentSpaceSelf is true).
+          required: false
+          schema:
+            type: boolean
+            default: true
+        - name: needParentSpaceSelf
+          in: query
+          description: Whether to include the parent space itself (corresponding to parentSpaceId). This takes effect only if parentSpaceId is not empty.
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpacesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+    post:
+      tags: [Space]
+      summary: Create A Space
+      description: Create a space. When parentSpaceId is empty, a top-level (root) space will be created; if not empty, a child space will be created under the specified parent space.
+      operationId: createSpace
+      x-skill-intent: space.create
+      x-idempotent: false
+      x-retryable: false
+      x-side-effects: create
+      parameters:
+        - $ref: '#/components/parameters/Accesstoken'
+        - $ref: '#/components/parameters/Appid'
+        - $ref: '#/components/parameters/Keyid'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Time'
+        - $ref: '#/components/parameters/Sign'
+        - $ref: '#/components/parameters/Lang'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSpaceRequest'
+            example:
+              parentSpaceId: "space-home-001"
+              name: "Living Room"
+              settings:
+                gmtTimeZone: "GMT+08:00"
+                locationId: "123.456,78.90"
+                autoAdjustDst: true
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSpaceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Update Space Name
+  # ────────────────────────────────────────────────────────────────
+  /spaces/name:
+    post:
+      tags: [Space]
+      summary: Update A Space Name
+      description: Update the name of the specified space.
+      operationId: updateSpaceName
+      x-skill-intent: space.name.update
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: update
+      parameters:
+        - $ref: '#/components/parameters/Accesstoken'
+        - $ref: '#/components/parameters/Appid'
+        - $ref: '#/components/parameters/Keyid'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Time'
+        - $ref: '#/components/parameters/Sign'
+        - $ref: '#/components/parameters/Lang'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSpaceNameRequest'
+            example:
+              spaceId: "space-livingroom-001"
+              name: "New Living Room"
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSpaceNameResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+
+  # ────────────────────────────────────────────────────────────────
+  # DeviceType Collection Query
+  # ────────────────────────────────────────────────────────────────
+  /devices/types:
+    get:
+      tags: [Device]
+      summary: List Device Types
+      description: Get all existing device types (DeviceType).
+      operationId: getDeviceTypes
+      x-skill-intent: device.type.list
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters:
+        - $ref: '#/components/parameters/Accesstoken'
+        - $ref: '#/components/parameters/Appid'
+        - $ref: '#/components/parameters/Keyid'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Time'
+        - $ref: '#/components/parameters/Sign'
+        - $ref: '#/components/parameters/Lang'
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Device List Query
+  # ────────────────────────────────────────────────────────────────
+  /devices:
+    get:
+      tags: [Device]
+      summary: List Devices
+      description: Get a list of devices under the specified space. It supports pagination and filtering conditions.
+      operationId: getDevices
+      x-skill-intent: device.list
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters:
+        - $ref: '#/components/parameters/Accesstoken'
+        - $ref: '#/components/parameters/Appid'
+        - $ref: '#/components/parameters/Keyid'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Time'
+        - $ref: '#/components/parameters/Sign'
+        - $ref: '#/components/parameters/Lang'
+        - name: spaceIds
+          in: query
+          description: "Space ID list. Example: spaceIds=xx1,xx2 or spaceIds=xx1&spaceIds=xx2. If empty, all devices will be queried."
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: needChildren
+          in: query
+          description: Whether to query devices under the child spaces. This parameter is only effective when spaceIds is not empty.
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: state
+          in: query
+          description: "Device online status. <ul><li>true: Query online devices.</li><li>false: Query offline devices.</li><li>Not set: Do not filter by status.</li></ul>"
+          required: false
+          schema:
+            type: boolean
+            nullable: true
+        - name: deviceTypesList
+          in: query
+          description: "Device type list. Example: deviceTypesList=light,switch or deviceTypesList=light&deviceTypesList=switch"
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: deviceName
+          in: query
+          description: Device name fuzzy matching (case-insensitive, blank values are automatically ignored)
+          required: false
+          schema:
+            type: string
+        - name: orderBy
+          in: query
+          description: "Sorting method. <ul><li><code>createTime asc</code>: Sorts results by creation time in ascending order (oldest first).</li><li><code>createTime desc</code>: Sorts results by creation time in descending order (newest first).</li></ul>"
+          required: false
+          schema:
+            type: string
+            default: createTime asc
+            enum: [createTime asc, createTime desc]
+          example: createTime asc
+        - name: pageNum
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+          example: 1
+        - name: pageSize
+          in: query
+          description: Number of devices per page
+          required: false
+          schema:
+            type: integer
+          example: 200
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevicesResponse'
+              examples:
+                devicesPage:
+                  value:
+                    type: GetDeviceInfoResponse
+                    version: v4
+                    msgId: "1751609244328"
+                    code: 0
+                    message: success
+                    data:
+                      totalCount: 3
+                      pageNum: 1
+                      pageSize: 200
+                      data:
+                        - deviceId: "device-001"
+                          deviceName: "Living Room Light"
+                          deviceTypesList: ["light"]
+                          createTime: 1710001234567
+                          state: true
+                          space:
+                            parentSpaceId: "space-home-001"
+                            spaceId: "space-room-001"
+                            name: "Living Room"
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Query Device Definitions (Device Details)
+  # ────────────────────────────────────────────────────────────────
+  /devices/definitions:
+    get:
+      tags: [Device]
+      summary: Query Device Details
+      description: Get detailed information for specified devices, including device type, endpoint list, parameter list, etc.
+      operationId: getDeviceDefinitions
+      x-skill-intent: device.definition.get
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters:
+        - $ref: '#/components/parameters/Accesstoken'
+        - $ref: '#/components/parameters/Appid'
+        - $ref: '#/components/parameters/Keyid'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Time'
+        - $ref: '#/components/parameters/Sign'
+        - $ref: '#/components/parameters/Lang'
+        - name: deviceIds
+          in: query
+          required: true
+          description: "List of device IDs, supporting up to 10 devices per query. Example: deviceIds=xx1,xx2 or deviceIds=xx1&deviceIds=xx2."
+          schema:
+            type: array
+            maxItems: 10
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: includeValues
+          in: query
+          required: false
+          description: |
+            Whether to include the current value (`value`) and reported time (`time`) of each trait. When set to `false` (default), only the capability definition metadata is returned; the structure is the same as with `true`, but the trait `value` fields may be empty or contain inaccurate/old values. When set to `true`, the current trait values of the device will be retrieved.
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceDefinitionsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Control Device / Reconnect Device to a New Room / Rename Device
+  # ────────────────────────────────────────────────────────────────
+  /devices/trait/execute:
+    post:
+      tags: [Device]
+      summary: Control Devices by Traits
+      description: |
+        Control devices by traits. You can perform the following operations:
+        - Update device attributes (such as switch, temperature, etc. For functionCode and traitCode, please refer to the /devices/definitions interface)
+        - Reconnect device to a new room (functionCode="EndpointLabel", traitCode="EndpointRoom")
+        - Rename device (functionCode="EndpointLabel", traitCode="EndpointName")
+      operationId: executeDeviceTrait
+      x-skill-intent: device.trait.execute
+      x-idempotent: false
+      x-retryable: conditional
+      x-side-effects: device_state_change
+      parameters:
+        - $ref: '#/components/parameters/Accesstoken'
+        - $ref: '#/components/parameters/Appid'
+        - $ref: '#/components/parameters/Keyid'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Time'
+        - $ref: '#/components/parameters/Sign'
+        - $ref: '#/components/parameters/Lang'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TraitExecuteRequest'
+            examples:
+              executeOnOff:
+                value:
+                  data:
+                    - deviceId: "123456"
+                      endpointId: 1
+                      functionCode: Output
+                      traitCode: OnOff
+                      value: true
+      responses:
+        '200':
+          description: Request succeeded. However, it does not mean all trait values were set successfully.<br />A code value of 0 indicates that at least some operations succeeded; a non-zero code indicates all failed.<br />If data is present, it indicates the set of traits that failed to be set; if not, all traits were set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TraitExecuteResponse'
+              examples:
+                partialFailed:
+                  value:
+                    type: ExecuteTraitResponse
+                    version: v4
+                    msgId: "2df2f431-a58d-4fdb-b39c-4f0d29e7ecf7"
+                    code: 0
+                    message: success
+                    data:
+                      - deviceId: "123456"
+                        endpointId: 1
+                        functionCode: Output
+                        traitCode: OnOff
+                        code: 1103
+                        message: device offline
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Query trait values
+  # ────────────────────────────────────────────────────────────────
+  /devices/trait/read:
+    post:
+      tags: [Device]
+      summary: Query Trait Values
+      description: Batch query the current values of specified traits.
+      operationId: getTraitValues
+      x-skill-intent: device.trait.read
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters:
+        - $ref: '#/components/parameters/Accesstoken'
+        - $ref: '#/components/parameters/Appid'
+        - $ref: '#/components/parameters/Keyid'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Time'
+        - $ref: '#/components/parameters/Sign'
+        - $ref: '#/components/parameters/Lang'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TraitReadRequest'
+            examples:
+              readTraits:
+                value:
+                  data:
+                    - deviceId: "123456"
+                      endpointId: 1
+                      functionCode: Output
+                      traitCodes: [OnOff]
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TraitValueResponse'
+              examples:
+                traitValueSuccess:
+                  value:
+                    type: GetTraitValueResponse
+                    version: v4
+                    msgId: "2df2f431-a58d-4fdb-b39c-4f0d29e7ecf8"
+                    code: 0
+                    message: success
+                    data:
+                      - deviceId: "123456"
+                        endpointId: 1
+                        functionCode: Output
+                        traitCode: OnOff
+                        value: true
+                        time: 1710001234567
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Control devices by commands
+  # ────────────────────────────────────────────────────────────────
+  /devices/command/execute:
+    post:
+      tags: [Device]
+      summary: Control Devices by Commands
+      description: |
+        Use commands to control device.
+        The required parameters, such as endpointId, functionCode, commandCode, and fieldCode, should be obtained from the /devices/definitions API before making a control request.
+      operationId: executeDeviceCommand
+      x-skill-intent: device.command.execute
+      x-idempotent: false
+      x-retryable: conditional
+      x-side-effects: device_state_change
+      parameters:
+        - $ref: '#/components/parameters/Accesstoken'
+        - $ref: '#/components/parameters/Appid'
+        - $ref: '#/components/parameters/Keyid'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Time'
+        - $ref: '#/components/parameters/Sign'
+        - $ref: '#/components/parameters/Lang'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandExecuteRequest'
+            examples:
+              executeCommand:
+                value:
+                  data:
+                    - deviceId: "gateway001"
+                      endpointId: 1
+                      functionCode: NetworkCommissioning
+                      commandCode: TriggerZigbeeNetworkInfoUpload
+                      args:
+                        - fieldCode: InstallCode
+                          value: "F9B34846413AB5DE81B60E63E440"
+                        - fieldCode: MAC
+                          value: "54EF441000EB0CCF"
+      responses:
+        '200':
+          description: Request succeeded. However, it does not mean all commands were executed successfully.<br />A code value of 0 indicates at least some commands succeeded; a non-zero code indicates all commands failed.<br/>If data is present, it represents the collection of commands that failed; if not, all commands succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandExecuteResponse'
+              examples:
+                commandFailed:
+                  value:
+                    type: ExecuteCommandResponse
+                    version: v4
+                    msgId: "2df2f431-a58d-4fdb-b39c-4f0d29e7ecf9"
+                    code: 0
+                    message: success
+                    data:
+                      - deviceId: "gateway001"
+                        endpointId: 1
+                        functionCode: HubCoordination
+                        commandCode: APIBindSubdeviceWithSecurityCode
+                        code: 2201
+                        message: invalid security code
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # MQTT Subscription / Unsubscription
+  # ────────────────────────────────────────────────────────────────
+  /subscriptions/mqtt/subscribe:
+    post:
+      tags: [Subscription]
+      summary: Get MQTT Connection Configuration
+      description: |
+        Call this API, providing the specified device ID, to obtain the necessary information for MQTT connection and topic subscription, including Client ID, MQTT host address, MQTT port, supported protocols, username, secret key, etc.<br />        
+        Based on the returned client ID and specific rules, you can generate the corresponding topics. Together with the other returned information, use a third-party MQTT client to connect to Aqara's MQTT Broker and subscribe to these topics to receive real-time updates of the specified device's function point value changes.
+      operationId: mqttSubscribe
+      x-skill-intent: subscription.mqtt.subscribe
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: subscription_create_or_refresh
+      parameters:
+        - $ref: '#/components/parameters/Accesstoken'
+        - $ref: '#/components/parameters/Appid'
+        - $ref: '#/components/parameters/Keyid'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Time'
+        - $ref: '#/components/parameters/Sign'
+        - $ref: '#/components/parameters/Lang'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MqttSubscribeRequest'
+            examples:
+              subscribe:
+                value:
+                  deviceUniqueId: "device-unique-id-001"
+                  expiresIn: 7200
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MqttSubscribeResponse'
+              examples:
+                subscribeSuccess:
+                  value:
+                    type: MqttSubscribeResponse
+                    version: v4
+                    msgId: "2df2f431-xxxx-4fdb-xxxx-xxxxxxxx"
+                    code: 0
+                    message: success
+                    data:
+                      clientId: "omqt.studio_16xxxxxxxxxxx9"
+                      mqttHost: "mqtt.xxx.com"
+                      mqttPort: "1883"
+                      supportedProtocols: ["tcp"]
+                      secretId: "YmFzZTY0xxxxxxxxxxxxxxxxxxJldElk"
+                      secretKey: "YmFzZTY0xxxxxxxxxxxxxxxxxxxxxxleQ=="
+                      expiresIn: 7200
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /subscriptions/mqtt/unsubscribe:
+    post:
+      tags: [Subscription]
+      summary: Invalidate MQTT Connection Configuration
+      description: |
+        Call this API, providing the specified device ID, to invalidate the MQTT connection configuration related to the device.
+      operationId: mqttUnsubscribe
+      x-skill-intent: subscription.mqtt.unsubscribe
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: subscription_delete
+      parameters:
+        - $ref: '#/components/parameters/Accesstoken'
+        - $ref: '#/components/parameters/Appid'
+        - $ref: '#/components/parameters/Keyid'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Time'
+        - $ref: '#/components/parameters/Sign'
+        - $ref: '#/components/parameters/Lang'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MqttUnsubscribeRequest'
+            examples:
+              unsubscribe:
+                value:
+                  deviceUniqueId: "device-unique-id-001"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MqttUnsubscribeResponse'
+              examples:
+                unsubscribeSuccess:
+                  value:
+                    type: MqttUnsubscribeResponse
+                    version: v4
+                    msgId: "2df2f431-a58d-4fdb-b39c-4f0d29e7f002"
+                    code: 0
+                    message: success
+                    data: null
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+# ══════════════════════════════════════════════════════════════════
+# Components
+# ══════════════════════════════════════════════════════════════════
+components:
+
+  responses:
+    BadRequestResponse:
+      description: Request Parameter Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example:
+              type: ErrorMessage
+              version: v4
+              msgId: "a1b2c3d4-e5f6-7890-abcd-err000000001"
+              code: 400
+              message: "Parameter xxx cannot be empty"
+    UnauthorizedResponse:
+      description: Unauthorized or Authentication Expired
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example:
+              type: ErrorMessage
+              version: v4
+              msgId: "a1b2c3d4-e5f6-7890-abcd-err000000002"
+              code: 401
+              message: "Token expired, please regenerate token"
+    ForbiddenResponse:
+      description: No Permission to Access
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example: 
+              type: ErrorMessage
+              version: v4
+              msgId: "a1b2c3d4-e5f6-7890-abcd-err000000003"
+              code: 403
+              message: "No permission to access this resource"
+    NotFoundResponse:
+      description: Resource Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example:
+              type: ErrorMessage
+              version: v4
+              msgId: "a1b2c3d4-e5f6-7890-abcd-err000000004"
+              code: 404
+              message: "Resource not found"
+    TooManyRequestsResponse:
+      description: Too Many Requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example:
+              type: ErrorMessage
+              version: v4
+              msgId: "a1b2c3d4-e5f6-7890-abcd-err000000005"
+              code: 429
+              message: "Too many requests"
+    InternalServerErrorResponse:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example:
+              type: ErrorMessage
+              version: v4
+              msgId: "a1b2c3d4-e5f6-7890-abcd-err000000006"
+              code: 500
+              message: "Internal server error"
+
+  # Common request header parameters (required for all APIs)
+  parameters:
+    Accesstoken:
+      name: Accesstoken
+      in: header
+      required: false
+      schema:
+        type: string
+        example: "{{Accesstoken}}"
+      description: Access token obtained via authorization.
+    Appid:
+      name: Appid
+      in: header
+      required: true
+      schema:
+        type: string
+        example: "{{Appid}}"
+      description: App ID assigned when creating an application on the [Aqara Developer Platform](https://developer.aqara.com).
+    Keyid:
+      name: Keyid
+      in: header
+      required: true
+      schema:
+        type: string
+        example: "{{Keyid}}"
+      description: Key ID assigned when creating an application on the [Aqara Developer Platform](https://developer.aqara.com).
+    Nonce:
+      name: Nonce
+      in: header
+      required: true
+      schema:
+        type: string
+        example: "{{Nonce}}"
+      description: Random string, should be different for each request.
+    Time:
+      name: Time
+      in: header
+      required: true
+      schema:
+        type: string
+        example: "{{Time}}"
+      description: Request timestamp in milliseconds.
+    Sign:
+      name: Sign
+      in: header
+      required: true
+      schema:
+        type: string
+        example: "{{Sign}}"
+      description: Request signature. For information on how to generate the signature, please refer to [Sign Generation Rules](https://opendoc.aqara.com/en/docs/developmanual/apiIntroduction/signGenerationRules.html).
+    Lang:
+      name: Lang
+      in: header
+      required: false
+      schema:
+        type: string
+        enum: [zh, en]
+        example: "en"
+      description: Language, defaults to English. Supports 'zh' and 'en'.
+
+  schemas:
+
+    # ── Base Request / Response ───────────────────────────────────
+    BaseResponse:
+      type: object
+      required: [type, version, msgId, code]
+      properties:
+        type:
+          type: string
+          description: Message type
+        version:
+          type: string
+          description: API version
+          example: v4
+        msgId:
+          type: string
+          description: Message ID
+        code:
+          type: integer
+          description: "Business status code, 0 indicates success"
+        message:
+          type: string
+          description: Message
+
+    ErrorResponse:
+      description: Error response. Read code and message for details.
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+
+    # ── Space ────────────────────────────────────────────────────
+    SpaceNode:
+      type: object
+      required: [spaceId, name]
+      properties:
+        spaceId:
+          type: string
+          description: Space ID
+        parentSpaceId:
+          type: string
+          nullable: true
+          description: Parent space ID
+        name:
+          type: string
+          description: Space name
+        spatialMarking:
+          type: string
+          nullable: true
+          description: Space tag
+        children:
+          type: array
+          nullable: true
+          items:
+            type: object
+            properties:
+              spaceId:
+                type: string
+                description: Child space ID
+              parentSpaceId:
+                type: string
+                nullable: true
+                description: Parent space ID
+              name:
+                type: string
+                description: Child space name
+              spatialMarking:
+                type: string
+                nullable: true
+                description: Child space tag
+              children:
+                type: array
+                nullable: true
+                items:
+                  type: object
+                  properties:
+                    spaceId:
+                      type: string
+                      description: Child space ID
+                    parentSpaceId:
+                      type: string
+                      nullable: true
+                      description: Parent space ID
+                    name:
+                      type: string
+                      description: Child space name
+                    spatialMarking:
+                      type: string
+                      nullable: true
+                  description: Grandchild and deeper-level child space list (same structure as the child space node, recursively follows this pattern)
+          description: Child space list
+
+    SpaceSettings:
+      type: object
+      description: Space configuration
+      properties:
+        gmtTimeZone:
+          type: string
+          description: Standard GMT format time zone, e.g. GMT+08:00
+          example: "GMT+08:00"
+        locationId:
+          type: string
+          nullable: true
+          description: Home location identifier, supports a latitude and longitude string (e.g. "123.456,78.90") or a city code (e.g. "30372")
+          example: "123.456,78.90"
+        autoAdjustDst:
+          type: boolean
+          default: true
+          description: Whether to automatically adjust for Daylight Saving Time (DST)
+          
+    CreateSpaceRequest:
+      type: object
+      required: [name]
+      properties:
+        parentSpaceId:
+          type: string
+          nullable: true
+          description: Parent space ID. When empty, a top-level (root) space will be created; if not empty, a child space will be created under the specified parent space.
+        name:
+          type: string
+          minLength: 1
+          description: Space name, cannot be an empty string.
+        settings:
+          $ref: '#/components/schemas/SpaceSettings'
+      example:
+        parentSpaceId: "space-home-001"
+        name: "Living Room"
+        settings:
+          gmtTimeZone: "GMT+08:00"
+          locationId: "123.456,78.90"
+          autoAdjustDst: true
+
+    CreateSpaceResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: string
+              description: Space ID of the newly created space.
+      example:
+        type: CreateSpaceResponse
+        version: v4
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000006"
+        code: 0
+        message: success
+        data: "space-livingroom-001"
+
+    UpdateSpaceNameRequest:
+      type: object
+      required: [spaceId, name]
+      properties:
+        spaceId:
+          type: string
+          description: Space ID.
+        name:
+          type: string
+          description: New space name.
+      example:
+        spaceId: "space-livingroom-001"
+        name: "New Living Room"
+
+    UpdateSpaceNameResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: string
+              description: Empty string (Fixed).
+      example:
+        type: UpdateSpaceNameResponse
+        version: v4
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000007"
+        code: 0
+        message: success
+        data: ""
+
+    SpacesResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/SpaceNode'
+      example:
+        type: GetSpacesResponse
+        version: v4
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000005"
+        code: 0
+        message: success
+        data:
+          - spaceId: "space-home-001"
+            parentSpaceId: null
+            name: "My Home"
+            spatialMarking: "home"
+            children:
+              - spaceId: "space-floor1-001"
+                parentSpaceId: "space-home-001"
+                name: "First Floor"
+                spatialMarking: "floor"
+                children: []
+
+    # ── Device ───────────────────────────────────────────────────
+    DeviceType:
+      type: object
+      required: [deviceType, name]
+      properties:
+        deviceType:
+          type: string
+          description: Device type code
+        name:
+          type: string
+          description: Device type name
+
+    DeviceInfo:
+      type: object
+      required: [deviceId, deviceName, deviceTypesList, createTime, state, space]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        deviceName:
+          type: string
+          description: Device name
+        deviceTypesList:
+          type: array
+          items:
+            type: string
+          description: Device type list
+        createTime:
+          type: integer
+          format: int64
+          description: Creation time (milliseconds since epoch)
+        state:
+          type: boolean
+          description: Device online status
+        space:
+          $ref: '#/components/schemas/DeviceSpace'
+
+    DeviceSpace:
+      type: object
+      required: [parentSpaceId, spaceId, name]
+      properties:
+        parentSpaceId:
+          type: string
+        spaceId:
+          type: string
+        name:
+          type: string
+
+    DeviceDefinition:
+      type: object
+      required: [deviceId, name, deviceTypesList, endpoints]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        name:
+          type: string
+          description: Device name
+        deviceTypesList:
+          type: array
+          items:
+            type: string
+          description: Device type list
+        endpoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Endpoint'
+
+    DeviceDefinitionsResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeviceDefinition'
+      example:
+        type: GetDeviceResponse
+        version: v4
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000008"
+        code: 0
+        message: success
+        data:
+          - deviceId: "device-001"
+            name: "Living Room Light"
+            deviceTypesList: ["light"]
+            endpoints: []
+
+    Endpoint:
+      type: object
+      required: [endpointId, endpointName, deviceType, functions]
+      properties:
+        endpointId:
+          type: integer
+          description: Endpoint ID
+        endpointName:
+          type: string
+          description: Endpoint name
+        deviceType:
+          type: string
+          description: Device type
+        functions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceFunction'
+
+    DeviceFunction:
+      type: object
+      required: [functionCode]
+      properties:
+        functionCode:
+          type: string
+          description: Function code (e.g. LevelControl, ColorControl, Output)
+        traits:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trait'
+        commands:
+          type: array
+          items:
+            $ref: '#/components/schemas/Command'
+
+    FlexibleValue:
+      oneOf:
+        - type: boolean
+        - type: integer
+        - type: number
+          format: double
+        - type: string
+      description: |
+        Dynamic value, with the specific type determined by the trait/command definition.
+        Recommended rules for determining the value type:
+        1) In the trait scenario, prioritize reading the parameter.type of the same level;
+        2) In the command scenario, prioritize reading the corresponding field's parameter.type;
+        3) When parameter.type is Enum, the value type is string;
+        4) If the parameter is missing or the type is unrecognized, default to string and retain the original value.
+
+    Trait:
+      type: object
+      required: [traitCode, parameter]
+      properties:
+        traitCode:
+          type: string
+          description: Trait code (e.g. CurrentLevel, ColorTemperature, OnOff)
+        parameter:
+          $ref: '#/components/schemas/TraitParameter'
+          description: Trait parameter
+        value:
+          $ref: '#/components/schemas/FlexibleValue'
+          description: Current value. The type is consistent with the parameter.type.
+        time:
+          type: integer
+          format: int64
+          description: Value update time (UTC timestamp in milliseconds)
+
+    Command:
+      type: object
+      required: [commandCode]
+      properties:
+        commandCode:
+          type: string
+          description: Command code (e.g. MoveToXYColor)
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommandField'
+          description: List of command fields
+
+    CommandField:
+      type: object
+      required: [fieldCode, parameter]
+      properties:
+        fieldCode:
+          type: string
+          description: Field code (e.g. ColorX, ColorY, Time)
+        parameter:
+          $ref: '#/components/schemas/CommandFieldParameter'
+
+    BaseParameter:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          description: |
+            Data type.<br />
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Bool</td>
+                  <td>Boolean</td>
+                  <td>True or false (true/false).</td>
+                </tr>
+                <tr>
+                  <td>Integer</td>
+                  <td>Integer</td>
+                  <td>Integer type.</td>
+                </tr>
+                <tr>
+                  <td>Float</td>
+                  <td>Float</td>
+                  <td>Number with decimals.</td>
+                </tr>
+                <tr>
+                  <td>String</td>
+                  <td>String</td>
+                  <td>String value.</td>
+                </tr>
+                <tr>
+                  <td>Struct</td>
+                  <td>Struct</td>
+                  <td>Structured data customized by Aqara, in JSON string format.<br />It can include fields of multiple types.</td>
+                </tr>
+                <tr>
+                  <td>Enum</td>
+                  <td>Enum</td>
+                  <td>Enumeration. It defines a finite set of values.</td>
+                </tr>
+                <tr>
+                  <td>List[X]</td>
+                  <td>List</td>
+                  <td>List of type X, in JSON string format.<br />X can be Integer, Float, String, Struct, or Enum.</td>
+                </tr>
+                <tr>
+                  <td>Data</td>
+                  <td>Data Block</td>
+                  <td>Hexadecimal string (Hex String), e.g., "0x01AB3F".</td>
+                </tr>
+              </tbody>
+            </table>
+          enum: [Bool, Float, Integer, Enum, String, Struct, "List[X]", Data]
+        min:
+          type: number
+          description: Minimum value
+          format: double
+          nullable: true
+        max:
+          type: number
+          description: Maximum value
+          format: double
+          nullable: true
+        supportedValues:
+          description: List of enum values. This field is meaningful only when parameter.type is Enum.
+          type: array
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          nullable: true
+        unit:
+          description: Unit. This field is only meaningful when parameter.type is Integer or Float.
+          type: string
+          nullable: true
+        step:
+          description: Step size. This field is only meaningful when parameter.type is Integer or Float.
+          type: number
+          format: double
+          nullable: true
+
+    TraitParameter:
+      allOf:
+        - $ref: '#/components/schemas/BaseParameter'
+        - type: object
+          required: [readable, writable, subscribable]
+          properties:
+            readable:
+              type: boolean
+              description: Whether it is readable
+              default: true
+            writable:
+              type: boolean
+              description: Whether it is writable
+              default: true
+            subscribable:
+              type: boolean
+              description: Whether it is subscribable
+              default: true
+
+    CommandFieldParameter:
+      allOf:
+        - $ref: '#/components/schemas/BaseParameter'
+        - type: object
+          required: [mandatory]
+          properties:
+            mandatory:
+              type: boolean
+              description: Whether it is mandatory
+
+    KeyValue:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+          description: Key
+        value:
+          type: string
+          description: Value
+
+    # ── Trait Execute ────────────────────────────────────────────
+    TraitExecuteRequest:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraitExecuteItem'
+
+    TraitExecuteItem:
+      type: object
+      required: [deviceId, endpointId, functionCode, traitCode, value]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        endpointId:
+          type: integer
+          description: Endpoint ID
+        functionCode:
+          type: string
+          description: |
+            Function code, e.g.:
+            - Output（Switch control）
+            - EndpointLabel（Device rename/room change）
+        traitCode:
+          type: string
+          description: |
+            Trait code, e.g.:
+            - OnOff（Switch）
+            - EndpointRoom（Device location）
+            - EndpointName（Device name）
+        value:
+          $ref: '#/components/schemas/FlexibleValue'
+          description: The target value to be set. The type is consistent with the parameter.type of the trait to be controlled.
+
+    TraitExecuteResult:
+      type: object
+      required: [deviceId, endpointId, functionCode, traitCode, code, message]
+      properties:
+        deviceId:
+          type: string
+        endpointId:
+          type: integer
+        functionCode:
+          type: string
+        traitCode:
+          type: string
+        code:
+          type: integer
+          description: Error code
+        message:
+          type: string
+          description: Error message
+
+    TraitExecuteResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              description: The array elements are the traits that failed to be executed.
+              items:
+                $ref: '#/components/schemas/TraitExecuteResult'
+      example:
+        type: ExecuteTraitResponse
+        version: v4
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000009"
+        code: 0
+        message: success
+        data:
+          - deviceId: "device-001"
+            endpointId: 1
+            functionCode: "Output"
+            traitCode: "OnOff"
+            code: 1103
+            message: "device offline"
+
+    # ── Trait Value Query ────────────────────────────────────────
+    TraitReadRequest:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraitValueQuery'
+
+    TraitValueQuery:
+      type: object
+      required: [deviceId, endpointId, functionCode, traitCodes]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        endpointId:
+          type: integer
+          description: Endpoint ID
+        functionCode:
+          type: string
+          description: Function code
+        traitCodes:
+          type: array
+          items:
+            type: string
+          description: List of trait codes to be queried
+
+    TraitValueResult:
+      type: object
+      required: [deviceId, endpointId, functionCode, traitCode, value, time]
+      properties:
+        deviceId:
+          type: string
+        endpointId:
+          type: integer
+        functionCode:
+          type: string
+        traitCode:
+          type: string
+        value:
+          $ref: '#/components/schemas/FlexibleValue'
+          description: The current value. The type is consistent with the parameter.type of the trait.
+        time:
+          type: integer
+          format: int64
+          description: Value update time (UTC timestamp in milliseconds)
+
+    TraitValueResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/TraitValueResult'
+      example:
+        type: GetTraitValueResponse
+        version: v4
+        msgId: "a1b2c3d4-e5f6-7890-abcd-00000000000d"
+        code: 0
+        message: success
+        data:
+          - deviceId: "device-001"
+            endpointId: 1
+            functionCode: "Output"
+            traitCode: "OnOff"
+            value: true
+            time: 1710001234567
+
+    # ── Command Execute ──────────────────────────────────────────
+    CommandExecuteRequest:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommandExecuteItem'
+
+    CommandExecuteItem:
+      type: object
+      required: [deviceId, endpointId, functionCode, commandCode]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        endpointId:
+          type: integer
+          description: Endpoint ID
+        functionCode:
+          type: string
+          description: |
+            Function code, e.g.:
+            - NetworkCommissioning
+        commandCode:
+          type: string
+          description: |
+            Command code, e.g.:
+            - TriggerZigbeeNetworkInfoUpload
+        args:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommandArg'
+          description: command
+
+    CommandArg:
+      type: object
+      required: [fieldCode, value]
+      properties:
+        fieldCode:
+          type: string
+          description: commandCode Field的filedCode
+        value:
+          $ref: '#/components/schemas/FlexibleValue'
+          description: Field value. The type is consistent with the parameter.type of the corresponding field.
+
+    CommandExecuteResult:
+      type: object
+      required: [deviceId, endpointId, functionCode, commandCode, code, message]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        endpointId:
+          type: integer
+          description: Endpoint ID
+        functionCode:
+          type: string
+          description: Function code
+        commandCode:
+          type: string
+          description: Command code
+        code:
+          type: integer
+          description: Error code
+        message:
+          type: string
+          description: Error message
+
+    CommandExecuteResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/CommandExecuteResult'
+      example:
+        type: ExecuteCommandResponse
+        version: v4
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000019"
+        code: 0
+        message: success
+        data: []
+
+    DeviceTypesResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeviceType'
+      example:
+        type: GetDeviceTypeInfosResponse
+        version: v4
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000006"
+        code: 0
+        message: success
+        data:
+          - deviceType: "light"
+            name: "Light"
+          - deviceType: "switch"
+            name: "Switch"
+
+    DeviceListData:
+      type: object
+      required: [totalCount, pageNum, pageSize, data]
+      properties:
+        totalCount:
+          type: integer
+          description: Total number of devices that meet the conditions
+          example: 3
+        pageNum:
+          type: integer
+          description: Current page number
+          example: 1
+        pageSize:
+          type: integer
+          description: Current page size
+          example: 200
+        data:
+          type: array
+          description: List of devices on the current page
+          items:
+            $ref: '#/components/schemas/DeviceInfo'
+
+    DevicesResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/DeviceListData'
+      example:
+        type: GetDeviceInfoResponse
+        version: v4
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000007"
+        code: 0
+        message: success
+        data:
+          totalCount: 3
+          pageNum: 1
+          pageSize: 200
+          data:
+            - deviceId: "device-001"
+              deviceName: "Living Room Light"
+              deviceTypesList: ["light"]
+              createTime: 1710001234567
+              state: true
+              space:
+                parentSpaceId: "space-home-001"
+                spaceId: "space-room-001"
+                name: "Living Room"
+
+    # ── MQTT ─────────────────────────────────────────────────────        
+    MqttSubscribeRequest:
+      type: object
+      properties:
+        deviceUniqueId:
+          type: string
+          description: Device ID. If not configured in this field, you can also pass this information in the `Device-Unique-Id` field of the request header (Header).
+        expiresIn:
+          type: integer
+          format: int32
+          description: Subscription expiration time (seconds). Valid values are [7200, 604800]; if not within the range or not provided, the default is 7200.
+          minimum: 7200
+          maximum: 604800
+
+    MqttUnsubscribeRequest:
+      type: object
+      properties:
+        deviceUniqueId:
+          type: string
+          description: Device ID. If not configured in this field, you can also pass this information in the `Device-Unique-Id` field of the request header (Header).
+
+    MqttSubscribeData:
+      type: object
+      required: [clientId, mqttHost, mqttPort, supportedProtocols, secretId, secretKey, expiresIn]
+      properties:
+        clientId:
+          type: string
+          description: |
+            MQTT Client ID. After obtaining this information, please generate the corresponding topic according to the rule `receive_${clientId}`.<br />
+            Example: When `clientId` is `omqt.studio_16ce93b6fc723f0d9f0dc02f4d4a2f15_123456789`, the topic is `receive_omqt.studio_16ce93b6fc723f0d9f0dc02f4d4a2f15_123456789`.
+        mqttHost:
+          type: string
+          description: MQTT host address.
+        mqttPort:
+          type: string
+          description: MQTT port.
+        supportedProtocols:
+          type: array
+          description: Supported protocols list.
+          items:
+            type: string
+        secretId:
+          type: string
+          description: Base64-encoded MQTT username.
+        secretKey:
+          type: string
+          description: Base64-encoded MQTT secret key.
+        expiresIn:
+          type: integer
+          format: int32
+          description: Subscription expiration time (seconds).
+
+    MqttSubscribeResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/MqttSubscribeData'
+
+    MqttUnsubscribeResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              nullable: true
+              description: null (fixed)

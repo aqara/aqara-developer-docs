@@ -1,0 +1,60 @@
+---
+id: aiot-api
+title: "AIOT API"
+description: "AIOT API Documentation"
+sidebar_label: Introduction
+sidebar_position: 0
+hide_title: true
+custom_edit_url: null
+---
+
+import ApiLogo from "@theme/ApiLogo";
+import Heading from "@theme/Heading";
+import SchemaTabs from "@theme/SchemaTabs";
+import TabItem from "@theme/TabItem";
+import Export from "@theme/ApiExplorer/Export";
+
+<span
+  className={"theme-doc-version-badge badge badge--secondary"}
+  children={"Version: v4"}
+>
+</span>
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"AIOT API"}
+>
+</Heading>
+
+
+
+AIOT API Documentation
+
+## Common Request Headers
+All APIs require the following header parameters (to be attached uniformly by the client):   
+| Header         | Required | Description                  |
+| -------------- | -------- | ---------------------------- |
+| Accesstoken | String | No  | Access token obtained via authorization. |
+| Appid       | String | Yes | App ID assigned when creating an application on the [Aqara Developer Platform](https://developer.aqara.com). |
+| Keyid       | String | Yes | Key ID assigned when creating an application on the [Aqara Developer Platform](https://developer.aqara.com). |
+| Nonce       | String | Yes | Random string, should be different for each request. |
+| Time        | String | Yes | Request timestamp in milliseconds. |
+| Sign        | Yes    | Request signature. For signature generation method, please refer to [Sign Generation Rules](https://opendoc.aqara.com/en/docs/developmanual/apiIntroduction/signGenerationRules.html). |
+| Lang        | Enum   | No  | Language, default is English, possible values: 'zh', 'en' |
+
+
+<div
+  style={{"marginBottom":"var(--ifm-paragraph-margin-bottom)"}}
+>
+  <h3
+    style={{"marginBottom":"0.25rem"}}
+  >
+    Terms of Service
+  </h3><a
+    href={"https://domain.com/terms"}
+  >
+    {'https://domain.com/terms'}
+  </a>
+</div>
+      
