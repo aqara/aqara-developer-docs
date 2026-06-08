@@ -156,7 +156,7 @@ const config: Config = {
           position: "left",
           items: [
             { label: "Aqara Studio", to: "docs/aqara-studio/overview/introduction", activeBasePath: "docs/aqara-studio" },
-            { label: "Aqara Developer", to: "docs/aqara-developer/aiot-api/get-spaces", activeBasePath: "docs/aqara-developer" },
+            { label: "Aqara Developer", to: "docs/aqara-developer/introduction", activeBasePath: "docs/aqara-developer" },
           ],
         },
 

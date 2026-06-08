@@ -87,3 +87,50 @@
   content: "DELETE";
 }
 
+.aqara-resource-card {
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-toc-border-color);
+  border-radius: 1rem;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  min-height: 13rem;
+  padding: 2rem;
+  text-decoration: none !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.aqara-resource-card:hover {
+  border-color: var(--ifm-color-primary-light);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  transform: translateY(-2px);
+}
+
+.aqara-resource-card__title {
+  color: var(--ifm-color-primary);
+  font-size: 1.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.aqara-resource-card__description {
+  color: var(--ifm-font-color-base);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 28rem;
+}
+
+@media (max-width: 996px) {
+  .aqara-resource-card {
+    min-height: auto;
+    padding: 1.5rem;
+  }
+
+  .aqara-resource-card__title {
+    font-size: 1.6rem;
+  }
+}

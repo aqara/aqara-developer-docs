@@ -176,6 +176,7 @@
     "aqara-studio/faq"
   ],
   "aqaraDeveloperSidebar": [
+    "aqara-developer/introduction",
     {
       "type": "category",
       "label": "Cloud API",
