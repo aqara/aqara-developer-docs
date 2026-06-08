@@ -1,0 +1,48 @@
+# Try API Online
+
+You can directly test the Aqara AIOT API online from the API documentation, making it convenient to test and verify API behavior. This article guides you through how to try the API online.
+
+## Before You Begin
+
+Before you begin, make sure you have prepared the following:
+
+- You have created an application on the [Aqara Developer Platform](https://developer.aqara.com/) and obtained `Appid` and `Keyid`.
+- You can generate the request `Sign`. For details, read [Signature Generation Rules](https://opendoc.aqara.com/en/docs/developmanual/apiIntroduction/signGenerationRules.html).
+- You have prepared `Nonce` (random string, should be different for each request) and `Time` (request timestamp in milliseconds).
+- If the endpoint requires authorized access, you also have `Accesstoken`.
+
+## How to Use
+
+1. Select the API you want to test and click its name to view the documentation.  
+
+   ![View API Documentation](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-developer/en/AIOT-Spaces.png)
+   
+2. On the right side of the documentation, find the **Request** area and click the **Edit** button next to **Base URL**.  
+
+   ![Click the Edit button](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-developer/en/AIOT-EditBaseUrl.png)
+
+3. At this point, the `host` field will appear below. Please select the Aqara Open Platform API server domain, such as `https://open-cn.aqara.com`, `https://open-usa.aqara.com`, etc. For available server region domains, refer to [Getting Started with the AIOT API - Base URL](./getting-started-with-the-aiot-api.mdx#base-url).
+
+   The AIOT API Base URL format is `{host}/v4.0/open/api`. 
+
+   <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-developer/en/AIOT-SelectHost.png" alt="Enter AIOT API server address" style={{width: '60%'}} />  
+
+4. In the Header parameters area, fill in `Appid`, `Keyid`, `Nonce`, `Time`, and `Sign`. 
+
+   <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-developer/en/AIOT-RequiredParameters.png" alt="Enter required request Header parameters" style={{width: '60%'}} />  
+
+   In addition to the required header parameters, click the **Show optional parameters** button to view the optional header parameters. 
+   
+   If the interface requires authorized access, you also need to fill in `Accesstoken`; if you need to specify the return language, you can fill in `Lang`.
+
+   <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-developer/en/AIOT-OptionalHeaders.png" alt="Enter optional request Header parameters" style={{width: '60%'}} />  
+
+5. (Optional) If the endpoint requires query parameters or a request body, continue configuring them in the **Request** area. For example:
+   - For [List Spaces](./get-spaces.api.mdx), you can set query parameters such as `parentSpaceId` and `needChildren`.
+   - For [Control Devices by Traits](./execute-device-trait.api.mdx) or [Query Trait Values](./get-trait-values.api.mdx), you need to fill in the request body.
+
+6. After completing the configuration, click **Send API Request** to debug the API online.     
+
+   <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-developer/zh/AIOT-SendAPIRequest.png" alt="Send Request" style={{width: '60%'}} />
+
+7. After the request is sent, you can view the returned results in real time in the **Response** area below, including the HTTP status code, business `code`, and detailed response content.  

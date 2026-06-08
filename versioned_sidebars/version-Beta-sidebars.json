@@ -180,6 +180,14 @@
       "type": "category",
       "label": "Cloud API",
       "items": [
+        "aqara-developer/aiot-api/introduction",
+        {
+          "type": "category",
+          "label": "HTTP",
+          "key": "cloud-api-http",
+          "items": [
+            "aqara-developer/aiot-api/getting-started-with-the-aiot-api",
+            "aqara-developer/aiot-api/try-api-online",
         {
           "type": "category",
           "label": "Space",
@@ -247,6 +255,8 @@
               "id": "aqara-developer/aiot-api/execute-device-command",
               "className": "api-method post"
             }
+          ]
+        }
           ]
         }
       ]      

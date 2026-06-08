@@ -1,0 +1,139 @@
+# AIOT API 入门
+
+本文介绍 Aqara AIOT HTTP API 的请求和响应要素。
+
+## 请求要素
+
+本节介绍组成 AIOT API 请求的各个要素：
+
+- [HTTP 方法](#http-方法)
+- [端点](#端点)
+- [请求头](#请求头)
+- [参数](#参数)
+
+每个对 Aqara AIOT API 的请求都包含一个 HTTP 方法和一个路径。根据不同的 API 端点，您可能还需要指定请求头、认证信息、查询参数或请求体参数。
+
+AIOT API 参考文档为每个端点详细说明了对应的 HTTP 方法、路径及所需参数，并提供了请求和响应示例。建议先查阅 [HTTP API 列表](./introduction.mdx#http-api-列表)，快速了解所有可用端点。
+
+### HTTP 方法
+
+端点的 HTTP 方法定义了其在指定资源上执行的操作类型。一些常见的 HTTP 方法包括：`GET`、`POST`、`DELETE` 和 `PATCH`。API 参考文档会为每个端点提供 HTTP 方法说明。
+
+例如，[“查询空间列表”端点](./get-spaces.api.mdx) 的 HTTP 方法是 `GET`。
+
+当前 Aqara AIOT API 支持以下 HTTP 方法：
+
+- `GET`
+- `POST`
+
+### 端点
+
+每个端点都有一个 [Base URL](#base-url) 和 [路径](#路径)。
+
+#### Base URL
+
+AIOT API 的 Base URL 由开放平台服务器域名和固定前缀组成，格式如下：
+
+```text
+{host}/v4.0/open/api
+```
+
+当前可用区域域名如下所示：
+
+| 服务器区域     | 域名                          |
+|------------|------------------------------|
+| 中国大陆     | `https://open-cn.aqara.com`   |
+| 美国         | `https://open-usa.aqara.com`  |
+| 韩国         | `https://open-kr.aqara.com`   |
+| 俄罗斯       | `https://open-ru.aqara.com`   |
+| 欧洲         | `https://open-ger.aqara.com`  |
+| 新加坡       | `https://open-sg.aqara.com`   |
+
+请根据您的业务区域、应用配置和实际接入环境选择对应的服务器地址。
+
+#### 路径
+
+AIOT API 参考文档为每个端点提供了具体路径。例如，[“查询设备详细信息”端点](./get-device-definitions.api.mdx) 的路径是 `/devices/definitions`。
+
+### 请求头
+
+以下是调用 AIOT API 时需关注的公共请求头。
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `Accesstoken` | String | 否 | 通过授权获取的访问 Token。详情请参考 [云开发 - 项目管理 - 授权管理](https://opendoc.aqara.cn/docs/%E4%BA%91%E5%BC%80%E5%8F%91/%E5%BA%94%E7%94%A8%E7%AE%A1%E7%90%86/%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86.html#%E6%8E%88%E6%9D%83%E7%AE%A1%E7%90%86)。 |
+| `Appid` | String | 是 | 在 Aqara 开发者平台创建应用时分配的 App ID。详情请参考 [云开发 - 项目管理 - 创建项目](https://opendoc.aqara.cn/docs/%E4%BA%91%E5%BC%80%E5%8F%91/%E5%BA%94%E7%94%A8%E7%AE%A1%E7%90%86/%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86.html#%E5%88%9B%E5%BB%BA%E9%A1%B9%E7%9B%AE)。 |
+| `Keyid` | String | 是 | 在 Aqara 开发者平台创建应用时分配的 Key ID。详情请参考 [云开发 - 项目管理 - 创建项目](https://opendoc.aqara.cn/docs/%E4%BA%91%E5%BC%80%E5%8F%91/%E5%BA%94%E7%94%A8%E7%AE%A1%E7%90%86/%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86.html#%E5%88%9B%E5%BB%BA%E9%A1%B9%E7%9B%AE)。 |
+| `Nonce` | String | 是 | 随机字符串，每次请求都不同。 |
+| `Time` | String | 是 | 请求时间戳，单位毫秒。 |
+| `Sign` | String | 是 | 请求签名。详情请参考 [Sign 生成规则](https://opendoc.aqara.cn/docs/%E4%BA%91%E5%BC%80%E5%8F%91/API%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/Sign%E7%94%9F%E6%88%90%E8%A7%84%E5%88%99.html)。 |
+| `Lang` | Enum | 否 | 返回语言，支持 `zh`、`en`，默认英文。 |
+
+### 参数
+
+许多 API 方法要求或允许您在请求时传递额外参数。AIOT API 中常见的参数类型包括：[请求头参数](#请求头参数)、 [查询参数](#查询参数) 和 [请求体参数](#请求体参数)。
+
+#### 请求头参数
+
+请求头参数通常用于传递认证信息、请求上下文或控制请求行为。详情请参考 [请求头](#请求头)。
+
+#### 查询参数
+
+查询参数通常用于筛选、分页或指定查询目标。例如：
+
+- 在[查询空间列表](./get-spaces.api.mdx)中，可通过 `parentSpaceId`、`needChildren`、`needParentSpaceSelf` 控制空间树的返回范围。
+- 在[查询设备信息列表](./get-devices.api.mdx)中，可通过 `spaceIds`、`state`、`deviceTypesList`、`pageNum`、`pageSize` 等参数进行筛选和分页。
+- 在[查询设备详细信息](./get-device-definitions.api.mdx)中，需要通过 `deviceIds` 指定待查询设备，并可通过 `includeValues` 决定是否同时返回 Trait 当前值。
+
+#### 请求体参数
+
+请求体参数通常用于创建资源、执行控制命令或批量读取状态。例如：
+
+- 在[创建空间](./create-space.api.mdx)中，可在请求体中传入父空间、名称和空间设置。
+- 在[通过 Trait 控制设备](./execute-device-trait.api.mdx)中，需要在请求体中指定设备 ID、端点 ID、功能编码、Trait 编码与目标值。
+- 在[查询 Trait 值](./get-trait-values.api.mdx)和[通过 Command 控制设备](./execute-device-command.api.mdx)中，也需要通过请求体传入批量操作对象。
+
+## 响应要素
+
+发起请求后，API 会返回 [响应状态码](#响应状态码) 和 [响应体](#响应体)。
+
+### 响应状态码
+
+每个请求都会返回 HTTP 状态码，指示是否成功。详见 [MDN HTTP 响应状态码文档](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)。
+
+AIOT API 常见的响应码如下：
+
+- `200`：请求发起成功。
+- `400`：请求参数错误。
+- `401`：未认证或认证失效。
+- `403`：无权限访问。
+- `404`：资源不存在。
+- `429`：请求频率过高。
+- `500`：服务内部错误。
+
+### 响应体
+
+大多数端点会返回 JSON 格式的响应体。
+
+AIOT API 的所有响应通常包含以下基础字段：
+
+| 参数 | 类型 | 说明 |
+| --- | --- | --- |
+| `type` | String | 消息类型。 |
+| `version` | String | 接口版本。当前接口版本为 `v4`。 |
+| `msgId` | String | 消息 ID。 |
+| `code` | Integer | 业务状态码，`0` 表示成功。 |
+| `message` | String | 请求结果说明信息。 |
+
+在此基础上，不同接口会返回各自的 `data` 字段。例如：
+
+- 空间类接口返回空间节点或空间 ID。
+- 设备查询类接口返回分页设备列表或设备详细定义。
+- Trait 查询类接口返回功能点当前值和上报时间。
+
+需要注意的是，部分控制类接口即使 HTTP 状态码为 `200`，也不一定代表请求中的所有操作都成功执行。例如：
+
+- [通过 Trait 控制设备](./execute-device-trait.api.mdx)
+- [通过 Command 控制设备](./execute-device-command.api.mdx)
+
+这类接口可能在响应体中返回失败项列表。建议同时检查 HTTP 状态码、顶层 `code` 字段，以及 `data` 中是否存在失败明细。

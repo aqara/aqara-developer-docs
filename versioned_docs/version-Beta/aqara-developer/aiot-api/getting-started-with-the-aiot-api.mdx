@@ -1,0 +1,140 @@
+# Getting Started with the AIOT API
+
+This article introduces the request and response elements of the Aqara AIOT HTTP API.
+
+## Request Elements
+
+This section describes the elements that make up an AIOT API request:
+
+- [HTTP Methods](#http-methods)
+- [Endpoints](#endpoints)
+- [Request Headers](#request-headers)
+- [Parameters](#parameters)
+
+Every request to the Aqara AIOT API includes an HTTP method and a path. Depending on the specific endpoint, you may also need to specify request headers, authentication details, query parameters, or request body parameters.
+
+The AIOT API reference documentation provides detailed information for each endpoint, including its HTTP method, path, required parameters, and request/response examples. It is recommended to first refer to the [HTTP API List](./introduction.mdx#http-api-list) to quickly understand all available endpoints.
+
+### HTTP Methods
+
+The HTTP method of an endpoint defines the type of operation it performs on a given resource. Some common HTTP methods include `GET`, `POST`, `DELETE`, and `PATCH`. The API reference provides the HTTP methods for each endpoint.
+
+For example, the [List Spaces](./get-spaces.api.mdx) endpoint uses the `GET` method.
+
+Currently, the Aqara AIOT API supports the following HTTP methods:
+
+- `GET`
+- `POST`
+
+### Endpoints
+
+Every endpoint has both a [Base URL](#base-url) and a [Path](#path).
+
+#### Base URL
+
+The Base URL of the AIOT API consists of the Open Platform server domain and a fixed prefix:
+
+```text
+{host}/v4.0/open/api
+```
+
+The documented `host` values currently include:
+
+| Region       | Domain                          |
+|--------------|---------------------------------|
+| Chinese Mainland | `https://open-cn.aqara.com`   |
+| USA           | `https://open-usa.aqara.com`  |
+| Korea         | `https://open-kr.aqara.com`   |
+| Russia        | `https://open-ru.aqara.com`   |
+| Europe        | `https://open-ger.aqara.com`  |
+| Singapore     | `https://open-sg.aqara.com`   |
+
+Choose the appropriate server address based on your business region, application configuration, and deployment environment.
+
+#### Path
+
+The AIOT API reference documentation provides the path for each endpoint. For example, the [Query Device Details](./get-device-definitions.api.mdx) endpoint has the path `/devices/definitions`.
+
+### Request Headers
+
+Below are the common request headers used by the AIOT API.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `Accesstoken` | String | No | Access token obtained via authorization. For details, read [Cloud Development - Project Management - Authorization Management](https://opendoc.aqara.com/en/docs/developmanual/manageApplication/manageProject.html#authorization-management). |
+| `Appid` | String | Yes | App ID assigned when creating an application on the Aqara Developer Platform. For details, read [Cloud Development - Project Management - Create a Project](https://opendoc.aqara.com/en/docs/developmanual/manageApplication/manageProject.html#create-a-project). |
+| `Keyid` | String | Yes | Key ID assigned when creating an application on the Aqara Developer Platform. For details, read [Cloud Development - Project Management - Create a Project](https://opendoc.aqara.com/en/docs/developmanual/manageApplication/manageProject.html#create-a-project).|
+| `Nonce` | String | Yes | Random string, which should be different for each request. |
+| `Time` | String | Yes | Request timestamp in milliseconds. |
+| `Sign` | String | Yes | Request signature. For details, read [Signature Generation Rules](https://opendoc.aqara.com/en/docs/developmanual/apiIntroduction/signGenerationRules.html). |
+| `Lang` | Enum | No | Response language, supports `zh` and `en`, default is English. |
+
+### Parameters
+
+Many API methods require or allow you to pass additional parameters with your request. Common AIOT API parameter types include [header parameters](#header-parameters), [query parameters](#query-parameters) and [request body parameters](#request-body-parameters).
+
+#### Header Parameters
+
+Header parameters are commonly used to pass authentication information, request context, or control request behavior. For details, read [Request Headers](#request-headers).
+
+#### Query Parameters
+
+Query parameters are commonly used for filtering, pagination, or specifying query targets. For example:
+
+- In [List Spaces](./get-spaces.api.mdx), you can use `parentSpaceId`, `needChildren`, and `needParentSpaceSelf` to control the returned portion of the space tree.
+- In [List Devices](./get-devices.api.mdx), you can use `spaceIds`, `state`, `deviceTypesList`, `pageNum`, and `pageSize` for filtering and pagination.
+- In [Query Device Details](./get-device-definitions.api.mdx), you use `deviceIds` to specify target devices, and `includeValues` to determine whether current trait values should also be returned.
+
+#### Request Body Parameters
+
+Request body parameters are commonly used to create resources, execute control operations, or read status in batches. For example:
+
+- In [Create A Space](./create-space.api.mdx), you can pass the parent space, name, and settings in the request body.
+- In [Control Devices by Traits](./execute-device-trait.api.mdx), you need to specify the device ID, endpoint ID, function code, trait code, and target value in the request body.
+- In [Query Trait Values](./get-trait-values.api.mdx) and [Control Devices by Commands](./execute-device-command.api.mdx), you also need to pass batch operation objects in the request body.
+
+## Response Elements
+
+After you make a request, the API returns a [response status code](#response-status-code) and a [response body](#response-body).
+
+### Response Status Code
+
+Every request returns an HTTP status code indicating whether it was successful. See the [MDN HTTP Response Status Codes Documentation](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) for more details.
+
+Common AIOT API response codes include:
+
+- `200`: Request was accepted successfully.
+- `400`: Request parameter error.
+- `401`: Unauthorized or authentication expired.
+- `403`: No permission to access.
+- `404`: Resource not found.
+- `429`: Too many requests.
+- `500`: Internal server error.
+
+### Response Body
+
+Most endpoints return a response body in JSON format.
+
+All AIOT API responses usually contain the following base fields:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `type` | String | Message type. |
+| `version` | String | API version. The current API version is `v4`. |
+| `msgId` | String | Message ID. |
+| `code` | Integer | Business status code. `0` means success. |
+| `message` | String | Description of the request result. |
+
+On top of these fields, different endpoints return different `data` payloads. For example:
+
+- Space APIs return space nodes or space IDs.
+- Device query APIs return paginated device lists or detailed device definitions.
+- Trait query APIs return current trait values and their reported timestamps.
+- MQTT subscription APIs return client ID, MQTT host, port, credentials, and expiration information.
+
+Note that for some control APIs, an HTTP status code of `200` does not necessarily mean every requested operation succeeded. For example:
+
+- [Control Devices by Traits](./execute-device-trait.api.mdx)
+- [Control Devices by Commands](./execute-device-command.api.mdx)
+
+These APIs may return a list of failed items in the response body. It is recommended to check the HTTP status code, the top-level `code` field, and whether `data` contains failure details.

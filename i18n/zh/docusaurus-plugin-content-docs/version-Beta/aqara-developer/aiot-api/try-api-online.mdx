@@ -1,0 +1,48 @@
+# 在线体验 API
+
+您可以直接在 Aqara AIOT API 的文档页面中在线调试接口，方便快捷地测试和验证 API 功能。本文将指导您如何在线体验 API。
+
+## 前提条件
+
+在开始之前，请确保您已准备好以下信息：
+
+- 已在 [Aqara 开发者平台](https://developer.aqara.com/) 创建应用，并获取 `Appid` 和 `Keyid`。
+- 已准备好请求签名所需参数，并能生成 `Sign`。详细说明请参见 [Sign 生成规则](https://opendoc.aqara.com/docs/%E4%BA%91%E5%BC%80%E5%8F%91/API%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/Sign%E7%94%9F%E6%88%90%E8%A7%84%E5%88%99.html)。
+- 已准备好 `Nonce`（随机数，每次请求都需不同） 和 `Time`（请求时间戳，单位毫秒）。
+- 如当前接口依赖授权访问，还需准备 `Accesstoken`。
+
+## 使用流程
+
+1. 选择一个您想要测试的 API，点击 API 名称，查看其文档。   
+
+   ![查看 API 文档](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-developer/zh/AIOT-Spaces.png)
+
+2. 在文档右侧找到 **Request** 区域。单击 **Base URL** 旁的 **Edit** 按钮。   
+
+   ![点击 Edit 按钮](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-developer/zh/AIOT-EditBaseUrl.png)
+
+3. 此时，下方会显示 `host` 字段。请选择 Aqara 开放平台的 API 服务器域名，例如 `https://open-cn.aqara.com`、`https://open-usa.aqara.com` 等。可用的服务器区域域名请参见 [AIOT API 入门 - Base URL](./getting-started-with-the-aiot-api.mdx#base-url)。
+
+   AIOT API 的 Base URL 格式为 `{host}/v4.0/open/api`。   
+
+   <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-developer/zh/AIOT-SelectHost.png" alt="输入 AIOT API 服务地址" style={{width: '60%'}} />   
+
+4. 在 **Request** 区域的 Header 参数中，依次填写 `Appid`、`Keyid`、`Nonce`、`Time`、`Sign`。
+
+   <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-developer/zh/AIOT-RequiredParameters.png" alt="输入必需请求 Header 参数" style={{width: '60%'}} />   
+
+   除了上述必需 Header 参数外，单击 **Show optional parameters** 按钮，可查看可选 Header 参数。
+   
+   如接口需要授权访问，还需填写 `Accesstoken`；如需指定返回语言，可填写 `Lang`。
+
+   <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-developer/zh/AIOT-OptionalHeaders.png" alt="输入可选请求 Header 参数" style={{width: '60%'}} />   
+
+5. （可选）如果需要设置查询参数或请求体，请继续在 **Request** 区域进行配置。例如：
+   - 对于 [查询空间列表](./get-spaces.api.mdx)，可按需填写 `parentSpaceId`、`needChildren` 等查询参数。
+   - 对于 [通过 Trait 控制设备](./execute-device-trait.api.mdx) 或 [查询 Trait 值](./get-trait-values.api.mdx)，需要在 Body 中填写对应的请求体。
+
+6. 完成上述配置后，单击 **Send API Request** 按钮，即可在线调试 API。  
+
+   <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-developer/zh/AIOT-SendAPIRequest.png" alt="发送请求" style={{width: '60%'}} />
+
+7. 当请求发送完毕后，您可以在下方 **Response** 区域，实时查看返回结果，包括 HTTP 状态码、业务 `code` 字段以及详细的响应内容。  

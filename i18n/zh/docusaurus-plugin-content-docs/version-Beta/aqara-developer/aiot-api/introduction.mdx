@@ -1,0 +1,28 @@
+# 简介
+
+## 概述
+
+Aqara AIOT API 提供了一组面向云端开放平台的接口，支持开发者访问和管理 Aqara 账号体系下的空间、设备与设备状态数据。通过这些 API，您可以查询空间树结构、检索设备清单与设备能力定义、读取设备 Trait 值、通过 Trait 或 Command 控制设备，并通过 MQTT 订阅指定设备的状态变化。
+
+对于需要将 Aqara 云端能力接入自有应用、后台系统或第三方平台的开发者来说，AIOT API 提供了一条从资源发现、状态读取到远程控制和实时订阅的完整接入路径。
+
+## HTTP API 列表
+
+### 空间
+
+| 功能 | API 端点 | 请求方法 |
+| --- | --- | --- |
+| [查询空间列表](./get-spaces.api.mdx) | /spaces | GET |
+| [创建空间](./create-space.api.mdx) | /spaces | POST |
+| [修改空间名称](./update-space-name.api.mdx) | /spaces/name | POST |
+
+### 设备
+
+| 功能 | API 端点 | 请求方法 |
+| --- | --- | --- |
+| [查询设备类型集合](./get-device-types.api.mdx) | /devices/types | GET |
+| [查询设备信息列表](./get-devices.api.mdx) | /devices | GET |
+| [查询设备详细信息](./get-device-definitions.api.mdx) | /devices/definitions | GET |
+| [通过 Trait 控制设备](./execute-device-trait.api.mdx) | /devices/trait/execute | POST |
+| [查询 Trait 值](./get-trait-values.api.mdx) | /devices/trait/read | POST |
+| [通过 Command 控制设备](./execute-device-command.api.mdx) | /devices/command/execute | POST |

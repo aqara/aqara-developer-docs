@@ -145,7 +145,7 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'Aqara Developers',
+      title: 'Aqara Docs',
       logo: {
         alt: 'Aqara Docs',
         src: 'img/logo.svg',

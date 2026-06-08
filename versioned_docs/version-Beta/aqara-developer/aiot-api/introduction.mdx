@@ -1,0 +1,28 @@
+# Introduction
+
+## Overview
+
+The Aqara AIOT API provides a set of cloud-facing interfaces for developers to access and manage spaces, devices, and device status data under the Aqara account system. With these APIs, you can query space hierarchies, list devices and device capability definitions, read device trait values, control devices through traits or commands, and subscribe to status changes of specific devices through MQTT.
+
+For developers who need to integrate Aqara cloud capabilities into their own applications, backend systems, or third-party platforms, the AIOT API offers a complete integration path from resource discovery and status retrieval to remote control and real-time subscription.
+
+## HTTP API List
+
+### Space
+
+| Name | API Endpoint | HTTP Method |
+| --- | --- | --- |
+| [List Spaces](./get-spaces.api.mdx) | /spaces | GET |
+| [Create A Space](./create-space.api.mdx) | /spaces | POST |
+| [Update A Space Name](./update-space-name.api.mdx) | /spaces/name | POST |
+
+### Device
+
+| Name | API Endpoint | HTTP Method |
+| --- | --- | --- |
+| [List Device Types](./get-device-types.api.mdx) | /devices/types | GET |
+| [List Devices](./get-devices.api.mdx) | /devices | GET |
+| [Query Device Details](./get-device-definitions.api.mdx) | /devices/definitions | GET |
+| [Control Devices by Traits](./execute-device-trait.api.mdx) | /devices/trait/execute | POST |
+| [Query Trait Values](./get-trait-values.api.mdx) | /devices/trait/read | POST |
+| [Control Devices by Commands](./execute-device-command.api.mdx) | /devices/command/execute | POST |

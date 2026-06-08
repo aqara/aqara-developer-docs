@@ -79,6 +79,10 @@
     "message": "鉴权",
     "description": "The label for category 'Auth' in sidebar 'aqaraDeveloperSidebar'"
   },
+  "sidebar.aqaraDeveloperSidebar.category.local-api-http": {
+    "message": "HTTP",
+    "description": "The label for category 'HTTP' in sidebar 'aqaraDeveloperSidebar'"
+  },
   "sidebar.aqaraDeveloperSidebar.category.local-api-space": {
     "message": "空间",
     "description": "The label for category 'Space' in sidebar 'aqaraDeveloperSidebar'"
@@ -86,6 +90,10 @@
   "sidebar.aqaraDeveloperSidebar.category.local-api-device": {
     "message": "设备",
     "description": "The label for category 'Device' in sidebar 'aqaraDeveloperSidebar'"
+  },
+  "sidebar.aqaraDeveloperSidebar.category.cloud-api-http": {
+    "message": "HTTP",
+    "description": "The label for category 'HTTP' in sidebar 'aqaraDeveloperSidebar'"
   },
   "sidebar.aqaraDeveloperSidebar.category.cloud-api-space": {
     "message": "空间",

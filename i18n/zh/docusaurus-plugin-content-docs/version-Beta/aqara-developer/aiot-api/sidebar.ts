@@ -4,6 +4,20 @@ const sidebar: SidebarsConfig = {
   apisidebar: [
     {
       type: "doc",
+      id: "version-Beta/aqara-developer/aiot-api/introduction",
+    },
+    {
+      type: "doc",
+      id: "version-Beta/aqara-developer/aiot-api/getting-started-with-the-aiot-api",
+      label: "AIOT API 入门",
+    },
+    {
+      type: "doc",
+      id: "version-Beta/aqara-developer/aiot-api/try-api-online",
+      label: "在线体验 API",
+    },
+    {
+      type: "doc",
       id: "version-Beta/aqara-developer/aiot-api/aiot-api",
     },
     {
