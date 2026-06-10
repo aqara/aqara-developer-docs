@@ -262,5 +262,8 @@
         }
       ]      
     }
+  ],
+  "aqaraLifeSidebar": [
+    "aqara-life/overview"
   ]
 }
