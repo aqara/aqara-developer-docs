@@ -377,8 +377,8 @@ paths:
   /devices/definitions:
     get:
       tags: [Device]
-      summary: 查询设备详细信息
-      description: 获取指定设备的详细信息，包括设备类型、端点列表、属性列表等。
+      summary: 查询设备模型定义
+      description: 获取指定设备的模型定义，包括设备类型（deviceType）、端点列表（endpoints）、属性列表（properties）等。
       operationId: getDeviceDefinitions
       x-skill-intent: device.definition.get
       x-idempotent: true
@@ -1198,100 +1198,6 @@ components:
           items:
             $ref: '#/components/schemas/Endpoint'
 
-    # ── 设备定义（数字 ID 形态，与 DeviceDefinition 信息同类、结构不同）────
-    DeviceDefinitionNumericParameter:
-      type: object
-      required: [id]
-      properties:
-        id:
-          type: integer
-          description: 参数槽位 ID（常见为 1，或其它约定槽位）。
-        mth:
-          type: string
-          nullable: true
-        value:
-          description: 多为字符串；亦可能为数值等，依设备/协议而定。
-        time:
-          type: integer
-          format: int64
-          nullable: true
-          description: 最新值时间（毫秒）。
-
-    DeviceDefinitionNumericTrait:
-      type: object
-      required: [id]
-      properties:
-        id:
-          type: integer
-          description: Trait 规格 ID（整型，对应协议/服务表）。
-        args:
-          type: array
-          description: 属性参数列表；无参数时可缺省或为空。
-          items:
-            $ref: '#/components/schemas/DeviceDefinitionNumericParameter'
-
-    DeviceDefinitionNumericCommand:
-      type: object
-      required: [id]
-      properties:
-        id:
-          type: integer
-          description: Command 规格 ID。
-        mth:
-          type: string
-          nullable: true
-        args:
-          type: array
-          description: 命令参数；可无。
-          items:
-            $ref: '#/components/schemas/DeviceDefinitionNumericParameter'
-
-    DeviceDefinitionNumericFunction:
-      type: object
-      required: [id]
-      description: 某一功能簇；可仅有 traits、仅有 cmds，或二者兼有。
-      properties:
-        id:
-          type: integer
-          description: Function（功能簇）ID。
-        traits:
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceDefinitionNumericTrait'
-        cmds:
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceDefinitionNumericCommand'
-
-    DeviceDefinitionNumericEndpoint:
-      type: object
-      required: [id, funcs]
-      properties:
-        id:
-          type: integer
-          description: Endpoint ID（端点索引，含 0 的根/设备级端点）。
-        type:
-          type: array
-          items:
-            type: integer
-          description: 端点类型 ID 列表；部分端点可能缺省该字段。
-        funcs:
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceDefinitionNumericFunction'
-
-    DeviceDefinitionNumericDevice:
-      type: object
-      required: [did, eps]
-      properties:
-        did:
-          type: string
-          description: 设备 ID。
-        eps:
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceDefinitionNumericEndpoint'
-
     DeviceDefinitionsResponse:
       allOf:
         - $ref: '#/components/schemas/BaseResponse'
@@ -1302,18 +1208,34 @@ components:
               items:
                 $ref: '#/components/schemas/DeviceDefinition'
       example:
-        type: GetDeviceResponse
+        type: GetDevicesResponse
         version: v4
-        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000008"
+        msgId: "123"
+        data:
+          - deviceId: lumi3.86108040f2b03a4e
+            name: Hub
+            deviceTypesList:
+              - Hub
+            endpoints:
+              - endpointId: 0
+                endpointName: Root
+                deviceType: Root
+                functions:
+                  - functionCode: BasicInformation
+                    traits:
+                      - traitCode: FirmwareRevisionString
+                        parameter:
+                          type: String
+                          readable: true
+                          writable: false
+                          subscribable: true
+                          unit: ""
+                        value: "4.5.50_0021"
+                        time: 1780900703977
+                        pointName: Firmware version number
+                    commands: []
         code: 0
         message: success
-        data:
-          - deviceId: "device-001"
-            name: "客厅灯"
-            deviceTypesList: ["light"]
-            endpoints: []
-
-
 
     Endpoint:
       type: object

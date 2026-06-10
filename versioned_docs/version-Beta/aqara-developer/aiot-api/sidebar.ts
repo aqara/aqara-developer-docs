@@ -73,7 +73,7 @@ const sidebar: SidebarsConfig = {
         {
           type: "doc",
           id: "version-Beta/aqara-developer/aiot-api/get-device-definitions",
-          label: "Query Device Details",
+          label: "Query Device Model Definition",
           className: "api-method get",
         },
         {

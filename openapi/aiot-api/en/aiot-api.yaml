@@ -380,8 +380,8 @@ paths:
   /devices/definitions:
     get:
       tags: [Device]
-      summary: Query Device Details
-      description: Get detailed information for specified devices, including device type, endpoint list, parameter list, etc.
+      summary: Query Device Model Definition
+      description: Get detailed model definition for specified devices, including device types, an endpoint list, property lists, etc.
       operationId: getDeviceDefinitions
       x-skill-intent: device.definition.get
       x-idempotent: true
@@ -1204,16 +1204,34 @@ components:
               items:
                 $ref: '#/components/schemas/DeviceDefinition'
       example:
-        type: GetDeviceResponse
+        type: GetDevicesResponse
         version: v4
-        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000008"
+        msgId: "123"
+        data:
+          - deviceId: lumi3.86108040f2b03a4e
+            name: Hub
+            deviceTypesList:
+              - Hub
+            endpoints:
+              - endpointId: 0
+                endpointName: Root
+                deviceType: Root
+                functions:
+                  - functionCode: BasicInformation
+                    traits:
+                      - traitCode: FirmwareRevisionString
+                        parameter:
+                          type: String
+                          readable: true
+                          writable: false
+                          subscribable: true
+                          unit: ""
+                        value: "4.5.50_0021"
+                        time: 1780900703977
+                        pointName: Firmware version number
+                    commands: []
         code: 0
         message: success
-        data:
-          - deviceId: "device-001"
-            name: "Living Room Light"
-            deviceTypesList: ["light"]
-            endpoints: []
 
     Endpoint:
       type: object

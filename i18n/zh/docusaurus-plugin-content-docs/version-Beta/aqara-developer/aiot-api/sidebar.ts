@@ -73,7 +73,7 @@ const sidebar: SidebarsConfig = {
         {
           type: "doc",
           id: "version-Beta/aqara-developer/aiot-api/get-device-definitions",
-          label: "查询设备详细信息",
+          label: "查询设备模型定义",
           className: "api-method get",
         },
         {
