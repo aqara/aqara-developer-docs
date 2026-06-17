@@ -1,0 +1,98 @@
+# 使用 Postman 调测
+
+本文介绍如何使用 Postman 调测 Aqara 数据转出 API。
+
+## 概述
+
+Postman 是一款常用的 API 调试和接口测试工具，界面直观，操作便捷。它支持发送各种类型的 HTTP 请求（如 GET、POST、PATCH 等），可灵活设置请求参数，并实时展示响应结果，便于开发者进行接口调试与验证。
+
+## 前提条件
+
+在开始之前，请确保您已满足以下条件：
+- 已下载并安装 [Postman](https://www.postman.com/downloads/)。
+- 已获取 Aqara Studio 的 Token。若尚未获取，请阅读 [开发者指南 - 获取必要信息](../../aqara-studio/developer-guide.mdx#获取必要信息)。
+
+## 获取 YAML 文件
+
+1. 点击此处下载 [Aqara 数据转出 API YAML 文件压缩包](https://itad-aqara-docs-1300889962.aqara.com/dev/postman/zh/data-export-api.yaml.zip)。
+2. 解压下载的压缩包后，获得一个名为 `data-export-api.yaml` 的文件。
+
+## 导入 YAML 文件
+
+1. 打开 Postman，在左侧边栏单击 **... > Import**。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-Import.png" alt="单击 Import" style={{width: '80%'}} />
+
+2. 向弹窗上传上述 data-export-api.yaml 文件。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-ImportFile.png" alt="上传文件" style={{width: '80%'}} />
+
+3. 在弹窗中选择 **OpenAPI 3.0 with a Postman Collection** 选项，并单击 **Import** 按钮。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-SelectOpenAPI3_0.png" alt="选择 OpenAPI 3.0 with a Postman Collection" style={{width: '80%'}} />
+
+4. 导入成功后，侧边栏出现 **Data Export API** 集合。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-ImportSuccess.png" alt="导入成功" style={{width: '80%'}} />
+
+## 配置
+
+在调测 API 之前，需要先配置 Token 和 host 地址。
+
+1. 在左侧边栏点击 **Data Export API**，切换到 **Authorization** 标签页，输入您从 Aqara Studio 获取的 Token。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-SetToken.png" alt="设置 Token" />
+
+    :::tip
+    请确保 **Type** 已设置为 `Bearer Token`，如果不是，请在下拉菜单中选择 `Bearer Token`。
+    :::
+
+2. 切换至 **Variables** 标签页，在 **host** 字段中输入您的 Aqara Studio 服务地址，支持输入本地局域网 IP（http）或远程访问地址（https）。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-SetHost.png" alt="设置 host 地址" />
+
+
+## 调测接口
+
+本节以 [查询空间列表接口](#查询空间列表接口) 和 [查询 Trait 值接口](#查询-trait-值接口) 为例介绍如何使用 Postman 调试 API。
+
+### 查询空间列表接口
+
+:::tip
+接口文档链接：[查询空间列表](./get-spaces.api.mdx)。
+:::
+
+1. 在 Postman 左侧目录选择 `Data Export API > spaces > 查询空间列表`。取消勾选 `parentSpaceId`，无需配置请求 Body，单击 **Send** 按钮，请求获取完整空间列表。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-GetSpaceList.png" alt="查询空间列表"  />
+
+2. 在下方 Body 确认 http 状态码是否为 200，则表示请求成功。
+    - 是：请求成功，查看 `code` 字段是否为 0。
+        - 为 0：表示列表获取成功，即可在 JSON 响应体中查看空间列表。
+        - 非 0：表示列表获取失败，请根据响应内容中的 `message` 排查问题。
+        
+        <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-CheckBody.png" alt="查询空间列表响应"  />
+    - 否：请求失败，请根据响应内容中的 `message` 排查问题。 
+    
+        <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-401.png" alt="请求失败示例"  />
+
+
+### 查询 Trait 值接口
+
+:::tip
+接口文档链接：[查询 Trait 值](./get-trait-values.api.mdx)。
+:::
+
+1. 在 Postman 左侧目录选择 `Data Export API > devices > traits > read > 查询 Trait 值`，点击 **Body**。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-PostBody.png" alt="查询 Trait 值接口"  />
+
+2. 由于这是一个 POST 请求，点击 **Schema**，查看 Body 字段的说明。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-CheckSchema.png" alt="阅读 Schema"  />
+    
+3. 在 `data` 对象中填写设备 ID、端点 ID、功能编码，以及待查询的功能点代码列表，单击 **Send** 按钮，请求获取 Trait 值。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-FillinBodyParameters.png" alt="配置请求 Body"  />
+
+4. 与 [查询空间列表接口](#查询空间列表接口) 类似，在下方 **Body** 确认 http 状态码是否为 200，则表示请求成功。

@@ -1,0 +1,41 @@
+# Introduction
+
+## Overview
+
+The Aqara Data Export API provides a comprehensive set of interfaces that support you to efficiently and securely access and manage data related to devices, spaces, and automation within Aqara Studio. 
+
+With these APIs, you can list spaces and devices, control devices remotely, read and write trait values, and create, query, update, and delete automation rules. 
+
+Whether you are managing devices or building automation scenarios, the Data Export API provides the essential capabilities needed to quickly integrate and extend Aqara platform data and services.
+
+## HTTP API List
+
+### Space
+
+| Name | API Endpoint | HTTP Method |
+| --- | --- | --- |
+| [List Spaces](./get-spaces.api.mdx) | /open/api/v1/spaces | GET |
+
+### Device
+
+| Name | API Endpoint | HTTP Method |
+| --- | --- | --- |
+| [List Device Types](./get-device-types.api.mdx) | /open/api/v1/device-types | GET |
+| [List Devices](./get-devices.api.mdx) | /open/api/v1/devices | GET |
+| [Query Device Details](./get-device-definitions.api.mdx) | /open/api/v1/devices/definitions | GET |
+| [Control Devices by Traits](./execute-device-trait.api.mdx) | /open/api/v1/devices/trait/execute | POST |
+| [Query Trait Values](./get-trait-values.api.mdx) | /open/api/v1/devices/trait/read | POST |
+| [Control Devices by Commands](./execute-device-command.api.mdx) | /open/api/v1/devices/command/execute | POST |
+
+### Automation
+
+| Name | API Endpoint | HTTP Method |
+| --- | --- | --- |
+| [List Endpoint Capabilities for Automation](./get-automation-capabilities.api.mdx) | /open/api/v1/automations/capabilities | GET |
+| [Create Automation](./create-automation.api.mdx) | /open/api/v1/automations | POST |
+| [List Automations](./query-automation-list.api.mdx) | /open/api/v1/automations | GET |
+| [Query Automation Details](./query-automation-details.api.mdx) | /open/api/v1/automations/\<automationId> | GET |
+| [Edit Automation](./update-automation.api.mdx) | /open/api/v1/automations/\<automationId> | PATCH |
+| [Batch Update Automation Status](./update-automation-status.api.mdx) | /open/api/v1/automations/status | POST |
+| [Delete Automations](./delete-automations.api.mdx) | /open/api/v1/automations/delete | POST |
+| [Execute Manual Trigger](./execute-automation-manual-trigger.api.mdx) | /open/api/v1/automations/manual-triggers/execute | POST |

@@ -4,22 +4,35 @@
 
 ## 开发者资源
 
-### Aqara 开发者平台
+### 开始前请先选择接入路径
 
-在开始调用接口或使用相关开发资源之前，建议先访问 [Aqara 开发者平台](https://developer.aqara.com/)，完成应用创建、凭证申请、授权配置以及基础接入准备。
+Aqara 当前提供的 API 分为两类，它们面向的环境和前置条件不同。建议您先确认要接入的是 **Cloud API** 还是 **Studio API**，再阅读对应文档。
+
+| API 类型 | 适用场景 | 开始前需要准备 |
+| --- | --- | --- |
+| Cloud API | 接入 Aqara 云端开放平台能力 | 访问 [Aqara 开发者平台](https://developer.aqara.com/)，创建应用，获取 `Appid`、`Keyid`，并完成授权与签名准备。 |
+| Studio 本地 API | 接入本地 Aqara Studio 内的数据与控制能力 | 先访问并准备 [Aqara Studio](../aqara-studio/overview/introduction.mdx) 环境，获取服务地址、Token 以及相关项目或设备数据。 |
 
 ### API 文档
 
-本栏目会逐步提供多组 API 文档，用于覆盖不同产品能力与接入场景。当前已经提供的 API 文档可用于了解接口范围、请求方式、认证要求、参数结构以及响应格式。
+本栏目会逐步提供多组 API 文档，用于覆盖不同产品能力与接入场景。当前已经提供的 API 文档可用于了解接口范围、请求方式、认证要求、参数结构、响应格式以及对应的接入前提。
 
 目前您可阅读的 API 文档如下：
 
 <div className="row aqara-resource-card-grid">
-  <div className="col col--4 margin-bottom--lg">
+  <div className="col col--6 margin-bottom--lg">
     <a className="aqara-resource-card" href="./aiot-api/introduction">
       <h3 className="aqara-resource-card__title">Cloud API</h3>
       <p className="aqara-resource-card__description">
-        浏览当前已发布的云端 API 文档，包括概览、入门说明、在线调试和接口参考。
+        面向 Aqara 开发者平台。开始前需先在 Aqara 开发者平台创建应用，并完成授权与签名准备。
+      </p>
+    </a>
+  </div>
+  <div className="col col--6 margin-bottom--lg">
+    <a className="aqara-resource-card" href="./data-export-api/introduction">
+      <h3 className="aqara-resource-card__title">Studio 本地 API</h3>
+      <p className="aqara-resource-card__description">
+        面向 Aqara Studio 环境。开始前需先访问并准备 Aqara Studio，再进行接口调试与集成。
       </p>
     </a>
   </div>
@@ -31,4 +44,4 @@
 
 ### 在线调试与验证
 
-对于支持在线调试的 API 文档，您可以直接在文档页面中验证请求参数、请求头、签名和服务地址配置，缩短联调与排查问题的时间。
+对于支持在线调试的 API 文档，您可以直接在文档页面中验证请求参数与基础配置。由于 Cloud API 和 Studio 本地 API 面向的环境不同，联调时关注的认证方式和服务地址配置也会有所区别。

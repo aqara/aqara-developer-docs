@@ -1,0 +1,97 @@
+# Test API with Postman
+
+This article explains how to use Postman to test the Aqara Data Export API.
+
+## Overview
+
+Postman is a popular API debugging and interface testing tool with an intuitive interface and convenient operation. It supports sending various types of HTTP requests (such as GET, POST, PATCH, etc.), allows you to flexibly set request parameters, and displays response results in real time, making it easy for developers to debug and verify APIs.
+
+## Before you begin
+
+Before you begin, please make sure you have met the following requirements:
+- Downloaded and installed [Postman](https://www.postman.com/downloads/).
+- Obtained an Aqara Studio Token. If you haven't acquired one yet, please read the [Developer Guide - Acquiring Essential Information](../../aqara-studio/developer-guide.mdx#obtain-required-information).
+
+## Download the YAML File
+
+1. Click here to download the [Aqara Data Export API YAML file package](https://itad-aqara-docs-1300889962.aqara.com/dev/postman/zh/data-export-api.yaml.zip).
+2. Unzip the downloaded file to get a file named `data-export-api.yaml`.
+
+## Import the YAML File
+
+1. Open Postman, and click **... > Import** in the left sidebar.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-Import.png" alt="Click Import" style={{width: '80%'}} />
+
+2. Upload the extracted `data-export-api.yaml` file to the popup.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-ImportFile.png" alt="Upload file" style={{width: '80%'}} />
+
+3. In the popup, select **OpenAPI 3.0 with a Postman Collection**, and click the **Import** button.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Postman-SelectOpenAPI3_0.png" alt="Select OpenAPI 3.0 with a Postman Collection" style={{width: '80%'}} />
+
+4. After a successful import, you will see the **Data Export API** collection in the sidebar.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Postman-ImportSuccess.png" alt="Import successful" style={{width: '80%'}} />
+
+## Configure the Token and Host Address
+
+Before testing the API, you need to configure the token and host address.
+
+1. In the left sidebar, click **Data Export API**, switch to the **Authorization** tab, and input the Token you have obtained from Aqara Studio.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-SetToken.png" alt="Set Token" />
+
+    :::tip
+    Please make sure the **Type** is set to `Bearer Token`. If not, select `Bearer Token` from the dropdown menu.
+    :::
+
+2. Switch to the **Variables** tab, and enter your Aqara Studio service address under the **host** field. Both local LAN IP (http) and remote addresses (https) are supported.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Postman-SetHost.png" alt="Set host address" />
+
+
+## Test APIs
+
+This section uses the [List Spaces API](#list-spaces-api) and [Query Trait Values API](#query-trait-values-api) as examples to show how to test APIs with Postman.
+
+### List Spaces API
+
+:::tip
+API Documentation: [List Spaces](./get-spaces.api.mdx).
+:::
+
+1. In the Postman sidebar, select `Data Export API > spaces > List Spaces`. Uncheck `parentSpaceId`, no need to configure the request Body, then click the **Send** button to fetch the complete list of spaces.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Postman-GetSpaceList.png" alt="List Spaces"  />
+
+2. In the Body section below, confirm that the HTTP status code is 200, which indicates the request was successful.
+    - If yes: Check whether the `code` field is 0.
+        - 0: The list was retrieved successfully, and you can view the space list in the JSON response.
+        - Not 0: Indicates failure; please check the `message` in the response for troubleshooting.
+        
+        <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Postman-CheckBody.png" alt="List Spaces response"  />
+    - If no: The request failed; check the `message` in the response for troubleshooting.
+    
+        <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Postman-401.png" alt="Request failed example"  />
+
+### Query Trait Values API
+
+:::tip
+API Documentation: [Query Trait Values](./get-trait-values.api.mdx).
+:::
+
+1. In the Postman sidebar, select `Data Export API > devices > traits > read > Query Trait Values`, then click **Body**.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Postman-PostBody.png" alt="Query Trait Values API"  />
+
+2. Since this is a POST request, click **Schema** to view the description of the Body fields.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Postman-CheckSchema.png" alt="Read Schema"  />
+    
+3. In the `data` object, fill in the device ID, endpoint ID, function code, and the list of trait codes to query. Then click the **Send** button to request the Trait values.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Postman-FillinBodyParameters.png" alt="Configure request Body"  />
+
+4. Similar to the [List Spaces API](#list-spaces-api), check the HTTP status code in the **Body** section below. If it is 200, the request was successful.

@@ -1,0 +1,2778 @@
+openapi: 3.0.3
+info:
+  title: Data Export API
+  termsOfService: https://domain.com/terms
+  x-internal: true
+  description: |
+    Data Export API Documentation
+
+    ## Common Request Headers
+    All APIs require the following header parameters:
+    | Header | Required | Description |
+    |--------|----------|-------------|
+    | Authorization | Yes | `Bearer accessToken` |
+    | Content-Type | Yes | `application/json` |
+  version: v1
+
+servers:
+  - url: '{host}/open/api/v1'
+    description: Data Export API endpoint
+    variables:
+      host:
+        description: |
+          Please enter your Aqara Studio service address. This can be a local LAN address (http) or a remote access address (https).
+          For example:
+          - http://10.11.50.56
+          - https://xxx.edge-xxx.aqara.com/
+        default: '<Aqara_Studio_URL>'
+
+# Global Security: All endpoints require Bearer Token
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Space
+    description: APIs for space query
+  - name: Device
+    description: APIs for device query, properties read/write, and command execution
+  - name: Gateway
+    description: APIs for managing gateway subdevice pairing, binding, and unbinding operations
+  - name: Automation
+    description: APIs for automation creation, editing, query, deletion, and capability query
+
+paths:
+
+  # ────────────────────────────────────────────────────────────────
+  # List Spaces
+  # ────────────────────────────────────────────────────────────────
+  /spaces:
+    get:
+      tags: [Space]
+      summary: List Spaces
+      description: List all child spaces under the specified parent space. Optionally include the parent space itself to flexibly meet diverse hierarchical querying needs.
+      operationId: getSpaces
+      x-skill-intent: space.list
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters:
+        - name: parentSpaceId
+          in: query
+          description: Parent space ID. If empty, the response will return all top-level spaces (spaces without a parent, i.e., root nodes of the space tree).
+          required: false
+          schema:
+            type: string
+        - name: needChildren
+          in: query
+          description: Whether to query for child spaces under the parent space. If parentSpaceId is not empty and needChildren is false, child spaces will not be returned (the parent space itself may be returned only when needParentSpaceSelf is true).
+          required: false
+          schema:
+            type: boolean
+            default: true
+        - name: needParentSpaceSelf
+          in: query
+          description: Whether to include the parent space itself (corresponding to parentSpaceId). This takes effect only if parentSpaceId is not empty.
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Request succeeded
+     
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpacesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+    post:
+      tags: [Space]
+      summary: Create A Space
+      description: Create a space. When parentSpaceId is empty, a top-level (root) space will be created; if not empty, a child space will be created under the specified parent space.
+      operationId: createSpace
+      x-skill-intent: space.create
+      x-idempotent: false
+      x-retryable: false
+      x-side-effects: create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSpaceRequest'
+            example:
+              parentSpaceId: "space-home-001"
+              name: "Living Room"
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSpaceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Update Space Name
+  # ────────────────────────────────────────────────────────────────
+  /spaces/name:
+    post:
+      tags: [Space]
+      summary: Update A Space Name
+      description: Update the name of the specified space.
+      operationId: updateSpaceName
+      x-skill-intent: space.name.update
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: update
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSpaceNameRequest'
+            example:
+              spaceId: "space-livingroom-001"
+              name: "New Living Room"
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSpaceNameResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':  
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # DeviceType Collection Query
+  # ────────────────────────────────────────────────────────────────
+  /devices/types:
+    get:
+      tags: [Device]
+      summary: List Device Types
+      description: Get all existing device types (DeviceType) in your Aqara Studio.
+      operationId: getDeviceTypes
+      x-skill-intent: device.type.list
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters: []
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Device List Query
+  # ────────────────────────────────────────────────────────────────
+  /devices:
+    get:
+      tags: [Device]
+      summary: List Devices
+      description: Get a list of devices under the specified space. It supports pagination and filtering conditions.
+      operationId: getDevices
+      x-skill-intent: device.list
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters:
+        - name: spaceIds
+          in: query
+          description: "Space ID list. Example: spaceIds=xx1,xx2 or spaceIds=xx1&spaceIds=xx2. If empty, all devices will be queried."
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: needChildren
+          in: query
+          description: Whether to query devices in child spaces. Only effective when spaceIds is not empty.
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: spaceAssociated
+          in: query
+          description: "Whether to query devices under the specified spaceIds.<ul><li>true: Query only devices under the specified space(s).</li><li>false: Query only devices NOT under the specified space(s) (in this case, the spaceIds and needChildren parameters are ignored).</li><li>Not set:<ul><li>If spaceIds is empty, queries all devices by default.</li><li>If spaceIds is set, queries devices under the specified space(s) by default.</li></ul></li></ul>"
+          required: false
+          schema:
+            type: boolean
+            nullable: true
+        - name: state
+          in: query
+          description: "Device online status. <ul><li>true: Query online devices.</li><li>false: Query offline devices.</li><li>Not set: Do not filter by status.</li></ul>"
+          required: false
+          schema:
+            type: boolean
+            nullable: true
+        - name: deviceTypesList
+          in: query
+          description: "Device type list. Example: deviceTypesList=light,switch or deviceTypesList=light&deviceTypesList=switch"
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: deviceName
+          in: query
+          description: Device name fuzzy matching (case-insensitive, blank values are automatically ignored)
+          required: false
+          schema:
+            type: string
+        - name: orderBy
+          in: query
+          description: "Sorting method. <ul><li><code>createTime asc</code>: Sorts results by creation time in ascending order (oldest first).</li><li><code>createTime desc</code>: Sorts results by creation time in descending order (newest first).</li></ul>"
+          required: false
+          schema:
+            type: string
+            default: createTime asc
+            enum: [createTime asc, createTime desc]
+          example: createTime asc
+        - name: pageNum
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+          example: 1
+        - name: pageSize
+          in: query
+          description: Number of devices per page
+          required: false
+          schema:
+            type: integer
+          example: 200
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevicesResponse'
+              examples:
+                devicesPage:
+                  value:
+                    type: GetDeviceInfoResponse
+                    version: v1
+                    msgId: "1751609244328"
+                    code: 0
+                    message: success
+                    data:
+                      totalCount: 3
+                      pageNum: 1
+                      pageSize: 200
+                      data:
+                        - deviceId: "device-001"
+                          deviceName: "Living Room Light"
+                          deviceTypesList: ["light"]
+                          createTime: 1710001234567
+                          state: true
+                          space:
+                            parentSpaceId: "space-home-001"
+                            spaceId: "space-room-001"
+                            name: "Living Room"
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Query Device Definitions (Device Details)
+  # ────────────────────────────────────────────────────────────────
+  /devices/definitions:
+    get:
+      tags: [Device]
+      summary: Query Device Model Definition
+      description: Get detailed model definition for specified devices, including device types, an endpoint list, property lists, etc.
+      operationId: getDeviceDefinitions
+      x-skill-intent: device.definition.get
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters:
+        - name: deviceIds
+          in: query
+          required: true
+          description: "Device ID list. Example: deviceIds=xx1,xx2 or deviceIds=xx1&deviceIds=xx2"
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceDefinitionsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Control Device / Reconnect Device to a New Room / Rename Device
+  # ────────────────────────────────────────────────────────────────
+  /devices/trait/execute:
+    post:
+      tags: [Device]
+      summary: Control Devices by Traits
+      description: |
+        Control devices by traits. You can perform the following operations:
+        - Update device attributes (such as switch, temperature, etc. For functionCode and traitCode, please refer to the /devices/definitions interface)
+        - Reconnect device to a new room (functionCode="EndpointLabel", traitCode="EndpointRoom")
+        - Rename device (functionCode="EndpointLabel", traitCode="EndpointName")
+      operationId: executeDeviceTrait
+      x-skill-intent: device.trait.execute
+      x-idempotent: false
+      x-retryable: conditional
+      x-side-effects: device_state_change
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TraitExecuteRequest'
+            examples:
+              executeOnOff:
+                value:
+                  data:
+                    - deviceId: "123456"
+                      endpointId: 1
+                      functionCode: Output
+                      traitCode: OnOff
+                      value: true
+      responses:
+        '200':
+          description: Request succeeded. However, it does not mean all trait values were set successfully.<br />A code value of 0 indicates that at least some operations succeeded; a non-zero code indicates all failed.<br />If data is present, it indicates the set of traits that failed to be set; if not, all traits were set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TraitExecuteResponse'
+              examples:
+                partialFailed:
+                  value:
+                    type: ExecuteTraitResponse
+                    version: v1
+                    msgId: "2df2f431-a58d-4fdb-b39c-4f0d29e7ecf7"
+                    code: 0
+                    message: success
+                    data:
+                      - deviceId: "123456"
+                        endpointId: 1
+                        functionCode: Output
+                        traitCode: OnOff
+                        code: 1103
+                        message: device offline
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Query trait function values
+  # ────────────────────────────────────────────────────────────────
+  /devices/trait/read:
+    post:
+      tags: [Device]
+      summary: Query Trait Values
+      description: Batch query the current values of specified traits.
+      operationId: getTraitValues
+      x-skill-intent: device.trait.read
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TraitReadRequest'
+            examples:
+              readTraits:
+                value:
+                  data:
+                    - deviceId: "123456"
+                      endpointId: 1
+                      functionCode: Output
+                      traitCodes: [OnOff]
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TraitValueResponse'
+              examples:
+                traitValueSuccess:
+                  value:
+                    type: GetTraitValueResponse
+                    version: v1
+                    msgId: "2df2f431-a58d-4fdb-b39c-4f0d29e7ecf8"
+                    code: 0
+                    message: success
+                    data:
+                      - deviceId: "123456"
+                        endpointId: 1
+                        functionCode: Output
+                        traitCode: OnOff
+                        value: true
+                        time: 1710001234567
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Control devices by commands
+  # ────────────────────────────────────────────────────────────────
+  /devices/command/execute:
+    post:
+      tags: [Device]
+      summary: Control Devices by Commands
+      description: |
+        Use commands to control device.
+        The required parameters, such as endpointId, functionCode, commandCode, and fieldCode, should be obtained from the /devices/definitions API before making a control request.
+      operationId: executeDeviceCommand
+      x-skill-intent: device.command.execute
+      x-idempotent: false
+      x-retryable: conditional
+      x-side-effects: device_state_change
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandExecuteRequest'
+            examples:
+              executeCommand:
+                value:
+                  data:
+                    - deviceId: "gateway001"
+                      endpointId: 1
+                      functionCode: NetworkCommissioning
+                      commandCode: TriggerZigbeeNetworkInfoUpload
+                      args:
+                        - fieldCode: InstallCode
+                          value: "F9B34846413AB5DE81B60E63E440"
+                        - fieldCode: MAC
+                          value: "54EF441000EB0CCF"
+      responses:
+        '200':
+          description: Request succeeded. However, it does not mean all commands were executed successfully.<br />A code value of 0 indicates at least some commands succeeded; a non-zero code indicates all commands failed.<br/>If data is present, it represents the collection of commands that failed; if not, all commands succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandExecuteResponse'
+              examples:
+                commandFailed:
+                  value:
+                    type: ExecuteCommandResponse
+                    version: v1
+                    msgId: "2df2f431-a58d-4fdb-b39c-4f0d29e7ecf9"
+                    code: 0
+                    message: success
+                    data:
+                      - deviceId: "gateway001"
+                        endpointId: 1
+                        functionCode: HubCoordination
+                        commandCode: APIBindSubdeviceWithSecurityCode
+                        code: 2201
+                        message: invalid security code
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Enable Gateway Sub-device Join Mode
+  # ────────────────────────────────────────────────────────────────
+  /gateways/subdevices/join:
+    post:
+      tags: [Gateway]
+      summary: Enable Sub-device Joining
+      description: |
+        Call this API to make a specified Zigbee gateway enter subdevice join mode.
+
+        :::tip
+        Before starting, please ensure that the Zigbee subdevice is already in pairing mode.
+        :::
+ 
+      operationId: joinSubdevice
+      x-skill-intent: gateway.subdevice.join
+      x-idempotent: false
+      x-retryable: conditional
+      x-side-effects: device_state_change
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubdeviceJoinRequest'
+            examples:
+              zigbeeJoin:
+                summary: Standard Zigbee device pairing (e.g., triple-click to join)
+                value:
+                  gatewayId: "gateway001"
+                  commandCode: APIEnableSubdeviceJoining
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubdeviceJoinResponse'
+              examples:
+                success:
+                  value:
+                    type: SubdeviceJoinResponse
+                    version: v1
+                    msgId: "2df2f431-a58d-4fdb-b39c-4f0d29e7ecf9"
+                    code: 0
+                    message: success
+                fail:
+                  value:
+                    type: SubdeviceJoinResponse
+                    version: v1
+                    msgId: "2df2f431-a58d-4fdb-b39c-4f0d29e7ecfa"
+                    code: 2201
+                    message: invalid security code
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Disable Gateway Sub-device Join Mode
+  # ────────────────────────────────────────────────────────────────
+  /gateways/subdevices/join/stop:
+    post:
+      tags: [Gateway]
+      summary: Disable Sub-device Joining
+      description: Call this API to have a specified Zigbee gateway exit sub-device addition mode.
+      operationId: stopSubdeviceJoin
+      x-skill-intent: gateway.subdevice.join.stop
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: device_state_change
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubdeviceJoinStopRequest'
+            examples:
+              stopJoin:
+                value:
+                  gatewayId: "gateway001"
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              examples:
+                success:
+                  value:
+                    type: SubdeviceJoinStopResponse
+                    version: v1
+                    msgId: "2df2f431-a58d-4fdb-b39c-4f0d29e7ecfb"
+                    code: 0
+                    message: success
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Query Sub-device Joining Result
+  # ────────────────────────────────────────────────────────────────
+  /gateways/subdevices/bindResult:
+    post:
+      tags: [Gateway]
+      summary: Query Sub-device Joining Results
+      description: |
+        Query the joining results of specified sub-devices. Flexible filtering is supported via `protocols` (protocol types) and `gatewaySubdeviceFilters` (filter conditions for gateways and their sub-devices). Multiple protocols and multiple gateway/sub-device combinations can be queried at the same time.   
+      operationId: getDeviceBindResult
+      x-skill-intent: device.bind.result
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceBindResultRequest'
+            examples:
+              queryByGatewayAndSubDevices:
+                value:
+                  protocols: [zigbee, matter]
+                  gatewaySubdeviceFilters:
+                    - gatewayId: "gateway-001"
+                      subDeviceIds: []
+                    - gatewayId: "gateway-001"
+                      subDeviceIds: ["subdevice-001", "subdevice-002"]
+                    - gatewayId: "gateway-002"
+                      subDeviceIds: ["subdevice-101"]
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceBindResultResponse'
+              examples:
+                bindResultSuccess:
+                  value:
+                    type: DeviceBindResultResponse
+                    version: v1
+                    msgId: "2df2f431-a58d-4fdb-b39c-4f0d29e7ecfb"
+                    code: 0
+                    message: success
+                    data:
+                      - deviceId: "subdevice-001"
+                        deviceName: "Bedroom Temperature Sensor"
+                        protocols: [zigbee]
+                        gatewayId: "gateway-001"
+                        code: 0
+                        message: null
+                        bindTime: 1710001235000
+                      - deviceId: "subdevice-002"
+                        deviceName: null
+                        protocols: [matter]
+                        gatewayId: "gateway-001"
+                        code: 0
+                        message: null
+                        bindTime: 1710001236000
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Automation Capability Query
+  # ────────────────────────────────────────────────────────────────
+  /automations/capabilities:
+    get:
+      tags: [Automation]
+      summary: List Endpoint Capabilities for Automation
+      description: Get the list of endpoint capabilities in all devices that can be used to create **Flow** automations. The response includes the value type and unit for each endpoint, as well as the roles they support in **Flow** automations (e.g., can be used as a trigger, condition, or action).
+      operationId: getAutomationCapabilities
+      x-skill-intent: automation.capabilities
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters:
+        - in: query
+          name: definitionType
+          required: false
+          schema:
+            type: string
+            enum: [SCRIPT_JSON]
+          description: Automation type. Currently, only SCRIPT_JSON (i.e., **Flow** automation) is supported.
+     
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationCapabilitiesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Automation Collection
+  # ────────────────────────────────────────────────────────────────
+  /automations:
+    post:
+      tags: [Automation]
+      summary: Create An Automation
+      description: Create a **Flow** automation.
+      operationId: createAutomation
+      x-skill-intent: automation.create
+      x-idempotent: false
+      x-retryable: conditional
+      x-side-effects: automation_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAutomationRequest'
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAutomationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    get:
+      tags: [Automation]
+      summary: List Automations
+      description: Get a paginated list of automation summaries, including each automation's ID, name, enable status, and creation time.
+      operationId: queryAutomationList
+      x-skill-intent: automation.list
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters:
+        - in: query
+          name: definitionTypes
+          required: false
+          description: |
+            List of automation types.    
+            Supported values:
+            SCRIPT_JSON: **Flow** automation created via API.  
+            SCRIPT_TEXT: **Flow** automation created via the Aqara Studio Web page.  
+            WHEN_IF_THEN: **Classic** automation.  
+            LEGACY_FLOW: **Flow** automation (legacy version).  
+            LEGACY_LINKAGE: **Logic** automation.  
+            OTHER: Other automation types.    
+            Example: definitionTypes=SCRIPT_JSON,LEGACY_FLOW or definitionTypes=SCRIPT_JSON&definitionTypes=LEGACY_FLOW.
+            If not provided or empty, all types will be queried.
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [SCRIPT_JSON, SCRIPT_TEXT, WHEN_IF_THEN, LEGACY_FLOW, LEGACY_LINKAGE, OTHER]
+          style: form
+          explode: true
+        - in: query
+          name: automationName
+          required: false
+          description: Fuzzy match keyword for automation name; if not provided or empty, the name will not be filtered.
+          schema:
+            type: string
+          example: Turn on the lights when coming home
+        - in: query
+          name: spaceIds
+          required: false
+          description: "Whether to query automations under the specified list of space IDs. Example: spaceIds=xx1,xx2 or spaceIds=xx1&spaceIds=xx2. If empty, automations will not be filtered by space."
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - in: query
+          name: needChildren
+          required: false
+          description: 是否查询 spaceIds 指定空间的子空间内的自动化。仅当 spaceIds 参数有值时此参数才生效。
+          schema:
+            type: boolean
+            default: false
+        - in: query
+          name: spaceAssociated
+          required: false
+          description: |
+            Whether to filter automations based on their association with spaces.
+            - Not set (default): Do not filter by space association, return all automations.
+            - true: Only return automations that are associated with spaces.
+            - false: Only return automations that are not associated with any space; in this case, the spaceIds and needChildren parameters are ignored.
+          schema:
+            type: boolean
+            nullable: true
+        - in: query
+          name: orderBy
+          required: false
+          description: |
+            Sorting method. 
+            - createTime asc: Sorts results by creation time in ascending order (oldest first).
+            - createTime desc: Sorts results by creation time in descending order (newest first).
+          schema:
+            type: string
+            default: createTime asc
+            enum: [createTime asc, createTime desc]
+          example: createTime asc
+        - in: query
+          name: pageNum
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: pageSize
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 200
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Single Automation Resource
+  # ────────────────────────────────────────────────────────────────
+  /automations/{automationId}:
+    get:
+      tags: [Automation]
+      summary: Query Automation Details
+      description: Query automation details by automation ID.
+      operationId: queryAutomationDetails
+      x-skill-intent: automation.details
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters:
+        - in: path
+          name: automationId
+          required: true
+          schema:
+            type: string
+          description: Automation ID.
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationDetailsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    patch:
+      tags: [Automation]
+      summary: Edit An Automation
+      description: |
+        Edit automation name, enabled status, and configuration.
+        :::tip
+        You can edit the name and enabled status of all automations, but you can only edit the configuration for SCRIPT_JSON automations.
+        :::
+      operationId: updateAutomation
+      x-skill-intent: automation.update
+      x-idempotent: false
+      x-retryable: conditional
+      x-side-effects: automation_update
+      parameters:
+        - in: path
+          name: automationId
+          description: Automation ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAutomationRequest'
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAutomationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /automations/status:
+    post:
+      tags: [Automation]
+      summary: Batch Update Automation Statuses
+      description: Update the enabled statuses of multiple automations in one request.
+      operationId: updateAutomationStatus
+      x-skill-intent: automation.update_status
+      x-idempotent: false
+      x-retryable: conditional
+      x-side-effects: automation_update
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAutomationStatusRequest'
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAutomationStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /automations/space:
+    post:
+      tags: [Automation]
+      summary: Update Space Association for Automations
+      description: |
+        Batch associate a space for multiple automations.
+        - Automations not associated with any space will be newly associated.
+        - Automations associated with other spaces will be reconnected to the target space.
+        - Automations already associated with the target space will remain unchanged and be considered successful.
+      operationId: updateAutomationSpace
+      x-skill-intent: automation.space.update
+      x-idempotent: true
+      x-retryable: conditional
+      x-side-effects: automation_update
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAutomationSpaceRequest'
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAutomationSpaceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /automations/delete:
+    post:
+      tags: [Automation]
+      summary: Delete Automations
+      description: Delete multiple automations in one request.
+      operationId: deleteAutomations
+      x-skill-intent: automation.delete
+      x-idempotent: true
+      x-retryable: conditional
+      x-side-effects: automation_delete
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteAutomationsRequest'
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteAutomationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Query the list of manual triggers within automations
+  # ────────────────────────────────────────────────────────────────
+  /automations/manual-triggers:
+    get:
+      tags: [Automation]
+      summary: Get Manual Trigger List
+      description: You can query the list of manual triggers within specific automations by IDs.
+      operationId: queryAutomationManualTriggerList
+      x-skill-intent: automation.manual_trigger.list
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters:
+        - in: query
+          name: automationIds
+          required: false
+          description: |
+            Automation ID list.
+            Example: automationIds=xx1,xx2 or automationIds=xx1&automationIds=xx2.
+            If empty, the response will return all manual triggers within the accessible automations.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - in: query
+          name: enabledOnly
+          required: false
+          description: "Whether to return only manual triggers under enabled automations.<br />true: Only return manual triggers of enabled automations.<br />false: Return manual triggers of all automations."
+          schema:
+            type: boolean
+            default: false
+        - in: query
+          name: includeSpace
+          required: false
+          description: "Whether to return the current associated space of the automation to which the manual trigger belongs.<br />true: Return the current associated space of the automation.<br />false: Do not return space information."
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryAutomationManualTriggerListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # ────────────────────────────────────────────────────────────────
+  # Execute A Manual Trigger
+  # ────────────────────────────────────────────────────────────────
+  /automations/manual-triggers/execute:
+    post:
+      tags: [Automation]
+      summary: Execute A Manual Trigger
+      description: |
+        Execute a manual trigger within an automation to initiate subsequent conditions and actions.
+        :::tip
+        A manual trigger is a trigger that users can add to automation workflows and activate through user operation. It is suitable for scenarios where automation requires manual intervention to start, or for instant activation during testing and debugging.
+
+        How to add a manual trigger depends on how you create your Flow automation:
+        1. If created on the Aqara Studio Web page, refer to: [Automation - Flow - Trigger - Manual Trigger](https://docs.aqara.com/docs/aqara-studio/flow/trigger#manual-trigger)
+        2. If created by API, add a manual trigger in your JSON script. See: [JSON Automation Script Definition - Starter - Manual](https://docs.aqara.com/docs/aqara-studio/api-references/json-automation-script#manual)
+        :::
+      operationId: executeAutomationManualTrigger
+      x-skill-intent: automation.manual_trigger.execute
+      x-idempotent: false
+      x-retryable: false
+      x-side-effects: write
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteAutomationManualTriggerRequest'
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecuteAutomationManualTriggerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+# ══════════════════════════════════════════════════════════════════
+# Components
+# ══════════════════════════════════════════════════════════════════
+components:
+
+  responses:
+    BadRequestResponse:
+      description: Request parameter error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example:
+              type: ErrorMessage
+              version: v1
+              msgId: "a1b2c3d4-e5f6-7890-abcd-err000000001"
+              code: 400
+              message: "Parameter xxx is required"
+    UnauthorizedResponse:
+      description: Unauthorized or authentication expired
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example:
+              type: ErrorMessage
+              version: v1
+              msgId: "a1b2c3d4-e5f6-7890-abcd-err000000002"
+              code: 401
+              message: "Token expired. Please generate a new token"
+    ForbiddenResponse:
+      description: No permission to access
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example: 
+              type: ErrorMessage
+              version: v1
+              msgId: "a1b2c3d4-e5f6-7890-abcd-err000000003"
+              code: 403
+              message: "No permission to access this resource"
+    NotFoundResponse:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example:
+              type: ErrorMessage
+              version: v1
+              msgId: "a1b2c3d4-e5f6-7890-abcd-err000000004"
+              code: 404
+              message: "Resource not found"
+    TooManyRequestsResponse:
+      description: Request frequency too high
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example:
+              type: ErrorMessage
+              version: v1
+              msgId: "a1b2c3d4-e5f6-7890-abcd-err000000005"
+              code: 429
+              message: "Request frequency too high"
+    InternalServerErrorResponse:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example:
+              type: ErrorMessage
+              version: v1
+              msgId: "a1b2c3d4-e5f6-7890-abcd-err000000006"
+              code: 500
+              message: "Internal server error"
+  
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: "Authorization: Bearer token"
+
+  schemas:
+
+    # ── Base Request / Response ───────────────────────────────────
+    BaseResponse:
+      type: object
+      required: [type, version, msgId, code]
+      properties:
+        type:
+          type: string
+          description: Message type
+        version:
+          type: string
+          description: API version
+          example: v1
+        msgId:
+          type: string
+          description: Message ID
+        code:
+          type: integer
+          description: "Business status code, 0 indicates success"
+        message:
+          type: string
+          description: Message
+
+    ErrorResponse:
+      description: Error response. Read code and message for details.
+     
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+
+    # ── Space ────────────────────────────────────────────────────
+    SpaceNode:
+      type: object
+      required: [spaceId, name]
+      properties:
+        spaceId:
+          type: string
+          description: Space ID
+        parentSpaceId:
+          type: string
+          nullable: true
+          description: Parent space ID
+        name:
+          type: string
+          description: Space name
+        spatialMarking:
+          type: string
+          nullable: true
+          description: Space tag
+        children:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/SpaceNode'
+          description: Child space list (recursive structure)
+
+    CreateSpaceRequest:
+      type: object
+      required: [name]
+      properties:
+        parentSpaceId:
+          type: string
+          nullable: true
+          description: Parent space ID. When empty, a top-level (root) space will be created; if not empty, a child space will be created under the specified parent space.
+        name:
+          type: string
+          minLength: 1
+          description: Space name, cannot be an empty string.
+      example:
+        parentSpaceId: "space-home-001"
+        name: "Living Room"
+
+    CreateSpaceResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: string
+              description: Space ID of the newly created space.
+      example:
+        type: CreateSpaceResponse
+        version: v1
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000006"
+        code: 0
+        message: success
+        data: "space-livingroom-001"
+
+    UpdateSpaceNameRequest:
+      type: object
+      required: [spaceId, name]
+      properties:
+        spaceId:
+          type: string
+          description: Space ID.
+        name:
+          type: string
+          description: New space name.
+      example:
+        spaceId: "space-livingroom-001"
+        name: "New Living Room"
+
+    UpdateSpaceNameResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: string
+              description: Empty string (Fixed).
+      example:
+        type: UpdateSpaceNameResponse
+        version: v1
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000007"
+        code: 0
+        message: success
+        data: ""
+
+    SpacesResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/SpaceNode'
+      example:
+        type: GetSpacesResponse
+        version: v1
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000005"
+        code: 0
+        message: success
+        data:
+          - spaceId: "space-home-001"
+            parentSpaceId: null
+            name: "My Home"
+            spatialMarking: "home"
+            children:
+              - spaceId: "space-floor1-001"
+                parentSpaceId: "space-home-001"
+                name: "First Floor"
+                spatialMarking: "floor"
+                children: []
+
+    # ── Device ───────────────────────────────────────────────────
+    DeviceType:
+      type: object
+      required: [deviceType, name]
+      properties:
+        deviceType:
+          type: string
+          description: Device type code
+        name:
+          type: string
+          description: Device type name
+
+    DeviceInfo:
+      type: object
+      required: [deviceId, deviceName, deviceTypesList, createTime, state]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        deviceName:
+          type: string
+          description: Device name
+        deviceTypesList:
+          type: array
+          items:
+            type: string
+          description: Device type list
+        createTime:
+          type: integer
+          format: int64
+          description: Creation time (UTC timestamp in milliseconds)
+        state:
+          type: boolean
+          description: Online status
+        space:
+          $ref: '#/components/schemas/DeviceSpace'
+
+    DeviceSpace:
+      type: object
+      required: [parentSpaceId, spaceId, name]
+      properties:
+        parentSpaceId:
+          type: string
+          description: Parent space ID
+        spaceId:
+          type: string
+          description: Space ID
+        name:
+          type: string
+          description: Space name
+
+    DeviceDefinition:
+      type: object
+      required: [deviceId, name, deviceTypesList, endpoints]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        gatewayId:
+          type: string
+          nullable: true
+          description: |
+            The gateway ID to which this device is bound.
+            If `gatewayId` equals `deviceId`, it indicates that this device is itself a gateway.
+            If `gatewayId` is `null` or an empty string, it means the device is a direct-connected device or is not bound to any gateway.
+        name:
+          type: string
+          description: Device name
+        deviceTypesList:
+          type: array
+          items:
+            type: string
+          description: Device type list
+        endpoints:
+          type: array
+          description: Endpoint list
+          items:
+            $ref: '#/components/schemas/Endpoint'
+
+    DeviceDefinitionsResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeviceDefinition'
+      example:
+        type: GetDevicesResponse
+        version: v1
+        msgId: "123"
+        data:
+          - deviceId: lumi3.86108040f2b03a4e
+            name: Hub
+            deviceTypesList:
+              - Hub
+            endpoints:
+              - endpointId: 0
+                endpointName: Root
+                deviceType: Root
+                functions:
+                  - functionCode: BasicInformation
+                    traits:
+                      - traitCode: FirmwareRevisionString
+                        parameter:
+                          type: String
+                          readable: true
+                          writable: false
+                          subscribable: true
+                          unit: ""
+                        value: "4.5.50_0021"
+                        time: 1780900703977
+                        pointName: Firmware version number
+                    commands: []
+        code: 0
+        message: success
+
+    Endpoint:
+      type: object
+      required: [endpointId, endpointName, deviceType, functions]
+      properties:
+        endpointId:
+          type: integer
+          description: Endpoint ID
+        endpointName:
+          type: string
+          description: Endpoint name
+        deviceType:
+          type: string
+          description: Device type
+        functions:
+          type: array
+          description: Function list
+          items:
+            $ref: '#/components/schemas/DeviceFunction'
+
+    DeviceFunction:
+      type: object
+      required: [functionCode]
+      properties:
+        functionCode:
+          type: string
+          description: Function code (e.g. LevelControl, ColorControl, Output)
+        traits:
+          type: array
+          description: Trait list
+          items:
+            $ref: '#/components/schemas/Trait'
+        commands:
+          type: array
+          description: Command list
+          items:
+            $ref: '#/components/schemas/Command'
+
+    FlexibleValue:
+      oneOf:
+        - type: boolean
+        - type: integer
+        - type: number
+          format: double
+        - type: string
+      description: |
+        Dynamic value, with the specific type determined by the trait/command definition.
+        Recommended rules for determining the value type:
+        1) In the trait scenario, prioritize reading the parameter.type of the same level;
+        2) In the command scenario, prioritize reading the corresponding field's parameter.type;
+        3) When parameter.type is Enum, the value type is string;
+        4) If the parameter is missing or the type is unrecognized, default to string and retain the original value.
+
+    Trait:
+      type: object
+      required: [traitCode, parameter]
+      properties:
+        traitCode:
+          type: string
+          description: Trait code (e.g. CurrentLevel, ColorTemperature, OnOff)
+        parameter:
+          $ref: '#/components/schemas/TraitParameter'
+          description: Trait parameter
+        value:
+          $ref: '#/components/schemas/FlexibleValue'
+          description: Current value. The type is consistent with the parameter.type.
+        time:
+          type: integer
+          format: int64
+          description: Value update time (UTC timestamp in milliseconds)
+
+    Command:
+      type: object
+      required: [commandCode]
+      properties:
+        commandCode:
+          type: string
+          description: Command code (e.g. MoveToXYColor)
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommandField'
+          description: List of command fields
+
+    CommandField:
+      type: object
+      required: [fieldCode, parameter]
+      properties:
+        fieldCode:
+          type: string
+          description: Field code (e.g. ColorX, ColorY, Time)
+        parameter:
+          $ref: '#/components/schemas/CommandFieldParameter'
+
+    BaseParameter:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          description: |
+            Data type.<br />
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Bool</td>
+                  <td>Boolean</td>
+                  <td>True or false (true/false).</td>
+                </tr>
+                <tr>
+                  <td>Integer</td>
+                  <td>Integer</td>
+                  <td>Integer type.</td>
+                </tr>
+                <tr>
+                  <td>Float</td>
+                  <td>Float</td>
+                  <td>Number with decimals.</td>
+                </tr>
+                <tr>
+                  <td>String</td>
+                  <td>String</td>
+                  <td>String value.</td>
+                </tr>
+                <tr>
+                  <td>Struct</td>
+                  <td>Struct</td>
+                  <td>Structured data customized by Aqara, in JSON string format.<br />It can include fields of multiple types.</td>
+                </tr>
+                <tr>
+                  <td>Enum</td>
+                  <td>Enum</td>
+                  <td>Enumeration. It defines a finite set of values.</td>
+                </tr>
+                <tr>
+                  <td>List[X]</td>
+                  <td>List</td>
+                  <td>List of type X, in JSON string format.<br />X can be Integer, Float, String, Struct, or Enum.</td>
+                </tr>
+                <tr>
+                  <td>Data</td>
+                  <td>Data Block</td>
+                  <td>Hexadecimal string (Hex String), e.g., "0x01AB3F".</td>
+                </tr>
+              </tbody>
+            </table>
+          enum: [Bool, Float, Integer, Enum, String, Struct, "List[X]", Data]
+        min:
+          type: number
+          description: Minimum value
+          format: double
+          nullable: true
+        max:
+          type: number
+          description: Maximum value
+          format: double
+          nullable: true
+        supportedValues:
+          description: List of enum values. This field is meaningful only when parameter.type is Enum.
+          type: array
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          nullable: true
+        unit:
+          description: Unit. This field is only meaningful when parameter.type is Integer or Float.
+          type: string
+          nullable: true
+        step:
+          description: Step size. This field is only meaningful when parameter.type is Integer or Float.
+          type: number
+          format: double
+          nullable: true
+
+    TraitParameter:
+      description: Trait parameter
+      allOf:
+        - $ref: '#/components/schemas/BaseParameter'
+        - type: object
+          required: [readable, writable, subscribable]
+          properties:
+            readable:
+              type: boolean
+              description: Whether it is readable
+              default: true
+            writable:
+              type: boolean
+              description: Whether it is writable
+              default: true
+            subscribable:
+              type: boolean
+              description: Whether it is subscribable
+              default: true
+
+    CommandFieldParameter:
+      allOf:
+        - $ref: '#/components/schemas/BaseParameter'
+        - type: object
+          required: [mandatory]
+          properties:
+            mandatory:
+              type: boolean
+              description: Whether it is mandatory
+
+    KeyValue:
+      type: object
+      description: Key-value pair
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+          description: Key
+        value:
+          type: string
+          description: Value
+
+    # ── Trait Execute ────────────────────────────────────────────
+    TraitExecuteRequest:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraitExecuteItem'
+
+    TraitExecuteItem:
+      type: object
+      required: [deviceId, endpointId, functionCode, traitCode, value]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        endpointId:
+          type: integer
+          description: Endpoint ID
+        functionCode:
+          type: string
+          description: |
+            Function code, e.g.:
+            - Output（Switch control）
+            - EndpointLabel（Device rename/room change）
+        traitCode:
+          type: string
+          description: |
+            Trait code, e.g.:
+            - OnOff（Switch）
+            - EndpointRoom（Device location）
+            - EndpointName（Device name）
+        value:
+          $ref: '#/components/schemas/FlexibleValue'
+          description: The target value to be set. The type is consistent with the parameter.type of the trait to be controlled.
+          
+    TraitExecuteResult:
+      type: object
+      required: [deviceId, endpointId, functionCode, traitCode, code, message]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        endpointId:
+          type: integer
+          description: Endpoint ID
+        functionCode:
+          type: string
+          description: Function code
+        traitCode:
+          type: string
+          description: Trait code
+        code:
+          type: integer
+          description: Error code
+        message:
+          type: string
+          description: Error message
+
+    TraitExecuteResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              description: The array elements are the traits that failed to be executed.
+              items:
+                $ref: '#/components/schemas/TraitExecuteResult'
+      example:
+        type: ExecuteTraitResponse
+        version: v1
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000009"
+        code: 0
+        message: success
+        data:
+          - deviceId: "device-001"
+            endpointId: 1
+            functionCode: "Output"
+            traitCode: "OnOff"
+            code: 1103
+            message: "device offline"
+
+    # ── Trait Value Query ────────────────────────────────────────
+    TraitReadRequest:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraitValueQuery'
+
+    TraitValueQuery:
+      type: object
+      required: [deviceId, endpointId, functionCode, traitCodes]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        endpointId:
+          type: integer
+          description: Endpoint ID
+        functionCode:
+          type: string
+          description: Function code
+        traitCodes:
+          type: array
+          description: List of trait codes to be queried
+          items:
+            type: string
+
+    TraitValueResult:
+      type: object
+      required: [deviceId, endpointId, functionCode, traitCode, value, time]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        endpointId:
+          type: integer
+          description: Endpoint ID
+        functionCode:
+          type: string
+          description: Function code
+        traitCode:
+          type: string
+          description: Trait code
+        value:
+          $ref: '#/components/schemas/FlexibleValue'
+          description: The current value. The type is consistent with the parameter.type of the trait.
+        time:
+          type: integer
+          format: int64
+          description: Value update time (UTC timestamp in milliseconds)
+
+    TraitValueResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/TraitValueResult'
+      example:
+        type: GetTraitValueResponse
+        version: v1
+        msgId: "a1b2c3d4-e5f6-7890-abcd-00000000000d"
+        code: 0
+        message: success
+        data:
+          - deviceId: "device-001"
+            endpointId: 1
+            functionCode: "Output"
+            traitCode: "OnOff"
+            value: true
+            time: 1710001234567
+
+    # ── Command Execute ──────────────────────────────────────────
+    CommandExecuteRequest:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommandExecuteItem'
+
+    CommandExecuteItem:
+      type: object
+      required: [deviceId, endpointId, functionCode, commandCode]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        endpointId:
+          type: integer
+          description: Endpoint ID
+        functionCode:
+          type: string
+          description: "Function code, e.g.: NetworkCommissioning"
+        commandCode:
+          type: string
+          description: "Command code, e.g.: TriggerZigbeeNetworkInfoUpload"
+        args:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommandArg'
+          description: Command field object list 
+
+    CommandArg:
+      type: object
+      description: Command parameters
+      required: [fieldCode, value]
+      properties:
+        fieldCode:
+          type: string
+          description: Field code
+        value:
+          $ref: '#/components/schemas/FlexibleValue'
+          description: Field value. The type is consistent with the parameter.type of the corresponding field.
+
+    CommandExecuteResult:
+      type: object
+      required: [deviceId, endpointId, functionCode, commandCode, code, message]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        endpointId:
+          type: integer
+          description: Endpoint ID
+        functionCode:
+          type: string
+          description: Function code
+        commandCode:
+          type: string
+          description: Command code
+        code:
+          type: integer
+          description: Error code
+        message:
+          type: string
+          description: Error message
+
+    CommandExecuteResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              description: The array elements are the commands that failed to be executed.
+              items:
+                $ref: '#/components/schemas/CommandExecuteResult'
+      example:
+        type: ExecuteCommandResponse
+        version: v1
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000019"
+        code: 0
+        message: success
+        data: []
+
+
+    # ── Subdevice Join ────────────────────────────────────────────
+    SubdeviceJoinRequest:
+      type: object
+      required: [gatewayId, commandCode]
+      properties:
+        gatewayId:
+          type: string
+          description: Gateway ID
+        commandCode:
+          type: string
+          enum:
+            - APIEnableSubdeviceJoining
+          description: |
+            Command codes for sub-device joining:
+            - `APIEnableSubdeviceJoining`: Standard Zigbee device joining (e.g. triggered by pressing a button to enter join mode)
+        data:
+          type: object
+          description: |
+            Network joining parameters (JSON object). Depending on the commandCode, the required parameters are as follows:
+            - `APIEnableSubdeviceJoining`: No need to provide this field.
+
+    SubdeviceJoinResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+      example:
+        type: SubdeviceJoinResponse
+        version: v1
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000011"
+        code: 0
+        message: success
+
+    SubdeviceJoinStopRequest:
+      type: object
+      required: [gatewayId]
+      properties:
+        gatewayId:
+          type: string
+          description: Gateway ID
+
+    # ── Device Bind Result ────────────────────────────────────────
+    GatewaySubdeviceDidFilter:
+      type: object
+      required: [gatewayId]
+      properties:
+        gatewayId:
+          type: string
+          description: Gateway ID
+        subDeviceIds:
+          type: array
+          nullable: true
+          description: |
+            List of subdevice IDs.
+            - If empty or omitted: Query all subdevices under the specified gateway.
+            - If not empty: Query the specified subdevices under the specified gateway.
+          items:
+            type: string
+
+    DeviceBindResultRequest:
+      type: object
+      required: [gatewaySubdeviceFilters]
+      properties:
+        protocols:
+          type: array
+          nullable: true
+          description: Specifies the protocol types of subdevices to query. If not provided, there is no restriction on protocol types.
+          items:
+            type: string
+            enum: [zigbee, matter]
+        gatewaySubdeviceFilters:
+          type: array
+          description: Filters (Gateway ID and Subdevice ID)
+          required: true
+          items:
+            $ref: '#/components/schemas/GatewaySubdeviceDidFilter'
+
+    DeviceBindResultItem:
+      type: object
+      required: [deviceId, protocols, gatewayId, bindTime]
+      properties:
+        deviceId:
+          type: string
+          description: Sub-device ID
+        deviceName:
+          type: string
+          nullable: true
+          description: Sub-device name
+        space:
+          $ref: '#/components/schemas/DeviceSpace'
+          nullable: true
+          description: Space where the sub-device is located
+        protocols:
+          type: array
+          items:
+            type: string
+            enum: [zigbee, matter]
+          description: List of supported protocols
+        gatewayId:
+          type: string
+          description: Associated gateway ID
+        code:
+          type: integer
+          nullable: true
+          description: Error code (returned on failure)
+        message:
+          type: string
+          nullable: true
+          description: Error message (returned on failure)
+        bindTime:
+          type: integer
+          format: int64
+          description: Join timestamp (milliseconds, UTC)
+
+    DeviceBindResultResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeviceBindResultItem'
+      example:
+        type: DeviceBindResultResponse
+        version: v1
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000017"
+        code: 0
+        message: success
+        data:
+          - deviceId: "subdevice-001"
+            deviceName: "Bedroom Temperature Sensor"
+            protocols: [zigbee]
+            gatewayId: "gateway-001"
+            code: 0
+            message: null
+            bindTime: 1710001235000
+
+    DeviceTypesResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeviceType'
+      example:
+        type: GetDeviceTypeInfosResponse
+        version: v1
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000006"
+        code: 0
+        message: success
+        data:
+          - deviceType: "light"
+            name: "Light"
+          - deviceType: "switch"
+            name: "Switch"
+
+    DevicesResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/DeviceListData'
+      example:
+        type: GetDeviceInfoResponse
+        version: v1
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000007"
+        code: 0
+        message: success
+        data:
+          totalCount: 3
+          pageNum: 1
+          pageSize: 200
+          data:
+            - deviceId: "device-001"
+              deviceName: "Living Room Light"
+              deviceTypesList: ["light"]
+              createTime: 1710001234567
+              state: true
+              space:
+                parentSpaceId: "space-home-001"
+                spaceId: "space-room-001"
+                name: "Living Room"
+
+    DeviceListData:
+      type: object
+      required: [totalCount, pageNum, pageSize, data]
+      properties:
+        totalCount:
+          type: integer
+          description: Total number of devices that meet the conditions
+          example: 3
+        pageNum:
+          type: integer
+          description: Current page number
+          example: 1
+        pageSize:
+          type: integer
+          description: Current page size
+          example: 200
+        data:
+          type: array
+          description: List of devices on the current page
+          items:
+            $ref: '#/components/schemas/DeviceInfo'
+            
+    # ── Automation ────────────────────────────────────────────────
+    AutomationDefinitionType:
+      type: string
+      enum: [SCRIPT_JSON]
+      description: Automation definition type. The currently supported type is SCRIPT_JSON.
+
+    AutomationSummary:
+      type: object
+      required: [automationId, name, enabled, definitionType, createTime]
+      properties:
+        automationId:
+          type: string
+          description: Automation ID.
+        name:
+          type: string
+          description: Automation name.
+        enabled:
+          type: boolean
+          description: "Whether it is enabled. true: enabled; false: disabled."
+        definitionType:
+          type: string
+          enum: [SCRIPT_JSON, SCRIPT_TEXT, WHEN_IF_THEN, LEGACY_FLOW, LEGACY_LINKAGE, OTHER]
+          description: |
+            Automation type, as follows: <br />
+            - SCRIPT_JSON：**Flow** automation created via API.  
+            - SCRIPT_TEXT：**Flow** automation created via Aqara Studio Web page.  
+            - WHEN_IF_THEN：**Classic** automation.  
+            - LEGACY_FLOW：**Flow** automation (legacy version).  
+            - LEGACY_LINKAGE：**Logic** automation.  
+            - OTHER：Other automation types.
+        createTime:
+          type: integer
+          format: int64
+          description: Creation time (UTC timestamp in milliseconds)
+        manualTriggers:
+          type: array
+          nullable: true
+          description: List of available manual triggers
+          items:
+            $ref: '#/components/schemas/AutomationManualTriggerBrief'
+        space:
+          allOf:
+            - $ref: '#/components/schemas/SpaceNode'
+          nullable: true
+          description: The current associated space of the automation; if not associated with any space, it is null.
+
+    AutomationManualTriggerBrief:
+      type: object
+      required: [triggerNodeId, triggerName]
+      properties:
+        triggerNodeId:
+          type: string
+          description: Manual trigger ID
+        triggerName:
+          type: string
+          description: Manual trigger name
+
+    AutomationManualTriggerInfo:
+      type: object
+      required: [automationId, automationName, triggerNodeId, triggerName, enabled, definitionType, createTime]
+      properties:
+        automationId:
+          type: string
+          description: Automation ID.
+        automationName:
+          type: string
+          description: Automation name.
+        triggerNodeId:
+          type: string
+          description: Manual trigger node ID.
+        triggerName:
+          type: string
+          description: Manual trigger name.
+        enabled:
+          type: boolean
+          description: Whether the automation is enabled.
+        definitionType:
+          type: string
+          enum: [SCRIPT_JSON, SCRIPT_TEXT, WHEN_IF_THEN, LEGACY_FLOW, LEGACY_LINKAGE, OTHER]
+          description: Automation type.
+        createTime:
+          type: integer
+          format: int64
+          description: Creation time (UTC timestamp in milliseconds)
+        space:
+          allOf:
+            - $ref: '#/components/schemas/SpaceNode'
+          nullable: true
+          description: The current associated space of the automation; only returned when `includeSpace` is true, and null if not associated with any space.
+
+    AutomationDetails:
+      allOf:
+        - $ref: '#/components/schemas/AutomationSummary'
+        - type: object
+          properties:
+            config:
+              type: object
+              nullable: true
+              description: Automation configuration details.  
+                - For automations with `definitionType` of `SCRIPT_JSON`, this field contains the full configuration object of the automation.  
+                - For all other automation types, an empty object is returned.
+              additionalProperties: true
+
+    AutomationListData:
+      type: object
+      required: [totalCount, pageNum, pageSize, data]
+      properties:
+        totalCount:
+          type: integer
+          description: Total number of automations that meet the conditions
+        pageNum:
+          type: integer
+          description: Current page number
+        pageSize:
+          type: integer
+          description: Current page size
+        data:
+          type: array
+          description: Automation list
+          items:
+            $ref: '#/components/schemas/AutomationSummary'
+
+    CreateAutomationRequest:
+      type: object
+      required: [definitionType, config]
+      properties:
+        name:
+          type: string
+          description: Automation name
+        definitionType:
+          $ref: '#/components/schemas/AutomationDefinitionType'
+        config:
+          type: object
+          description: JSON automation script, please refer to [JSON automation script definition](../../aqara-studio/api-references/json-automation-script).
+          additionalProperties: true
+
+    UpdateAutomationRequest:
+      type: object
+      required: [updateMask]
+      properties:
+        name:
+          type: string
+          description: New name.
+          nullable: true
+        enabled:
+          type: boolean
+          description: "New enabled state. true: enabled; false: disabled."
+          nullable: true
+        config:
+          type: object
+          description: New configuration. Only applicable to automations with `definitionType` of `SCRIPT_JSON`.  
+          nullable: true
+          additionalProperties: true
+        updateMask:
+          type: array
+          description: |
+            List of parameter names to be updated. Please make sure each item in <code>updateMask</code> has a corresponding new value provided in the data object.<br />
+            **Note**: `name` and `enabled` are applicable to all automations. `config` is only applicable to automations with `definitionType` of `SCRIPT_JSON`.
+          items:
+            type: string
+            enum: [name, enabled, config]
+
+    UpdateAutomationStatusRequest:
+      type: object
+      required: [automationIds, enabled]
+      properties:
+        automationIds:
+          type: array
+          description: List of automation IDs.
+          minItems: 1
+          items:
+            type: string
+        enabled:
+          type: boolean
+          description: "New enabled state. true: enabled; false: disabled."
+
+    UpdateAutomationSpaceRequest:
+      type: object
+      required: [spaceId, automationIds]
+      properties:
+        spaceId:
+          type: string
+          minLength: 1
+          description: Target space ID.
+        automationIds:
+          type: array
+          minItems: 1
+          description: List of automation IDs to update the space association.
+          items:
+            type: string
+      example:
+        spaceId: "space-livingroom-001"
+        automationIds: ["auto_01HXYZABCDEF1234567890"]
+
+    DeleteAutomationsRequest:
+      type: object
+      required: [automationIds]
+      properties:
+        automationIds:
+          type: array
+          description: List of automation IDs.
+          minItems: 1
+          items:
+            type: string
+
+    AutomationBatchFailure:
+      type: object
+      required: [automationId, code, message]
+      properties:
+        automationId:
+          type: string
+          description: Automation ID.
+        code:
+          type: integer
+          description: Error code.
+        message:
+          type: string
+          description: Error message.
+
+    AutomationBatchResultData:
+      type: object
+      required: [successIds, failedItems]
+      properties:
+        successIds:
+          type: array
+          description: List of successfully updated automation IDs.
+          items:
+            type: string
+        failedItems:
+          type: array
+          description: List of failed automation objects.
+          items:
+            $ref: '#/components/schemas/AutomationBatchFailure'
+
+    CreateAutomationResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: string
+              description: Automation ID.
+
+    UpdateAutomationResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: string
+              nullable: true
+              example: ""
+
+    DeleteAutomationResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AutomationBatchResultData'
+
+    QueryAutomationManualTriggerListResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              description: List of manual triggers
+              items:
+                $ref: '#/components/schemas/AutomationManualTriggerInfo'
+
+    ExecuteAutomationManualTriggerRequest:
+      type: object
+      required: [automationId, triggerNodeId]
+      properties:
+        automationId:
+          type: string
+          description: Automation ID.
+        triggerNodeId:
+          type: string
+          description: ID of the manual trigger to be executed.
+
+    ExecuteAutomationManualTriggerResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+
+    UpdateAutomationStatusResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AutomationBatchResultData'
+
+    UpdateAutomationSpaceResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AutomationBatchResultData'
+      example:
+        type: UpdateAutomationSpaceResponse
+        version: v1
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000026"
+        code: 0
+        message: success
+        data:
+          successIds: ["auto_01HXYZABCDEF1234567890"]
+          failedItems: []
+
+    AutomationDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AutomationDetails'
+              nullable: true
+
+    AutomationListResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AutomationListData'
+
+    AutomationCapabilitiesResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AutomationCapabilitiesData'
+      example:
+        type: QueryAutomationCapabilitiesResponse
+        version: v1
+        msgId: "52ebd835-1b8d-48f7-ab30-741d7c1ae0ee"
+        code: 0
+        message: success
+        data:
+          devices:
+            - deviceId: "lumi3.a61fca0f4da1a0bd"
+              deviceName: "Edge Hub M300"
+              endpoints:
+                - endpointName: "Root"
+                  endpointId: 1
+                  properties:
+                    - deviceType: "Root"
+                      functionCode: "GeneralDiagnostics"
+                      functionName: "GeneralDiagnostics"
+                      traitCode: "AntiDeletionNotification"
+                      traitName: "Accidental Deletion Prevention notification (child device)"
+                      valueType: "event"
+                      semanticRole: ["starter"]
+                      valueRange:
+                        enumRange:
+                          - value: "1"
+                            key: "trigger"
+
+    AutomationCapabilitiesData:
+      type: object
+      nullable: true
+      properties:
+        devices:
+          type: array
+          description: List of device capabilities that can be used for automation orchestration
+          items:
+            $ref: '#/components/schemas/AutomationCapabilityDevice'
+
+    AutomationCapabilityDevice:
+      type: object
+      required: [deviceId, deviceName, endpoints]
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        deviceName:
+          type: string
+          description: Device name
+        endpoints:
+          type: array
+          description: Endpoint list
+          items:
+            $ref: '#/components/schemas/AutomationCapabilityEndpoint'
+
+    AutomationCapabilityEndpoint:
+      type: object
+      required: [endpointName, endpointId, properties]
+      properties:
+        endpointName:
+          type: string
+          description: Endpoint name
+        endpointId:
+          type: integer
+          description: Endpoint ID
+        properties:
+          type: array
+          description: List of available capabilities for the endpoint (traits/events/commands)
+          items:
+            $ref: '#/components/schemas/AutomationCapabilityProperty'
+
+    AutomationCapabilityProperty:
+      type: object
+      required: [deviceType, functionCode, functionName, valueType, semanticRole]
+      properties:
+        deviceType:
+          type: string
+          description: Device type
+        functionCode:
+          type: string
+          description: Function code
+        functionName:
+          type: string
+          description: Function name
+        traitCode:
+          type: string
+          description: Trait code (common when valueType is not cmd)
+        traitName:
+          type: string
+          description: Trait name
+        commandCode:
+          type: string
+          description: Command code (common when valueType is cmd)
+        commandName:
+          type: string
+          description: Command name
+        valueType:
+          type: string
+          description: Value type (e.g. boolean/number/enum/event/cmd)
+        semanticRole:
+          type: array
+          description: Automation roles
+          items:
+            type: string
+            enum: [starter, condition, action]
+        unit:
+          type: string
+          description: Unit (e.g. %, °C, lx, etc.)
+        valueRange:
+          $ref: '#/components/schemas/AutomationCapabilityValueRange'
+
+    AutomationCapabilityValueRange:
+      type: object
+      description: Value range or enum range
+      properties:
+        min:
+          type: number
+          format: double
+          description: Minimum value
+        max:
+          type: number
+          format: double
+          description: Maximum value
+        enumRange:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutomationCapabilityEnumItem'
+
+    AutomationCapabilityEnumItem:
+      type: object
+      description: Enum range
+      required: [value, key]
+      properties:
+        value:
+          type: string
+          description: Enum value (usually a string in the API response)
+        key:
+          type: string
+          description: Enum display text

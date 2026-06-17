@@ -1,0 +1,39 @@
+# 简介
+
+## 概述
+
+Aqara 数据转出 API 提供了一套丰富的接口，支持用户高效、安全地访问和管理 Aqara Studio 内的设备、空间与自动化相关的数据。通过这些 API，用户可以实现空间和设备的查询、设备的远程控制、Trait 功能点的读取与下发，以及自动化规则的创建、查询、更新和删除等操作。无论是进行设备管理还是构建自动化场景，数据转出 API 都能为开发者提供基础能力，助力快速集成和扩展 Aqara 平台的数据与服务。
+
+## HTTP API 列表
+
+### 空间
+
+| 功能 | API 端点 | 请求方法 |
+| --- | --- | --- |
+| [查询空间列表](./get-spaces.api.mdx) | /open/api/v1/spaces | GET |
+
+### 设备
+
+| 功能 | API 端点 | 请求方法 |
+| --- | --- | --- |
+| [查询设备类型列表](./get-device-types.api.mdx) | /open/api/v1/device-types | GET |
+| [查设备信息列表](./get-devices.api.mdx) | /open/api/v1/devices | GET |
+| [查询设备详细信息](./get-device-definitions.api.mdx) | /open/api/v1/devices/definitions | GET |
+| [通过 Trait 控制设备](./execute-device-trait.api.mdx) | /open/api/v1/devices/trait/execute | POST |
+| [查询 Trait 值](./get-trait-values.api.mdx) | /open/api/v1/devices/trait/read | POST |
+| [通过 Command 控制设备](./execute-device-command.api.mdx) | /open/api/v1/devices/command/execute | POST |
+
+### 自动化
+
+| 功能 | API 端点 | 请求方法 |
+| --- | --- | --- |
+| [查询所有支持自动化的设备功能点](./get-automation-capabilities.api.mdx) | /open/api/v1/automations/capabilities | GET |
+| [创建自动化](./create-automation.api.mdx) | /open/api/v1/automations | POST |
+| [查询自动化列表](./query-automation-list.api.mdx) | /open/api/v1/automations | GET |
+| [查询自动化详情](./query-automation-details.api.mdx) | /open/api/v1/automations/\<automationId> | GET |
+| [编辑自动化](./update-automation.api.mdx) | /open/api/v1/automations/\<automationId> | PATCH |
+| [批量更新自动化状态](./update-automation-status.api.mdx) | /open/api/v1/automations/status | POST |
+| [批量更新自动化关联空间](./update-automation-space.api.mdx) | /open/api/v1/automations/space | POST |
+| [删除自动化](./delete-automations.api.mdx) | /open/api/v1/automations/delete | POST |
+| [查询自动化手动触发对象列表](./query-automation-manual-trigger-list.api.mdx) | /open/api/v1/automations/manual-triggers | GET |
+| [执行手动触发器](./execute-automation-manual-trigger.api.mdx) | /open/api/v1/automations/manual-triggers/execute | POST |

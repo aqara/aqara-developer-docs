@@ -1,0 +1,102 @@
+# Getting Started with the Data Export API
+
+This article introduces the request and response elements of the Aqara Data Export HTTP API.
+
+## Request Elements
+
+This section describes the elements that make up a data export API request:
+
+- [HTTP Methods](#http-methods)
+- [Endpoints](#endpoints)
+- [Request Header](#request-header)
+- [Authentication](#authentication)
+- [Parameters](#parameters)
+
+Every request by the data export API includes an HTTP method and a path. Depending on the specific API endpoint, you may also need to specify request headers, authentication details, query parameters, or request body parameters.
+
+The data export API documentation provides detailed information for each endpoint, including their HTTP method, path, required parameters, and request/response examples. It is recommended to first refer to the [HTTP API list](./introduction.mdx#http-api-list) to quickly understand all available endpoints.
+
+### HTTP Methods
+
+The HTTP method of an endpoint defines the type of operation it performs on a given resource. Some common HTTP methods include: `GET`, `POST`, `DELETE`, and `PATCH`. The API reference provides the HTTP methods for each endpoint.
+
+For example, the [List Spaces” endpoint](./get-spaces.api.mdx) uses the `GET` method.
+
+Currently, the Aqara Data Export API supports the following HTTP methods:
+
+- `GET`
+- `POST`
+- `PATCH`
+
+### Endpoints
+
+Every endpoint has both a [Base URL](#base-url) and a [Path](#path).
+
+#### Base URL
+
+The Base URL is the access address of [Aqara Studio](../../aqara-studio/overview/introduction.mdx). By default, the Base URL is the local IP address (http) of Aqara Studio. If you have enabled remote access, the Base URL can also be the remote access address (https) for Aqara Studio. 
+
+Please consult [Aqara Studio - Developer Guide - Obtain Required Information - Obtain Access Address](../../aqara-studio/developer-guide.mdx#obtain-access-address).
+
+#### Path
+
+The Aqara Data Export API reference documentation provides the path for each endpoint. For example, the [“Query Automation Details” endpoint](./query-automation-details.api.mdx) has the path `/open/api/v1/automations/<automationId>`.
+
+Angle brackets `<>` in the path indicate parameters you need to specify. Path parameters are used to modify the endpoint path and are required in your request. For example, the [“Query Automation Details” endpoint](./query-automation-details.api.mdx) has `{automationId}` as its path parameter. In your request, replace `{automationId}` with the ID of the automation you wish to query.
+
+### Request Header
+
+Below is the common request header that is required for all Aqara Data Export API calls.
+
+| Parameter | Type | Description |
+| ------------- | ------ | ------------------------------------------------------------ |
+| Content-Type  | String | Defaults to `application/json`.  |
+
+### Authentication
+
+When calling the Aqara Data Export API, you must include the Authorization header in the request headers.
+
+Set the Authorization header to `Bearer <token>`, where `<token>` is the access token you obtained from Aqara Studio. If your token already includes the `Bearer` prefix, you can copy and use it directly without adding it again. For details on how to obtain an access token, refer to [Developer Guide - Obtain Required Information](../../aqara-studio/developer-guide.mdx#obtain-required-information).
+
+### Parameters
+
+Many API methods require or allow you to pass additional parameters with your request. There are two types: [path parameters](#path-parameters), and [request body parameters](#request-body-parameters).
+
+#### Path Parameters
+
+Path parameters are used to modify the endpoint path and are required. For more details, see [Path](#path) above.
+
+#### Request Body Parameters
+
+Request body parameters are used to send additional data to the API. For some endpoints, they are required; for others, they are optional. For example, when creating an automation, the request body can include the automation's JSON script. For specifics on which request body parameters are supported by each endpoint, refer to the respective API documentation.
+
+## Response Elements
+
+After you make a request, the API will return a [response status code](#response-status-code) and a [response body](#response-body).
+
+### Response Status Code
+
+Every request will return an HTTP status code, indicating whether it was successful. See the [MDN HTTP Response Status Codes Documentation](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) for more details.
+
+Common response codes include:
+- 200: Request succeeded.
+- 400: Request parameter error.
+- 401: Not authenticated or authentication invalid.
+- 403: No permission to access.
+- 404: Resource not found.
+- 429: Too many requests.
+- 500: Internal server error.
+
+### Response Body
+
+Most endpoints return a response body; unless otherwise noted, this is in JSON format.
+
+All responses will contain the following fields:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| type | String | Message type. |
+| version | String | API version. |
+| msgId | String | Message ID. |
+| code | Integer | Status code, 0 means success. |
+| message | String | Description of the request result. |

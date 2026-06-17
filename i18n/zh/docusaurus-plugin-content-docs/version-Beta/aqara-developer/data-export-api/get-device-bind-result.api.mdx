@@ -1,0 +1,72 @@
+---
+id: get-device-bind-result
+title: "查询子设备入网结果"
+description: "查询指定子设备的入网绑定结果，可通过 protocols（协议类型） 和 gatewaySubdeviceFilters（网关及其子设备过滤条件）进行灵活筛选，支持同时按多协议及多个网关/子设备组合查询。"
+sidebar_label: "查询子设备入网结果"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "post api-method"
+info_path: i18n/zh/docusaurus-plugin-content-docs/version-Beta/aqara-developer/data-export-api/data-export-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"查询子设备入网结果"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/gateways/subdevices/bindResult"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+查询指定子设备的入网绑定结果，可通过 protocols（协议类型） 和 gatewaySubdeviceFilters（网关及其子设备过滤条件）进行灵活筛选，支持同时按多协议及多个网关/子设备组合查询。
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["gatewaySubdeviceFilters"],"properties":{"protocols":{"type":"array","nullable":true,"description":"指定待查询的子设备协议类型。不传时，表示不限制协议类型。","items":{"type":"string","enum":["zigbee","matter"]}},"gatewaySubdeviceFilters":{"type":"array","description":"过滤条件（网关 ID 与子设备 ID）","required":true,"items":{"type":"object","required":["gatewayId"],"properties":{"gatewayId":{"type":"string","description":"网关设备 ID。"},"subDeviceIds":{"type":"array","nullable":true,"description":"子设备 ID 列表。\n- 为空或不传：查询指定网关下的全部子设备\n- 非空：查询指定网关下的指定子设备\n","items":{"type":"string"}}},"title":"GatewaySubdeviceDidFilter"}}},"title":"DeviceBindResultRequest"},"examples":{"queryByGatewayAndSubDevices":{"value":{"protocols":["zigbee","matter"],"gatewaySubdeviceFilters":[{"gatewayId":"gateway-001","subDeviceIds":[]},{"gatewayId":"gateway-001","subDeviceIds":["subdevice-001","subdevice-002"]},{"gatewayId":"gateway-002","subDeviceIds":["subdevice-101"]}]}}}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"成功","content":{"application/json":{"schema":{"allOf":[{"type":"object","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息 ID"},"code":{"type":"integer","description":"业务状态码，0 表示成功"},"message":{"type":"string","description":"提示信息"}},"title":"BaseResponse"},{"type":"object","properties":{"data":{"type":"array","items":{"type":"object","required":["deviceId","protocols","gatewayId","bindTime"],"properties":{"deviceId":{"type":"string","description":"子设备 ID。"},"deviceName":{"type":"string","nullable":true,"description":"子设备名称。"},"space":{"type":"object","required":["parentSpaceId","spaceId","name"],"properties":{"parentSpaceId":{"type":"string","description":"父空间 ID"},"spaceId":{"type":"string","description":"空间 ID"},"name":{"type":"string","description":"空间名称"}},"title":"DeviceSpace","nullable":true,"description":"子设备所在空间。"},"protocols":{"type":"array","items":{"type":"string","enum":["zigbee","matter"]},"description":"入网协议集合。"},"gatewayId":{"type":"string","description":"所属网关 ID。"},"code":{"type":"integer","nullable":true,"description":"错误码（失败时返回）。"},"message":{"type":"string","nullable":true,"description":"错误信息（失败时返回）。"},"bindTime":{"type":"integer","format":"int64","description":"入网时间戳（毫秒级 UTC 时间戳）。"}},"title":"DeviceBindResultItem"}}}}],"example":{"type":"DeviceBindResultResponse","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-000000000017","code":0,"message":"success","data":[{"deviceId":"subdevice-001","deviceName":"卧室温度传感器","protocols":["zigbee"],"gatewayId":"gateway-001","code":0,"message":null,"bindTime":1710001235000}]},"title":"DeviceBindResultResponse"},"examples":{"bindResultSuccess":{"value":{"type":"DeviceBindResultResponse","version":"v1","msgId":"2df2f431-a58d-4fdb-b39c-4f0d29e7ecfb","code":0,"message":"success","data":[{"deviceId":"subdevice-001","deviceName":"卧室温度传感器","protocols":["zigbee"],"gatewayId":"gateway-001","code":0,"message":null,"bindTime":1710001235000},{"deviceId":"subdevice-002","deviceName":null,"protocols":["matter"],"gatewayId":"gateway-001","code":0,"message":null,"bindTime":1710001236000}]}}}}}},"400":{"description":"请求参数错误","content":{"application/json":{"schema":{"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 xxx 不能为空"},"description":"错误响应，错误信息通过 code 与 message 提供","allOf":[{"type":"object","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息 ID"},"code":{"type":"integer","description":"业务状态码，0 表示成功"},"message":{"type":"string","description":"提示信息"}},"title":"BaseResponse"}],"title":"ErrorResponse"}}}},"401":{"description":"未认证或认证失效","content":{"application/json":{"schema":{"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000002","code":401,"message":"token 已过期，请重新生成 token"},"description":"错误响应，错误信息通过 code 与 message 提供","allOf":[{"type":"object","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息 ID"},"code":{"type":"integer","description":"业务状态码，0 表示成功"},"message":{"type":"string","description":"提示信息"}},"title":"BaseResponse"}],"title":"ErrorResponse"}}}},"403":{"description":"无权限访问","content":{"application/json":{"schema":{"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000003","code":403,"message":"无权限访问该资源"},"description":"错误响应，错误信息通过 code 与 message 提供","allOf":[{"type":"object","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息 ID"},"code":{"type":"integer","description":"业务状态码，0 表示成功"},"message":{"type":"string","description":"提示信息"}},"title":"BaseResponse"}],"title":"ErrorResponse"}}}},"404":{"description":"资源不存在","content":{"application/json":{"schema":{"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000004","code":404,"message":"资源不存在"},"description":"错误响应，错误信息通过 code 与 message 提供","allOf":[{"type":"object","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息 ID"},"code":{"type":"integer","description":"业务状态码，0 表示成功"},"message":{"type":"string","description":"提示信息"}},"title":"BaseResponse"}],"title":"ErrorResponse"}}}},"429":{"description":"请求频率过高","content":{"application/json":{"schema":{"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000005","code":429,"message":"请求频率过高"},"description":"错误响应，错误信息通过 code 与 message 提供","allOf":[{"type":"object","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息 ID"},"code":{"type":"integer","description":"业务状态码，0 表示成功"},"message":{"type":"string","description":"提示信息"}},"title":"BaseResponse"}],"title":"ErrorResponse"}}}},"500":{"description":"服务内部错误","content":{"application/json":{"schema":{"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000006","code":500,"message":"服务内部异常"},"description":"错误响应，错误信息通过 code 与 message 提供","allOf":[{"type":"object","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息 ID"},"code":{"type":"integer","description":"业务状态码，0 表示成功"},"message":{"type":"string","description":"提示信息"}},"title":"BaseResponse"}],"title":"ErrorResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

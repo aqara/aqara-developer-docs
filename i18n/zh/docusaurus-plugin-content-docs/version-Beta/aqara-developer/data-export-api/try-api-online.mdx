@@ -1,0 +1,23 @@
+# 在线体验 API
+
+您可以直接在 Aqara 数据转出 API 的文档页面中在线调试接口，方便快捷地测试和验证 API 功能。本文将指导您如何在线体验 API。
+
+## 前提条件
+
+在开始之前，请确保您已获取 Aqara Studio 的 Token。若尚未获取，请参考 [开发者指南 - 获取必要信息](../../aqara-studio/developer-guide.mdx#获取必要信息) 文档中的步骤进行操作。
+
+## 使用流程
+
+1. 选择一个您想要测试的 API，点击 API 名称，查看其文档。    
+    ![查看 API 文档](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/API-Spaces.png)   
+2. 在文档右侧找到 **Request** 区域。单击 **Base URL** 旁的 **Edit** 按钮。   
+    ![查看 API 文档](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/API-EditBaseUrl.png)   
+3. 此时，下方会显示 `host` 字段。请输入您的 Aqara Studio 服务地址，支持输入本地局域网 IP（http）或远程访问地址（https）。阅读 [Aqara Studio - 开发者指南 - 获取必要信息](../../aqara-studio/developer-guide.mdx#获取必要信息) 获取可用地址。   
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/API-SetHost.png" alt="输入 Aqara Studio 服务地址" style={{width: '60%'}} />   
+4. 找到 Bearer Token 字段。输入您从 Aqara Studio 获取的 Token。
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/API-SetToken.png" alt="输入 Token" style={{width: '60%'}} />   
+5. （可选）如果需要设置其他参数和请求体，请继续在 Request 区域进行设置。
+6. 完成上述配置后，单击 **Send API Request** 按钮，即可在线调试 API。
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/API-SendAPIRequest.png" alt="发送请求" style={{width: '60%'}} />   
+7. 当请求发送完毕后，您可以在下方 **Response** 区域，实时查看返回结果，包括请求是否成功及详细的响应内容。
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/API-CheckResponse.png" alt="查看响应" style={{width: '60%'}} /> 

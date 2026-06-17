@@ -1,0 +1,105 @@
+# 数据转出 API 入门
+
+本文介绍 Aqara 数据转出 HTTP API 的请求和响应要素。
+
+## 请求要素
+
+本节介绍组成数据转出 API 请求的各个要素：
+
+- [HTTP 方法](#http-方法)
+- [端点](#端点)
+- [请求头](#请求头)
+- [认证](#认证)
+- [参数](#参数)
+
+每个对 Aqara 数据转出 API 的请求都包含一个 HTTP 方法和一个路径。根据不同的 API 端点，您可能还需要指定请求头、认证信息、查询参数或请求体参数。
+
+Aqara 数据转出 API 参考文档为每个端点详细说明了对应的 HTTP 方法、路径及所需参数，并提供了请求和响应的示例。建议先查阅[HTTP API 列表](./introduction.mdx#http-api-列表)，快速了解所有可用端点。
+
+### HTTP 方法
+
+端点的 HTTP 方法定义了其在指定资源上执行的操作类型。一些常见的 HTTP 方法包括：`GET`、`POST`、`DELETE` 和 `PATCH`。API 参考文档会为每个端点提供 HTTP 方法说明。
+
+例如，[“查询空间列表”端点](./get-spaces.api.mdx) 的 HTTP 方法是 `GET`。
+
+当前 Aqara 数据转出 API 支持以下 HTTP 方法：
+
+- `GET`。
+- `POST`。
+- `PATCH`。
+
+### 端点
+
+每个端点都有一个 [Base URL](#base-url) 和 [路径](#路径)。
+
+#### Base URL
+
+Base URL 是 [Aqara Studio](../../aqara-studio/overview/introduction.mdx) 的访问地址。Base URL 默认为 Aqara Studio 的本机 IP 地址（http）。若您已启用远程访问，则 Base URL 也可为 Aqara Studio 的远程访问地址（https）。
+
+请阅读 [Aqara Studio - 开发者指南 - 获取必要信息](../../aqara-studio/developer-guide.mdx#获取必要信息)。
+
+#### 路径
+
+Aqara 数据转出 API 参考文档为每个端点提供了路径。例如，[“查询自动化详情”端点](./query-automation-details.api.mdx) 的路径是 `/open/api/v1/automations/<automationId>`。
+
+路径中的大括号 `<>` 表示需要您明确指定的路径参数。路径参数用来修改端点路径，并且在您的请求中是必需的。例如，[“查询自动化详情”端点](./query-automation-details.api.mdx) 的路径参数为 `{automationId}`。在请求时，需要将 `{automationId}` 替换为您希望查询的自动化 ID。
+
+### 请求头
+
+以下是您在调用所有 Aqara 数据转出 API 时都必需的公共请求头。
+
+| 参数 | 类型 | 说明 |
+| ------------- | ------ | ------------------------------------------------------------ |
+| Content-Type  | String | 默认为`application/json`。  |
+
+### 认证
+
+调用 Aqara 数据转出 API 时，必须在请求头中携带 Authorization 信息进行身份验证。
+
+请将 Authorization 设置为 `Bearer <token>`，其中 `<token>` 为您在 Aqara Studio 获取的访问令牌。如果令牌本身已包含 `Bearer` 前缀，可直接复制使用，无需重复添加。关于如何获取 Access Token，请参阅 [开发者指南 - 获取必要信息](../../aqara-studio/developer-guide.mdx#获取必要信息)。
+
+### 参数
+
+许多 API 方法要求或允许您在请求时传递额外参数。参数类型有两种：[路径参数](#路径参数) 和 [请求体参数](#请求体参数)。
+
+#### 路径参数
+
+路径参数用于修改端点路径，且为必须填写的参数。详情请参见 [路径](#路径)。
+
+#### 请求体参数
+
+请求体参数用于向 API 提交额外的数据，有些端点为必填，有些则为可选。例如，创建自动化时可在请求体中提供自动化的 JSON 脚本。具体每个端点支持的请求体参数，请参见相应的接口文档说明。
+
+## 响应要素
+
+发起请求后，API 会返回 [响应状态码](#响应状态码) 和 [响应体](#响应体)。
+
+### 响应状态码
+
+每个请求都会返回 HTTP 状态码，指示是否成功。详见 [MDN HTTP 响应状态码文档](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)。
+
+常见的响应码如下：
+- 200：请求成功。
+- 400：请求参数错误。
+- 401：未认证或认证失效。
+- 403：无权限访问。
+- 404：资源不存在。
+- 429：请求频率过高。
+- 500：服务内部错误。
+
+
+### 响应体
+
+大多数端点会返回响应体，除非另有说明，均为 JSON 格式。
+
+以下是所有响应都会包含的字段：
+
+| 参数 | 类型 | 说明 
+| --- | --- | --- |
+| type | String | 消息类型。|
+| version | String | 接口版本。|
+| msgId | String | 消息 ID。|
+| code | Integer | 业务状态码，0 表示成功。|
+| message | String | 请求结果的说明信息。|
+
+

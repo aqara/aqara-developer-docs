@@ -87,6 +87,10 @@
     "message": "空间",
     "description": "The label for category 'Space' in sidebar 'aqaraDeveloperSidebar'"
   },
+  "sidebar.aqaraDeveloperSidebar.category.local-api-gateway": {
+    "message": "网关",
+    "description": "The label for category 'Gateway' in sidebar 'aqaraDeveloperSidebar'"
+  },
   "sidebar.aqaraDeveloperSidebar.category.local-api-device": {
     "message": "设备",
     "description": "The label for category 'Device' in sidebar 'aqaraDeveloperSidebar'"

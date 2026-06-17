@@ -4,22 +4,35 @@ Learn about the resources Aqara provides for your further development.
 
 ## Developer Resources
 
-### Aqara Developer Platform
+### Choose the Right Integration Path First
 
-Before using APIs or related developer resources, start in the [Aqara Developer Platform](https://developer.aqara.com/) to create your app, request credentials, configure authorization, and prepare the basic integration setup.
+Aqara currently provides two API tracks, each targeting a different environment and requiring different prerequisites. Before diving into the docs, first determine whether you need **Cloud API** or **Studio API**.
+
+| API Type | Typical Scenario | What You Need Before You Start |
+| --- | --- | --- |
+| Cloud API | Integrating with Aqara cloud platform capabilities | Go to the [Aqara Developer Platform](https://developer.aqara.com/), create an app, obtain `Appid` and `Keyid`, and prepare authorization and signature generation. |
+| Local API for Studio | Integrating with data and control capabilities inside Aqara Studio | Prepare an accessible [Aqara Studio](../aqara-studio/overview/introduction.mdx) environment, along with its service address, token, and relevant project or device data. |
 
 ### API Documentation
 
-This section will gradually include multiple API documentation sets for different product capabilities and integration scenarios. The currently available API docs help you understand API scope, request methods, authentication requirements, parameter structures, and response formats.
+This section will gradually include multiple API documentation sets for different product capabilities and integration scenarios. The currently available API docs help you understand API scope, request methods, authentication requirements, parameter structures, response formats, and setup prerequisites.
 
 The API docs currently available are listed below:
 
 <div className="row aqara-resource-card-grid">
-  <div className="col col--4 margin-bottom--lg">
+  <div className="col col--6 margin-bottom--lg">
     <a className="aqara-resource-card" href="./aiot-api/introduction">
       <h3 className="aqara-resource-card__title">Cloud API</h3>
       <p className="aqara-resource-card__description">
-        Explore the currently published cloud API docs, including overview, getting started guidance, online testing, and endpoint references.
+        For Aqara cloud platform integrations. Start by creating an app in the Aqara Developer Platform and preparing authorization and signature settings.
+      </p>
+    </a>
+  </div>
+  <div className="col col--6 margin-bottom--lg">
+    <a className="aqara-resource-card" href="./data-export-api/introduction">
+      <h3 className="aqara-resource-card__title">Local API for Studio</h3>
+      <p className="aqara-resource-card__description">
+        For Aqara Studio environments. Start by preparing access to Aqara Studio before moving on to API testing and integration.
       </p>
     </a>
   </div>
@@ -31,4 +44,4 @@ In addition to API documentation, this section will also continue to include SDK
 
 ### Online Debugging and Validation
 
-For API docs that support interactive testing, you can validate request parameters, headers, signatures, and service endpoint configuration directly in the documentation, reducing integration and troubleshooting time.
+For API docs that support interactive testing, you can validate request parameters and basic configuration directly in the documentation. Because Cloud API and Local API for Studio target different environments, the authentication approach and service endpoint configuration you need to verify will also differ.

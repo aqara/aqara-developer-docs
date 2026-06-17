@@ -1,0 +1,23 @@
+# Try API Online
+
+You can directly try the Aqara Data Export API online on the API documentation page, making it fast and convenient to test and verify API functions. This article will guide you through how to try the API online.
+
+## Before you begin
+
+Before you begin, please ensure you have obtained the Aqara Studio Token. If you have not yet acquired it, refer to the steps in the [Developer Guide - Obtain Required Information](../../aqara-studio/developer-guide.mdx#obtain-required-information) documentation.
+
+## How to Use
+
+1. Select the API you want to test and click its name to view its documentation.  
+    ![View API Documentation](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/API-Spaces.png)
+2. On the right side of the documentation, find the **Request** area. Click the **Edit** button next to **Base URL**.  
+    ![Edit Base URL](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/API-EditBaseUrl.png)
+3. At this point, a `host` field will appear below. Enter your Aqara Studio service address here. You can use a local LAN IP address (http) or a remote access address (https). Read [Aqara Studio - Developer Guide - Obtain Required Information](../../aqara-studio/developer-guide.mdx#obtain-required-information) for available addresses.    
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/API-SetHost.png" alt="Enter Aqara Studio service address" style={{width: '60%'}} />
+4. Find the Bearer Token field. Enter the Token you obtained from Aqara Studio.   
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/API-SetToken.png" alt="Enter Token" style={{width: '60%'}} />
+5. (Optional) If you need to set other parameters or request bodies, configure them in the Request area.
+6. After completing the above configuration, click the **Send API Request** button to debug the API online.  
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/API-SendAPIRequest.png" alt="Send Request" style={{width: '60%'}} />
+7. After sending the request, you can view the returned results in real time in the **Response** area below, including whether the request was successful and the detailed response content.  
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/API-CheckResponse.png" alt="View Response" style={{width: '60%'}} /> 
