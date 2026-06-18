@@ -1,0 +1,2287 @@
+# Aqara 赋能通信协议规范
+
+## 第一章 介绍
+
+本文档定义 **Aqara Empowerment Communication Protocol**（中文名：Aqara 赋能通信协议，以下简称"本协议"或"AECP"），规范无线通信赋能模组（可搭载多种 IoT 无线协议栈，以下简称"Client"）与宿主 MCU（以下简称"Server"）之间通过 UART 串口进行数据交换的完整协议栈。
+
+Client 负责实现 IoT 无线协议的接入与赋能，承担网络管理、云端通信与 IoT 协议适配职责；Server 负责执行产品自身的业务逻辑，不感知无线网络。两者之间所有的状态同步、命令传递与事件通知均通过本协议完成。
+
+:::tip
+本协议持续演进。版本迭代遵循向前兼容原则，但不保证与极低版本固件或长期未维护固件之间的完全兼容。以下建议适用于所有集成方：
+
+- 以实际使用的具体模块文档为准。
+- 咨询绿米 Aqara 官方，或使用官方推荐的最新公版固件。
+:::
+
+### 范围
+
+本规范涵盖：
+
+- Client 与 Server 之间的 UART 硬件接口要求（参见 [第二章](#第二章-硬件接口)）
+- 数据类型、数据帧编码与应用交互格式（参见 [第三章](#第三章-数据类型与交互格式)）
+- 低功耗设备的串口唤醒机制、上电启动与初始化发现流程（参见 [第四章](#第四章-唤醒与初始化)）
+- Profile 体系、应答与重传等实现规则（参见 [第五章](#第五章-profile-体系与实现规则)）
+- Foundation Profile 与产品 Profile 的属性、命令定义（参见 [第六章](#第六章-foundation-profileprofile-id--0x0000) 和 [第七章](#第七章-thermostat-profileprofile-id--0x1000)）
+- 固件在线升级（OTA）子协议（参见 [第六章](#第六章-foundation-profileprofile-id--0x0000)）
+- 串口消息编解码示例（参见 [附录 A](#附录-a串口消息示例)）
+
+本规范面向嵌入式固件开发人员，提供实现互操作性所需的完整技术细节。
+
+### 协议架构与设计理念
+
+本节给出 AECP 的整体架构、设计理念与核心概念，帮助读者在阅读后续技术细节前建立统一的理解框架。
+
+#### 系统架构
+
+AECP 面向 **"无线赋能模组 + 宿主 MCU"** 的双芯片协作场景。无线赋能模组承担 IoT 无线协议接入、配网、联网与云端通信，对宿主 MCU 屏蔽无线网络的复杂性；宿主 MCU 专注于产品自身的业务逻辑与外设控制。两者通过一条 UART 串口连接，本协议即定义这条链路上的全部数据交换规则。
+
+![AECP 系统架构](https://itad-aqara-docs-1300889962.aqara.com/dev/img/mcu-standard-protocol/zh/system_architecture.svg)
+
+在本协议中，无线赋能模组担任 **Client**，宿主 MCU 担任 **Server**。该角色命名以 **"数据与能力的归属"** 为依据：设备的业务状态与能力由 MCU（Server）持有并对外提供，模组（Client）作为这些能力的访问方与赋能方。这一约定贯穿全文，是理解后续属性归属与交互方向的基础。
+
+#### UART 缓冲区约束
+
+Client 模组的 UART 接收缓冲区和发送缓冲区大小 SHALL 均不小于 **1024 字节**。Server 发送给 Client 的单个完整 AECP 帧长度 SHALL NOT 超过 Client 接收缓冲区大小。完整 AECP 帧长度从 `SOF` 开始计算，到 `Overall Checksum` 结束，包含帧头、`Data Segment` 和校验字段。
+
+| 接收缓冲区大小 | 发送缓冲区大小 | 备注 |
+|:---:|:---:|:---|
+| 最小 1024 字节 | 最小 1024 字节 | 若固件版本支持文件传输类功能，则缓冲区大小最大值参考文件传输时单包文件数据的最大长度。 |
+
+若 Server 发送给 Client 的完整数据包长度超出 Client 接收缓冲区大小，可能导致接收溢出、丢包或解析失败，从而出现数据通信异常。实现方在设计属性上报、命令参数和 IAP OTA 分片长度时 SHALL 以目标 Client 平台的接收缓冲区大小作为 AECP 单帧长度上限。该约束仅适用于本协议定义的 AECP 通信帧，不适用于 BootLoader OTA 中由 XMODEM 承载的固件传输过程。
+
+#### 设计理念
+
+本协议的设计遵循以下原则：
+
+- **职责解耦**：Server 不感知无线网络，Client 不介入产品业务逻辑。任意一侧的实现演进或更换（如更换无线制式）不应影响另一侧。
+- **以属性为中心的数据模型**：设备的状态与能力统一抽象为 *属性（Attribute）*，状态同步退化为对属性的读、写、上报，使数据模型清晰、可枚举、可校验。
+- **核心 + 产品分层的 Profile 体系**：所有设备共享一个强制的 Foundation Profile 提供通用能力，再由唯一的产品 Profile 描述具体品类，兼顾一致性与可扩展性。
+- **对称的交互模型**：属性访问按 *"谁持有、谁发起、拉取还是推送"* 形成一组对称且封闭的操作码，避免特例，降低实现复杂度。
+- **可演进与向前兼容**：通过协议版本号、Profile 与属性的可选性声明，支持能力的渐进式扩展，并保持对旧实现的向前兼容。
+
+#### 分层模型
+
+AECP 在逻辑上可分为四层，自底向上各层职责独立、依次封装：
+
+| 层次 | 职责 | 本规范对应 |
+|:---|:---|:---|
+| 物理层 | UART 电气与时序、低功耗唤醒信号 | [第二章](#第二章-硬件接口)、[第四章](#第四章-唤醒与初始化) |
+| 帧层 | 帧结构、字段编码、字节序、HCS 与 CRC 校验 | [第三章](#第三章-数据类型与交互格式) |
+| 事务层 | 操作码语义、请求与应答配对、Seq 关联、超时与重传 | [第三章](#第三章-数据类型与交互格式)、[第五章](#第五章-profile-体系与实现规则) |
+| 应用层 | 属性、命令、Profile 与 OTA 子协议 | [第五章](#第五章-profile-体系与实现规则)、[第六章](#第六章-foundation-profileprofile-id--0x0000)、[第七章](#第七章-thermostat-profileprofile-id--0x1000) |
+
+#### 核心概念与交互模型
+
+理解本协议需把握以下核心概念：
+
+- **角色（Client / Server）**：Client 为无线赋能模组，Server 为宿主 MCU；二者的职责与归属见 [系统架构](#系统架构)。
+- **Profile**：一组相关属性与命令构成的功能域，由 Profile ID 标识。Server 默认支持 Foundation Profile（`0x0000`），并通过 `ProductProfileID` 声明唯一的产品 Profile。
+- **属性（Attribute）**：设备状态或能力的数据单元，按归属端区分为 Server 属性（`Side = S`）与 Client 属性（`Side = C`），其合法操作由访问权限声明。
+- **命令（Command）**：触发性动作，合法发起方与应答方式由所属 Profile 命令表声明。
+- **帧与事务**：每次交互以数据帧承载，由操作码（OPC）界定消息类型与方向，并通过 Seq 关联请求与应答构成一次事务。
+
+属性交互遵循一组对称、封闭的操作：以属性归属端为中心，区分"访问方拉取"与"持有方推送"两个维度，构成下表所示的完整操作集合（详细编码与时序见 [第三章](#第三章-数据类型与交互格式)）：
+
+| 交互 | 发起方 | 操作对象 | 发起操作码 | 应答 |
+|:---|:---|:---|:---|:---|
+| 读取 Server 属性 | Client | Server 属性 | READ | READ_RESPONSE |
+| 写入 Server 属性 | Client | Server 属性 | WRITE | WRITE_RESPONSE |
+| Server 主动上报 | Server | Server 属性 | REPORT | ACKNOWLEDGE |
+| 查询 Client 属性 | Server | Client 属性 | QUERY | QUERY_RESPONSE |
+| Client 主动上报 | Client | Client 属性 | NOTIFY | ACKNOWLEDGE |
+| 触发命令 | 由命令定义 | 命令 | COMMAND | ACKNOWLEDGE / 配对 COMMAND / 无 |
+
+### 术语与定义
+
+| 术语 | 定义 |
+|:---|:---|
+| Client | 无线通信赋能模组（Module）。搭载 IoT 无线协议栈，负责 IoT 协议接入与赋能业务。在 AECP 中发起对 Server 属性的 READ/WRITE 与命令（COMMAND），响应 Server 对 Client 属性的查询（QUERY_RESPONSE），并可主动上报 Client 属性（NOTIFY）。 |
+| Server | 宿主微控制器（MCU），执行产品业务逻辑。在 AECP 中持有设备侧状态，响应 Client 对 Server 属性的读写与命令，主动上报属性（REPORT），并可向 Client 发起属性查询（QUERY）。Server 不感知无线网络。 |
+| Profile | 功能域。由一组相关的属性和命令组成，用 Profile ID（uint16）标识。Server 默认支持 Foundation Profile（`0x0000`），并通过 `ProductProfileID` 声明唯一产品 Profile。 |
+| 属性 (Attribute) | 设备状态或能力的持久化数据单元，由 Attribute ID（uint16）在所属 Profile 内唯一标识。完整属性地址由 `Profile ID + Attribute ID` 确定。每个属性有确定的数据类型、归属方（Side：C 或 S）、访问权限（Access）和实现要求（Conformance）。READ/WRITE/QUERY/QUERY_RESPONSE/REPORT/NOTIFY 均针对属性操作。 |
+| 命令 (Command) | 触发性动作，由 Command ID（uint16）标识，携带类型化参数。每条命令的合法发起方由所属 Profile 命令表中的 Direction 明确声明；接收方以 ACKNOWLEDGE 或配对 COMMAND 应答。 |
+| 操作码 (OPC) | 数据帧中标识消息类型与方向的 1 字节字段，共定义 10 种操作码，对应属性读写、属性上报、属性查询、属性上报（NOTIFY）和命令等交互模式。 |
+| Side | 属性归属方标注。**C**（Client）= 该属性由 Client 持有和维护；**S**（Server）= 该属性由 Server 持有和维护。每个属性 SHALL 在属性表中明确标注 C 或 S。 |
+| Conformance | 实现要求标注。**M**（Mandatory，必选）= 该条目 SHALL 实现；**O**（Optional，可选）= 该条目 MAY 实现。 |
+| Profile ID | 数据帧头部的 2 字节字段（原 Device Type），标识本帧通信所属的功能域，而非仅区分产品类型。 |
+| OTA | Over-The-Air，固件在线升级。本协议定义 IAP OTA 与 BootLoader OTA 两种升级方式。 |
+
+### 缩写
+
+| 缩写 | 全称 |
+|:---|:---|
+| ACK | Acknowledgement（应答） |
+| ASCII | American Standard Code for Information Interchange（美国信息交换标准代码） |
+| CRC | Cyclic Redundancy Check（循环冗余校验） |
+| GPIO | General-Purpose Input/Output（通用输入/输出引脚） |
+| IAP | In Application Programming（应用内编程） |
+| ISP | In System Programming（系统内编程） |
+| LSB | Least Significant Byte / Bit（最低有效字节/位） |
+| MCU | Micro Controller Unit（微控制器） |
+| MSB | Most Significant Byte / Bit（最高有效字节/位） |
+| OTA | Over-The-Air（空中升级/在线升级） |
+| SOF | Start Of Frame（帧起始码） |
+| UART | Universal Asynchronous Receiver-Transmitter（通用异步收发传输器） |
+| UTC | Coordinated Universal Time（协调世界时） |
+| XMODEM | XMODEM 文件传输协议 |
+
+### 文档约定
+
+#### 关键字约定
+
+本文档中的关键字按照 RFC 2119 的定义解释：
+
+- **SHALL** — 绝对要求。
+- **SHALL NOT** — 绝对禁止。
+- **SHOULD** — 推荐行为；忽略前须充分理解并权衡影响。
+- **SHOULD NOT** — 不推荐行为；采用前须充分理解并权衡影响。
+- **MAY** — 可选项。
+
+#### 字节序约定
+
+AECP 中的所有多字节字段均采用 **大端序（Big-Endian）** 传输，即高位字节在前。该规则适用于帧头、Data Segment、属性值、命令参数以及 Overall Checksum。
+
+以下字段明确采用大端序：`Profile ID`、`Data Length`、`Overall Checksum`。
+
+唯一例外是 OTA 固件文件内部的 OTA Header。OTA Header 不属于 AECP 通信帧字段，其内部字段采用**小端序（Little-Endian）**，在固件升级章节中另行说明。
+
+#### 数值表示约定
+
+- 十六进制值使用 `0x` 前缀表示，例如 `0x55`。
+- 二进制值使用 `0b` 前缀表示，例如 `0b00000001`。
+- 字节长度使用 `N bytes` 表示，例如 `2 bytes`。
+
+<a id="ref_FieldNotation"></a>
+
+#### 字段记号约定
+
+本规范中的属性表、命令表和参数表 SHALL 统一使用以下列含义。后续章节不再重复定义这些列名。
+
+| 列名 | 含义 |
+|:---|:---|
+| `ID` / `Attribute ID` / `Command ID` | 条目标识符。属性表中表示 Attribute ID；命令表中表示 Command ID；参数表中表示参数序号或参数 ID。 |
+| `Name` / `名称` | 条目名称，使用英文标识符。 |
+| `Type` / `类型` | 数据类型，取值 SHALL 来自数据类型章节或本 Profile 定义的数据类型。 |
+| `Constraint` / `约束` | 数值范围、长度、固定值或取值约束；"无额外约束"表示仅受基础数据类型限制。 |
+| `Default` / `默认值` | 缺省值或复位后的初始值；`—` 表示不规定统一默认值。 |
+| `Access` / `访问权限` | 合法访问方式。`R` = READ；`W` = WRITE；`RP` = REPORT；`Q` = QUERY；`NF` = NOTIFY。 |
+| `Side` / `归属方` | 属性归属方。`C` = Client 持有和维护；`S` = Server 持有和维护。 |
+| `Conformance` / `必选性` | 实现要求。`M` = Mandatory，必选，SHALL 实现；`O` = Optional，可选，MAY 实现。 |
+| `Direction` / `方向` | 命令合法发起方，由命令表定义。 |
+| `Response` / `应答` | 命令应答方式。可为 `ACKNOWLEDGE`、配对 COMMAND 名称，或 `N`（无应答）。 |
+| `Description` / `简述` / `说明` | 条目的简要说明。 |
+| `Octets` | COMMAND Payload Format 中每个字段占用的 Raw Data 字节数。变长字段 SHALL 写明长度计算方式。 |
+| `Data Type` | COMMAND Payload Format 中每个字段的数据类型。 |
+| `Field Name` | COMMAND Payload Format 中每个字段的名称。 |
+
+## 第二章 硬件接口
+
+本章定义 Client 与 Server 之间的 UART 串口硬件接口要求。
+
+### UART 通信参数
+
+Client 与 Server 之间的串口通信须按以下参数配置：
+
+| 参数 | 值 |
+|:---|:---|
+| 波特率 (Baud Rate) | 115200 bps |
+| 数据位 (Data Bits) | 8 位 |
+| 奇偶校验 (Parity) | 无 (None) |
+| 停止位 (Stop Bits) | 1 位 |
+| 数据流控 (Flow Control) | 无 (None) |
+| 供电电压 | DC 3.3 V（Client 与 Server 均采用） |
+
+### 引脚连接
+
+Client 与 Server 之间至少需要以下连接：
+
+- **TXD / RXD**：串口数据线，Client TXD 接 Server RXD，Client RXD 接 Server TXD，交叉连接。
+- **唤醒引脚（Wake Pin）**：用于低功耗设备的双向唤醒信号（参见 [第三章](#第三章-数据类型与交互格式)）。Client 和 Server 各自提供一个唤醒引脚，分别用于被对方唤醒。
+- **BootLoader 进入引脚（BootLoader Entry GPIO）**：若设备声明支持 BootLoader OTA，SHALL 提供由 Client 控制的硬件进入路径，使 Server 可通过 GPIO、复位脚或 Boot 选择脚进入 BootLoader。
+- **电源（VCC / GND）**：Client 和 Server 均采用 DC 3.3 V 供电，共地。
+
+:::tip
+具体引脚编号因 Client 产品型号而异。请参考对应 Client 的硬件规格书或咨询绿米 Aqara 官方获取准确的引脚定义。
+:::
+
+### 电气特性
+
+- 所有数字 I/O 引脚（TXD、RXD、唤醒引脚、BootLoader 进入引脚）的逻辑电平均为 3.3 V CMOS。
+- 设计时应避免直接与 5 V 电平系统相连；若 Server 为 5 V 系统，须加电平转换电路。
+
+<a id="ref_DataTypesAndInteractionFormat"></a>
+
+## 第三章 数据类型与交互格式
+
+本章先定义 AECP 的应用交互模式和帧结构，再定义 Data Segment 与校验编码规则，最后定义 Data Type 与 Status。具体属性、命令、枚举和值域由各 Profile 定义。
+
+<a id="ref_FrameFormat"></a>
+
+### 交互模式
+
+本节定义 AECP 的数据帧线路格式、操作码语义、事务匹配规则以及应用层交互模型。具体属性、命令、枚举和值域由各 Profile 定义。
+
+#### 帧结构总览
+
+AECP 数据帧由固定帧头（7 字节）、可变长数据段和尾部校验组成：
+
+```
++-------+------------+-------+-------+---------+-------+------------------+-------+
+|  SOF  | Profile ID |  Seq  |  OPC  |  D-Len  |  HCS  |   Data Segment   |  CRC  |
+| (1 B) |    (2 B)   | (1 B) | (1 B) |  (2 B)  | (1 B) |     (N bytes)    | (2 B) |
++-------+------------+-------+-------+---------+-------+------------------+-------+
+```
+
+| 缩写 | 长度 | 说明 |
+|:---:|:---:|:---|
+| SOF | 1 byte | Start Of Frame，帧起始标志，固定为 `0x55`。 |
+| Profile ID | 2 bytes | 功能域标识，大端序。接收方通过 Profile ID 与 Attribute ID / Command ID 共同解析语义。 |
+| Seq | 1 byte | Sequence，事务序列号，用于应答匹配、重传去重和事务关联。 |
+| OPC | 1 byte | Operation Code，操作码，定义消息类型、方向和 Data Segment 格式。 |
+| D-Len | 2 bytes | Data Length，Data Segment 字节长度，大端序。 |
+| HCS | 1 byte | Header Checksum，帧头校验，覆盖 SOF 至 D-Len 共 7 字节。 |
+| — | N bytes | Data Segment，数据段，格式由 OPC 决定。 |
+| CRC | 2 bytes | Overall Checksum，CRC16-Modbus，覆盖 Data Segment，大端序。 |
+
+:::tip
+Profile ID、D-Len、CRC 均采用 **大端序（Big-Endian）** 编码，即高位字节在前。
+:::
+
+#### 帧头字段说明
+
+##### SOF — 帧起始码
+
+SOF 固定为 `0x55`，用于标识一帧数据的起始。接收方 SHALL 以 `0x55` 作为帧同步标志。
+
+<a id="ref_ProfileID"></a>
+
+##### Profile ID — 功能域标识
+
+Profile ID 为 2 字节大端序无符号整数，标识本帧通信所属的 **功能域（Functional Profile）**。接收方须结合 Profile ID 与 Attribute ID / Command ID 才能完整解析本帧语义。
+
+| Profile ID | 说明 |
+|:---:|:---|
+| `0x0000` | Foundation Profile。所有设备必须支持。包含基础属性、基础命令和固件升级相关能力。 |
+| `0x1000` | Thermostat Profile。恒温器设备专有属性与命令。 |
+
+Server SHALL 默认支持 Foundation Profile（`0x0000`），并通过 Foundation Profile 中的 `ProductProfileID` 声明唯一产品 Profile。Client 可根据当前交互对象，在 Foundation Profile 与该产品 Profile 之间切换 Profile ID。
+
+##### Seq — 事务序列号
+
+Seq 为 1 字节无符号整数，用于关联请求与应答帧，并支持重传识别：
+
+- Client 与 Server 各自独立维护序列号计数器，互不同步。
+- 发送方 SHALL 对每条新事务递增序列号（回绕时从 `0x00` 重新开始）。
+- 应答帧的 Seq SHALL 与所响应的请求帧保持一致。
+- 接收方收到相同 Seq 且载荷相同的重传帧时，SHOULD 保持幂等处理并返回相同语义的应答。
+
+<a id="ref_OpCodes"></a>
+
+##### OPC — 操作码
+
+OPC 为 1 字节，定义本帧的消息类型、方向与操作对象：
+
+| 值 | 名称 | 方向 | 对象 | 语义 |
+|:---:|:---|:---|:---:|:---|
+| 0x1 | READ | Client → Server | 属性 | Client 读取 Server 端属性。 |
+| 0x2 | READ_RESPONSE | Server → Client | 属性 | Server 回应 READ，携带属性级 Status 和属性值。 |
+| 0x3 | WRITE | Client → Server | 属性 | Client 写入 Server 属性。 |
+| 0x4 | WRITE_RESPONSE | Server → Client | 属性 | Server 回应 WRITE，携带属性级 Status。 |
+| 0x5 | REPORT | Server → Client | 属性 | Server 主动上报属性变化或周期性属性值。 |
+| 0x6 | ACKNOWLEDGE | 接收方 → 原发起方 | 帧 | 对 REPORT、NOTIFY 或无需返回数据的 COMMAND 进行帧级确认。 |
+| 0x7 | QUERY | Server → Client | 属性 | Server 查询读取 Client 端属性。 |
+| 0x8 | QUERY_RESPONSE | Client → Server | 属性 | Client 回应 QUERY，携带属性级 Status 和属性值。 |
+| 0x9 | COMMAND | 由命令定义决定 | 命令 | 发起触发性命令，携带 Command ID 与类型化参数。 |
+| 0xA | NOTIFY | Client → Server | 属性 | Client 主动上报自身属性变化或同步属性值。 |
+
+除 0x9（COMMAND）外，其余 OPC 均为属性操作，Data Segment 中包含 Attribute ID；0x9 为命令操作，Data Segment 中包含 Command ID。
+
+##### D-Len — 数据长度
+
+D-Len 为 2 字节大端序无符号整数，表示 Data Segment 的字节长度。Data Segment 为空时，D-Len = `0`。
+
+发送方构造任意 AECP 帧时，完整帧长度 SHALL 同时满足发送方 UART 发送缓冲区和接收方 UART 接收缓冲区约束。完整帧长度计算如下：
+
+```
+Complete Frame Length = 10 + D-Len
+```
+
+其中 `10 bytes` 为 `SOF`、`Profile ID`、`Seq`、`OPC`、`D-Len`、`HCS` 和 `Overall Checksum` 的固定开销。UART 缓冲区要求见 [UART 缓冲区约束](#uart-缓冲区约束)。
+
+##### HCS — 帧头校验
+
+HCS 为 1 字节，覆盖从 SOF 到 D-Len（含）共 7 字节，用于验证帧头完整性。
+
+计算方法（二补数求和）：
+
+```
+Sum = SOF + Profile_ID[MSB] + Profile_ID[LSB]
+    + Seq + OPC + D-Len[MSB] + D-Len[LSB]
+
+HCS = (~Sum + 1) & 0xFF
+```
+
+:::tip
+CRC（Overall Checksum）使用不同的校验算法，参见 [Overall Checksum](#overall-checksum--整体校验)。
+:::
+
+<a id="ref_InteractionModel"></a>
+
+#### 应用交互模型
+
+AECP 将应用交互分为四类：Server 属性读写、Server 属性上报、Client 属性查询与上报、命令交互。Profile 属性表中的 `Side` 与 `Access` 决定某个属性是否支持对应操作，`Conformance` 决定该属性是否必须实现；Profile 命令表中的 `Direction` 决定某个命令的合法发起方。
+
+##### 角色、寻址与属性归属
+
+完整应用寻址由帧头 `Profile ID` 与 Data Segment 中的 `Attribute ID` 或 `Command ID` 共同组成：
+
+- `Profile ID + Attribute ID` 唯一标识一个属性。
+- `Profile ID + Command ID` 唯一标识一个命令。
+- `Side = S` 的属性由 Server 持有，Client 可按 `Access` 执行 READ / WRITE，Server 可按 `Access` 执行 REPORT。
+- `Side = C` 的属性由 Client 持有，Server 可按 `Access` 执行 QUERY 拉取（Client 通过 QUERY_RESPONSE 返回属性值），Client 可按 `Access` 主动 NOTIFY 同步属性值。
+
+##### 属性读写
+
+属性读写用于 Client 访问 Server 持有的属性。
+
+| 事务 | 应答 | 说明 |
+|:---|:---|:---|
+| READ | READ_RESPONSE | Client 读取 `Side = S` 且 `Access` 包含 `R` 的属性。 |
+| WRITE | WRITE_RESPONSE | Client 写入 `Side = S` 且 `Access` 包含 `W` 的属性。 |
+
+READ_RESPONSE 与 WRITE_RESPONSE 中的 Status 为**属性级**结果。单帧包含多个 Attribute Block 时，每个属性独立成功或失败；某个属性失败不影响同帧其他属性的处理。
+
+![AECP 应用交互模型](https://itad-aqara-docs-1300889962.aqara.com/dev/img/mcu-standard-protocol/zh/interaction_model.svg)
+
+##### 属性上报与确认
+
+REPORT 用于 Server 主动上报属性变化或周期性属性值。仅 `Side = S` 且 `Access` 包含 `RP` 的属性可通过 REPORT 上报。
+
+ACKNOWLEDGE 的 Status 为**帧级**结果，表示接收方是否成功接收并受理该 REPORT 帧。若 REPORT 帧携带多个 Attribute Block，ACKNOWLEDGE 不逐项返回属性级结果。
+
+上报行为由 Profile 属性表声明：
+
+- `RP` 表示 Server 具备主动上报该属性的能力。
+- 凡 `Side = S` 且 `Access` 包含 `R` 的可读属性，Access SHALL 同时包含 `RP`。
+- 变化上报、周期上报、关联上报等策略由具体 Profile 属性说明定义。
+- 本协议不定义独立的上报配置命令；运行时配置应通过对应的 Server 属性完成。
+
+##### Client 属性查询、响应与上报
+
+QUERY / QUERY_RESPONSE 用于 Server 按需读取 Client 持有的属性。
+
+仅 `Side = C` 且 `Access` 包含 `Q` 的属性可被 QUERY。QUERY_RESPONSE 中的 Status 为**属性级**结果，截断规则与 READ_RESPONSE 相同。
+
+NOTIFY 用于 Client 主动向 Server 同步自身属性，尤其在属性值发生变化时。仅 `Side = C` 且 `Access` 包含 `NF` 的属性可通过 NOTIFY 上报。Server 收到 NOTIFY 后 SHALL 返回 ACKNOWLEDGE，其 Status 为**帧级**结果，表示是否成功接收并受理该 NOTIFY 帧；若 NOTIFY 帧携带多个 Attribute Block，ACKNOWLEDGE 不逐项返回属性级结果。
+
+上报行为由 Profile 属性表声明：
+
+- `NF` 表示 Client 具备主动 NOTIFY 该属性的能力。
+- 变化上报、周期上报等策略由具体 Profile 属性说明定义。
+- 本协议不定义独立的 NOTIFY 配置命令；运行时配置应通过对应属性完成。
+
+##### 命令交互与应答模式
+
+COMMAND 用于触发动作。命令语义由 `Profile ID + Command ID` 决定，合法发起方由该命令在所属 Profile 命令表中的 `Direction` 决定，应答方式由命令表中的 `Response` 决定。
+
+以下时序图中的 `Initiator` 表示该命令 `Direction` 允许的 COMMAND 发起方；`Receiver` 表示接收该 COMMAND 的另一端。
+
+接收方收到 COMMAND 后，SHALL 按命令表中的 `Response` 选择以下任一应答路径：
+
+- 若 `Response = ACKNOWLEDGE`，接收方 SHALL 直接返回 ACKNOWLEDGE。
+- 若 `Response = <CommandName>`，接收方 SHALL 返回该名称对应的配对 COMMAND。
+- 若 `Response = N`，接收方 SHALL 不再返回应答。`N` SHOULD 仅用于配对返回命令，避免无限应答链。
+
+无返回数据的命令使用 ACKNOWLEDGE 直接确认：
+
+需要返回数据的命令使用配对 COMMAND 返回数据；配对 COMMAND 是否继续应答由其自身 `Response` 声明决定：
+
+若配对返回命令声明 `Response = ACKNOWLEDGE`，原发起方收到该配对 COMMAND 后 SHALL 返回 ACKNOWLEDGE；若声明 `Response = N`，原发起方 SHALL 不再返回应答。
+
+若接收方无法执行命令，SHOULD 直接返回 ACKNOWLEDGE 且 Status 为非零错误码，不再发送配对 COMMAND。
+
+##### 事务、方向与序列号
+
+事务应答的 Seq SHALL 与原事务 Seq 一致：
+
+| 请求 / 主动帧 | 应答帧 | Seq 规则 |
+|:---|:---|:---|
+| READ | READ_RESPONSE | 应答沿用 READ 的 Seq。 |
+| WRITE | WRITE_RESPONSE | 应答沿用 WRITE 的 Seq。 |
+| REPORT | ACKNOWLEDGE | ACKNOWLEDGE 沿用 REPORT 的 Seq。 |
+| QUERY | QUERY_RESPONSE | QUERY_RESPONSE 沿用 QUERY 的 Seq。 |
+| NOTIFY | ACKNOWLEDGE | ACKNOWLEDGE 沿用 NOTIFY 的 Seq。 |
+| COMMAND | ACKNOWLEDGE、配对 COMMAND 或无应答 | ACKNOWLEDGE 或配对 COMMAND 沿用 COMMAND 的 Seq；`Response = N` 时无应答帧。 |
+
+REPORT 与 Server 发起的 COMMAND 属于 Server 自发事务，Server 使用本端新 Seq。Client 发起的 READ、WRITE、COMMAND、NOTIFY 属于 Client 自发事务，Client 使用本端新 Seq。
+
+##### Status 用法
+
+Status 编码见 [Status — 返回状态](#status--返回状态)。不同 OPC 中 Status 的作用域不同：
+
+| 帧类型 | Status 粒度 | 说明 |
+|:---|:---:|:---|
+| READ_RESPONSE / QUERY_RESPONSE | 属性级 | 每个 Attribute Block 独立携带 Status。 |
+| WRITE_RESPONSE | 属性级 | 每个 Attribute Block 独立携带 Status。 |
+| ACKNOWLEDGE | 帧级 | 对整帧 REPORT、NOTIFY 或 COMMAND 的接收 / 执行结果确认。 |
+
+当属性级 Status 不为 `0x00` 时，对应 Attribute Block SHALL 仅包含 Attribute ID 与 Status，不再携带 Data Type 与 Data。
+
+### 编码规则
+
+<a id="ref_DataSegmentFormat"></a>
+
+#### Data Segment 编码规则
+
+本节定义每种 OPC 对应的 Data Segment 布局。多 Attribute 时，各 Attribute Block 依次紧接排列。
+
+本节以下每一种 Data Segment 布局均 SHALL 遵循 UART 缓冲区约束：发送方在填充 Attribute Block、Command 参数或可变长 Raw Data 时，必须确保 `10 + D-Len` 不超过发送方 UART 发送缓冲区大小，也不超过接收方 UART 接收缓冲区大小。若待发送内容无法放入单帧，发送方 SHALL 使用对应 Profile 定义的分片、分页或多次交互机制，不得直接发送超出缓冲区能力的帧。
+
+##### READ（OPC = 0x1）
+
+READ 请求读取一个或多个 Server 属性。Data Segment 仅含 Attribute ID 列表，不携带值。
+
+```
+Data Segment（一个或多个 AttrID）：
++-----------+-----------+-----+-----------+
+|  AttrID 1 |  AttrID 2 | ... |  AttrID N |
+|   (2 B)   |   (2 B)   |     |   (2 B)   |
++-----------+-----------+-----+-----------+
+```
+
+##### READ_RESPONSE（OPC = 0x2）
+
+READ_RESPONSE 回应 READ。Data Segment SHALL 为 READ 请求中的每个 Attribute ID 返回一个 Attribute Block，且 Attribute Block 顺序 SHOULD 与 READ 请求中的 Attribute ID 顺序一致。
+
+每个 Attribute Block 独立携带属性级 Status：
+
+- 若 Status = `0x00`，表示该属性读取成功，Attribute Block SHALL 同时携带 Data Type 与 Data。
+- 若 Status != `0x00`，表示该属性读取失败，Attribute Block SHALL 仅携带 AttrID 与 Status，SHALL NOT 携带 Data Type 与 Data。
+- 多属性 READ 中，允许部分属性成功、部分属性失败；某个属性失败 SHALL NOT 影响同帧其他属性的返回。
+
+```
+Data Segment（单个属性，Status = 0x00）：
++--------+--------+-----------+------+
+| AttrID | Status | Data Type | Data |
+| (2 B)  | (1 B)  |   (1 B)   |(N B) |
++--------+--------+-----------+------+
+```
+
+```
+Data Segment（单个属性，Status != 0x00）：
++--------+--------+
+| AttrID | Status |
+| (2 B)  | (1 B)  |
++--------+--------+
+```
+
+多属性全部成功示例：
+
+```
++---------+--------+-----------+-------+---------+--------+-----------+-------+
+| AttrID1 | Status | Data Type | Data1 | AttrID2 | Status | Data Type | Data2 |
+| (2 B)   | (1 B) |   (1 B)   | (N B) | (2 B)   | (1 B) |   (1 B)   | (N B) |
++---------+--------+-----------+-------+---------+--------+-----------+-------+
+```
+
+多属性部分成功示例：
+
+```
++---------+--------+-----------+-------+---------+--------+
+| AttrID1 | Status | Data Type | Data1 | AttrID2 | Status |
+| (2 B)   | (1 B) |   (1 B)   | (N B) | (2 B)   | (1 B) |
++---------+--------+-----------+-------+---------+--------+
+```
+
+上述示例中，`AttrID1` 读取成功；`AttrID2` 读取失败，因此 `AttrID2` 后不再携带 Data Type 与 Data。
+
+多属性全部失败示例：
+
+```
++---------+--------+---------+--------+
+| AttrID1 | Status | AttrID2 | Status |
+| (2 B)   | (1 B) | (2 B)   | (1 B) |
++---------+--------+---------+--------+
+```
+
+##### WRITE（OPC = 0x3）
+
+WRITE 写入 Server 属性。Data Segment 由一个或多个 Attribute Block 组成，每个 Attribute Block 携带 Attribute ID、Data Type 与 Data。
+
+```
+Data Segment（单个属性）：
++--------+-----------+------+
+| AttrID | Data Type | Data |
+| (2 B)  |   (1 B)   |(N B) |
++--------+-----------+------+
+```
+
+##### WRITE_RESPONSE（OPC = 0x4）
+
+WRITE_RESPONSE 回应 WRITE。Data Segment 由一个或多个 Attribute Block 组成，每个 Attribute Block 携带属性级 Status。
+
+```
+Data Segment（单个属性）：
++--------+--------+
+| AttrID | Status |
+| (2 B)  | (1 B)  |
++--------+--------+
+```
+
+##### REPORT（OPC = 0x5）
+
+REPORT 主动上报一个或多个 Server 属性。Data Segment 格式与 WRITE 相同，由一个或多个 Attribute Block 组成。
+
+```
+Data Segment（单个属性，同 WRITE）：
++--------+-----------+------+
+| AttrID | Data Type | Data |
+| (2 B)  |   (1 B)   |(N B) |
++--------+-----------+------+
+```
+
+##### ACKNOWLEDGE（OPC = 0x6）
+
+ACKNOWLEDGE 对 REPORT、NOTIFY 或 COMMAND 进行帧级确认。Data Segment 仅含 Status。
+
+```
+Data Segment：
++--------+
+| Status |
+| (1 B)  |
++--------+
+```
+
+##### QUERY（OPC = 0x7）
+
+QUERY 查询读取一个或多个 Client 属性。Data Segment 格式与 READ 相同。
+
+```
+Data Segment（一个或多个 AttrID）：
++-----------+-----------+-----+-----------+
+|  AttrID 1 |  AttrID 2 | ... |  AttrID N |
+|   (2 B)   |   (2 B)   |     |   (2 B)   |
++-----------+-----------+-----+-----------+
+```
+
+##### QUERY_RESPONSE（OPC = 0x8）
+
+QUERY_RESPONSE 回应 QUERY。Data Segment 格式与 READ_RESPONSE 相同，也 SHALL 为 QUERY 中的每个 Attribute ID 返回一个 Attribute Block。
+
+QUERY_RESPONSE 同样支持多属性全部成功、部分成功和全部失败。Status = `0x00` 的 Attribute Block 携带 Data Type 与 Data；Status != `0x00` 的 Attribute Block 仅携带 AttrID 与 Status。
+
+##### NOTIFY（OPC = 0xA）
+
+NOTIFY 由 Client 主动上报一个或多个 Client 属性。Data Segment 格式与 REPORT 相同，由一个或多个 Attribute Block 组成。
+
+```
+Data Segment（单个属性，同 REPORT）：
++--------+-----------+------+
+| AttrID | Data Type | Data |
+| (2 B)  |   (1 B)   |(N B) |
++--------+-----------+------+
+```
+
+##### COMMAND（OPC = 0x9）
+
+COMMAND 发起一条命令。每帧 SHALL 仅承载一条命令，不聚合多条 Command ID。
+
+```
+Data Segment（无参数）：
++------------+
+|   Cmd ID   |
+|   (2 B)    |
++------------+
+```
+
+```
+Data Segment（带参数）：
++------------+--------------+--------------+-----+--------------+
+|   Cmd ID   | Param 0 Data | Param 1 Data | ... | Param N Data |
+|   (2 B)    |    (N B)     |    (N B)     |     |    (N B)     |
++------------+--------------+--------------+-----+--------------+
+```
+
+参数 SHALL 按对应 Profile 中该命令 `Parameter Details` 表的 `ID` 从小到大依次排列。COMMAND 参数不携带 Data Type，也不携带参数数量字段；参数类型、长度、顺序和约束均由命令表定义。
+
+- **无参数命令**：D-Len = `2`，Data Segment 仅含 Cmd ID。
+- **有参数命令**：D-Len = `2 + Σ(sizeof(param_i))`。
+- 参数名称、顺序、类型、长度和约束由 Profile 命令定义决定。
+
+<a id="ref_OverallChecksum"></a>
+
+#### Overall Checksum — 整体校验
+
+CRC 为 2 字节大端序无符号整数，采用 **CRC16-Modbus** 算法，覆盖 Data Segment 的全部字节。
+
+- 初始值：`0xFFFF`
+- 多项式：Modbus CRC16（标准 0x8005 反转多项式）
+
+参考实现：
+
+```c
+static const uint16_t sCrcTableAbs[] = {
+    0x0000, 0xCC01, 0xD801, 0x1400, 0xF001, 0x3C00, 0x2800, 0xE401,
+    0xA001, 0x6C00, 0x7800, 0xB401, 0x5000, 0x9C01, 0x8801, 0x4400
+};
+
+uint16_t crc16Modbus(uint16_t crc, const uint8_t *ptr, uint16_t len)
+{
+    for (uint16_t i = 0; i < len; i++) {
+        uint8_t ch = *ptr++;
+        crc = sCrcTableAbs[(ch ^ crc) & 15] ^ (crc >> 4);
+        crc = sCrcTableAbs[((ch >> 4) ^ crc) & 15] ^ (crc >> 4);
+    }
+    return crc;
+}
+```
+
+调用方式：
+
+```c
+/* 计算 Data Segment 的 CRC，初始值传入 0xFFFF */
+uint16_t checksum = crc16Modbus(0xFFFF, data_segment, data_length);
+```
+
+:::warning
+CRC16-Modbus 的初始值为 `0xFFFF`，与 CRC16/XMODEM（OTA 固件校验，初始值 `0x0000`）不同，请勿混用。
+:::
+
+### 数据类型
+
+本节定义 Data Segment 中使用的所有数据类型及其字节编码规则，包括每种类型的语义、取值范围、线路格式，以及操作返回状态码。
+
+<a id="ref_DataType"></a>
+
+#### 数据类型总览
+
+`Data Type` 为 1 字节，标识 Raw Data 的类型与长度计算方式。历史缩写 `DT` 与 `Data Type` 含义相同；本文后续统一使用 `Data Type`。
+
+本表中的 **Raw Data 长度** 指单个属性值或命令参数值在 Data Segment 中的值域长度，不包含 `AttrID`、`Status`、`Data Type`、`Command ID` 等外层字段。固定长度类型直接给出字节数；变长或复合类型给出最小长度，实际长度由该类型自身编码中的长度字段、成员数量或元素数量决定。
+
+| Class | Data Type | Short Name | ID | Raw Data 长度 | 说明 |
+|:---:|:---|:---|:---:|:---:|:---|
+| Discrete | Boolean | bool | 0x10 | 1 | 布尔值，`0x00` = false，`0x01` = true。 |
+| Discrete | 8-bit bitmap | map8 | 0x18 | 1 | 8 位位图，每个 bit 表示一个独立布尔状态。 |
+| Discrete | 16-bit bitmap | map16 | 0x19 | 2 | 16 位位图，每个 bit 表示一个独立布尔状态。 |
+| Discrete | 24-bit bitmap | map24 | 0x1A | 3 | 24 位位图，每个 bit 表示一个独立布尔状态。 |
+| Discrete | 32-bit bitmap | map32 | 0x1B | 4 | 32 位位图，每个 bit 表示一个独立布尔状态。 |
+| Discrete | 64-bit bitmap | map64 | 0x1F | 8 | 64 位位图，每个 bit 表示一个独立布尔状态。 |
+| Analog | Unsigned 8-bit integer | uint8 | 0x20 | 1 | 无符号 8 位整数。 |
+| Analog | Unsigned 16-bit integer | uint16 | 0x21 | 2 | 无符号 16 位整数。 |
+| Analog | Unsigned 24-bit integer | uint24 | 0x22 | 3 | 无符号 24 位整数。 |
+| Analog | Unsigned 32-bit integer | uint32 | 0x23 | 4 | 无符号 32 位整数。 |
+| Analog | Unsigned 64-bit integer | uint64 | 0x27 | 8 | 无符号 64 位整数。 |
+| Analog | Signed 8-bit integer | int8 | 0x28 | 1 | 有符号 8 位整数。 |
+| Analog | Signed 16-bit integer | int16 | 0x29 | 2 | 有符号 16 位整数。 |
+| Analog | Signed 24-bit integer | int24 | 0x2A | 3 | 有符号 24 位整数。 |
+| Analog | Signed 32-bit integer | int32 | 0x2B | 4 | 有符号 32 位整数。 |
+| Analog | Signed 64-bit integer | int64 | 0x2F | 8 | 有符号 64 位整数。 |
+| Discrete | 8-bit enumeration | enum8 | 0x30 | 1 | 8 位枚举值，命名常量集合，有效值由各属性定义。 |
+| Discrete | 16-bit enumeration | enum16 | 0x31 | 2 | 16 位枚举值，命名常量集合，有效值由各属性定义。 |
+| Discrete | 32-bit enumeration | enum32 | 0x32 | 4 | 32 位枚举值，命名常量集合，有效值由各属性定义。 |
+| Discrete | 64-bit enumeration | enum64 | 0x33 | 8 | 64 位枚举值，命名常量集合，有效值由各属性定义。 |
+| Analog | Single precision | single | 0x39 | 4 | 单精度浮点。 |
+| Analog | Double precision | double | 0x3A | 8 | 双精度浮点。 |
+| Discrete | Octet string | octstr | 0x41 | `1 + Length` | 变长字节串。Raw Data 第 1 字节为 `Length`，表示后续字节内容长度；`Length` 不允许为 0，因此最小 Raw Data 长度为 2。 |
+| Discrete | Character string | string | 0x42 | `1 + Length` | 变长 UTF-8 字符串。Raw Data 第 1 字节为 `Length`，表示后续 UTF-8 字节长度；`Length` 不允许为 0，因此最小 Raw Data 长度为 2。 |
+| Composite | list | list | 0x48 | `3 + ElementCount × ElementLen`，最小 3 | 同类型元素列表，含 1 字节 `Element Data Type` 和 2 字节 `Element Count`；允许空列表。 |
+| Composite | Structure | struct | 0x4C | `2 + Σ(1 + DataLen)`，最小 4 | 多成员复合结构体，含 2 字节 `Element Count`；成员数不允许为 0。 |
+
+:::tip
+AECP 内所有多字节 Raw Data 均采用**大端序（Big-Endian）**，高位字节先发送。单字节类型（bool、uint8、int8、enum8、map8）无字节序之分。OTA 固件文件内部的 OTA Header 是唯一小端序例外，不属于本节定义的通信帧 Raw Data。
+:::
+
+#### bool（Data Type = 0x10）
+
+bool 表示布尔量，占 1 字节。
+
+##### 取值
+
+- `0x00` = `false`
+- `0x01` = `true`
+- 其他值 SHALL NOT 使用。
+
+##### 编码
+
+```
++------+
+| 0xVV |   VV = 0x00 (false) 或 0x01 (true)
++------+
+```
+
+<a id="ref_Enum8"></a>
+
+#### enum8（Data Type = 0x30）
+
+enum8 为 8 位枚举类型，占 1 字节，与 uint8 编码相同，但其语义为**命名常量集合**：每个有效值对应一个具名状态或选项。
+
+##### 取值
+
+enum8 的原始取值范围为 `0x00 ~ 0xFF`，但具体合法值 SHALL 由使用该类型的属性、命令参数或 Profile 数据类型枚举表定义。
+
+- 枚举表未列出的值 SHALL NOT 使用。
+- 发送方 SHALL 只发送枚举表中定义的合法值。
+- 接收方收到未知枚举值时，SHOULD 将其视为参数范围错误，并回应非零 Status。
+
+##### 编码
+
+```
++------+
+| 0xVV |   VV = 枚举值（由各属性定义决定）
++------+
+```
+
+##### 示例
+
+若某属性的类型为 `OtaStatusEnum8`，且该枚举定义 `0x02 = VerifyFailed`，则 Raw Data 编码为：
+
+```
++------+
+| 0x02 |
++------+
+```
+
+<a id="ref_Enum16"></a>
+
+#### enum16（Data Type = 0x31）
+
+enum16 为 16 位枚举类型，占 2 字节，与 uint16 编码相同，但其语义为**命名常量集合**。当枚举值超过 `0xFF`，或 Profile 明确要求预留更大枚举空间时，SHALL 使用 enum16。
+
+##### 取值
+
+enum16 的原始取值范围为 `0x0000 ~ 0xFFFF`，但具体合法值 SHALL 由使用该类型的属性、命令参数或 Profile 数据类型枚举表定义。
+
+- 枚举表未列出的值 SHALL NOT 使用。
+- 发送方 SHALL 只发送枚举表中定义的合法值。
+- 接收方收到未知枚举值时，SHOULD 将其视为参数范围错误，并回应非零 Status。
+
+##### 编码
+
+enum16 采用 2 字节大端序编码：
+
+```
++------+------+
+| MSB  | LSB  |
++------+------+
+```
+
+<a id="ref_Enum32"></a>
+
+#### enum32（Data Type = 0x32）
+
+enum32 为 32 位枚举类型，占 4 字节，与 uint32 编码相同，但其语义为**命名常量集合**。当枚举空间需要跨系统稳定分配，或枚举值超过 `0xFFFF` 时，SHALL 使用 enum32。
+
+##### 取值
+
+enum32 的原始取值范围为 `0x00000000 ~ 0xFFFFFFFF`，但具体合法值 SHALL 由使用该类型的属性、命令参数或 Profile 数据类型枚举表定义。
+
+- 枚举表未列出的值 SHALL NOT 使用。
+- 发送方 SHALL 只发送枚举表中定义的合法值。
+- 接收方收到未知枚举值时，SHOULD 将其视为参数范围错误，并回应非零 Status。
+
+##### 编码
+
+enum32 采用 4 字节大端序编码：
+
+```
++--------+--------+--------+--------+
+| MSB    |        |        | LSB    |
++--------+--------+--------+--------+
+```
+
+<a id="ref_Enum64"></a>
+
+#### enum64（Data Type = 0x33）
+
+enum64 为 64 位枚举类型，占 8 字节，与 uint64 编码相同，但其语义为**命名常量集合**。当枚举空间需要跨系统稳定分配，或枚举值超过 `0xFFFFFFFF` 时，SHALL 使用 enum64。
+
+##### 取值
+
+enum64 的原始取值范围为 `0x0000000000000000 ~ 0xFFFFFFFFFFFFFFFF`，但具体合法值 SHALL 由使用该类型的属性、命令参数或 Profile 数据类型枚举表定义。
+
+- 枚举表未列出的值 SHALL NOT 使用。
+- 发送方 SHALL 只发送枚举表中定义的合法值。
+- 接收方收到未知枚举值时，SHOULD 将其视为参数范围错误，并回应非零 Status。
+
+##### 编码
+
+enum64 采用 8 字节大端序编码：
+
+```
++--------+--------+--------+--------+--------+--------+--------+--------+
+| MSB    |        |        |        |        |        |        | LSB    |
++--------+--------+--------+--------+--------+--------+--------+--------+
+```
+
+<a id="ref_MapTypes"></a>
+
+#### map8 / map16 / map32 / map64
+
+map 类型用于表达一组可同时成立的布尔状态，也称位图或 bitmask。与 enum 类型不同，enum 表示互斥选项，map 表示多个 bit 的组合状态。
+
+map 类型按底层宽度分为：
+
+| 类型 | Data Type 值 | Raw Data 字节长度 | 说明 |
+|:---:|:---:|:---:|:---|
+| map8 | 0x18 | 1 | bit 0 ~ bit 7。 |
+| map16 | 0x19 | 2 | bit 0 ~ bit 15，采用大端序编码。 |
+| map32 | 0x1B | 4 | bit 0 ~ bit 31，采用大端序编码。 |
+| map64 | 0x1F | 8 | bit 0 ~ bit 63，采用大端序编码。 |
+
+##### 取值
+
+每个 bit SHALL 在对应 Profile 的 map 类型表中定义含义：
+
+- bit 值为 `1` 表示该状态处于激活、存在或使能状态。
+- bit 值为 `0` 表示该状态未激活、不存在或未使能。
+- 未在 map 类型表中定义的 bit SHALL 发送为 `0`；接收方收到未知 bit 为 `1` 时 SHOULD 忽略该 bit。
+
+##### 编码
+
+map8 占 1 字节，无字节序之分。map16、map32 与 map64 采用大端序编码。bit 编号按整数值的最低有效位开始计算，即 bit 0 表示数值 `0x0001`，bit 1 表示数值 `0x0002`。
+
+#### 整数类型
+
+整数类型分为有符号（Int）和无符号（Uint）两组，均采用二进制补码（Two's Complement）表示。
+
+##### uint8（Data Type = 0x20）
+
+无符号 8 位整数，取值范围：`0` ~ `255`（`0x00` ~ `0xFF`）。
+
+编码：1 字节，无字节序之分。
+
+```
++--------+
+| 0x00   |  ← 示例：值 0
++--------+
+| 0xFF   |  ← 示例：值 255
++--------+
+```
+
+##### int8（Data Type = 0x28）
+
+有符号 8 位整数，取值范围：`-128` ~ `127`（`0x80` ~ `0x7F`）。
+
+编码：1 字节，二进制补码，无字节序之分。
+
+```
++--------+
+| 0x7F   |  ← 示例：值 +127
++--------+
+| 0xFF   |  ← 示例：值 -1
++--------+
+| 0x80   |  ← 示例：值 -128
++--------+
+```
+
+##### uint16（Data Type = 0x21）
+
+无符号 16 位整数，取值范围：`0` ~ `65,535`。
+
+编码：2 字节，大端序（高位字节先发送）。
+
+```
++----------+----------+
+| octet[0] | octet[1] |
+|   (MSB)  |   (LSB)  |
++----------+----------+
+```
+
+示例：值 `300`（`0x012C`）编码为：
+
+```
++------+------+
+| 0x01 | 0x2C |
++------+------+
+```
+
+##### int16（Data Type = 0x29）
+
+有符号 16 位整数，取值范围：`-32,768` ~ `32,767`。
+
+编码：2 字节，大端序，二进制补码。
+
+示例：值 `-1`（`0xFFFF`）编码为 `FF FF`；值 `2650`（表示 26.50℃）编码为 `0A 5A`。
+
+##### uint32（Data Type = 0x23）
+
+无符号 32 位整数，取值范围：`0` ~ `4,294,967,295`。
+
+编码：4 字节，大端序。
+
+```
++----------+----------+----------+----------+
+| octet[0] | octet[1] | octet[2] | octet[3] |
+|   (MSB)  |          |          |   (LSB)  |
++----------+----------+----------+----------+
+```
+
+示例：值 `0x01020304` 编码为：
+
+```
++------+------+------+------+
+| 0x01 | 0x02 | 0x03 | 0x04 |
++------+------+------+------+
+```
+
+##### int32（Data Type = 0x2B）
+
+有符号 32 位整数，取值范围：`-2,147,483,648` ~ `2,147,483,647`。
+
+编码：4 字节，大端序，二进制补码。
+
+示例：值 `-1`（`0xFFFFFFFF`）编码为 `FF FF FF FF`。
+
+##### uint64（Data Type = 0x27）
+
+无符号 64 位整数，取值范围：`0` ~ `2^64 − 1`。
+
+编码：8 字节，大端序。
+
+```
++----------+----------+----------+----------+----------+----------+----------+----------+
+| octet[0] | octet[1] | octet[2] | octet[3] | octet[4] | octet[5] | octet[6] | octet[7] |
+|   (MSB)  |          |          |          |          |          |          |   (LSB)  |
++----------+----------+----------+----------+----------+----------+----------+----------+
+```
+
+##### int64（Data Type = 0x2F）
+
+有符号 64 位整数，取值范围：`−2^63` ~ `2^63 − 1`。
+
+编码：8 字节，大端序，二进制补码。
+
+#### 浮点类型
+
+浮点类型遵循 IEEE 754 标准，大端序编码（符号位位于 octet[0] 最高位）。
+
+##### single（Data Type = 0x39）
+
+单精度浮点，4 字节，IEEE 754 binary32：1 位符号 + 8 位指数 + 23 位尾数，有效精度约 7 位十进制数字。
+
+编码：4 字节，大端序。
+
+```
++--------------+----------------------+------------+------------+
+| octet[0]     | octet[1]             | octet[2]   | octet[3]   |
+| S + exp[7:1] | exp[0] + mant[22:16] | mant[15:8] | mant[7:0]  |
++--------------+----------------------+------------+------------+
+```
+
+示例：
+
+| 值 | 十六进制 | 编码（Hex 字节序列） |
+|:---:|:---:|:---|
+| `1.0` | `0x3F800000` | `3F 80 00 00` |
+| `0.5` | `0x3F000000` | `3F 00 00 00` |
+| `-1.0` | `0xBF800000` | `BF 80 00 00` |
+
+##### double（Data Type = 0x3A）
+
+双精度浮点，8 字节，IEEE 754 binary64：1 位符号 + 11 位指数 + 52 位尾数，有效精度约 15 ~ 17 位十进制数字。
+
+编码：8 字节，大端序。
+
+示例：
+
+| 值 | 十六进制 | 编码（Hex 字节序列） |
+|:---:|:---:|:---|
+| `1.0` | `0x3FF0000000000000` | `3F F0 00 00 00 00 00 00` |
+| `-1.0` | `0xBFF0000000000000` | `BF F0 00 00 00 00 00 00` |
+
+<a id="ref_OctetStringEncoding"></a>
+
+##### octstr（Data Type = 0x41）
+
+octstr 为变长字节串，可携带任意二进制内容（如设备 ID、版本字符串、固件数据分片等）。
+
+##### 编码格式
+
+Raw Data 由 1 字节长度前缀与实际字节内容组成：
+
+```
++--------+----------+----------+----------+-----+
+| Length | octet[0] | octet[1] | octet[2] | ... |
+| (1 B)  |        (Length bytes)                |
++--------+----------+----------+----------+-----+
+```
+
+- `Length`（1 字节）：后续字节内容的实际字节数，不含 `Length` 字段本身。Raw Data 总长度 = `Length + 1`。
+- `Length` SHALL NOT 为 `0`。
+- 字节内容按原始字节顺序传输，不做字节序转换；具体含义由各 Attribute 定义决定。
+
+##### 示例
+
+| Raw Data（Hex） | 含义 |
+|:---|:---|
+| `05 48 45 4C 4C 4F` | `Length = 5`，后续 5 字节 ASCII 解码得字符串 `HELLO` |
+
+<a id="ref_StructureEncoding"></a>
+
+##### Structure（Data Type = 0x4C）
+
+Structure 用于在单个属性中同时传递多个类型不同的数据成员，避免多次交互。每个成员有独立的 Data Type 和数据体。
+
+:::tip
+Structure 的成员数范围为 **1 ~ 15**，且成员 SHALL NOT 嵌套另一个 Structure（最大嵌套深度为 1）。
+:::
+
+##### 编码格式
+
+```
++---------------+--------------+--------+--------------+--------+-----+
+| Element Count | Field 1 Type | Data 1 | Field 2 Type | Data 2 | ... |
+|    (2 B)      |    (1 B)     | (N1 B) |    (1 B)     | (N2 B) |     |
++---------------+--------------+--------+--------------+--------+-----+
+```
+
+- `Element Count`（2 字节）：成员数量，取值范围 `1 ~ 15`。`0` SHALL NOT 使用。
+- 每个成员由 `Data Type`（1 字节数据类型）和 `Data`（对应长度的字节）组成。
+- 成员的字节序遵循本章各类型规定。
+
+##### 示例
+
+| Raw Data（Hex） | 含义 |
+|:---|:---|
+| `00 02 41 05 48 45 4C 4C 4F 20 FF` | `Element Count = 2`。成员 1：`Data Type = 0x41`（octstr），`Length = 5`，解码得字符串 `HELLO`。成员 2：`Data Type = 0x20`（uint8），值为 `255`（`0xFF`）。 |
+
+<a id="ref_CharacterStringEncoding"></a>
+
+#### string（Data Type = 0x42）
+
+string 为变长字符串，Raw Data 使用 UTF-8 编码。与 octstr 不同，string 的内容 SHALL 为合法 UTF-8 字节序列。
+
+##### 编码格式
+
+Raw Data 由 1 字节长度前缀与实际 UTF-8 字节内容组成：
+
+```
++--------+----------+----------+----------+-----+
+| Length | octet[0] | octet[1] | octet[2] | ... |
+| (1 B)  |        (Length bytes)                |
++--------+----------+----------+----------+-----+
+```
+
+- `Length`（1 字节）：后续 UTF-8 字节内容的实际字节数，不含 `Length` 字段本身。Raw Data 总长度 = `Length + 1`。
+- `Length` SHALL NOT 为 `0`。
+- 字符串长度按 UTF-8 字节数计算，不按字符数计算。
+
+##### 示例
+
+| Raw Data（Hex） | 含义 |
+|:---|:---|
+| `05 48 45 4C 4C 4F` | `Length = 5`，后续 5 字节 UTF-8 解码得字符串 `HELLO`。 |
+
+<a id="ref_listEncoding"></a>
+
+#### list（Data Type = 0x48）
+
+list 用于在单个属性或命令参数中传递**同一数据类型**的多个元素。list 与 Structure 的区别是：list 内所有元素类型相同；Structure 内每个成员可使用不同类型。
+
+在 Profile 属性表或命令参数表中，list 类型 SHALL 写作 `list[T]`，其中 `T` 为元素类型的 `Short Name`。例如 `list[uint16]` 表示元素类型为 `uint16` 的列表；在线路编码中 `Element Data Type` SHALL 填写 `uint16` 对应的 Data Type 值。
+
+:::tip
+list 的元素数量最多为 **65535**。为避免解析复杂度，list 的 `Element Data Type` SHALL NOT 为 Structure、string 或 list。
+:::
+
+##### 编码格式
+
+```
++-------------------+---------------+--------+--------+-----+--------+
+| Element Data Type | Element Count | Data 0 | Data 1 | ... | Data N |
+|       (1 B)       |    (2 B)      | (N B)  | (N B)  |     | (N B)  |
++-------------------+---------------+--------+--------+-----+--------+
+```
+
+- `Element Data Type`（1 字节）：列表元素的数据类型。列表内所有元素 SHALL 使用同一个 `Element Data Type`。
+- `Element Count`（2 字节）：列表元素数量，取值范围 `0 ~ 65535`。`0` 表示空列表。
+- 后续 `Data` 按元素顺序连续排列，每个元素的编码规则遵循本章对应数据类型定义。
+- 当 `Element Count = 0` 时，Raw Data 仅包含 `Element Data Type` 与 `Element Count`，不携带元素数据。
+
+##### 示例
+
+| Raw Data（Hex） | 含义 |
+|:---|:---|
+| `20 00 03 0A 14 1E` | `Element Data Type = 0x20`（uint8），`Element Count = 3`，元素值依次为 `10`、`20`、`30`。 |
+| `21 00 02 00 64 01 2C` | `Element Data Type = 0x21`（uint16），`Element Count = 2`，元素值依次为 `100`、`300`。 |
+
+<a id="ref_Status"></a>
+
+#### Status — 返回状态
+
+`Status` 为 1 字节，携带于 ACKNOWLEDGE、READ_RESPONSE、WRITE_RESPONSE、QUERY_RESPONSE 帧中，表示属性级或帧级操作结果。
+
+Status 的取值按适用交互划分。属性级 Status 用于 READ_RESPONSE、WRITE_RESPONSE、QUERY_RESPONSE 中的单个 Attribute Block；帧级 Status 用于 ACKNOWLEDGE，对 REPORT、NOTIFY 或 COMMAND 整帧进行确认。
+
+| 值 | 名称 | 适用交互 | 含义 |
+|:---:|:---|:---|:---|
+| 0x00 | Success | 所有带 Status 的应答 | 操作成功。 |
+| 0x01 | UnsupportedProfile | READ / WRITE / QUERY / REPORT / NOTIFY / COMMAND | `Profile ID` 不支持，或当前 Profile 不允许该交互。 |
+| 0x02 | UnsupportedAttribute | READ / WRITE / QUERY | `Attribute ID` 不存在，或该 Attribute 未在当前 Profile 中定义。 |
+| 0x03 | AttributeAccessDenied | READ / WRITE / QUERY / REPORT / NOTIFY | 属性存在，但访问权限、`Side` 或 `Access` 不允许当前操作。 |
+| 0x04 | AttributeTypeMismatch | WRITE / REPORT / NOTIFY | Data Segment 中携带的 Data Type 与属性定义不一致。 |
+| 0x05 | AttributeValueOutOfRange | WRITE / REPORT / NOTIFY | 属性值超出 Profile 定义的取值范围或约束。 |
+| 0x10 | UnsupportedCommand | COMMAND | `Command ID` 不存在，或该 Command 未在当前 Profile 中定义。 |
+| 0x11 | CommandDirectionDenied | COMMAND | Command 存在，但当前发起方不符合命令表中的 `Direction` 定义。 |
+| 0x12 | CommandParameterError | COMMAND | Command 参数数量、长度、顺序或取值范围不符合命令定义。 |
+| 0x13 | CommandRejected | COMMAND | 接收方因当前状态、资源不足、忙碌或业务条件不满足而拒绝执行命令。 |
+| 0x20 | InvalidOpcode | 帧级解析 | `OPC` 未定义，或当前状态下不允许接收该 `OPC`。 |
+| 0x21 | InvalidDataLength | 帧级解析 | `Data Length` 与该 `OPC` 的 Data Segment 格式不匹配。 |
+| 0x22 | HeaderChecksumError | 帧级解析 | Header Checksum 校验失败。 |
+| 0x23 | OverallChecksumError | 帧级解析 | Overall Checksum 校验失败。 |
+| 0x24 | MalformedDataSegment | 帧级解析 | Data Segment 格式非法，例如字段截断、Attribute Block 不完整或参数长度无法解析。 |
+| 0x25 | DiscoveryInProgress | QUERY / REPORT / COMMAND | Client 尚未完成初始化 Discovery，暂不接受 Server 主动数据同步。Server SHOULD 等待 `InitDiscoveryComplete` 完成后再重试。 |
+| 0x30 | OtaVersionMismatch | OTA COMMAND / OTA 属性交互 | 固件版本不匹配，或升级目标版本不被允许。 |
+| 0x31 | OtaImageSizeError | OTA COMMAND / OTA 属性交互 | 固件镜像长度错误。 |
+| 0x32 | OtaImageCrcError | OTA COMMAND / OTA 属性交互 | 固件镜像 CRC 校验失败。 |
+| 0x33 | OtaHeaderError | OTA COMMAND / OTA 属性交互 | OTA Header 信息异常，例如 Identity ID、长度、CRC 或目标硬件信息不匹配。 |
+| 0x34 | OtaOffsetError | OTA COMMAND / OTA 属性交互 | 固件分片偏移量错误。 |
+| 0x35 | OtaStateError | OTA COMMAND / OTA 属性交互 | OTA 状态机不允许当前操作，例如未准备、重复开始、已取消或已结束。 |
+| 0x36 | OtaInternalError | OTA COMMAND / OTA 属性交互 | OTA 过程中发生其他不可归类错误。 |
+| 0x7F | UnknownError | 所有带 Status 的应答 | 未知错误。仅当无法归类到以上错误码时使用。 |
+
+:::tip
+除 `0x00`（Success）外，所有其他值均视为错误返回。实现方可以 `status != 0x00` 判断操作是否成功。
+:::
+
+<a id="ref_WakeAndInitialization"></a>
+
+## 第四章 唤醒与初始化
+
+本章定义低功耗场景下的唤醒机制，以及 Client 与 Server 上电后的初始化发现、属性同步和正常工作入口。
+
+### 唤醒机制
+
+当设备进入睡眠模式以实现低功耗待机时，其串口数据接收能力可能受到限制。因此，Client 与 Server 在进行串口通信前，须先通过唤醒机制确保对端已就绪，再进行数据传输。数据传输完成后，解除唤醒信号，对端可重新进入低功耗状态。
+
+:::tip
+非低功耗设备无需实现本章所述的唤醒机制，可忽略唤醒引脚，直接进行串口通信。
+:::
+
+#### 低电平唤醒
+
+本协议采用 **低电平有效** 的唤醒信号。唤醒方通过将目标设备的唤醒引脚拉低来激活目标设备，待目标设备就绪后开始传输数据，传输完成后将唤醒引脚拉高。在无数据传输期间，唤醒引脚 SHALL 维持高电平。
+
+##### 时序
+
+下图描述了单次唤醒与数据传输的完整时序：
+
+![唤醒时序图](https://itad-aqara-docs-1300889962.aqara.com/dev/img/mcu-standard-protocol/zh/wake_timing.svg)
+
+| 参数 | 名称 | 说明 |
+|:---:|:---|:---|
+| T0 | 等待时间 | 唤醒引脚拉低后，唤醒方等待目标设备完成唤醒准备的时间。T0 结束后才开始发送串口数据。 |
+| T1 | 单次唤醒总时长 | 从唤醒引脚拉低到重新拉高的完整持续时间，即 T0 加上全部数据传输时间。 |
+
+##### Client 唤醒 Server
+
+当 Client 需要向 Server 发送数据时，Client 拉低 Server 的唤醒引脚：
+
+- **T0 建议值**：5 ms。
+- **T1**：无固定要求，由实际数据传输时长决定。
+
+##### Server 唤醒 Client
+
+当 Server 需要向 Client 发送数据时，Server 拉低 Client 的唤醒引脚：
+
+- **T0 固定值**：20 ms（当前版本固定，不支持通过命令动态配置）。
+- Client SHALL 在 T0 时间内完成串口接收准备。
+
+#### 超时处理
+
+发送方在等待对端响应时，超时时间 SHALL 设定为 **100 ms**。超时后的重传行为参见 [重发机制](#重发机制)。
+
+#### 开发建议
+
+- 唤醒引脚的驱动能力应满足目标设备的输入阈值要求。
+- 数据传输完成后，应及时释放唤醒引脚（拉高），避免长时间持续拉低导致对端无法恢复低功耗状态。
+- 若系统不需要低功耗功能，可将唤醒引脚固定接高，省略唤醒时序。
+
+### 启动初始化流程
+
+本章描述 Client 与 Server 上电后的启动流程，包括唤醒时序、Client 主导的能力读取、初始化完成通知、Server 数据同步及正常工作入口。
+
+#### 启动流程总览
+
+Client 与 Server 上电后，按以下阶段顺序执行：
+
+| 阶段 | 名称 | 说明 |
+|:---:|:---|:---|
+| 阶段 1 | 唤醒 | 发送方按需执行唤醒时序，确认接收方串口就绪。 |
+| 阶段 2 | 初始化发现 | Client 读取 Server 唯一产品 Profile、属性列表及属性初始值。 |
+| 阶段 3 | Discovery 完成通知 | Client 发送 `InitDiscoveryComplete`，Server ACK 后初始化数据同步窗口开启。 |
+| 阶段 4 | Server 数据同步 | Server 按需 QUERY Client 属性或 REPORT Server 属性，Client 回 QUERY_RESPONSE 或 ACKNOWLEDGE。 |
+| 阶段 5 | 正常工作 | Client 与 Server 进入正常属性读写与命令交互。 |
+
+#### 阶段 2 — 初始化发现
+
+Client SHALL 先完成 Server 产品 Profile 发现、属性列表读取和属性初始值读取，再进入后续初始化阶段。Server SHALL 默认支持 Foundation Profile（`0x0000`），且只支持一个产品 Profile。产品 Profile 由 Foundation Profile 的 Server 属性声明；每个 Profile 的 Server 属性列表由该 Profile 的 `ServerAttributeList`（Attribute ID `0xFFFB`）声明。
+
+推荐顺序如下：
+
+1. 使用 `Profile ID = 0x0000` READ `ServerAttributeList`（Attribute ID `0xFFFB`）。
+2. 使用 `Profile ID = 0x0000` READ `ProductProfileID`（Attribute ID `0x1007`）。
+3. 使用 `Profile ID = ProductProfileID` READ 产品 Profile 的 `ServerAttributeList`（Attribute ID `0xFFFB`）。
+4. 使用 `Profile ID = 0x0000` READ Foundation Profile 中需要初始化的 Server 属性。
+5. 使用 `Profile ID = ProductProfileID` READ 产品 Profile 中需要初始化的 Server 属性。
+
+Client SHALL 使用 `Profile ID = 0x0000` 读取以下 Foundation Server 属性：
+
+| Attribute ID | 名称 | 说明 |
+|:---:|:---|:---|
+| `0xFFFB` | ServerAttributeList | Foundation Profile 下 Server 实际支持的 Attribute ID 列表。 |
+| `0x1007` | ProductProfileID | Server 唯一产品 Profile。Foundation Profile（`0x0000`）默认支持，不通过该属性声明。 |
+
+Client SHALL 先读取 Foundation Profile 的 `ServerAttributeList`（Attribute ID `0xFFFB`），再读取 `ProductProfileID`。随后 Client SHALL 使用 `Profile ID = ProductProfileID` 读取该产品 Profile 的 `ServerAttributeList`（Attribute ID `0xFFFB`）。Discovery 结果用于确定 Foundation Profile 和产品 Profile 下实际支持的 Server 属性。
+
+Client SHALL 分别读取 Foundation Profile 与产品 Profile 中需要初始化的 Server 属性：
+
+- 使用 `Profile ID = 0x0000` READ Foundation Profile 中需要初始化的 Server 属性。
+- 使用 `Profile ID = ProductProfileID` READ 产品 Profile 中需要初始化的 Server 属性。
+
+Client SHALL NOT 在产品 Profile 初始化读取中访问 `ServerAttributeList` 未声明的属性。
+
+完成属性初始值读取后，Client 后续 READ/WRITE/COMMAND SHALL 按该产品 Profile 文档和 `ServerAttributeList` 结果发起。
+
+#### 阶段 3 — Discovery 完成通知
+
+Client 完成初始化发现后，SHALL 发送 `InitDiscoveryComplete` 命令通知 Server：
+
+Client SHALL 使用 `Profile ID = 0x0000` 发送 `COMMAND InitDiscoveryComplete`。Server 返回 `ACKNOWLEDGE(Status=0x00)` 后，初始化控制权转移到 Server，初始化数据同步窗口开启。此后 Server MAY 开始 QUERY Client 属性，也 MAY 按属性上报策略 REPORT Server 属性。
+
+Server 在收到 `InitDiscoveryComplete` 并返回 `ACKNOWLEDGE(Status=0x00)` 之前，SHALL NOT 主动发起初始化数据同步，包括 QUERY Client 属性、REPORT Server 属性或发送用于同步业务数据的 Server → Client COMMAND。Client 仍可在阶段 2 中通过 READ 主动读取 Server 属性初始值。
+
+#### 阶段 4 — Server 数据同步
+
+Server MAY 通过 QUERY 拉取自身需要的 Client 属性（Side = C），也 MAY 通过 REPORT 主动同步 Server 属性（Side = S）的初始状态或变化状态。Client 收到 QUERY 后 SHALL 通过 QUERY_RESPONSE 返回当前值；Client 收到 REPORT 后 SHALL 通过 ACKNOWLEDGE 确认：
+
+| Attribute ID | 名称 | 说明 |
+|:---:|:---|:---|
+| 0x0000 | ProtocolVersion | Server 拉取 Client 支持的 AECP 版本 |
+| 0x0001 | ModuleFirmwareVersion | Server 拉取 Client 固件版本，用于日志与版本管理 |
+| 0x0002 | ModuleUniqueID | Server 拉取设备唯一标识 |
+| 0x0003 | PairingStatus | Server 拉取当前配网状态 |
+| 0x0004 | NetworkStatus | Server 拉取当前网络连接状态（离线/连接中/在线） |
+| 0x0005 | LocalTime | Server 拉取当前本地时间 |
+| 0x0006 | ModuleSupportedProductProfileList | Server 拉取 Client 支持的产品 Profile ID 列表 |
+| 0x0007 | ClientUartBufferSize | Server 拉取 Client UART 缓冲区大小 |
+
+Server SHALL NOT 在收到 `InitDiscoveryComplete` 并返回 `ACKNOWLEDGE(Status=0x00)` 之前 QUERY Client 属性或 REPORT Server 属性。若 Client 尚未完成 Discovery，Client MAY 对过早到达的 QUERY、REPORT 或 Server → Client 数据同步 COMMAND 返回 `DiscoveryInProgress`。
+
+#### 阶段 5 — 正常工作
+
+完成阶段 1 ~ 4 后，Client 与 Server 进入正常工作状态：
+
+- **Client 按需**：READ/WRITE Server 属性，发送 COMMAND 触发动作。
+- **Server 主动**：REPORT 属性变化（如温度变化、故障告警、心跳），QUERY Client 属性（如拉取最新时间戳）。Server 主动同步 SHALL 发生在 `InitDiscoveryComplete` 已完成 ACK 之后。
+- **双方**：在通信前按需执行唤醒时序（如 Server 为低功耗设备）。
+
+#### 完整启动时序图
+
+![唤醒与初始化启动流程](https://itad-aqara-docs-1300889962.aqara.com/dev/img/mcu-standard-protocol/zh/initialization_sequence.svg)
+
+## 第五章 Profile 体系与实现规则
+
+本章定义 AECP 的 **Profile（功能域）** 体系，以及通信双方实现时须遵守的应答机制、重传机制、属性 ID 命名空间和命令 ID 命名空间规则。
+
+Profile 是协议的应用层组织单元，每个 Profile 由一组相关的**属性（Attribute）**和**命令（Command）**组成，用 Profile ID（uint16）唯一标识。
+
+帧头中的 Profile ID 声明本帧操作所属的功能域。Server SHALL 默认支持 Foundation Profile（`0x0000`），并且 SHALL 只声明一个产品 Profile。Client 在完成初始化发现后，可在 Foundation Profile 与该产品 Profile 之间切换通信。
+
+<a id="ref_ProfileIDNamespace"></a>
+
+### Profile ID 命名空间
+
+`Profile ID` 的数据类型为 `uint16`，取值范围 SHALL 遵循下表。未在本规范中定义的 Profile ID SHALL NOT 用于标准产品互通。
+
+| Profile ID 范围 | 说明 |
+|:---:|:---|
+| `0x0000` | Foundation Profile。所有设备 SHALL 支持。 |
+| `0x0001 ~ 0x0FFF` | 禁止使用。该范围 SHALL 保留，不得分配给产品 Profile。 |
+| `0x1000 ~ 0x2000` | 赋能业务 Profile，由本规范分配和定义。 |
+| `0x2001 ~ 0xFFFF` | 保留，供后续协议扩展使用。当前版本 SHALL NOT 分配或使用。 |
+
+#### 已定义 Profile ID
+
+| Profile ID | 名称 | 说明 |
+|:---:|:---|:---|
+| `0x0000` | Foundation Profile | 所有设备必须支持。属性：`0x0000~0x0FFF`（Client 属性）、`0x1000~0x1FFF`（Server 属性）；命令由 Foundation Profile 命令表统一定义。 |
+| `0x1000` | Thermostat Profile | 恒温器设备专有属性与命令。Server 属性 SHALL 使用 `0x1000 ~ 0x1FFF` 分段。一个 Server 若声明 Thermostat Profile，则其 `ProductProfileID` 为 `0x1000`。 |
+
+### 属性与命令寻址规则
+
+- **Attribute ID** 在**所属 Profile 内唯一**；不同 Profile 的同一 Attribute ID 数值可具有不同语义。完整地址 = **Profile ID + Attribute ID**，接收方须结合帧头 Profile ID 才能解析属性语义。
+- **Command ID** 同样在 Profile 内唯一。帧头 Profile ID + Command ID 共同确定命令语义。
+
+### Attribute Side 与 Conformance
+
+每个属性 SHALL 在属性表中通过 **Side** 列标注归属方，并通过 **Conformance** 列标注实现要求。列含义统一遵循 [第一章字段记号约定](##字段记号约定)。
+
+| 标记 | 归属端 | 说明 |
+|:---:|:---|:---|
+| **C** | Client | 该属性由 Client 持有和维护。典型值为 Client 自身信息（固件版本、Unique ID）或网络能力（配网状态、网络状态、时间）。Server 需要读取时发起 QUERY，Client 回 QUERY_RESPONSE；Client 也可对 `Access` 含 `NF` 的属性主动发起 NOTIFY，Server 回 ACKNOWLEDGE。 |
+| **S** | Server | 该属性由 Server 持有和维护。典型值为传感器数据、设定值、设备硬件状态。Client 通过 READ/WRITE 访问；Server 通过 REPORT 主动上报。 |
+
+Conformance 列说明实现要求：**M**（Mandatory，必选，SHALL 实现）；**O**（Optional，可选，MAY 实现）。
+
+### 应答机制
+
+每种操作码均有确定的应答要求。除命令表明确声明 `Response = N` 的 COMMAND 外，接收方 SHALL 对每一条收到的消息在超时时间内作出响应：
+
+| 发起方发送 | 接收方应答 | 说明 |
+|:---:|:---:|:---|
+| READ(0x1) | READ_RESPONSE(0x2) | Server 携带属性值与 Status 回应 |
+| WRITE(0x3) | WRITE_RESPONSE(0x4) | Server 携带 Status 回应 |
+| REPORT(0x5) | ACKNOWLEDGE(0x6) | Client 确认收到，携带 Status |
+| QUERY(0x7) | QUERY_RESPONSE(0x8) | Client 携带 Client 属性值与 Status 回应 |
+| NOTIFY(0xA) | ACKNOWLEDGE(0x6) | Server 确认收到，携带 Status |
+| COMMAND(0x9) | ACKNOWLEDGE(0x6) | 接收方仅需确认执行结果时，回 ACKNOWLEDGE 携带 Status |
+| COMMAND(0x9) | 配对 COMMAND(0x9) | 接收方需返回数据时，回配对 COMMAND；配对 COMMAND 是否继续应答由其自身 `Response` 声明决定 |
+| COMMAND(0x9) | 无应答 | 仅当该命令在命令表中声明 `Response = N` 时使用 |
+
+发送方在等待响应时，超时时间 SHALL 设定为 **100 ms**。
+
+### 初始化发现规则
+
+上电初始化阶段 SHALL 由 Client 先发起 Discovery，读取 Server 唯一产品 Profile。Discovery SHALL 使用 `Profile ID = 0x0000` 发送 READ，读取 Foundation Profile 中定义的 `ProductProfileID` 属性。
+
+Foundation Profile（`0x0000`）为默认必选能力，不通过 `ProductProfileID` 声明。`ProductProfileID` 仅声明 Server 唯一的产品 Profile。
+
+Client 完成 Discovery 后 SHALL 发送 `InitDiscoveryComplete` 命令。Server 收到该命令并返回 `ACKNOWLEDGE(Status=0x00)` 前，SHALL NOT 主动发起初始化数据同步，包括 QUERY Client 属性、REPORT Server 属性或发送用于同步业务数据的 Server → Client COMMAND。若 Client 尚未完成 Discovery，Client MAY 对过早到达的 Server 主动同步请求返回 `DiscoveryInProgress`。Server 返回 `ACKNOWLEDGE(Status=0x00)` 后，初始化控制权转移到 Server，Server MAY 按需 QUERY Client 属性或 REPORT Server 属性。
+
+Client 后续 READ、WRITE 或 COMMAND SHALL 以 `ProductProfileID` 对应的产品 Profile 定义为依据。若 Client 访问该 Profile 未定义的 Attribute 或 Command，Server SHOULD 返回非零 Status。
+
+<a id="ref_retry"></a>
+
+### 重发机制
+
+当发送方超时未收到应答时，SHALL 启动重传机制：
+
+- 每条消息最多重传 **3 次**（含初次发送共 4 次尝试）。
+- 重传时 SHALL 使用与原始消息相同的序列号（`Seq`），以便接收方识别重传包并去重。
+- 三次重传均超时后，发送方 MAY 记录错误并通知上层应用，具体处理策略由产品实现决定。
+
+<a id="ref_AttributeID"></a>
+
+### 属性 ID 命名空间
+
+`Attribute ID` 的数据类型为 `uint16`，取值范围 `0x0000 ~ 0xFFFF`，**在所属 Profile 内唯一**；不同 Profile 的相同 Attribute ID 数值可具有不同语义。完整地址 = **Profile ID（帧头）+ Attribute ID**。
+
+所有 Profile 的 Attribute ID SHALL 遵循下表分段。未定义的 Attribute ID SHALL 视为保留，接收方收到访问未定义 Attribute ID 的请求时 SHOULD 返回 `UnsupportedAttribute`。
+
+| Attribute ID 范围 | 说明 |
+|:---:|:---|
+| `0x0000 ~ 0x0FFF` | **Client 属性**。由 Client 持有；Server 通过 QUERY 拉取，Client 通过 QUERY_RESPONSE 返回。Client 也可对 `Access` 含 `NF` 的属性主动 NOTIFY。 |
+| `0x1000 ~ 0x1FFF` | **Server 属性**。由 Server 持有；Client 可 READ/WRITE，Server 可 REPORT。每个产品 Profile 的 Server 本地状态、能力和控制属性 SHALL 定义在该范围。 |
+| `0x2000 ~ 0xFFFA` | 保留，供后续协议扩展使用。 |
+| `0xFFFB ~ 0xFFFF` | 全局属性范围。当前定义 `0xFFFB ServerAttributeList`，每个 Profile SHALL 定义该属性；其余 ID 保留，供后续全局属性使用。 |
+
+<a id="ref_CommandID"></a>
+
+### 命令 ID 命名空间
+
+`Command ID` 的数据类型为 `uint16`，取值范围 `0x0001 ~ 0xFFFF`，**在所属 Profile 内唯一**。完整命令标识 = **Profile ID（帧头）+ Command ID**。`0x0000` SHALL 保留，不作为有效 Command ID 使用。
+
+所有 Profile 的 Command ID SHALL 遵循下表分段。未定义的 Command ID SHALL 视为保留，接收方收到未定义 Command ID 时 SHOULD 返回 `UnsupportedCommand`。
+
+| Command ID 范围 | 说明 |
+|:---:|:---|
+| `0x0001 ~ 0x7FFF` | 标准命令，由所属 Profile 定义。 |
+| `0x8000 ~ 0xFFFF` | 保留，供后续协议扩展使用。当前版本 SHALL NOT 分配或使用。 |
+
+每条命令 SHALL 在所属 Profile 的命令表中声明方向（Direction）：
+
+- `Client → Server`：仅允许 Client 作为发起方发送该 COMMAND，Server 作为接收方处理。
+- `Server → Client`：仅允许 Server 作为发起方发送该 COMMAND，Client 作为接收方处理。
+
+每条命令 SHALL 在所属 Profile 的命令表中声明应答（Response）：
+
+- `ACKNOWLEDGE`：该命令无配对响应命令；接收方 SHALL 直接返回 ACKNOWLEDGE。
+- `<CommandName>`：该命令有配对响应命令；接收方 SHALL 返回指定名称的 COMMAND。
+- `N`：该命令不需要任何应答。`N` SHOULD 仅用于配对返回命令，避免无限应答链。
+
+接收方收到方向不匹配的 COMMAND 时，SHOULD 返回 ACKNOWLEDGE，且 Status SHOULD 为非零错误码。
+
+### 具体 Profile 定义
+
+具体 Profile 的属性、命令、枚举、位图和参数表 SHALL 在 `src/profiles` 目录下按独立文件维护：
+
+- [Foundation Profile（0x0000）](#第六章-foundation-profileprofile-id--0x0000)
+- [Thermostat Profile（0x1000）](#第七章-thermostat-profileprofile-id--0x1000)
+
+<a id="ref_FoundationProfile"></a>
+
+## 第六章 Foundation Profile（Profile ID = 0x0000）
+
+Foundation Profile 是所有设备类型必须实现的基础功能域，包含基础属性、基础命令和固件升级能力。所有 Foundation Profile 帧的 Profile ID SHALL 为 `0x0000`。
+
+### 表格约定
+
+本章所有属性表、命令表和参数表的列含义统一遵循 [第 1 章字段记号约定](#字段记号约定)。
+
+<a id="ref_FoundationDataTypes"></a>
+
+### 数据类型
+
+<a id="ref_PairingStatusEnum8"></a>
+
+#### PairingStatusEnum8 类型
+
+`PairingStatusEnum8` 定义 Client 侧配网窗口与入网状态。该枚举的底层类型为 enum8。
+
+| 值 | 名称 | 说明 |
+|:---:|:---|:---|
+| 0x00 | NotPairing | Client 未处于配网模式，配网窗口关闭；未入网或已退出配网流程时使用该状态。 |
+| 0x01 | Pairing | Client 已打开配网窗口，正在等待或处理入网、认证、绑定流程。 |
+| 0x02 | Paired | Client 已完成入网或绑定流程，并确认当前网络身份有效。 |
+
+<a id="ref_NetworkStatusEnum8"></a>
+
+#### NetworkStatusEnum8 类型
+
+`NetworkStatusEnum8` 定义 Client 网络连接状态。该枚举的底层类型为 enum8。
+
+| 值 | 名称 | 说明 |
+|:---:|:---|:---|
+| 0x00 | Offline | Client 当前未接入可用网络，无法完成需要网络连接的上行或下行业务。 |
+| 0x01 | Online | Client 已接入可用网络，可进行正常的网络通信与业务同步。 |
+| 0x02 | Connecting | Client 正在尝试接入网络、恢复连接或进行网络认证，当前网络能力尚不可用。 |
+
+<a id="ref_OtaUpgradeMethodEnum8"></a>
+
+#### OtaUpgradeMethodEnum8 类型
+
+`OtaUpgradeMethodEnum8` 定义 Server 支持的固件升级方式。该枚举的底层类型为 enum8。
+
+| 值 | 名称 | 说明 |
+|:---:|:---|:---|
+| 0x00 | NotSupported | Server 不支持 OTA。 |
+| 0x01 | IapOta | Server 支持 IAP OTA。 |
+| 0x02 | BootLoaderOta | Server 支持 BootLoader OTA。 |
+
+<a id="ref_HardwareFaultMap32"></a>
+
+#### HardwareFaultMap32 类型
+
+`HardwareFaultMap32` 定义 Server 硬件故障位。该 map 的底层类型为 map32，对应 bit 置 `1` 表示该故障处于激活状态。
+
+| Bit | 名称 | 说明 |
+|:---:|:---|:---|
+| 0 | GeneralFault | 通用硬件故障。 |
+| 1 | RadioFault | 无线或通信子系统故障。 |
+| 2 | SensorFault | 传感器子系统故障。 |
+| 3 | RecoverableOverTemperature | 可恢复过温。 |
+| 4 | NonRecoverableOverTemperature | 不可恢复过温。 |
+| 5 | PowerSourceFault | 电源故障。 |
+| 6 | DisplayFault | 显示子系统故障。 |
+| 7 | AudioFault | 音频子系统故障。 |
+| 8 | UserInterfaceFault | 用户界面故障。 |
+| 9 | NonVolatileMemoryFault | 非易失存储器故障。 |
+| 10 | PhysicalTamperDetected | 检测到物理篡改。 |
+
+<a id="ref_OtaStatusEnum8"></a>
+
+#### OtaStatusEnum8 类型
+
+`OtaStatusEnum8` 定义 Server OTA 进度状态。该枚举的底层类型为 enum8。
+
+| 值 | 名称 | 说明 |
+|:---:|:---|:---|
+| 0x00 | Idle | 未进行 OTA。 |
+| 0x01 | InProgress | OTA 进行中。 |
+| 0x02 | VerifyFailed | 固件校验失败。 |
+| 0x03 | Complete | OTA 镜像已校验并应用。 |
+
+<a id="ref_OtaAbortReasonEnum8"></a>
+
+#### OtaAbortReasonEnum8 类型
+
+`OtaAbortReasonEnum8` 定义 Server 主动终止 OTA 的原因。该枚举的底层类型为 enum8。
+
+| 值 | 名称 | 说明 |
+|:---:|:---|:---|
+| 0x00 | Unspecified | 未指定原因。 |
+| 0x01 | ClientCancelled | Client 请求取消 OTA。 |
+| 0x02 | Timeout | OTA 过程超时。 |
+| 0x03 | InsufficientSpace | Server 存储空间不足。 |
+| 0x04 | WriteFailed | 固件写入失败。 |
+| 0x05 | VerifyFailed | 固件校验失败。 |
+| 0x06 | UnsupportedImage | 固件镜像类型、版本或硬件条件不匹配。 |
+| 0x07 | InvalidState | Server 当前状态不允许继续 OTA。 |
+
+<a id="ref_ClientAttributes"></a>
+
+### Client 属性
+
+| ID | 名称 | 类型 | 约束 | 默认值 | 访问权限 | 归属方 | 必选性 | 简述 |
+|:---:|:---|:---|:---|:---:|:---:|:---:|:---:|:---|
+| 0x0000 | ProtocolVersion | uint16 | 从 0 开始 | 0x0000 | Q | C | M | AECP 版本号。 |
+| 0x0001 | ModuleFirmwareVersion | uint32 | 无额外约束 | — | Q | C | M | Client 固件版本。 |
+| 0x0002 | ModuleUniqueID | octstr | 最长 255 | — | Q | C | M | Client 唯一标识。 |
+| 0x0003 | PairingStatus | [PairingStatusEnum8](#pairingstatusenum8-类型) | 见枚举 | — | Q/NF | C | M | 配网状态。 |
+| 0x0004 | NetworkStatus | [NetworkStatusEnum8](#networkstatusenum8-类型) | 见枚举 | — | Q/NF | C | M | Client 网络状态。 |
+| 0x0005 | LocalTime | uint32 | 无额外约束 | — | Q/NF | C | O | Client 本地时间。 |
+| 0x0006 | ModuleSupportedProductProfileList | list[uint16] | 非保留 Profile ID | — | Q | C | M | Client 支持的产品 Profile 列表。 |
+| 0x0007 | ClientUartBufferSize | uint16 | >= 1024 字节 | 1024 | Q | C | M | Client UART 缓冲区大小。 |
+
+<a id="ref_ProtocolVersionAttr"></a>
+
+#### ProtocolVersion 属性
+
+`ProtocolVersion` 由 Client 维护，用于声明 Client 支持的 AECP 版本。版本号 SHALL 从 `0` 开始递增；当前版本默认值为 `0x0000`。
+
+Server 需要判断 Client 协议兼容性时，SHALL 通过 QUERY 拉取该属性，Client SHALL 通过 QUERY_RESPONSE 返回当前值。
+
+<a id="ref_ModuleFirmwareVersionAttr"></a>
+
+#### ModuleFirmwareVersion 属性
+
+`ModuleFirmwareVersion` 由 Client 维护。Server 需要获取 Client 固件版本时，MAY 通过 QUERY 拉取该属性，Client SHALL 通过 QUERY_RESPONSE 返回当前值。
+
+<a id="ref_ModuleUniqueIDAttr"></a>
+
+#### ModuleUniqueID 属性
+
+`ModuleUniqueID` 由 Client 维护。Server 需要获取 Client 唯一标识时，MAY 通过 QUERY 拉取该属性，Client SHALL 通过 QUERY_RESPONSE 返回当前值。
+
+<a id="ref_PairingStatusAttr"></a>
+
+#### PairingStatus 属性
+
+`PairingStatus` 由 Client 维护。Server 需要获取当前配网状态时，SHALL 通过 QUERY 拉取该属性，Client SHALL 通过 QUERY_RESPONSE 返回当前值。
+
+配网状态发生变化时，Client SHOULD 通过 NOTIFY 主动向 Server 同步该属性的最新值。
+
+有效值见 [PairingStatusEnum8](#pairingstatusenum8-类型)。
+
+<a id="ref_NetworkStatusAttr"></a>
+
+#### NetworkStatus 属性
+
+`NetworkStatus` 由 Client 维护。Server 需要获取当前网络状态时，MAY 通过 QUERY 拉取该属性，Client SHALL 通过 QUERY_RESPONSE 返回当前值。
+
+网络状态发生变化（如上线、离线）时，Client SHOULD 通过 NOTIFY 主动向 Server 同步该属性的最新值。
+
+有效值见 [NetworkStatusEnum8](#networkstatusenum8-类型)。
+
+<a id="ref_LocalTimeAttr"></a>
+
+#### LocalTime 属性
+
+`LocalTime` 由 Client 维护。该值为 Unix Epoch 时间，单位秒，从 `1970-01-01 00:00:00 UTC` 起算。
+
+Server 需要网络同步时间戳时 MAY 通过 QUERY 拉取该属性。Client SHALL 在 QUERY_RESPONSE 中返回当前可用的最新本地时间。
+
+<a id="ref_ModuleSupportedProductProfileListAttr"></a>
+
+#### ModuleSupportedProductProfileList 属性
+
+`ModuleSupportedProductProfileList` 由 Client 维护，用于声明 Client 支持解析和交互的产品 Profile ID 列表。
+
+该属性类型为 `list[uint16]`。列表元素 SHALL 按 Profile ID 从小到大排列。Foundation Profile（`0x0000`）为所有 Client 必选能力，不通过该属性声明，也 SHALL NOT 出现在该列表中。
+
+<a id="ref_ClientUartBufferSizeAttr"></a>
+
+#### ClientUartBufferSize 属性
+
+`ClientUartBufferSize` 由 Client 维护，用于声明 Client UART 接收和发送缓冲区大小，单位字节。
+
+该属性类型为 `uint16`，默认值为 `1024`。Client UART 接收缓冲区和发送缓冲区 SHALL 均不小于该值；若接收和发送缓冲区大小不同，该属性 SHALL 使用较小值作为可用单帧长度能力。
+
+<a id="ref_ServerAttributes"></a>
+
+### Server 属性
+
+| ID | 名称 | 类型 | 约束 | 默认值 | 访问权限 | 归属方 | 必选性 | 简述 |
+|:---:|:---|:---|:---|:---:|:---:|:---:|:---:|:---|
+| 0x1000 | VendorID | uint16 | 1 ~ 0xFFFF | 0x0000 | R/RP | S | M | 厂商 ID。 |
+| 0x1001 | ProductID | uint16 | 1 ~ 0xFFFF | 0x0000 | R/RP | S | M | 产品 ID。 |
+| 0x1002 | ServerHardwareVersion | uint16 | 1 ~ 0xFFFF | 0x0001 | R/RP | S | M | Server 硬件版本。 |
+| 0x1003 | ServerSoftwareVersion | uint16 | 1 ~ 0xFFFF | 0x0001 | R/RP | S | M | Server 固件版本。 |
+| 0x1004 | OtaUpgradeMethod | [OtaUpgradeMethodEnum8](#otaupgrademethodenum8-类型) | 见枚举 | 0x00 | R/RP | S | M | OTA 升级方式。 |
+| 0x1005 | OtaStatus | [OtaStatusEnum8](#otastatusenum8-类型) | 见枚举 | 0x00 | RP | S | O | OTA 状态。 |
+| 0x1006 | HardwareFault | [HardwareFaultMap32](#hardwarefaultmap32-类型) | 见 map | — | R/RP | S | O | 硬件故障位图。 |
+| 0x1007 | ProductProfileID | uint16 | 非保留 Profile ID | — | R/RP | S | M | Server 唯一产品 Profile。 |
+| 0x1008 | ServerUartBufferSize | uint16 | >= 1024 字节 | 1024 | R/RP | S | M | Server UART 缓冲区大小。 |
+| 0xFFFB | ServerAttributeList | list[uint16] | 无额外约束 | — | R/RP | S | M | Server 支持的属性列表。 |
+
+<a id="ref_VendorIDAttr"></a>
+
+#### VendorID 属性
+
+`VendorID` 标识设备制造商 ID。Server SHALL 支持 Client READ 读取该属性。
+
+<a id="ref_ProductIDAttr"></a>
+
+#### ProductID 属性
+
+`ProductID` 标识设备产品 ID。Server SHALL 支持 Client READ 读取该属性。
+
+<a id="ref_ServerHardwareVersionAttr"></a>
+
+#### ServerHardwareVersion 属性
+
+`ServerHardwareVersion` 标识 Server 硬件版本。Server SHALL 支持 Client READ 读取该属性。
+
+<a id="ref_ServerSoftwareVersionAttr"></a>
+
+#### ServerSoftwareVersion 属性
+
+`ServerSoftwareVersion` 标识 Server 固件版本。Server SHALL 支持 Client READ 读取该属性。
+
+OTA 完成且新固件启动成功后，Server SHALL 通过 REPORT 上报该属性的最新值。
+
+<a id="ref_OtaUpgradeMethodAttr"></a>
+
+#### OtaUpgradeMethod 属性
+
+`OtaUpgradeMethod` 声明 Server 支持的固件升级方式。有效值见 [OtaUpgradeMethodEnum8](#otaupgrademethodenum8-类型)。
+
+Client 发起任何 OTA 流程前 SHALL 先 READ 该属性，并按 Server 返回的升级方式选择 IAP OTA、BootLoader OTA 或放弃 OTA。
+
+<a id="ref_HardwareFaultAttr"></a>
+
+#### HardwareFault 属性
+
+`HardwareFault` 由 Server 维护。Client MAY READ 该属性。任一故障 bit 变化时，Server SHOULD REPORT 该属性。
+
+Bit 定义见 [HardwareFaultMap32](#hardwarefaultmap32-类型)。
+
+<a id="ref_ProductProfileIDAttr"></a>
+
+#### ProductProfileID 属性
+
+`ProductProfileID` 声明 Server 支持的唯一产品 Profile。Foundation Profile（`0x0000`）为所有设备默认必选，不通过该属性声明。
+
+Server SHALL 仅声明一个非保留产品 Profile ID。Profile ID 取值范围见 [Profile ID 命名空间](#profile-id-命名空间)。若设备实现 Thermostat Profile，则该值为 `0x1000`。
+
+<a id="ref_ServerUartBufferSizeAttr"></a>
+
+#### ServerUartBufferSize 属性
+
+`ServerUartBufferSize` 由 Server 维护，用于声明 Server UART 接收和发送缓冲区大小，单位字节。
+
+该属性类型为 `uint16`，默认值为 `1024`。Server UART 接收缓冲区和发送缓冲区 SHALL 均不小于该值；若接收和发送缓冲区大小不同，该属性 SHALL 使用较小值作为可用单帧长度能力。
+
+<a id="ref_OtaStatusAttr"></a>
+
+#### OtaStatus 属性
+
+`OtaStatus` 由 Server 维护。OTA 状态变化时，Server SHOULD REPORT 该属性。
+
+有效值见 [OtaStatusEnum8](#otastatusenum8-类型)。
+
+<a id="ref_FoundationServerAttributeListAttr"></a>
+
+#### ServerAttributeList 属性
+
+`ServerAttributeList` 声明 Foundation Profile 下 Server 实际支持的 Attribute ID 列表。
+
+该属性类型为 `list[uint16]`。列表元素 SHALL 按 Attribute ID 从小到大排列，并包含 `ServerAttributeList` 自身的 Attribute ID `0xFFFB`。
+
+<a id="ref_CommonCommands"></a>
+
+### Foundation 命令
+
+以下命令挂载于 Foundation Profile，适用于所有设备类型。固件升级相关命令也是 Foundation Profile 能力的一部分，使用同一命令表定义。
+
+| ID | 名称 | 方向 | 应答 | 必选性 | 简述 |
+|:---:|:---|:---|:---|:---:|:---|
+| 0x0001 | InitDiscoveryComplete | Client → Server | ACKNOWLEDGE | M | 通知 Server 初始化发现已完成。 |
+| 0x0002 | NetworkResetNotify | Client → Server | ACKNOWLEDGE | M | Client 通知 Server 无线侧收到重置网络请求。 |
+| 0x0003 | FactoryResetNotify | Client → Server | ACKNOWLEDGE | M | Client 通知 Server 无线侧收到恢复出厂请求。 |
+| 0x0004 | NetworkResetRequest | Server → Client | ACKNOWLEDGE | M | Server 请求 Client 重置网络。 |
+| 0x0005 | FactoryResetRequest | Server → Client | ACKNOWLEDGE | M | Server 请求 Client 恢复出厂。 |
+| 0x0006 | EnterPairingMode | Server → Client | ACKNOWLEDGE | M | Server 请求 Client 进入配网模式。 |
+| 0x0007 | ExitPairingMode | Server → Client | ACKNOWLEDGE | M | Server 请求 Client 退出配网模式。 |
+| 0x0008 | Identify | Client → Server | ACKNOWLEDGE | M | 物理识别提示。 |
+| 0x0020 | OtaPrepare | Client → Server | ACKNOWLEDGE | O | 声明固件镜像已准备好。 |
+| 0x0021 | OtaCancel | Client → Server | ACKNOWLEDGE | O | 取消升级。 |
+| 0x0022 | OtaChunkRequest | Server → Client | OtaChunkData | O | 请求固件分片。 |
+| 0x0023 | OtaChunkData | Client → Server | N | O | 返回固件分片。 |
+| 0x0024 | OtaApplyRequest | Server → Client | OtaApplyResponse | O | 镜像校验通过，请求切换确认。 |
+| 0x0025 | OtaApplyResponse | Client → Server | N | O | 确认 Server 可以切换镜像。 |
+| 0x0026 | OtaAbortNotify | Server → Client | ACKNOWLEDGE | O | Server 主动终止升级。 |
+
+<a id="ref_InitDiscoveryCompleteCommand"></a>
+
+#### InitDiscoveryComplete 命令
+
+该命令由 Client 在完成 `ProductProfileID`、`ServerAttributeList` 和 Server 属性初始值读取后发送，用于通知 Server：Client 侧初始化发现阶段已经完成，Server 可以开始主动数据同步。
+
+Server 收到该命令并返回 `ACKNOWLEDGE(Status=0x00)` 后，MAY 开始发起 QUERY 拉取 Client 属性，也 MAY 按属性上报策略 REPORT Server 属性。若 Server 在收到该命令前发起 QUERY、REPORT 或用于同步业务数据的 Server → Client COMMAND，Client MAY 返回 `DiscoveryInProgress`。
+
+该命令无参数。
+
+<a id="ref_NetworkResetNotifyCommand"></a>
+
+#### NetworkResetNotify 命令
+
+该命令由 Client 在无线侧收到重置网络请求后发送，用于通知 Server 同步执行本地网络状态清理、业务状态复位或用户提示等动作。
+
+该命令无参数。
+
+<a id="ref_FactoryResetNotifyCommand"></a>
+
+#### FactoryResetNotify 命令
+
+该命令由 Client 在无线侧收到恢复出厂请求后发送，用于通知 Server 擦除本地持久化用户参数与运行参数，并恢复到出厂状态。
+
+该命令无参数。
+
+<a id="ref_NetworkResetRequestCommand"></a>
+
+#### NetworkResetRequest 命令
+
+该命令由 Server 在本地触发重置网络流程时发送，用于请求 Client 清除无线网络相关状态并退出当前网络。
+
+该命令无参数。
+
+<a id="ref_FactoryResetRequestCommand"></a>
+
+#### FactoryResetRequest 命令
+
+该命令由 Server 在本地触发恢复出厂流程时发送，用于请求 Client 清除无线网络状态、用户绑定状态和其他与出厂恢复相关的无线侧持久化状态。
+
+该命令无参数。
+
+<a id="ref_EnterPairingModeCommand"></a>
+
+#### EnterPairingMode 命令
+
+该命令由 Server 发送，用于请求 Client 打开配网窗口并进入配网模式。Client 接受后 SHOULD 更新 `PairingStatus` 并在状态变化时通过 NOTIFY 同步。
+
+该命令无参数。
+
+<a id="ref_ExitPairingModeCommand"></a>
+
+#### ExitPairingMode 命令
+
+该命令由 Server 发送，用于请求 Client 关闭配网窗口并退出配网模式。Client 接受后 SHOULD 更新 `PairingStatus` 并在状态变化时通过 NOTIFY 同步。
+
+该命令无参数。
+
+<a id="ref_IdentifyCommand"></a>
+
+#### Identify 命令
+
+该命令请求 Server 执行物理识别动作，例如 LED 闪烁或蜂鸣提示。
+
+Command Payload Format：
+
+| Octets | 2 |
+|:---|:---|
+| Data Type | uint16 |
+| Field Name | Duration |
+| Default | — |
+
+#### Duration 字段
+
+`Duration` 指定识别动作持续时间，单位秒。值为 `0` 表示停止当前识别动作。
+
+<a id="ref_OTA"></a>
+
+### 固件升级（OTA）
+
+Foundation Profile 定义两种固件升级方式：
+
+| 升级方式 | 适用场景 |
+|:---|:---|
+| IAP OTA | Server 在应用运行期间接收固件分片，校验完成后切换镜像。 |
+| BootLoader OTA | Client 通知 Server 进入 BootLoader，后续固件传输由 XMODEM 承载。 |
+
+#### OTA 能力选择流程
+
+Client 发起任何 OTA 流程前，SHALL 使用 `Profile ID = 0x0000` READ `OtaUpgradeMethod`（Attribute ID `0x1004`）：
+
+| 返回值 | 名称 | Client 行为 |
+|:---:|:---|:---|
+| `0x00` | NotSupported | Server 不支持 OTA，Client SHALL NOT 发起 OTA。 |
+| `0x01` | IapOta | Client SHALL 使用 IAP OTA 命令流程。 |
+| `0x02` | BootLoaderOta | Client SHALL 使用 BootLoader OTA 流程，并按硬件要求支持 GPIO 进入 BootLoader。 |
+
+若 READ `OtaUpgradeMethod` 失败，Client SHALL NOT 发起 OTA。Client 不得在未知 Server OTA 能力的情况下直接发送 `OtaPrepare` 或触发 BootLoader 进入时序。
+
+#### OTA 版本兼容要求
+
+为确保 Client 与 Server 两端固件能力兼容，Server 固件升级时，Client 固件 SHALL 在同一次 OTA 任务中升级。Client 在确认 Server OTA 成功前，SHALL NOT 启动 Client 自身 OTA；若无法确认 Server OTA 成功，Client SHALL 终止本次 OTA。
+
+#### IAP OTA 流程
+
+IAP OTA 采用 **Client 声明镜像、Server 主动拉取分片** 的流程。Server OTA 阶段中，Client 负责提供 Server 固件数据；Server 负责分片请求、写入、校验和最终应用。完整镜像校验通过后，Server SHALL 通过 `OtaApplyRequest` 请求 Client 确认切换镜像，Client 确认后 Server 才开始切换镜像并重启。
+
+Client 仅在 `OtaUpgradeMethod = IapOta` 时 SHALL 使用本节命令。
+
+<a id="ref_OtaPrepareCommand"></a>
+
+#### OtaPrepare 命令
+
+该命令通知 Server：Client 已准备好提供固件镜像。仅当 ACKNOWLEDGE 返回 `Status = 0x00` 后，Server 才进入分片拉取阶段。
+
+Command Payload Format：
+
+| Octets | 4 | 4 |
+|:---|:---:|:---:|
+| Data Type | uint32 | uint32 |
+| Field Name | FirmwareSize | Crc16 |
+| Default | — | — |
+
+字段说明：
+
+- `FirmwareSize`：固件正文大小，单位字节，不含 OTA Header。
+- `Crc16`：固件正文 CRC16/XMODEM 校验值。
+
+<a id="ref_OtaCancelCommand"></a>
+
+#### OtaCancel 命令
+
+该命令取消当前 OTA 流程。Server 接受该命令后 SHALL 重置 OTA 状态机。
+
+该命令无参数。
+
+<a id="ref_OtaChunkRequestCommand"></a>
+
+#### OtaChunkRequest 命令
+
+该命令由 Server 发送，用于向 Client 请求指定固件分片。
+
+Command Payload Format：
+
+| Octets | 4 | 1 |
+|:---|:---:|:---:|
+| Data Type | uint32 | uint8 |
+| Field Name | Offset | Length |
+| Default | — | — |
+
+字段说明：
+
+- `Offset`：请求数据偏移，单位字节。
+- `Length`：请求数据长度，取值范围 `1 ~ 255`。
+
+<a id="ref_OtaChunkDataCommand"></a>
+
+#### OtaChunkData 命令
+
+该命令返回 `OtaChunkRequest` 请求的固件分片。该命令为配对返回命令，Server 收到后不再返回 ACKNOWLEDGE。
+
+Command Payload Format：
+
+| Octets | 4 | `1 + Length` |
+|:---|:---:|:---:|
+| Data Type | uint32 | octstr |
+| Field Name | Offset | Data |
+| Default | — | — |
+
+字段说明：
+
+- `Offset`：固件数据偏移，单位字节。
+- `Data`：固件数据分片，使用 octstr 编码，后续字节内容长度最长 255。
+
+<a id="ref_OtaApplyRequestCommand"></a>
+
+#### OtaApplyRequest 命令
+
+该命令由 Server 在固件镜像接收完成且校验通过后发送，用于通知 Client 镜像已可应用，并请求 Client 确认是否允许 Server 切换镜像。Client SHALL 通过 `OtaApplyResponse` 响应。
+
+该命令无参数。
+
+<a id="ref_OtaApplyResponseCommand"></a>
+
+#### OtaApplyResponse 命令
+
+该命令表示 Client 已确认 Server 可以切换镜像。该命令为配对返回命令，Server 收到后不再返回 ACKNOWLEDGE。Server 收到 `OtaApplyResponse` 后 SHALL 开始切换镜像并重启。
+
+该命令无参数。
+
+<a id="ref_OtaAbortNotifyCommand"></a>
+
+#### OtaAbortNotify 命令
+
+该命令由 Server 在 OTA 遇到不可恢复错误时发送。Client SHALL ACKNOWLEDGE 该命令并重置 OTA 状态机。
+
+Command Payload Format：
+
+| Octets | 1 |
+|:---|:---:|
+| Data Type | [OtaAbortReasonEnum8](#otaabortreasonenum8-类型) |
+| Field Name | Reason |
+| Default | — |
+
+字段说明：
+
+- `Reason`：终止原因，有效值见 [OtaAbortReasonEnum8](#otaabortreasonenum8-类型)。
+
+##### IAP OTA 正常流程
+
+IAP OTA 正常流程分为七个阶段：
+
+1. **准备阶段**：Client 发送 `OtaPrepare`，声明固件大小和固件正文 CRC。Server 返回 `ACKNOWLEDGE(Status=0x00)` 后进入传输阶段。
+2. **传输阶段**：Server 按需重复发送 `OtaChunkRequest` 拉取指定偏移与长度的固件分片。Client 使用 `OtaChunkData` 返回对应数据。`OtaChunkData` 的 `Response = N`，Server 收到后不再返回 ACKNOWLEDGE。
+3. **校验阶段**：Server 接收完整镜像后校验固件正文 CRC。校验失败时，Server 通过 `OtaStatus` REPORT 上报失败状态，或发送 `OtaAbortNotify` 主动终止。
+4. **应用确认阶段**：校验通过后，Server 发送 `OtaApplyRequest`。Client 返回 `OtaApplyResponse` 后，Server SHALL 开始切换镜像并重启。
+5. **Server 版本确认阶段**：Server 切换到新镜像并重新进入应用程序后，SHALL 通过 REPORT 上报 `ServerSoftwareVersion` 的最新值。Client SHALL 检查该版本是否为目标版本，并返回 `ACKNOWLEDGE(Status=0x00)` 确认。
+6. **Client OTA 阶段**：Client 确认 Server OTA 成功后，SHALL 再执行 Client 自身 OTA。Server OTA 和 Client OTA SHALL 成对升级，确保两端固件版本兼容。
+7. **重新服务发现阶段**：Client OTA 完成并重启后，SHALL 重新执行初始化发现流程，读取 `ProductProfileID`、各 Profile 的 `ServerAttributeList` 以及已发现 Server 属性的当前值。Client 完成重新发现后，SHALL 再发送 `InitDiscoveryComplete`。Server 返回 `ACKNOWLEDGE(Status=0x00)` 前，SHALL NOT 主动 QUERY Client 属性或 REPORT Server 属性；ACK 完成后，Server MAY 重新开始主动数据同步，确保 Server 更新后的能力与 Client 更新后的协议栈能力重新同步。
+
+![IAP OTA 升级流程](https://itad-aqara-docs-1300889962.aqara.com/dev/img/mcu-standard-protocol/zh/iap_ota_sequence.svg)
+
+##### IAP OTA 异常流程
+
+Client 取消：
+
+Client MAY 发送 `OtaCancel` 取消当前 OTA，Server 接受后 SHALL 返回 `ACKNOWLEDGE(Status=0x00)` 并重置 OTA 状态机。
+
+校验失败上报：
+
+Server 校验失败时 SHALL 通过 `OtaStatus = VerifyFailed` 上报失败状态，Client SHALL 使用 `ACKNOWLEDGE(Status=0x00)` 确认该 REPORT。
+
+Server OTA 成功确认失败：
+
+Client 进入 Server OTA 流程后，SHALL 以 `ServerSoftwareVersion` REPORT 作为 Server OTA 成功依据。若 Client 在超时时间内未收到该 REPORT，或收到的版本不是目标版本，Client SHALL 重试 Server OTA 流程，最多重试 **3 次**。3 次重试后仍无法确认 Server OTA 成功时，Client SHALL 终止本次 OTA，且 SHALL NOT 启动 Client 自身 OTA。
+
+Server 主动终止：
+
+Server MAY 发送 `OtaAbortNotify(reason)` 主动终止当前 OTA，Client SHALL 使用 `ACKNOWLEDGE(Status=0x00)` 确认该 COMMAND。
+
+##### IAP OTA 超时机制
+
+Client 发送 `OtaPrepare` 后 SHALL 启动 OTA 超时定时器，并在每次收到 `OtaChunkRequest` 时刷新。Server 接受 `OtaPrepare` 后 SHOULD 启动 OTA 超时定时器，并在每次收到 `OtaChunkData` 时刷新。
+
+##### OTA Header 解析
+
+Server SHALL 从固件文件起始位置解析 128 字节 OTA Header。若首个 `OtaChunkData` 分片不足 128 字节，Server SHALL 合并后续分片，直到获得完整 OTA Header。
+
+#### BootLoader OTA
+
+BootLoader OTA 用于在 AECP 下统一描述 Server 进入 BootLoader 后，通过标准 XMODEM 协议完成固件传输的流程。
+
+与 IAP OTA 不同，BootLoader OTA 不通过 AECP 属性或命令传输固件分片。
+
+Client 仅在 `OtaUpgradeMethod = BootLoaderOta` 时 SHALL 使用本节流程。
+
+##### BootLoader OTA 进入方式
+
+BootLoader OTA SHALL 通过硬件方式进入 BootLoader。Client 通过专用 GPIO、复位脚或 Boot 选择脚控制 Server 进入 BootLoader。
+
+##### BootLoader OTA 流程
+
+![BootLoader OTA 升级流程](https://itad-aqara-docs-1300889962.aqara.com/dev/img/mcu-standard-protocol/zh/bootloader_ota_sequence.svg)
+
+BootLoader OTA 正常流程分为七个阶段：
+
+1. **能力选择阶段**：Client 发起 BootLoader OTA 前，SHALL 先 READ `OtaUpgradeMethod`，仅当 Server 返回 `BootLoaderOta` 时进入本流程。
+2. **进入 BootLoader 阶段**：Client 通过 GPIO、复位脚或 Boot 选择脚控制 Server 进入 BootLoader。Server 进入 BootLoader 后启动 XMODEM 接收流程，并发送握手字符 `'C'`。
+3. **XMODEM 固件传输阶段**：Client 收到 `'C'` 后，按标准 XMODEM 协议传输固件包。AECP 不承载 BootLoader OTA 的固件分片、重传或结束确认。
+4. **校验与镜像切换阶段**：Server 通过 XMODEM 接收完整固件并完成校验后，自行复位或跳转到新镜像。
+5. **Server 版本确认阶段**：Server 重新进入应用程序后，SHALL 通过 REPORT 上报 `ServerSoftwareVersion` 的最新值。Client SHALL 检查该版本是否为目标版本，并返回 `ACKNOWLEDGE(Status=0x00)` 确认。
+6. **Client OTA 阶段**：Client 确认 Server OTA 成功后，SHALL 再执行 Client 自身 OTA。Server OTA 和 Client OTA SHALL 成对升级，确保两端固件版本兼容。
+7. **重新服务发现阶段**：Client OTA 完成并重启后，SHALL 重新执行初始化发现流程，读取 `ProductProfileID`、各 Profile 的 `ServerAttributeList` 以及已发现 Server 属性的当前值。Client 完成重新发现后，SHALL 再发送 `InitDiscoveryComplete`。Server 返回 `ACKNOWLEDGE(Status=0x00)` 前，SHALL NOT 主动 QUERY Client 属性或 REPORT Server 属性；ACK 完成后，Server MAY 重新开始主动数据同步，确保 Server 更新后的能力与 Client 更新后的协议栈能力重新同步。
+
+BootLoader OTA 进入 Server 升级过程后，Client SHALL 以 `ServerSoftwareVersion` REPORT 作为 Server OTA 成功依据。若 Client 在超时时间内未收到该 REPORT，或收到的版本不是目标版本，Client SHALL 重试 Server OTA 流程，最多重试 **3 次**。3 次重试后仍无法确认 Server OTA 成功时，Client SHALL 终止本次 OTA，且 SHALL NOT 启动 Client 自身 OTA。
+
+<a id="ref_OTAHeader"></a>
+
+#### OTA Header 格式
+
+所有 OTA 固件文件 SHALL 在起始位置包含固定 128 字节 OTA Header。OTA Header 是 AECP 中唯一采用小端序编码的结构；该小端序仅适用于固件文件内部 Header 字段，不适用于 AECP 通信帧、属性值或命令参数。
+
+下表中的类型为 OTA Header 文件字段类型，不是 AECP Data Type：
+
+- `Uint32LE`：4 字节无符号整数，小端序。
+- `Utf8String[48]`：固定 48 字节 UTF-8 字符串区域，末尾使用 NULL 填充。
+- `Reserved[28]`：固定 28 字节保留区域，SHALL 填充为 `0x00`。
+
+| 偏移 | 字段 | 类型 | 大小 | 说明 |
+|:---:|:---|:---|:---:|:---|
+| 0 | headerIdentifier | Uint32LE | 4 B | 固定标识 `0x6C756D69`。 |
+| 4 | headerVersion | Uint32LE | 4 B | Header 格式版本，固定为 `0x00000000`。 |
+| 8 | headerLength | Uint32LE | 4 B | Header 长度，固定为 `128`。 |
+| 12 | timestamp | Uint32LE | 4 B | 固件构建时间戳，Unix Epoch 秒。 |
+| 16 | manufacturerCode | Uint32LE | 4 B | 厂商编码。 |
+| 20 | imageType | Uint32LE | 4 B | Image 类型：`0` = APP，`1` = BootLoader。 |
+| 24 | imageTagId | Uint32LE | 4 B | Image Tag ID，范围 `0x0000` ~ `0xFFFF`。 |
+| 28 | imageUpdateAddress | Uint32LE | 4 B | 目标 Flash 地址。 |
+| 32 | imageFileSize | Uint32LE | 4 B | 固件镜像大小，不含 OTA Header。 |
+| 36 | imageFileCrc16 | Uint32LE | 4 B | 固件镜像 CRC16/XMODEM 校验值。 |
+| 40 | imageSoftwareVersion | Uint32LE | 4 B | Image 软件版本。 |
+| 44 | imageHardwareVersion | Uint32LE | 4 B | Image 硬件版本。 |
+| 48 | imageFileName | Utf8String[48] | 48 B | Image 文件名，UTF-8 字符串，末尾 NULL 填充。 |
+| 96 | reserved | Reserved[28] | 28 B | 保留字段。SHALL 填充为 `0x00`。 |
+| 124 | headerCrc16 | Uint32LE | 4 B | Header CRC16/XMODEM 校验值，覆盖偏移 0 到 123。 |
+
+<a id="ref_crc16xmodem"></a>
+
+#### CRC16/XMODEM 实现
+
+OTA Header 与固件镜像校验使用 **CRC16/XMODEM**：
+
+- 初始值：`0x0000`
+- 多项式：`0x1021`
+
+```c
+uint16_t imageFileCrc16(uint16_t u16Crc, const uint8_t *buf, uint32_t u32len)
+{
+    uint16_t crc = u16Crc;
+    uint32_t len = u32len;
+
+    while (len--) {
+        int i;
+        crc ^= (uint16_t)(*buf++) << 8;
+        for (i = 0; i < 8; ++i) {
+            if (crc & 0x8000)
+                crc = (crc << 1) ^ 0x1021;
+            else
+                crc = crc << 1;
+        }
+    }
+    return crc;
+}
+```
+
+:::warning
+CRC16/XMODEM 的初始值为 `0x0000`，与 CRC16-Modbus（Overall Checksum 使用 `0xFFFF`）不同，请勿混用。
+:::
+
+<a id="ref_ThermostatProfile"></a>
+
+## 第七章 Thermostat Profile（Profile ID = 0x1000）
+
+Thermostat Profile 定义恒温器设备的专有属性与命令，适用于帧头 Profile ID = `0x1000` 的通信帧。
+
+所有实现 Thermostat Profile 的设备同时 SHALL 实现 [Foundation Profile（0x0000）](#第六章-foundation-profileprofile-id--0x0000) 中定义的全部属性与命令。
+
+### 表格约定
+
+本章所有属性表的列含义统一遵循 [第 1 章字段记号约定](#字段记号约定)。
+
+### 数据类型
+
+<a id="ref_ThermostatSystemModeEnum8"></a>
+
+#### ThermostatSystemModeEnum8 类型
+
+`ThermostatSystemModeEnum8` 定义恒温器基础工作模式。该枚举的底层类型为 enum8。
+
+| 值 | 名称 | 说明 |
+|:---:|:---|:---|
+| 0x00 | Off | 关闭。 |
+| 0x01 | Auto | 自动模式。 |
+| 0x02 | Cool | 制冷模式。 |
+| 0x03 | Heat | 制热模式。 |
+
+<a id="ref_KeypadLockoutEnum8"></a>
+
+#### KeypadLockoutEnum8 类型
+
+`KeypadLockoutEnum8` 定义本地按键锁定状态。该枚举的底层类型为 enum8。
+
+| 值 | 名称 | 说明 |
+|:---:|:---|:---|
+| 0x00 | Unlocked | 童锁关闭。 |
+| 0x01 | Locked | 童锁打开。 |
+
+<a id="ref_TemperatureDisplayModeEnum8"></a>
+
+#### TemperatureDisplayModeEnum8 类型
+
+`TemperatureDisplayModeEnum8` 定义温度显示单位。该枚举的底层类型为 enum8。
+
+| 值 | 名称 | 说明 |
+|:---:|:---|:---|
+| 0x00 | Celsius | 摄氏度。 |
+| 0x01 | Fahrenheit | 华氏度。 |
+
+### 属性
+
+| ID | 名称 | 类型 | 约束 | 默认值 | 访问权限 | 归属方 | 必选性 | 简述 |
+|:---:|:---|:---|:---|:---:|:---:|:---:|:---:|:---|
+| 0x1000 | SystemMode | [ThermostatSystemModeEnum8](#thermostatsystemmodeenum8-类型) | 见枚举 | 0x00 | R/W/RP | S | M | 基础工作模式。 |
+| 0x1001 | OccupiedHeatingSetpoint | int16 | 设备能力范围 | — | R/W/RP | S | M | 设定制热温度。 |
+| 0x1002 | LocalTemperature | int16 | 0.01℃ | — | R/RP | S | M | 设备环境温度测量值。 |
+| 0x1003 | LocalTemperatureCalibration | int8 | 0.1℃ | 0 | R/W/RP | S | M | 本地温度校准。 |
+| 0x1004 | KeypadLockout | [KeypadLockoutEnum8](#keypadlockoutenum8-类型) | 见枚举 | 0x00 | R/W/RP | S | O | 童锁状态。 |
+| 0x1005 | TemperatureDisplayMode | [TemperatureDisplayModeEnum8](#temperaturedisplaymodeenum8-类型) | 见枚举 | 0x00 | R/W/RP | S | O | 温度显示单位。 |
+| 0x1006 | FrostProtectionEnabled | bool | true / false | false | R/W/RP | S | O | 防冻模式使能开关。 |
+| 0x1007 | FrostProtectionTemperature | int16 | 0.01℃ | — | R/W/RP | S | O | 防冻模式触发温度。 |
+| 0x1008 | WindowDetectionEnabled | bool | true / false | false | R/W/RP | S | O | 开窗检测功能使能开关。 |
+| 0x1009 | ActiveCurrent | uint32 | mA | — | RP | S | O | 当前电流。 |
+| 0x100A | ActivePower | uint32 | mW | — | RP | S | O | 当前功率。 |
+| 0xFFFB | ServerAttributeList | list[uint16] | 无额外约束 | — | R/RP | S | M | Server 支持的属性列表。 |
+
+<a id="ref_SystemModeAttr"></a>
+
+#### SystemMode 属性
+
+`SystemMode` 表示恒温器当前基础工作模式。Client MAY WRITE 该属性切换工作模式。Server SHALL 在模式变化后 REPORT 该属性。
+
+有效值见 [ThermostatSystemModeEnum8](#thermostatsystemmodeenum8-类型)。
+
+<a id="ref_OccupiedHeatingSetpointAttr"></a>
+
+#### OccupiedHeatingSetpoint 属性
+
+`OccupiedHeatingSetpoint` 表示有人占用场景下的制热目标温度，单位 0.01℃。例如 `2650` 表示 26.50℃，`-900` 表示 -9.00℃。
+
+Client MAY WRITE 该属性修改制热目标温度。Server SHALL 在目标温度变化后 REPORT 该属性。
+
+<a id="ref_LocalTemperatureAttr"></a>
+
+#### LocalTemperature 属性
+
+`LocalTemperature` 表示 Server 传感器实测环境温度，单位 0.01℃。例如 `2650` 表示 26.50℃。
+
+该属性由 Server 维护，Client MAY READ，Server SHALL 在温度变化满足产品上报策略时 REPORT。
+
+<a id="ref_LocalTemperatureCalibrationAttr"></a>
+
+#### LocalTemperatureCalibration 属性
+
+`LocalTemperatureCalibration` 表示本地温度校准偏移，单位 0.1℃。例如 `20` 表示 +2.0℃。
+
+最终本地温度 = `LocalTemperature` + `LocalTemperatureCalibration`。Client MAY WRITE 该属性调整校准偏移。
+
+<a id="ref_KeypadLockoutAttr"></a>
+
+#### KeypadLockout 属性
+
+`KeypadLockout` 表示本地按键锁定状态。Client MAY WRITE 该属性启用或关闭童锁。
+
+有效值见 [KeypadLockoutEnum8](#keypadlockoutenum8-类型)。
+
+<a id="ref_TemperatureDisplayModeAttr"></a>
+
+#### TemperatureDisplayMode 属性
+
+`TemperatureDisplayMode` 表示温度显示单位。Client MAY WRITE 该属性切换显示单位。
+
+有效值见 [TemperatureDisplayModeEnum8](#temperaturedisplaymodeenum8-类型)。
+
+<a id="ref_FrostProtectionEnabledAttr"></a>
+
+#### FrostProtectionEnabled 属性
+
+`FrostProtectionEnabled` 表示防冻模式是否启用。`true` 表示启用，`false` 表示禁用。
+
+<a id="ref_FrostProtectionTemperatureAttr"></a>
+
+#### FrostProtectionTemperature 属性
+
+`FrostProtectionTemperature` 表示防冻模式触发温度，单位 0.01℃。当环境温度低于该值且防冻模式启用时，Server MAY 自动开启制热以防冻。
+
+<a id="ref_WindowDetectionEnabledAttr"></a>
+
+#### WindowDetectionEnabled 属性
+
+`WindowDetectionEnabled` 表示开窗检测功能是否启用。`true` 表示启用，`false` 表示禁用。
+
+<a id="ref_ActiveCurrentAttr"></a>
+
+#### ActiveCurrent 属性
+
+`ActiveCurrent` 表示当前电流，单位 mA。Server SHOULD 按产品定义的周期或变化策略 REPORT 该属性。
+
+<a id="ref_ActivePowerAttr"></a>
+
+#### ActivePower 属性
+
+`ActivePower` 表示当前功率，单位 mW。Server SHOULD 按产品定义的周期或变化策略 REPORT 该属性。
+
+<a id="ref_ThermostatServerAttributeListAttr"></a>
+
+#### ServerAttributeList 属性
+
+`ServerAttributeList` 声明 Thermostat Profile 下 Server 实际支持的 Attribute ID 列表。
+
+该属性类型为 `list[uint16]`。列表元素 SHALL 按 Attribute ID 从小到大排列，并包含 `ServerAttributeList` 自身的 Attribute ID `0xFFFB`。
+
+## 附录 A：串口消息示例
+
+本附录提供三个典型交互场景的完整串口消息示例，包含逐字节标注，帮助实现方验证帧的构造与解析逻辑。
+
+### 示例场景说明
+
+以下示例均基于 `Profile ID = 0x0000`（Foundation Profile）。Client 侧发出的帧标注为 **CLIENT SEND**，Server 侧发出的帧标注为 **SERVER SEND**。
+
+### 示例 A：READ 与 READ_RESPONSE
+
+#### 属性定义
+
+| Attribute ID | 名称 | Data Type | Side | Access | 说明 |
+|:---:|:---|:---:|:---:|:---:|:---|
+| 0x1003 | ServerSoftwareVersion | uint16 | S | R/RP | Server 固件版本。 |
+
+#### 帧内容
+
+**READ 帧（CLIENT SEND）**
+
+| 字段 | SOF | Profile ID | Seq | OPC | D-Len | HCS | Attribute ID |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 长度 | 1 B | 2 B | 1 B | 1 B | 2 B | 1 B | 2 B |
+| 值 (Hex) | `55` | `00 00` | `01` | `01` | `00 02` | `A7` | `10 03` |
+
+最后 2 字节 `71 4C` 为 Overall Checksum。
+
+完整帧（Hex）：`55 00 00 01 01 00 02 A7 10 03 71 4C`
+
+---
+
+**READ_RESPONSE 帧（SERVER SEND）**
+
+| 字段 | SOF | Profile ID | Seq | OPC | D-Len | HCS | Attr ID | Status | Data Type | Data |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 长度 | 1 B | 2 B | 1 B | 1 B | 2 B | 1 B | 2 B | 1 B | 1 B | 2 B |
+| 值 (Hex) | `55` | `00 00` | `01` | `02` | `00 06` | `A2` | `10 03` | `00` | `21` | `00 63` |
+
+最后 2 字节 `A8 56` 为 Overall Checksum。
+
+完整帧（Hex）：`55 00 00 01 02 00 06 A2 10 03 00 21 00 63 A8 56`
+
+#### 解析说明
+
+- `OPC = 0x01` 对应 READ。
+- `OPC = 0x02` 对应 READ_RESPONSE。
+- `Status = 0x00` 表示成功。
+- `Data Type = 0x21` 表示 uint16。
+- `Data = 0x0063` = 99（十进制），即 Server 固件版本号为 `99`。
+
+### 示例 B：REPORT 与 ACKNOWLEDGE
+
+#### 属性定义
+
+| Attribute ID | 名称 | Data Type | Side | Access | 说明 |
+|:---:|:---|:---:|:---:|:---:|:---|
+| 0x1005 | OtaStatus | enum8 | S | RP | OTA 状态。 |
+
+#### 帧内容
+
+**REPORT 帧（SERVER SEND）**
+
+| 字段 | SOF | Profile ID | Seq | OPC | D-Len | HCS | Attr ID | Data Type | Data |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 长度 | 1 B | 2 B | 1 B | 1 B | 2 B | 1 B | 2 B | 1 B | 1 B |
+| 值 (Hex) | `55` | `00 00` | `08` | `05` | `00 04` | `9A` | `10 05` | `30` | `02` |
+
+最后 2 字节 `24 81` 为 Overall Checksum。
+
+完整帧（Hex）：`55 00 00 08 05 00 04 9A 10 05 30 02 24 81`
+
+---
+
+**ACKNOWLEDGE 帧（CLIENT SEND）**
+
+| 字段 | SOF | Profile ID | Seq | OPC | D-Len | HCS | Status |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 长度 | 1 B | 2 B | 1 B | 1 B | 2 B | 1 B | 1 B |
+| 值 (Hex) | `55` | `00 00` | `08` | `06` | `00 01` | `9C` | `00` |
+
+最后 2 字节 `40 BF` 为 Overall Checksum。
+
+完整帧（Hex）：`55 00 00 08 06 00 01 9C 00 40 BF`
+
+#### 解析说明
+
+- `OPC = 0x05` 对应 REPORT。
+- `Data Type = 0x30` 表示 enum8。
+- `Data = 0x02` 表示 `OtaStatus = VerifyFailed`。
+- ACKNOWLEDGE 中 `Status = 0x00` 表示 Client 已成功接收并受理该 REPORT 帧。

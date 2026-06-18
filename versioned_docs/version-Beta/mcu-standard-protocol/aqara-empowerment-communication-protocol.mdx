@@ -1,0 +1,14 @@
+---
+sidebar_label: Not Found
+hide_title: true
+hide_table_of_contents: true
+---
+
+import { useEffect } from 'react';
+
+export default function RedirectPage() {
+  useEffect(() => {
+    window.location.href = 'https://docs.aqara.com/';
+  }, []);
+  return null;
+}
