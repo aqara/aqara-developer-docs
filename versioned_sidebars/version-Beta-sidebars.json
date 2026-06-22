@@ -442,6 +442,7 @@
     "aqara-life/overview"
   ],
   "mcuStandardProtocolSidebar": [
+    "mcu-standard-protocol/overview",
     "mcu-standard-protocol/aqara-empowerment-communication-protocol"
   ]
 }
