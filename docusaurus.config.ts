@@ -158,7 +158,7 @@ const config: Config = {
             { label: "Aqara Studio", to: "docs/aqara-studio/overview/introduction", activeBasePath: "docs/aqara-studio" },
             { label: "Aqara Developer", to: "docs/aqara-developer/introduction", activeBasePath: "docs/aqara-developer" },
             { label: "Aqara Life", to: "docs/aqara-life/overview", activeBasePath: "docs/aqara-life" },
-            { label: "MCU 标准协议接入", to: "docs/mcu-standard-protocol/overview", activeBasePath: "docs/mcu-standard-protocol", className: "navbar-item--zh-only" },
+            { label: "MCU Standard Protocol", to: "docs/mcu-standard-protocol/overview", activeBasePath: "docs/mcu-standard-protocol", className: "navbar-item--zh-only" },
           ],
         },
 
