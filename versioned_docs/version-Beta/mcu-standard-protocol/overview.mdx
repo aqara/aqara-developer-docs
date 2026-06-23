@@ -1,14 +1,22 @@
----
-sidebar_label: Not Found
-hide_title: true
-hide_table_of_contents: true
----
+# Overview
 
-import { useEffect } from 'react';
+## Introduction
 
-export default function RedirectPage() {
-  useEffect(() => {
-    window.location.href = 'https://docs.aqara.com/';
-  }, []);
-  return null;
-}
+This solution aims to provide you with a standardized "smart module + UART integration" approach for rapidly enabling traditional devices with intelligent features, leveraging mature wireless module hardware and a unified serial communication protocol. With this, you can quickly upgrade products to smart solutions at very low development costs.
+
+You only need to connect our smart module to your device's main MCU via a UART interface, and your device will gain wireless connectivity, eco-system integration, and intelligent control capabilities. Throughout the development process, you do not need to dive deep into complex wireless protocols such as Matter, Thread, or Zigbee, nor do you need to create extra cloud or app-side interaction logic. You can focus entirely on your product functionality, significantly accelerating development and time-to-market.
+
+## Core Features
+
+- **Multi-Protocol Support**: Currently supports Matter over Thread and Zigbee 3.0, covering networking requirements for residential and commercial scenarios.
+- **Standardized Serial Protocol**: Provides a unified serial communication protocol specification, covering network commissioning, attribute read/write, event reporting, OTA upgrades, and a full instruction set. Compatible with major mainstream MCU platforms.
+- **End-to-End Capabilities Built-In**: The module side integrates a complete protocol stack, provisioning logic, data exchange, and security encryption. You only need to implement the protocol adaptation on the MCU end as specified to achieve stable two-way communication between the device and the smart ecosystem.
+- **Low Power Adaptation Support**: Supports configuration for module low power mode, offering coordinated low power solutions between MCU and module to fully meet long battery life requirements for battery-powered devices.
+
+## Full Onboarding Process
+
+1. **Module Selection**: Choose the appropriate smart module according to device category, power consumption requirements, target protocol, and market certification needs.
+2. **Hardware Design**: Refer to the hardware specifications and reference designs of the module to complete power supply, UART connections, antenna layout, and other PCB and hardware integration work.
+3. **Software Development**: Develop MCU-side protocol adaptation and functions based on the serial communication protocol specification.
+4. **Testing & Verification**: Complete serial communication, basic function, stability, and RF performance testing.
+5. **Mass Production Deployment**: Integrate with the production testing solution to successfully implement large-scale product manufacturing.

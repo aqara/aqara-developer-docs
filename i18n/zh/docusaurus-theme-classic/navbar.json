@@ -30,5 +30,9 @@
   "item.label.Aqara Developer": {
     "message": "Aqara Developer",
     "description": "Navbar item with label Aqara Developer"
+  },
+  "item.label.MCU Standard Protocol": {
+    "message": "MCU 标准协议接入",
+    "description": "Navbar item with label MCU Standard Protocol"
   }
 }
