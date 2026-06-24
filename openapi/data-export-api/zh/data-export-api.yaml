@@ -39,6 +39,8 @@ tags:
     description: 网关相关接口
   - name: Automation
     description: 自动化创建、编辑、查询、删除与能力查询接口
+  - name: Studio
+    description: Studio 统计信息查询接口
 
 paths:
 
@@ -238,14 +240,14 @@ paths:
           explode: true
         - name: needChildren
           in: query
-          description: 是否查询子空间内的设备。仅在 spaceIds 有值时生效。
+          description: "是否查询子空间内的设备。仅在 `spaceIds` 有值时生效。"
           required: false
           schema:
             type: boolean
             default: false
         - name: spaceAssociated
           in: query
-          description: 是否查询 spaceIds 指定空间下的设备。<ul><li>true：仅查询指定空间下的设备；</li><li>false：仅查询非指定空间下的设备（此时 spaceIds 和 needChildren 参数无效）；</li><li>不填：<ul><li>当 spaceIds 为空时，默认查询所有设备；</li><li>当 spaceIds 不为空时，默认查询指定空间下的设备。</li></ul></li></ul>
+          description: "是否查询 `spaceIds` 指定空间下的设备。<ul><li>true：仅查询指定空间下的设备；</li><li>false：仅查询非指定空间下的设备（此时 `spaceIds` 和 `needChildren` 参数无效）；</li><li>不填：<ul><li>当 `spaceIds` 为空时，默认查询所有设备；</li><li>当 `spaceIds` 不为空时，默认查询指定空间下的设备。</li></ul></li></ul>"
           required: false
           schema:
             type: boolean
@@ -267,6 +269,15 @@ paths:
               type: string
           style: form
           explode: true
+        - name: deviceTypesMatchMode
+          in: query
+          description: "`deviceTypesList` 内多个设备类型的匹配方式；`or` 表示命中任意一个类型，`and` 表示必须同时命中全部类型"
+          required: false
+          schema:
+            type: string
+            enum: [or, and]
+            default: or
+          example: or
         - name: deviceName
           in: query
           description: 设备名称模糊匹配（不区分大小写，空白值自动忽略）
@@ -275,7 +286,7 @@ paths:
             type: string
         - name: orderBy
           in: query
-          description: 排序方式。<ul><li>createTime asc：按创建时间升序排序。</li><li>createTime desc：按创建时间降序排序。</li></ul>
+          description: "排序方式。<ul><li>`createTime asc`：按创建时间升序排序。</li><li>`createTime desc`：按创建时间降序排序。</li></ul>"
           required: false
           schema:
             type: string
@@ -317,6 +328,7 @@ paths:
                       pageSize: 200
                       data:
                         - deviceId: "device-001"
+                          gatewayId: "gateway-001"
                           deviceName: "客厅灯"
                           deviceTypesList: ["light"]
                           createTime: 1710001234567
@@ -1277,6 +1289,52 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
+  # ────────────────────────────────────────────────────────────────
+  # 获取 Studio 统计信息
+  # ────────────────────────────────────────────────────────────────
+  /studio/statistics:
+    get:
+      tags: [Studio]
+      summary: 获取 Studio 统计信息
+      description: 获取 Studio 统计信息，如设备数量、自动化数量、空间数量、场景数量等。
+      operationId: getStudioStatistics
+      x-skill-intent: studio.statistics.get
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters:
+        - name: dimensions
+          in: query
+          description: 统计维度列表。支持 deviceCount（设备数量）、linkageCount（自动化数量）、spaceCount（空间数量）、sceneCount（场景数量）。URL 示例：dimensions=deviceCount,linkageCount,spaceCount,sceneCount 或 dimensions=deviceCount&dimensions=linkageCount
+          required: true
+          schema:
+            type: array
+            minItems: 1
+            items:
+              $ref: '#/components/schemas/StudioStatisticsDimension'
+          style: form
+          explode: true
+          example: [deviceCount, linkageCount, spaceCount, sceneCount]
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudioStatisticsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
 # ══════════════════════════════════════════════════════════════════
 # Components
 # ══════════════════════════════════════════════════════════════════
@@ -1526,6 +1584,10 @@ components:
         deviceId:
           type: string
           description: 设备 ID
+        gatewayId:
+          type: string
+          nullable: true
+          description: 所属网关 ID
         deviceName:
           type: string
           description: 设备名称
@@ -1571,7 +1633,7 @@ components:
           description: |
             此设备所绑定的网关 ID。
             如果 `gatewayId` 等于 `deviceId`，表示这个设备自身是网关。
-            如果 `gatewayId` 为 `null` 或空字符串，表示这个设备为直连设备或未绑定网关。
+            如果 `gatewayId` 为 `null` 或空字符串，表示这个设备是不带子设备的直连网关或第三方接入设备。
         name:
           type: string
           description: 设备名称
@@ -2268,6 +2330,7 @@ components:
           pageSize: 200
           data:
             - deviceId: "device-001"
+              gatewayId: "gateway-001"
               deviceName: "客厅灯"
               deviceTypesList: ["light"]
               createTime: 1710001234567
@@ -2773,3 +2836,48 @@ components:
         key:
           type: string
           description: 枚举显示文案
+    
+    StudioStatisticsDimension:
+      type: string
+      description: Studio 统计维度
+      enum: [deviceCount, linkageCount, spaceCount, sceneCount]
+
+    StudioStatisticsData:
+      type: object
+      description: Studio 统计信息；仅返回 dimensions 请求的统计字段
+      properties:
+        deviceCount:
+          type: integer
+          description: 设备数量
+          example: 128
+        linkageCount:
+          type: integer
+          description: 自动化数量
+          example: 24
+        spaceCount:
+          type: integer
+          description: 空间数量
+          example: 16
+        sceneCount:
+          type: integer
+          description: 场景数量
+          example: 12
+
+    StudioStatisticsResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/StudioStatisticsData'
+      example:
+        type: StudioStatisticsResponse
+        version: v1
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000021"
+        code: 0
+        message: success
+        data:
+          deviceCount: 128
+          linkageCount: 24
+          spaceCount: 16
+          sceneCount: 12
