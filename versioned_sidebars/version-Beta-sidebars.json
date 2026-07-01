@@ -346,6 +346,22 @@
                   "className": "api-method post"
                 } 
               ]
+            },
+            {
+              "type": "category",
+              "label": "Studio",
+              "link": {
+                "type": "doc",
+                "id": "aqara-developer/data-export-api/studio"
+              },
+              "collapsed": false,
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "aqara-developer/data-export-api/get-studio-statistics",
+                  "className": "api-method get"
+                }
+              ]
             }
           ]
         }

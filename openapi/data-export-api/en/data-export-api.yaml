@@ -39,6 +39,8 @@ tags:
     description: APIs for managing gateway subdevice pairing, binding, and unbinding operations
   - name: Automation
     description: APIs for automation creation, editing, query, deletion, and capability query
+  - name: Studio
+    description: Studio statistics query API
 
 paths:
 
@@ -64,7 +66,7 @@ paths:
             type: string
         - name: needChildren
           in: query
-          description: Whether to query for child spaces under the parent space. If parentSpaceId is not empty and needChildren is false, child spaces will not be returned (the parent space itself may be returned only when needParentSpaceSelf is true).
+          description: "Whether to query for child spaces under the parent space. If parentSpaceId is not empty and needChildren is false, child spaces will not be returned (the parent space itself may be returned only when `needParentSpaceSelf` is true)."
           required: false
           schema:
             type: boolean
@@ -239,14 +241,14 @@ paths:
           explode: true
         - name: needChildren
           in: query
-          description: Whether to query devices in child spaces. Only effective when spaceIds is not empty.
+          description: "Whether to query devices in child spaces. Only effective when `spaceIds` is not empty."
           required: false
           schema:
             type: boolean
             default: false
         - name: spaceAssociated
           in: query
-          description: "Whether to query devices under the specified spaceIds.<ul><li>true: Query only devices under the specified space(s).</li><li>false: Query only devices NOT under the specified space(s) (in this case, the spaceIds and needChildren parameters are ignored).</li><li>Not set:<ul><li>If spaceIds is empty, queries all devices by default.</li><li>If spaceIds is set, queries devices under the specified space(s) by default.</li></ul></li></ul>"
+          description: "Whether to query devices under the specified `spaceIds`.<ul><li>true: Query only devices under the specified space(s).</li><li>false: Query only devices NOT under the specified space(s) (in this case, the `spaceIds` and `needChildren` parameters are ignored).</li><li>Not set:<ul><li>If `spaceIds` is empty, queries all devices by default.</li><li>If `spaceIds` is set, queries devices under the specified space(s) by default.</li></ul></li></ul>"
           required: false
           schema:
             type: boolean
@@ -268,6 +270,15 @@ paths:
               type: string
           style: form
           explode: true
+        - name: deviceTypesMatchMode
+          in: query
+          description: "Match mode for multiple device types in `deviceTypesList`: `or` means match any of the types, `and` means must match all types"
+          required: false
+          schema:
+            type: string
+            enum: [or, and]
+            default: or
+          example: or
         - name: deviceName
           in: query
           description: Device name fuzzy matching (case-insensitive, blank values are automatically ignored)
@@ -318,6 +329,7 @@ paths:
                       pageSize: 200
                       data:
                         - deviceId: "device-001"
+                          gatewayId: "gateway-001"
                           deviceName: "Living Room Light"
                           deviceTypesList: ["light"]
                           createTime: 1710001234567
@@ -1280,6 +1292,52 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
+  # ────────────────────────────────────────────────────────────────
+  # Get Studio Statistics
+  # ────────────────────────────────────────────────────────────────
+  /studio/statistics:
+    get:
+      tags: [Studio]
+      summary: Get Studio Statistics
+      description: Get Studio statistics, such as the number of devices, automations, spaces, scenes, etc.
+      operationId: getStudioStatistics
+      x-skill-intent: studio.statistics.get
+      x-idempotent: true
+      x-retryable: true
+      x-side-effects: none
+      parameters:
+        - name: dimensions
+          in: query
+          description: "List of statistical dimensions. Supported values: deviceCount (number of devices), linkageCount (number of automations), spaceCount (number of spaces), sceneCount (number of scenes). Example URL: dimensions=deviceCount,linkageCount,spaceCount,sceneCount or dimensions=deviceCount&dimensions=linkageCount"
+          required: true
+          schema:
+            type: array
+            minItems: 1
+            items:
+              $ref: '#/components/schemas/StudioStatisticsDimension'
+          style: form
+          explode: true
+          example: [deviceCount, linkageCount, spaceCount, sceneCount]
+      responses:
+        '200':
+          description: Request succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudioStatisticsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequestsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
 # ══════════════════════════════════════════════════════════════════
 # Components
 # ══════════════════════════════════════════════════════════════════
@@ -1530,6 +1588,10 @@ components:
         deviceId:
           type: string
           description: Device ID
+        gatewayId:
+          type: string
+          nullable: true
+          description: Gateway ID to which the device belongs
         deviceName:
           type: string
           description: Device name
@@ -1575,7 +1637,7 @@ components:
           description: |
             The gateway ID to which this device is bound.
             If `gatewayId` equals `deviceId`, it indicates that this device is itself a gateway.
-            If `gatewayId` is `null` or an empty string, it means the device is a direct-connected device or is not bound to any gateway.
+            If `gatewayId` is `null` or an empty string, it means this device is a directly connected gateway without subdevices or a third-party integrated device.
         name:
           type: string
           description: Device name
@@ -2273,6 +2335,7 @@ components:
           pageSize: 200
           data:
             - deviceId: "device-001"
+              gatewayId: "gateway-001"
               deviceName: "Living Room Light"
               deviceTypesList: ["light"]
               createTime: 1710001234567
@@ -2776,3 +2839,48 @@ components:
         key:
           type: string
           description: Enum display text
+    
+    StudioStatisticsDimension:
+      type: string
+      description: Studio statistics dimension
+      enum: [deviceCount, linkageCount, spaceCount, sceneCount]
+
+    StudioStatisticsData:
+      type: object
+      description: Studio statistics; returns only the statistical fields requested in dimensions
+      properties:
+        deviceCount:
+          type: integer
+          description: Number of devices
+          example: 128
+        linkageCount:
+          type: integer
+          description: Number of automations
+          example: 24
+        spaceCount:
+          type: integer
+          description: Number of spaces
+          example: 16
+        sceneCount:
+          type: integer
+          description: Number of scenes
+          example: 12
+
+    StudioStatisticsResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/StudioStatisticsData'
+      example:
+        type: StudioStatisticsResponse
+        version: v1
+        msgId: "a1b2c3d4-e5f6-7890-abcd-000000000021"
+        code: 0
+        message: success
+        data:
+          deviceCount: 128
+          linkageCount: 24
+          spaceCount: 16
+          sceneCount: 12

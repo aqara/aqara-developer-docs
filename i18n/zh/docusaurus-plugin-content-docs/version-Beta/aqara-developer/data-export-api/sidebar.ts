@@ -182,6 +182,23 @@ const sidebar: SidebarsConfig = {
         },
       ],
     },
+    {
+      type: "category",
+      label: "Studio",
+      link: {
+        type: "doc",
+        id: "version-Beta/aqara-developer/data-export-api/studio",
+      },
+      collapsed: false,
+      items: [
+        {
+          type: "doc",
+          id: "version-Beta/aqara-developer/data-export-api/get-studio-statistics",
+          label: "获取 Studio 统计信息",
+          className: "api-method get",
+        },
+      ],
+    },
   ],
 };
 

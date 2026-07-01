@@ -182,6 +182,23 @@ const sidebar: SidebarsConfig = {
         },
       ],
     },
+    {
+      type: "category",
+      label: "Studio",
+      link: {
+        type: "doc",
+        id: "version-Beta/aqara-developer/data-export-api/studio",
+      },
+      collapsed: false,
+      items: [
+        {
+          type: "doc",
+          id: "version-Beta/aqara-developer/data-export-api/get-studio-statistics",
+          label: "Get Studio Statistics",
+          className: "api-method get",
+        },
+      ],
+    },
   ],
 };
 
