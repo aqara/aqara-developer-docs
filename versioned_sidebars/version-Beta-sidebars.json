@@ -184,6 +184,7 @@
       "label": "Developer",
       "items": [
         "aqara-studio/developer-guide",
+        "aqara-studio/http-push",
         "aqara-studio/use-aqara-studio-skill-in-openclaw-web-ui",
         "aqara-studio/set-up-mcp-server"
       ]      

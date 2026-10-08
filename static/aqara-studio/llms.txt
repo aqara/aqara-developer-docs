@@ -68,6 +68,7 @@
 - Plugin Center: https://docs.aqara.com/docs/aqara-studio/plugin-center
 - AIOT Data Migration: https://docs.aqara.com/docs/aqara-studio/plugin-center/aiot-data-migration
 - Developer Guide: https://docs.aqara.com/docs/aqara-studio/developer-guide
+- HTTP Push: https://docs.aqara.com/docs/aqara-studio/http-push
 - Use Aqara Studio Skill in OpenClaw Web UI: https://docs.aqara.com/docs/aqara-studio/use-aqara-studio-skill-in-openclaw-web-ui
 - Connect to Aqara Studio MCP Server: https://docs.aqara.com/docs/aqara-studio/set-up-mcp-server
 - FAQ: https://docs.aqara.com/docs/aqara-studio/faq

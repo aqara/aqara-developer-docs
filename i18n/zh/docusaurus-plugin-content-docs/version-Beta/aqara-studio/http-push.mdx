@@ -1,0 +1,382 @@
+---
+title: "HTTP Push 推送"
+description: "通过 HTTP Push 将 Aqara Studio 的设备数据、对象事件和告警实时推送到第三方 Webhook 接收端。"
+keywords: ["Aqara 文档", "Aqara Studio", "HTTP Push", "Webhook", "数据转出"]
+---
+# HTTP Push 推送
+
+Aqara Studio 支持通过 HTTP Push 将设备数据、对象事件和告警实时推送给您。您只需在 Studio 中配置一个全局 Webhook 地址，Studio 就会以 HTTP `POST` 的方式，将消息逐条发送到该地址。
+
+这类能力适合以下场景：
+- 将设备数据同步到自建平台、数据中台或告警中心。
+- 在第三方系统中接收设备新增、删除、空间变更等对象事件。
+
+## Aqara Studio 的 HTTP Push 是如何工作的？
+
+Aqara Studio 的 HTTP Push 采用“Studio 主动推送，第三方服务端确认”的模式：
+
+1. 您在 Aqara Studio 中 [配置接收地址并选择需要订阅的事件类型；必要时还可添加 Header 字段和签名配置](#在-aqara-studio-配置消息推送)。
+2. 当您保存上述配置后，Aqara Studio 会立即向您配置的接收地址发送一条 `WebhookVerification` 消息（HTTP POST），用于验证接收地址是否可用。
+3. 您需要返回一条包含 `code` 为 0 且 `challenge` 为 `WebhookVerification` 消息中 `data.challenge` 的响应消息，表示您顺利接收该消息，此地址通过验证。如此，Aqara Studio 才会正式启用 HTTP Push。
+4. 当您配置的订阅事件发生时，Aqara Studio 会按上述配置向您配置的接收地址发送 HTTP `POST` 请求。
+
+  每个请求正文只包含一条消息，消息格式为 JSON。
+5. 当您接收到消息后，您需要返回一条包含 `code` 为 0 的响应消息，表示您顺利接收该消息。
+
+:::tip
+HTTP Push 是实时、best-effort 的推送机制，不提供持久化消息队列、历史补发，也不保证全局顺序。
+:::
+
+## 接收端要求
+
+在实现 HTTP Push 之前，请先确认您的接收端满足以下要求：
+
+| 项目 | 要求 |
+| --- | --- |
+| 协议 | 支持 HTTP 或 HTTPS |
+| HTTP 版本 | HTTP/1.1 |
+| 接收地址 | 在 Studio 中配置唯一全局 endpoint |
+| HTTPS | 必须能正确校验证书 |
+| 重定向 | 不跟随重定向 |
+| URL 限制 | 地址中不能包含 query、fragment 和 userinfo |
+| 路径处理 | 保留路径中的连续斜杠和已有百分号转义 |
+
+另外，接收端必须支持 `WebhookVerification` 验证请求。保存配置时，Studio 会自动验证当前配置；只有验证成功后，HTTP Push 才会正式启用。后续如果重新启用推送，也会再次执行验证。
+
+## 支持的消息类型
+
+Aqara Studio 会向接收端发送以下几类消息：
+
+| 消息类型 | 说明 |
+| --- | --- |
+| `TraitValueUpdate` | 设备功能点值变化消息 |
+| `objectEvent` | 对象事件，例如设备新增、删除、空间变化、自动化变化等 |
+| `AlarmEvent` | 告警消息 |
+| `WebhookVerification` | Webhook 验证消息，用于校验接收端是否可用 |
+
+业务消息正文复用了 [WebSocket `v1` 的消息 schema](./../aqara-developer/data-export-api/websocket-api/index.mdx)。除验证消息（`WebhookVerification`）外，业务消息通常都带有以下通用字段：
+
+| 字段 | 说明 |
+| --- | --- |
+| `type` | 消息类型，例如 `TraitValueUpdate`、`objectEvent`、`AlarmEvent` |
+| `version` | 当前仅支持 `v1` |
+| `msgId` | 消息标识，用于链路追踪 |
+| `data` | 业务数据主体 |
+| `code` | 处理结果码，`0` 表示成功 |
+| `message` | 处理结果描述 |
+
+## 在 Aqara Studio 配置消息推送
+
+1. 登录 Aqara Studio，从侧边栏进入 **开发者** 页面。找到 **开放 API 与 MCP 访问** 区域，选择 **消息推送** 按钮。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/HTTPPush-Click.png" alt="在 Aqara Studio 配置消息推送" />
+
+2. 在弹窗中填写并保存如下信息：
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/HTTPPush-Configure.png" alt="在 Aqara Studio 配置消息推送" style={{width: '60%'}} />
+
+    <table>
+      <thead>
+        <tr>
+          <th>项目</th>
+          <th>是否必需</th>
+          <th>说明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>推送地址（Push URL）</td>
+          <td>是</td>
+          <td>传入您用于接收推送的地址，请确保该地址满足<a href="#接收端要求">接收端要求</a>。</td>
+        </tr>
+        <tr>
+          <td>消息订阅模式</td>
+          <td>是</td>
+          <td>
+            您可以选择消息订阅模式，支持如下：<br/>
+            - 自主订阅：选择需要订阅的事件类型。<br/>
+            - 全订阅：订阅所有事件类型。<br/>
+            更多说明见 <a href="#订阅与默认推送规则">订阅与默认推送规则</a>
+          </td>
+        </tr>
+        <tr>
+          <td>推送事件类型</td>
+          <td>否</td>
+          <td>仅当 <em>消息订阅模式</em> 为 <em>自主订阅</em> 时，您可以勾选需要订阅的事件类型。</td>
+        </tr>
+        <tr>
+          <td>固定 Header</td>
+          <td>否</td>
+          <td>
+            您可以添加 Header 字段，用于自定义请求头。但是，不可以为以下任意字段：<br/>
+            - <code>X-Studio-Delivery-Id</code><br/>
+            - <code>X-Studio-App-Key</code><br/>
+            - <code>X-Studio-Time</code><br/>
+            - <code>X-Studio-Nonce</code><br/>
+            - <code>X-Studio-Sign-Version</code><br/>
+            - <code>X-Studio-Sign</code>
+          </td>
+        </tr>
+        <tr>
+          <td>AppKey</td>
+          <td>否</td>
+          <td>AppKey 是 1～128 个可打印 ASCII 字符，由您定义，不允许空格。</td>
+        </tr>
+        <tr>
+          <td>AppSecret</td>
+          <td>否</td>
+          <td>AppSecret 是 1～4096 个 UTF-8 字节，由您定义，不能包含控制字符。</td>
+        </tr>
+      </tbody>
+    </table>
+
+## Webhook 验证
+
+### 接收 WebhookVerification 消息
+
+当您根据上述步骤在 Aqara Studio 上保存 HTTP Push 配置或重新启用推送时，Aqara Studio 会先向您配置的接收地址发送一条 `WebhookVerification` 消息，用于验证接收端是否可用。
+
+验证消息示例如下：
+
+```json
+{
+  "type": "WebhookVerification",
+  "version": "v1",
+  "msgId": "verify-39c63800-c8c1-4f4b-b77c-57f24f0de240",
+  "data": {
+    "challenge": "00112233445566778899aabbccddeeff"
+  }
+}
+```
+
+### 返回 WebhookVerification 响应
+
+当您收到 `WebhookVerification` 消息后，您需要返回一条包含 `code` 为 0 且 `challenge` 为 `WebhookVerification` 消息中 `data.challenge` 的响应消息，表示您顺利接收该消息，此地址通过验证。如此，Aqara Studio 才会正式启用 HTTP Push。
+
+```json
+{
+  "code": 0,
+  "challenge": "00112233445566778899aabbccddeeff"
+}
+```
+
+:::note
+验证消息不重试。如果验证失败，当前配置不会生效。
+:::
+
+## 请求格式
+
+Studio 向接收端发送请求时，具有以下固定特征：
+
+- 请求方法为 `POST`。
+- 默认 `Content-Type` 为 `application/json`。
+- 每个请求正文只包含一条消息。
+- 响应也在同一条 HTTP 请求中返回。
+- 您在 Aqara Studio 中配置的 Header 字段，会按名称和值原样发送。
+
+### 请求头
+
+HTTP Push 请求头至少包含以下字段：
+| Header | 说明 |
+| --- | --- |
+| `X-Studio-Delivery-Id` | 每次投递的唯一标识，格式为 UUID |
+| `X-Studio-App-Key` | AppKey 字段。若您在 Aqara Studio 上配置了 AppKey 和 AppSecret 时，请求头才会包含此字段。 |
+| `X-Studio-Time` | 时间戳。若您在 Aqara Studio 上配置了 AppKey 和 AppSecret，请求头才会包含此字段。 |
+| `X-Studio-Nonce` | 32 位小写十六进制随机数。若您在 Aqara Studio 上配置了 AppKey 和 AppSecret，请求头才会包含此字段。 |
+| `X-Studio-Sign-Version` | 签名版本。若您在 Aqara Studio 上配置了 AppKey 和 AppSecret，请求头才会包含此字段，固定为 `v1`。 |
+| `X-Studio-Sign` |  签名（HMAC-SHA256 小写十六进制结果）。若您在 Aqara Studio 上配置了 AppKey 和 AppSecret，请求头才会包含此字段， |
+### 验签规则
+
+若您在 Aqara Studio 中配置了 AppKey 和 AppSecret，接收端应使用 AppSecret 校验请求头中的 `X-Studio-Sign`。
+
+用请求中的明文信息 **重新拼出** [签名原文](#签名原文)，再用同一 AppSecret 计算 HMAC，与 `X-Studio-Sign` 比对。AppKey 本身已通过请求头 `X-Studio-App-Key` 明文下发，如需确认是否为本端配置，可直接与本地 AppKey 比较；完整性与防篡改仍依赖签名校验。
+
+#### 签名原文
+
+签名原文（`signingString`）由以下 6 行 UTF-8 文本按顺序组成，行与行之间使用 `LF`（`\n`）连接，末尾不加换行：
+
+```text
+v1
+AppKey
+Delivery-Id
+Time
+Nonce
+SHA256(raw-body)
+```
+
+各行取值如下：
+
+| 行内容 | 说明 |
+| --- | --- |
+| `v1` | 对应 `X-Studio-Sign-Version` |
+| `AppKey` | 对应 `X-Studio-App-Key` |
+| `Delivery-Id` | 对应 `X-Studio-Delivery-Id` |
+| `Time` | 对应 `X-Studio-Time` |
+| `Nonce` | 对应 `X-Studio-Nonce` |
+| `SHA256(raw-body)` | 原始请求体的 SHA-256 小写十六进制值 |
+
+#### 推荐验签步骤
+
+1. （可选）将 `X-Studio-App-Key` 与本地配置的 AppKey 比较，不一致可直接拒绝。
+2. 按上表用请求头与原始请求体拼出 `signingString`。
+3. 计算 `HMAC-SHA256(signingString, AppSecret)`，输出小写十六进制字符串。
+4. 与请求头 `X-Studio-Sign` 做恒定时间比较；一致则验签通过。
+
+:::tip
+发生重试时，消息正文和 `X-Studio-Delivery-Id` 保持不变，但 `Time`、`Nonce` 和 `Sign` 会重新生成。
+:::
+
+## 响应要求
+
+接收端返回的响应必须满足以下条件，Aqara Studio 才会认定投递成功：
+
+- HTTP 状态码为 `2xx`
+- 响应体是未压缩的 UTF-8 JSON
+- JSON 顶层 `code` 字段的词法值必须是整数 `0`
+
+以下值都**不算成功**：
+- `0.0`
+- `0e0`
+- `"0"`
+- `null`
+
+### 响应体格式
+
+响应体至少应包含：
+
+```json
+{
+  "code": 0
+}
+```
+
+验证请求（`WebhookVerification`）的响应则必须原样回传 `challenge`：
+
+```json
+{
+  "code": 0,
+  "challenge": "00112233445566778899aabbccddeeff"
+}
+```
+
+如果处理失败，可以返回非 0 的 `code`：
+
+```json
+{
+  "code": 1
+}
+```
+
+### 响应体限制
+
+| 项目 | 限制 |
+| --- | --- |
+| 默认响应体上限 | 4096 字节 |
+| 响应体硬上限 | 65536 字节 |
+| JSON 最大嵌套深度 | 128（含根对象） |
+
+建议接收端尽量返回简洁响应，避免复杂 JSON 结构和大量响应头。
+
+## 订阅与默认推送规则
+
+HTTP Push 启用后，并不是所有事件都需要手动勾选才会发送。当前规则如下：
+
+| 类别 | 规则 |
+| --- | --- |
+| `DEVICE_ADDED` / `DEVICE_REMOVED` | 默认发送，不受其他订阅项影响 |
+| `TraitValueUpdate` | 默认开启 |
+| `DEVICE_ENDPOINT_ADDED` / `DEVICE_ENDPOINT_REMOVED` | 与设备数据/结构事件组合项共用，默认开启 |
+| `DEVICE_TRAIT_PARAMETER_UPDATE` | 与设备数据/结构事件组合项共用，默认开启 |
+| 可配置对象事件 | 当前可逐项选择 8 个对象事件，默认全部选中 |
+| 告警事件 | 默认关闭 |
+
+:::tip
+- 允许取消全部可选项。此时仍会继续推送 `DEVICE_ADDED` 和 `DEVICE_REMOVED`。
+- “全订阅”不仅包含当前所有可选对象事件，也包含后续新增的对象事件。
+- 如果关闭 HTTP Push，则默认事件也会一并停止推送。
+:::
+
+## 重试、超时与熔断
+
+为避免接收端故障导致大量积压，HTTP Push 采用了明确的超时、重试和熔断策略。
+
+### 重试规则
+
+- 单条业务消息最多重试一次。
+- 普通失败场景下，重试前等待 1 秒。
+- 如果接收到 `429` 响应，则只接受 `Retry-After` 为 `0` 到 `30` 秒之间的整数值。
+- 验证消息不重试。
+
+### 超时规则
+
+| 项目 | 值 |
+| --- | --- |
+| 连接超时 | 2 秒 |
+| 单次 HTTP 调用取消期限 | 5 秒 |
+| 逻辑投递窗口 | 45 秒 |
+
+其中，45 秒逻辑投递窗口从消息进入发送阶段开始计算，不包含此前的排队等待时间。窗口到期后，不再启动重试。
+
+:::note
+上述时间限制并不代表底层网络资源会立即释放。例如 DNS 等底层操作如果不响应取消，实际结束时间可能更晚。
+:::
+
+### 熔断规则
+
+- 连续 5 条消息最终失败后，触发熔断。
+- 探测退避时间依次为：1 分钟、5 分钟、15 分钟、1 小时、6 小时，之后封顶。
+- 熔断恢复后，不会补发熔断期间错过的历史消息。
+- 连续 10 条业务消息投递成功后，退避档位会被重置。
+
+## 数据大小限制
+
+| 项目 | 限制 |
+| --- | --- |
+| 固定 Header 总容量 | 32 KiB |
+| 单条业务请求体默认上限 | 1 MiB |
+| 单条业务请求体硬上限 | 64 MiB |
+
+如果消息体超过上限，该消息不会被发送。
+
+## 接收端实现建议
+
+为了让 HTTP Push 更稳定，建议您的接收端遵循以下实践：
+
+- 优先做到“快速接收、异步处理”，避免在 5 秒超时窗口内执行耗时业务。
+- 以 `X-Studio-Delivery-Id` 作为投递链路追踪字段，并结合业务状态做幂等处理。
+- 不要依赖全局顺序，也不要假设一定能收到历史补发。
+- 开启签名时，务必使用原始请求体参与摘要计算，不要使用格式化后的 JSON。
+- 对 `WebhookVerification` 单独处理，确保 `challenge` 原样返回。
+
+## 示例
+
+下面是一个典型的推送与确认示例。
+
+### Studio 推送请求
+
+```http
+POST /hook HTTP/1.1
+Content-Type: application/json
+X-Studio-Delivery-Id: 0c9c109a-e724-469c-ae96-1f96e824c127
+
+{
+  "type": "WebhookVerification",
+  "version": "v1",
+  "msgId": "verify-39c63800-c8c1-4f4b-b77c-57f24f0de240",
+  "data": {
+    "challenge": "00112233445566778899aabbccddeeff"
+  }
+}
+```
+
+### 接收端返回确认
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "code": 0,
+  "challenge": "00112233445566778899aabbccddeeff"
+}
+```

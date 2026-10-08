@@ -68,6 +68,7 @@
 - 插件中心: https://docs.aqara.com/zh/docs/aqara-studio/plugin-center
 - AIOT 数据迁移: https://docs.aqara.com/zh/docs/aqara-studio/plugin-center/aiot-data-migration
 - 开发者指南: https://docs.aqara.com/zh/docs/aqara-studio/developer-guide
+- HTTP Push 推送: https://docs.aqara.com/zh/docs/aqara-studio/http-push
 - 在 OpenClaw Web UI 中使用 Aqara Studio Skill: https://docs.aqara.com/zh/docs/aqara-studio/use-aqara-studio-skill-in-openclaw-web-ui
 - 连接至 Aqara Studio MCP Server: https://docs.aqara.com/zh/docs/aqara-studio/set-up-mcp-server
 - 常见问题: https://docs.aqara.com/zh/docs/aqara-studio/faq
