@@ -235,8 +235,8 @@ Each line refers to:
 
 1. (Optional) Compare `X-Studio-App-Key` with your local AppKey. If mismatched, you may reject the request.
 2. Construct the `signingString` using request headers and the raw request body as specified above.
-3. Calculate `HMAC-SHA256(signingString, AppSecret)`, output as a lowercase hex string.
-4. Perform a constant-time comparison between the result and the `X-Studio-Sign` header; if equal, signature verification passes.
+3. Generate the signature (a lowercase hexadecimal string) with the HmacSHA256 algorithm, using the your AppSecret as the key.
+4. Compare the result with the `X-Studio-Sign` header; if equal, the `X-Studio-Sign` passes the verification.
 
 :::tip
 On retry, the request body and `X-Studio-Delivery-Id` remain the same, but `Time`, `Nonce`, and `Sign` are regenerated.
@@ -316,12 +316,13 @@ After HTTP Push is enabled, not all events require manual selection to be sent. 
 
 To avoid message backlog due to receiver issues, HTTP Push enforces explicit timeout, retry, and circuit breaker strategies.
 
-### Retry Rules
+### Retry and Idempotency
 
-- Each business message is retried at most once.
-- For ordinary failures, retry after 1 second.
-- If receiving a `429` response, only accept a `Retry-After` value between `0` and `30` seconds (integer).
-- Verification messages are not retried.
+Business messages are retried at most once. During retries, `X-Studio-Delivery-Id` remains unchanged, and the receiver should use it for idempotent handling.
+
+When the receiver returns 429, it can specify a wait time via `Retry-After`, which only supports integer seconds from 0 to 30; if not provided or invalid, the default wait time is used.
+
+`WebhookVerification` is not retried immediately. Successful verification is required when enabling or recovering push for the first time; if verification fails while modifying the configuration, the original configuration is not replaced, and existing push continues to run with the original configuration.
 
 ### Timeout Rules
 
@@ -329,13 +330,6 @@ To avoid message backlog due to receiver issues, HTTP Push enforces explicit tim
 | --- | --- |
 | Connection timeout | 2 seconds |
 | Single HTTP call deadline | 5 seconds |
-| Logical delivery window | 45 seconds |
-
-The 45-second delivery window begins when the message enters the sending stage (excludes previous queuing). Retries will not be attempted after this window.
-
-:::note
-These time limits do not guarantee immediate release of system resources. For example, DNS or other low-level operations may not respond to cancellation and may end later.
-:::
 
 ### Circuit Breaker Rules
 
