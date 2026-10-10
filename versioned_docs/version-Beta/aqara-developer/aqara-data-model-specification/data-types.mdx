@@ -45,7 +45,7 @@ Parameter structure for the AddOrUpdateThreadNetwork Command.
 
 | Member Index | Field | Type | Required | Description |
 | --- | --- | --- | --- | --- |
-| 0 | OperationalDataset | octetString | Required | Operational Dataset. |
+| 0 | OperationalDataset | octetString | Required | Complete Thread Operational Dataset. Omission or Null indicates the device will create a new network. |
 
 ## AddOrUpdateThreadNetworkResponse Command Structure
 
@@ -147,8 +147,6 @@ This enumeration defines the valid Present Value values for the AlarmError Trait
 | 0x00 | SUCCESS | Success |
 | 0x01 | FAILURE | Failure |
 | 0x02 | NOT_ALLOWED | Not allowed |
-
-## AllpagesTraitPresentValueStructure
 
 ## AllpagesWidgetStructure
 
@@ -1818,7 +1816,6 @@ This enumeration defines the valid Present Value values for the StartUpOnOff Tra
 | 0x02 | Toggle | Toggle. |
 | 0x03 | Hold | Hold. |
 
-## StartUpXYColorTraitPresentValueStructure
 
 ## StateOfLowBatEnum8
 

@@ -45,7 +45,7 @@ AddOrUpdateThreadNetwork Command 的参数结构体。
 
 | 结构体成员序号 | 字段名 | 类型 | 是否必选 | 说明 |
 | --- | --- | --- | --- | --- |
-| 0 | OperationalDataset | octetString | 必选 | 参数。 |
+| 0 | OperationalDataset | octetString | 必选 | 完整 Thread Operational Dataset。省略或 Null 表示由设备创建新网络。 |
 
 ## AddOrUpdateThreadNetworkResponse Command Structure
 
@@ -53,7 +53,7 @@ AddOrUpdateThreadNetworkResponse Command 的参数结构体。
 
 | 结构体成员序号 | 字段名 | 类型 | 是否必选 | 说明 |
 | --- | --- | --- | --- | --- |
-| 0 | StatusCodes | uint8 | 必选 | 参数。 |
+| 0 | StatusCodes | uint8 | 必选 |  |
 
 ## AddOrUpdateWiFiNetwork Command Structure
 
@@ -61,12 +61,12 @@ AddOrUpdateWiFiNetwork Command 的参数结构体。
 
 | 结构体成员序号 | 字段名 | 类型 | 是否必选 | 说明 |
 | --- | --- | --- | --- | --- |
-| 0 | SSID | characterString | 可选 | 参数。 |
-| 1 | Credentials | characterString | 可选 | 参数。 |
-| 2 | Encryption | uint8 | 可选 | 参数。 |
-| 3 | CountryDomain | characterString | 可选 | 参数。 |
-| 4 | Bindkey | characterString | 可选 | 参数。 |
-| 5 | TimeZone | characterString | 可选 | 参数。 |
+| 0 | SSID | characterString | 可选 |  |
+| 1 | Credentials | characterString | 可选 |  |
+| 2 | Encryption | uint8 | 可选 |  |
+| 3 | CountryDomain | characterString | 可选 |  |
+| 4 | Bindkey | characterString | 可选 |  |
+| 5 | TimeZone | characterString | 可选 |  |
 
 ## AddOrUpdateWiFiNetworkResponse Command Structure
 
@@ -74,7 +74,7 @@ AddOrUpdateWiFiNetworkResponse Command 的参数结构体。
 
 | 结构体成员序号 | 字段名 | 类型 | 是否必选 | 说明 |
 | --- | --- | --- | --- | --- |
-| 0 | StatusCodes | uint8 | 必选 | 参数。 |
+| 0 | StatusCodes | uint8 | 必选 |  |
 
 ## AddOrUpdateZigbeeNetwork Command Structure
 
@@ -82,11 +82,11 @@ AddOrUpdateZigbeeNetwork Command 的参数结构体。
 
 | 结构体成员序号 | 字段名 | 类型 | 是否必选 | 说明 |
 | --- | --- | --- | --- | --- |
-| 0 | Channel | uint8 | 必选 | 参数。 |
-| 1 | ExtendedPANID | octetString | 必选 | 参数。 |
-| 2 | NetworkKey | octetString | 必选 | 参数。 |
-| 3 | NetworkName | characterString | 可选 | 参数。 |
-| 4 | PANID | uint16 | 必选 | 参数。 |
+| 0 | Channel | uint8 | 必选 |  |
+| 1 | ExtendedPANID | octetString | 必选 |  |
+| 2 | NetworkKey | octetString | 必选 |  |
+| 3 | NetworkName | characterString | 可选 |  |
+| 4 | PANID | uint16 | 必选 |  |
 
 ## AddOrUpdateZigbeeNetworkResponse Command Structure
 
@@ -94,7 +94,7 @@ AddOrUpdateZigbeeNetworkResponse Command 的参数结构体。
 
 | 结构体成员序号 | 字段名 | 类型 | 是否必选 | 说明 |
 | --- | --- | --- | --- | --- |
-| 0 | StatusCodes | uint8 | 必选 | 参数。 |
+| 0 | StatusCodes | uint8 | 必选 |  |
 
 ## AddressingModeEnum8
 
@@ -147,8 +147,6 @@ AddUserDefinedEffect Command 的参数结构体。
 | 0x00 | SUCCESS | 成功 |
 | 0x01 | FAILURE | 失败 |
 | 0x02 | NOT_ALLOWED | 不允许 |
-
-## AllpagesTraitPresentValueStructure
 
 ## AllpagesWidgetStructure
 
@@ -1036,7 +1034,7 @@ LockDoor Command 的参数结构体。
 
 | 结构体成员序号 | 字段名 | 类型 | 是否必选 | 说明 |
 | --- | --- | --- | --- | --- |
-| 0 | Code | characterString | 可选 | 参数。 |
+| 0 | Code | characterString | 可选 |  |
 
 ## LockOperationErrorTraitPresentValueStructure
 
@@ -1817,8 +1815,6 @@ StartEffect Command 的参数结构体。
 | 0x01 | On | 上电开启 |
 | 0x02 | Toggle | 上电反转 |
 | 0x03 | Hold | 上电记忆 |
-
-## StartUpXYColorTraitPresentValueStructure
 
 ## StateOfLowBatEnum8
 
