@@ -317,7 +317,6 @@ keywords: ["Aqara 文档", "Aqara Developer", "Aqara 数据模型规范", "功�
 | [PulseDuration](#pulseduration) | 定义脉冲负载的脉冲持续时间 |
 | [LoadType](#loadtype) | 描述连接到开关的负载类型 |
 | [ThemeID](#themeid) | 主题ID |
-| [Allpages](#allpages) | 所有页面 |
 | [MaxPageNum](#maxpagenum) | 最大页面数量 |
 | [ScreenWidth](#screenwidth) | 屏幕宽度 |
 | [DataVersion](#dataversion) | 数据版本 |
@@ -3090,16 +3089,6 @@ MultiStateInputPV 提供当前枚举状态，以及人类可读的状态标签�
 | 最小值 | uint16 | 1.0 | ✔ | ✘ | ✘ |
 | 默认值 | uint16 | 1 | ✔ | ✔ | ✘ |
 
-## Allpages
-
-该 Trait 用于「所有页面」相关数据的访问与上报。
-
-#### 参数
-
-| 名称 | 类型 | 默认值 | 可读 | 可写 | 可上报 |
-| --- | --- | --- | --- | --- | --- |
-| 当前值 | list[[AllpagesTraitPresentValueStructure](./data-types#allpagestraitpresentvaluestructure)] |  | ✔ | ✔ | ✔ |
-
 ## MaxPageNum
 
 该 Trait 用于「最大页面数量」相关数据的访问与上报。
@@ -4249,11 +4238,11 @@ ColorXY表示CIE xyY颜色空间中的x和y值，包含ColorX和ColorY元素，�
 
 | 名称 | 类型 | 默认值 | 可读 | 可写 | 可上报 |
 | --- | --- | --- | --- | --- | --- |
-| 当前值 | [StartUpXYColorTraitPresentValueStructure](./data-types#startupxycolortraitpresentvaluestructure) | 0 | ✔ | ✔ | ✔ |
+| 当前值 | uint32 | 0 | ✔ | ✔ | ✔ |
 | 最大值 | uint32 | 4.2949673E9 | ✔ | ✘ | ✘ |
 | 最小值 | uint32 | 0.0 | ✔ | ✘ | ✘ |
 | 步长 | uint32 | 1.0 | ✔ | ✘ | ✘ |
-| 默认值 | [StartUpXYColorTraitPresentValueStructure](./data-types#startupxycolortraitpresentvaluestructure) | 0 | ✔ | ✔ | ✘ |
+| 默认值 | uint32 | 0 | ✔ | ✔ | ✘ |
 
 ## LightingMusicSyncMode
 

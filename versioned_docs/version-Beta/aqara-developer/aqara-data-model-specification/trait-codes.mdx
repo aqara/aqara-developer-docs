@@ -317,7 +317,6 @@ The following table lists all trait codes supported by Aqara:
 | [PulseDuration](#pulseduration) | Pulse Duration |
 | [LoadType](#loadtype) | Load Type |
 | [ThemeID](#themeid) | Theme ID |
-| [Allpages](#allpages) | Allpages |
 | [MaxPageNum](#maxpagenum) | Max Page Num |
 | [ScreenWidth](#screenwidth) | Screen Width |
 | [DataVersion](#dataversion) | Data Version |
@@ -3090,16 +3089,6 @@ This Trait provides access to and reporting for the associated data.
 | Min | uint16 | 1.0 | ✔ | ✘ | ✘ |
 | Default Value | uint16 | 1 | ✔ | ✔ | ✘ |
 
-## Allpages
-
-This Trait provides access to and reporting for the associated data.
-
-#### Parameters
-
-| Name | Type | Default | Readable | Writable | Reportable |
-| --- | --- | --- | --- | --- | --- |
-| Present Value | list[[AllpagesTraitPresentValueStructure](./data-types#allpagestraitpresentvaluestructure)] |  | ✔ | ✔ | ✔ |
-
 ## MaxPageNum
 
 This Trait provides access to and reporting for the associated data.
@@ -4249,11 +4238,11 @@ ColorXY represents x and y values in the CIE xyY color space and contains ColorX
 
 | Name | Type | Default | Readable | Writable | Reportable |
 | --- | --- | --- | --- | --- | --- |
-| Present Value | [StartUpXYColorTraitPresentValueStructure](./data-types#startupxycolortraitpresentvaluestructure) | 0 | ✔ | ✔ | ✔ |
+| Present Value | uint32 | 0 | ✔ | ✔ | ✔ |
 | Max | uint32 | 4.2949673E9 | ✔ | ✘ | ✘ |
 | Min | uint32 | 0.0 | ✔ | ✘ | ✘ |
 | Step | uint32 | 1.0 | ✔ | ✘ | ✘ |
-| Default Value | [StartUpXYColorTraitPresentValueStructure](./data-types#startupxycolortraitpresentvaluestructure) | 0 | ✔ | ✔ | ✘ |
+| Default Value | uint32 | 0 | ✔ | ✔ | ✘ |
 
 ## LightingMusicSyncMode
 
