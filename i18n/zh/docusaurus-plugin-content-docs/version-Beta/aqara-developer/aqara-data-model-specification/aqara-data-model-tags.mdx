@@ -5922,6 +5922,12 @@ BooleanState描述如何在设备的上下文中使用布尔值（可能在智�
       <td>M</td>
     </tr>
     <tr>
+      <td>0x5241</td>
+      <td><a href="#ref_NodeLabel">NodeLabel</a></td>
+      <td>节点标签</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x8083</td>
       <td><a href="#ref_VendorID">VendorID</a></td>
       <td>厂商ID</td>
@@ -6172,6 +6178,11 @@ BooleanState描述如何在设备的上下文中使用布尔值（可能在智�
       <td>0x8084</td>
       <td><a href="#ref_ProductName">ProductName</a></td>
       <td>M</td>
+    </tr>
+    <tr>
+      <td>0x5241</td>
+      <td><a href="#ref_NodeLabel">NodeLabel</a></td>
+      <td>O</td>
     </tr>
     <tr>
       <td>0x8083</td>
@@ -6568,6 +6579,52 @@ BooleanState描述如何在设备的上下文中使用布尔值（可能在智�
       <td></td>
       <td>RV</td>
       <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NodeLabel Trait（节点标签） {#ref_NodeLabel}
+
+表示用户为 Matter 节点设置的自定义名称，字符串长度最多为 32 字节。Matter 设备接入 Aqara 时，设备名称优先使用非空的 `NodeLabel`；当 `NodeLabel` 为空时，回退显示 `ProductName`。用户在 Aqara Home 中修改设备名称后，网关或 App 应将自定义名称写入设备的 `NodeLabel`，由设备保存并通过该 Trait 同步。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5241</td>
+      <td>NodeLabel</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>string32</td>
+      <td>最大 32 字节</td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
     </tr>
   </tbody>
 </table>
