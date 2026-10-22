@@ -1862,35 +1862,70 @@ Device Type 用于描述 Endpoint 的设备类型，一个 Device 可以由一�
   <tbody>
     <tr>
       <td>0x000D</td>
-      <td>AirConditioner（空调）</td>
+      <td>AirConditioner（空调，双设定点）</td>
       <td>Output</td>
       <td>M</td>
-      <td></td>
+      <td>支持自动制冷/制热切换，并分别维护制冷和制热目标温度。</td>
     </tr>
     <tr>
       <td>0x000D</td>
-      <td>AirConditioner（空调）</td>
+      <td>AirConditioner（空调，双设定点）</td>
       <td>HeaterCooler</td>
       <td>M</td>
-      <td></td>
+      <td>必须实现 <code>CoolingTemperature</code>、<code>HeatingTemperature</code> 和 <code>MinHeatCoolDeadBand</code>；<code>HeaterCoolerMode</code> 必须支持 <code>Auto</code>，并上报 <code>Supported Value</code>。双设定点及自动模式要求见下文。</td>
     </tr>
     <tr>
       <td>0x000D</td>
-      <td>AirConditioner（空调）</td>
+      <td>AirConditioner（空调，双设定点）</td>
       <td>FanControl</td>
       <td>O</td>
       <td></td>
     </tr>
     <tr>
       <td>0x000D</td>
-      <td>AirConditioner（空调）</td>
+      <td>AirConditioner（空调，双设定点）</td>
       <td>FreshAirControl</td>
       <td>O</td>
       <td></td>
     </tr>
     <tr>
       <td>0x000D</td>
-      <td>AirConditioner（空调）</td>
+      <td>AirConditioner（空调，双设定点）</td>
+      <td>Temperature</td>
+      <td>O</td>
+      <td>室外温度使用 <code>OutdoorTemperature</code>；室内温度复用 HeaterCooler 的 <code>CurrentTemperature</code>。</td>
+    </tr>
+    <tr>
+      <td>0x0087</td>
+      <td>SingleSetpointAC（单设定点空调）</td>
+      <td>Output</td>
+      <td>M</td>
+      <td>用户先选择制冷或制热模式，再设置该模式下唯一的目标温度。</td>
+    </tr>
+    <tr>
+      <td>0x0087</td>
+      <td>SingleSetpointAC（单设定点空调）</td>
+      <td>HeaterCooler</td>
+      <td>M</td>
+      <td>必须实现 <code>SetTemperature</code>；<code>HeaterCoolerMode</code> 必须上报 <code>Supported Value</code>，至少支持 <code>Cool</code> 或 <code>Heat</code> 之一。单设定点控制要求见下文。</td>
+    </tr>
+    <tr>
+      <td>0x0087</td>
+      <td>SingleSetpointAC（单设定点空调）</td>
+      <td>FanControl</td>
+      <td>O</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>0x0087</td>
+      <td>SingleSetpointAC（单设定点空调）</td>
+      <td>FreshAirControl</td>
+      <td>O</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>0x0087</td>
+      <td>SingleSetpointAC（单设定点空调）</td>
       <td>Temperature</td>
       <td>O</td>
       <td>室外温度使用 <code>OutdoorTemperature</code>；室内温度复用 HeaterCooler 的 <code>CurrentTemperature</code>。</td>
@@ -2037,6 +2072,13 @@ Device Type 用于描述 Endpoint 的设备类型，一个 Device 可以由一�
     </tr>
   </tbody>
 </table>
+
+AirConditioner 与 SingleSetpointAC 都实现 `Output` 和 `HeaterCooler`，区别在于目标温度和模式控制模型：
+
+* `AirConditioner`（Device Type ID `0x000D`，十进制 13）为双设定点空调，适用于能够同时维护制冷与制热目标、并根据室温自动在制冷和制热之间切换的设备。其 `CoolingTemperature` 和 `HeatingTemperature` 是两个独立且同时有效的目标；`SetTemperature` 不得作为这两个目标的别名或替代值。两目标之间的差值必须不小于 `MinHeatCoolDeadBand` 的 Present Value。设备必须支持并上报 `HeaterCoolerMode/Supported Value` 中的 `Auto`。在 Auto 模式下，室温高于制冷目标时制冷，低于制热目标时制热；处于两目标之间的死区时，不因该自动温控逻辑同时请求制冷和制热。客户端在 Auto 模式下应显示并可分别调整两个目标；切换至 Cool 或 Heat 时，应使用对应的制冷或制热目标，另一个目标仍保持独立有效。设备应在更新任一目标或最小死区时校验关系；违反最小死区的写入必须拒绝，且不得部分更新。
+* `SingleSetpointAC`（Device Type ID `0x0087`，十进制 135）为单设定点空调，适用于需要用户先选择制冷或制热模式、然后设置一个目标温度的设备，包括单冷型或单热型设备。其 `SetTemperature` 是当前模式下唯一有效的空调目标温度；设备不得以 `CoolingTemperature` 和 `HeatingTemperature` 同时表示当前空调控制目标。该 Device Type 的 `HeaterCoolerMode/Supported Value` 必须列出设备实际支持的模式，至少包含 `Cool` 或 `Heat` 之一；用户切换 Cool/Heat 模式后，`SetTemperature` 仍表示当前模式的唯一目标，不代表分别保存的制冷和制热目标。
+* `HeaterCoolerMode/Supported Value` 是客户端可用模式的依据；客户端不得仅凭全局枚举定义就展示设备未声明支持的模式。`AirConditioner` 的自动模式根据两个目标和死区工作；`SingleSetpointAC` 的客户端流程应先展示设备支持的 Cool/Heat 模式（仅支持一个时只展示该模式），再编辑 `SetTemperature`。
+* `MinHeatCoolDeadBand` 约束双设定点自动控制，表示制冷与制热目标之间必须保留的最小温差；它不适用于以 `SetTemperature` 控制的 SingleSetpointAC。当前温度 Trait 用于状态展示时按其自身 Conformance 实现；设备可在内部使用传感器执行 Auto 控制，无须因内部传感器而虚报外部温度测量值。
 
 #### 影音类型
 
@@ -3428,7 +3470,7 @@ Device Type 用于描述 Endpoint 的设备类型，一个 Device 可以由一�
     <tr>
       <td>[[devtype_000d]]0x000D</td>
       <td>AirConditioner</td>
-      <td>空调</td>
+      <td>双设定点空调</td>
       <td>HeaterCooler</td>
     </tr>
     <tr>
@@ -4126,6 +4168,12 @@ Device Type 用于描述 Endpoint 的设备类型，一个 Device 可以由一�
       <td>ElectricityMeter</td>
       <td>电能表</td>
       <td>Other</td>
+    </tr>
+    <tr>
+      <td>[[devtype_0087]]0x0087</td>
+      <td>SingleSetpointAC</td>
+      <td>单设定点空调</td>
+      <td>HeaterCooler</td>
     </tr>
   </tbody>
 </table>
@@ -40606,13 +40654,6 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
   </thead>
   <tbody>
     <tr>
-      <td>0</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>来源 ID，语义参见 AddAqaraCredential 命令。</td>
-    </tr>
-    <tr>
       <td>1</td>
       <td>UserId</td>
       <td>uint16</td>
@@ -43476,13 +43517,6 @@ ExitAddAqaraCredential Command 的参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>0</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>来源ID。</td>
-    </tr>
-    <tr>
       <td>1</td>
       <td>UserId</td>
       <td>uint16</td>
@@ -43522,13 +43556,6 @@ GetAqaraCredential Command 的参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>0</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>来源ID。</td>
-    </tr>
-    <tr>
       <td>1</td>
       <td>UserId</td>
       <td>uint16</td>
@@ -43561,13 +43588,6 @@ DeleteAqaraCredential Command 的参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>0</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>来源ID。</td>
-    </tr>
-    <tr>
       <td>1</td>
       <td>CredentialId</td>
       <td>uint16</td>
@@ -43592,13 +43612,6 @@ ModifyAqaraCredential Command 的参数结构体。
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td>0</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>来源ID。</td>
-    </tr>
     <tr>
       <td>1</td>
       <td>CredentialId</td>
@@ -43660,13 +43673,6 @@ AddAqaraCredential Command 的参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>0</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>来源ID。</td>
-    </tr>
-    <tr>
       <td>1</td>
       <td>UserId</td>
       <td>uint16</td>
@@ -43727,13 +43733,6 @@ DeleteAqaraUser Command 的参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>0</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>来源ID。</td>
-    </tr>
-    <tr>
       <td>1</td>
       <td>UserId</td>
       <td>uint16</td>
@@ -43758,13 +43757,6 @@ ModifyAqaraUser Command 的参数结构体。
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td>0</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>来源ID。</td>
-    </tr>
     <tr>
       <td>1</td>
       <td>UserId</td>
@@ -43805,13 +43797,6 @@ AddAqaraUser Command 的参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>0</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>来源ID。</td>
-    </tr>
-    <tr>
       <td>1</td>
       <td>UserType</td>
       <td>enum8</td>
@@ -43843,13 +43828,6 @@ GetAqaraUser Command 的参数结构体。
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td>0</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>来源ID。</td>
-    </tr>
     <tr>
       <td>1</td>
       <td>UserId</td>
@@ -50929,13 +50907,6 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
       <td>用户创建结果。</td>
     </tr>
     <tr>
-      <td>1</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>回显请求中的来源链路标识。</td>
-    </tr>
-    <tr>
       <td>2</td>
       <td>UserId</td>
       <td>uint16</td>
@@ -50966,13 +50937,6 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
       <td>enum8</td>
       <td>M</td>
       <td>用户修改结果。</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>回显请求中的来源链路标识。</td>
     </tr>
     <tr>
       <td>2</td>
@@ -51007,13 +50971,6 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
       <td>用户删除结果。</td>
     </tr>
     <tr>
-      <td>1</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>回显请求中的来源链路标识。</td>
-    </tr>
-    <tr>
       <td>2</td>
       <td>UserId</td>
       <td>uint16</td>
@@ -51025,7 +50982,7 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
 
 #### GetAqaraUserResponse 响应数据格式 {#ref_GetAqaraUserResponseResponseFormat}
 
-设备以该响应返回用户记录及分页游标。下表仅列出 Aqara Spec 用户数据模型使用的字段；Trait 仅保存 `Users`，不包含 `ErrorCode` 或 `SourceId`。字段 ID 沿用 Extension 定义。
+设备以该响应返回用户记录及分页游标。下表仅列出 Aqara Spec 用户数据模型使用的字段；Trait 仅保存 `Users`，不包含 `ErrorCode`。字段 ID 沿用 Extension 定义。
 
 <table>
   <thead>
@@ -51078,13 +51035,6 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
       <td>凭证添加结果。</td>
     </tr>
     <tr>
-      <td>1</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>回显请求中的来源链路标识。</td>
-    </tr>
-    <tr>
       <td>2</td>
       <td>UserId</td>
       <td>uint16</td>
@@ -51124,13 +51074,6 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
       <td>凭证修改结果。</td>
     </tr>
     <tr>
-      <td>1</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>回显请求中的来源链路标识。</td>
-    </tr>
-    <tr>
       <td>2</td>
       <td>CredentialId</td>
       <td>uint16</td>
@@ -51163,13 +51106,6 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
       <td>凭证删除结果。</td>
     </tr>
     <tr>
-      <td>1</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>回显请求中的来源链路标识。</td>
-    </tr>
-    <tr>
       <td>2</td>
       <td>CredentialId</td>
       <td>uint16</td>
@@ -51200,13 +51136,6 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
       <td>enum8</td>
       <td>M</td>
       <td>凭证查询结果。</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>回显请求中的来源链路标识。</td>
     </tr>
     <tr>
       <td>2</td>
@@ -51246,13 +51175,6 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
       <td>enum8</td>
       <td>M</td>
       <td>退出会话结果。</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>SourceId</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>回显请求中的来源链路标识。</td>
     </tr>
     <tr>
       <td>2</td>
@@ -51569,7 +51491,7 @@ ClearUser（清除用户）
 
 #### ExitAddAqaraCredential Command {#ref_ExitAddAqaraCredential}
 
-该命令应退出指定凭证类型和属性的添加凭证会话。客户端发送该命令以取消或完成凭证录入流程而不提交新凭证。SourceId 字段标识发出该命令的源链路（字段语义参见 AddAqaraCredential）。UserId 字段标识正在退出凭证录入会话的用户。
+该命令应退出指定凭证类型和属性的添加凭证会话。客户端发送该命令以取消或完成凭证录入流程而不提交新凭证。UserId 字段标识正在退出凭证录入会话的用户。
 
 ##### 参数
 
@@ -51577,7 +51499,7 @@ ClearUser（清除用户）
 
 #### GetAqaraCredential Command {#ref_GetAqaraCredential}
 
-该命令应请求门锁返回指定凭证的完整凭证记录。设备应以 GetAqaraCredentialResponse 命令响应。SourceId 字段标识发出该命令的源链路（字段语义参见 AddAqaraCredential）。
+该命令应请求门锁返回指定凭证的完整凭证记录。设备应以 GetAqaraCredentialResponse 命令响应。
 
 ##### 参数
 
@@ -51585,7 +51507,7 @@ ClearUser（清除用户）
 
 #### DeleteAqaraCredential Command {#ref_DeleteAqaraCredential}
 
-该命令应从门锁凭证数据库中删除 CredentialId 标识的凭证。SourceId 字段标识发出该命令的源链路（字段语义参见 AddAqaraCredential）。
+该命令应从门锁凭证数据库中删除 CredentialId 标识的凭证。
 
 ##### 参数
 
@@ -51594,7 +51516,7 @@ ClearUser（清除用户）
 #### ModifyAqaraCredential Command {#ref_ModifyAqaraCredential}
 
 该命令应更新 CredentialId 标识凭证的一个或多个属性。
-SourceId 字段标识发出该命令的源链路（字段语义参见 AddAqaraCredential）。每个可更新字段均可独立省略：字段省略时，设备上凭证的现有值应保持不变。至少应提供 CredentialAttribute、CredentialType、CredentialContent、Validity 或 CredentialName 之一；若五项均省略，设备应以 DoorLockErrorCodeEnum 类型 InvalidParameter（0x07）响应且不得修改任何凭证数据。
+每个可更新字段均可独立省略：字段省略时，设备上凭证的现有值应保持不变。至少应提供 CredentialAttribute、CredentialType、CredentialContent、Validity 或 CredentialName 之一；若五项均省略，设备应以 DoorLockErrorCodeEnum 类型 InvalidParameter（0x07）响应且不得修改任何凭证数据。
 
 ##### 参数
 
@@ -51602,7 +51524,7 @@ SourceId 字段标识发出该命令的源链路（字段语义参见 AddAqaraCr
 
 #### AddAqaraCredential Command {#ref_AddAqaraCredential}
 
-该命令应添加新凭证并将其与 UserId 标识的现有用户关联。SourceId 字段标识发出该命令的源链路（如会话、控制器或传输通道），以便设备及上层将请求与其来源关联。CredentialContent 字段以结构化值承载类型特定的凭证载荷；CredentialName 为带隐式长度前缀的可变长度字符串。可选 Validity 字段在存在时以 CredentialValidityStruct 类型编码凭证的周期性有效日程；不存在时，凭证除设备默认限制外无时间边界限制。
+该命令应添加新凭证并将其与 UserId 标识的现有用户关联。CredentialContent 字段以结构化值承载类型特定的凭证载荷；CredentialName 为带隐式长度前缀的可变长度字符串。可选 Validity 字段在存在时以 CredentialValidityStruct 类型编码凭证的周期性有效日程；不存在时，凭证除设备默认限制外无时间边界限制。
 
 ##### 参数
 
@@ -51610,7 +51532,7 @@ SourceId 字段标识发出该命令的源链路（字段语义参见 AddAqaraCr
 
 #### GetAqaraUser Command {#ref_GetAqaraUser}
 
-该命令应请求门锁返回一条或多条用户记录（每条携带用户属性及关联凭证）。设备应以 GetAqaraUserResponse 响应，从 UserId 起最多返回 Number 条记录。SourceId 字段标识发出该命令的源链路。该命令也是遍历完整用户数据库的基本操作--客户端通过链式连续调用并消费每次响应的 NextUserId 字段直至其为 null 来遍历数据库。
+该命令应请求门锁返回一条或多条用户记录（每条携带用户属性及关联凭证）。设备应以 GetAqaraUserResponse 响应，从 UserId 起最多返回 Number 条记录。该命令也是遍历完整用户数据库的基本操作--客户端通过链式连续调用并消费每次响应的 NextUserId 字段直至其为 null 来遍历数据库。
 
 ##### 参数
 
@@ -66348,7 +66270,7 @@ Studio 向其他端点（网关、设备、云端等）通知其当前关键状�
 
 ### 简介
 
-提供 Matter 入网与 Fabric 管理能力，包括配网窗口、Fabric 列表及节点标识。Magic Pair 二码合一产品的 Discriminator、Passcode、Vendor ID 与 Product ID SHALL 与本 Function 及 Matter QR 保持一致，见 ref_MatterMagicPairUnified。打开窗口的默认超时为 10 分钟，也可由 [SysControl](#ref_SysControl) Cmd 6 触发。
+提供 Matter 入网与 Fabric 管理能力，包括配网窗口、Fabric 列表及节点标识。二码合一设备的 Discriminator、Passcode 与 Vendor ID SHALL 与本 Function 及 Matter QR 保持一致；Product ID 在单固件二码合一设备上相同，在双固件二码合一设备上不同，见 ref_MatterMagicPairUnifiedTypes。打开窗口的默认超时为 10 分钟，也可由 [SysControl](#ref_SysControl) Cmd 6 触发。
 
 ### Function 标识
 
@@ -74732,7 +74654,7 @@ PTZRemovePreset Command 的参数结构体。
       <td>Present Value</td>
       <td><a href="#ref_PTZPowerOffMemoryEnum8">PTZPowerOffMemoryEnum8</a></td>
       <td></td>
-      <td>0</td>
+      <td>1</td>
       <td>RVW</td>
       <td>O</td>
     </tr>
@@ -75006,7 +74928,7 @@ PTZRemovePreset Command 的参数结构体。
       <td>Present Value</td>
       <td><a href="#ref_PTZHomePositionStructure">PTZHomePositionStructure</a></td>
       <td></td>
-      <td></td>
+      <td><code>&#123;&amp;quot;0&amp;quot;:0,&amp;quot;1&amp;quot;:999,&amp;quot;2&amp;quot;:999&#125;</code></td>
       <td>RVW</td>
       <td>O</td>
     </tr>
@@ -130196,7 +130118,7 @@ PlayRingtone Command 的参数结构体。
       <td>Present Value</td>
       <td><a href="#ref_FenceAreaSettingTraitPresentValueStructure">FenceAreaSettingTraitPresentValueStructure</a></td>
       <td></td>
-      <td></td>
+      <td><code>&#123;&amp;quot;0&amp;quot;:&amp;quot;1&amp;quot;,&amp;quot;1&amp;quot;:&amp;quot;1&amp;quot;,&amp;quot;2&amp;quot;:[&#123;&amp;quot;0&amp;quot;:&amp;quot;1&amp;quot;,&amp;quot;1&amp;quot;:&amp;quot;6&amp;quot;,&amp;quot;2&amp;quot;:[&#123;&amp;quot;0&amp;quot;:&amp;quot;0.50000000&amp;quot;,&amp;quot;1&amp;quot;:&amp;quot;0.01694915&amp;quot;&#125;,&#123;&amp;quot;0&amp;quot;:&amp;quot;0.73528814&amp;quot;,&amp;quot;1&amp;quot;:&amp;quot;0.25847459&amp;quot;&#125;,&#123;&amp;quot;0&amp;quot;:&amp;quot;0.73528814&amp;quot;,&amp;quot;1&amp;quot;:&amp;quot;0.74152541&amp;quot;&#125;,&#123;&amp;quot;0&amp;quot;:&amp;quot;0.50000000&amp;quot;,&amp;quot;1&amp;quot;:&amp;quot;0.98305082&amp;quot;&#125;,&#123;&amp;quot;0&amp;quot;:&amp;quot;0.26471186&amp;quot;,&amp;quot;1&amp;quot;:&amp;quot;0.74152541&amp;quot;&#125;,&#123;&amp;quot;0&amp;quot;:&amp;quot;0.26471186&amp;quot;,&amp;quot;1&amp;quot;:&amp;quot;0.25847459&amp;quot;&#125;]&#125;]</code></td>
       <td>RVW</td>
       <td>O</td>
     </tr>
