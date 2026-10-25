@@ -36431,6 +36431,12 @@ WindSetting 定义了风的类型.
       <td>O</td>
     </tr>
     <tr>
+      <td>0x9DB6</td>
+      <td><a href="#ref_PlayMediaURL">PlayMediaURL</a></td>
+      <td>按链接播放媒体</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x811A</td>
       <td><a href="#ref_Off">Off</a></td>
       <td>关闭</td>
@@ -36835,6 +36841,38 @@ SearchAndPlay Command 的参数结构体。
       <td>characterString</td>
       <td>O</td>
       <td>歌曲名，用于精确筛选。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### PlayMediaURL Command Structure Type {#ref_PlayMediaURLCommandStructure}
+
+PlayMediaURL Command 的参数结构体。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>MediaURL</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>指向可直接播放音频资源的 URL。设备应将其作为播放目标，不得将其解释为搜索关键词；普通网页或搜索结果页面 URL 不属于可直接播放资源。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Title</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>媒体标题，仅用于显示或媒体信息；不改变 MediaURL 指定的播放目标。</td>
     </tr>
   </tbody>
 </table>
@@ -37791,6 +37829,11 @@ PlayFavorite Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x9DB6</td>
+      <td><a href="#ref_PlayMediaURL">PlayMediaURL</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x811A</td>
       <td><a href="#ref_Off">Off</a></td>
       <td>O</td>
@@ -37869,6 +37912,16 @@ MediaPlaybackCommand表示媒体播放命令，适用于多种类型的媒体（
 ##### 参数
 
 [SearchAndPlay Command Structure](#ref_SearchAndPlayCommandStructure)
+
+#### PlayMediaURL Command {#ref_PlayMediaURL}
+
+直接播放 `MediaURL` 指定的音频资源。该命令用于播放客户端已知的直链，不执行歌曲搜索；需要按歌曲名、歌手或关键词查找内容时，应使用 `SearchAndPlay`。命令执行后，设备应以该 URL 作为当前播放项并开始加载、播放；URL 所指资源不可访问、格式或协议不受设备支持时，设备不得将其报告为正在播放，并应按命令执行机制报告失败。支持的 URL 协议、音频格式及访问条件由设备能力决定，设备实现应明确其支持范围。需要鉴权的资源仅在设备具备相应访问凭据或授权机制时可播放。
+
+`Title` 为可选展示信息，不作为资源定位或搜索条件。命令被接受或开始加载不代表音频已成功播放；播放过程和当前状态应通过本 Function 的播放状态相关 Trait 反映。
+
+##### 参数
+
+[PlayMediaURL Command Structure](#ref_PlayMediaURLCommandStructure)
 
 #### PlayPlaylist Command {#ref_PlayPlaylist}
 
@@ -63236,10 +63289,10 @@ TriggerDoorbellWake Command 的参数结构体。
     </tr>
     <tr>
       <td>6</td>
-      <td>NodeID</td>
+      <td>ShortAddr</td>
       <td>uint16</td>
       <td>O</td>
-      <td></td>
+      <td>设备在Zigbee网络的短地址</td>
     </tr>
     <tr>
       <td>7</td>
