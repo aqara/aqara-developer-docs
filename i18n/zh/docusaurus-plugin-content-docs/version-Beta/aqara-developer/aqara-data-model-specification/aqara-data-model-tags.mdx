@@ -38352,7 +38352,7 @@ PlayTTS Command 的参数结构体。
 
 ### 简介
 
-描述设备供电来源与电池状态，包括电量、充电状态、电池类型等信息。
+描述设备供电来源与电池状态，包括电量、充电状态、电池数量、可更换性，以及面向用户的电池更换规格描述等信息。
 
 ### Function 标识
 
@@ -39191,7 +39191,7 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
 
 #### BatReplaceability Trait（电池可更换性） {#ref_BatReplaceability}
 
-该特征应指示电池是否可更换。
+该特征应指示电池是否可更换以及适用的更换方式：未指定或未知、不可更换、用户可更换，或由工厂授权人员更换。
 
 <table>
   <thead>
@@ -63250,42 +63250,42 @@ TriggerDoorbellWake Command 的参数结构体。
       <td>Mac</td>
       <td>uint64</td>
       <td>M</td>
-      <td>Zigbee MAC</td>
+      <td>设备的64位Zigbee IEEE MAC地址</td>
     </tr>
     <tr>
       <td>1</td>
       <td>InstallCode</td>
       <td>characterString</td>
-      <td>M</td>
-      <td>Install Code</td>
+      <td>O</td>
+      <td>Install Code（安装码）；Magic Pair 阶段必选，其他场景可选</td>
     </tr>
     <tr>
       <td>2</td>
       <td>FirmwareVersion</td>
       <td>uint32</td>
       <td>O</td>
-      <td></td>
+      <td>设备固件版本号</td>
     </tr>
     <tr>
       <td>3</td>
       <td>HardwareVersion</td>
       <td>uint32</td>
       <td>O</td>
-      <td></td>
+      <td>设备硬件版本号</td>
     </tr>
     <tr>
       <td>4</td>
       <td>ManufacturerCode</td>
       <td>uint16</td>
       <td>O</td>
-      <td></td>
+      <td>Zigbee 厂商编码</td>
     </tr>
     <tr>
       <td>5</td>
       <td>Model</td>
       <td>characterString</td>
       <td>O</td>
-      <td></td>
+      <td>设备型号</td>
     </tr>
     <tr>
       <td>6</td>
@@ -63299,28 +63299,28 @@ TriggerDoorbellWake Command 的参数结构体。
       <td>ZigbeeVersion</td>
       <td>uint8</td>
       <td>O</td>
-      <td></td>
+      <td>Zigbee 协议版本</td>
     </tr>
     <tr>
       <td>8</td>
       <td>DeviceType</td>
       <td>uint8</td>
       <td>O</td>
-      <td></td>
+      <td>Zigbee 设备类型</td>
     </tr>
     <tr>
       <td>9</td>
       <td>ExtendedXCode</td>
       <td>uint16</td>
       <td>O</td>
-      <td></td>
+      <td>扩展 X 码；具体含义依产品 Profile 定义</td>
     </tr>
     <tr>
       <td>10</td>
       <td>LastResetType</td>
       <td>uint8</td>
       <td>O</td>
-      <td>0 Invalid；1 Factory Reset；2 Network Reset</td>
+      <td>0 无效；1 恢复出厂设置；2 网络重置</td>
     </tr>
   </tbody>
 </table>
@@ -92633,6 +92633,12 @@ SupportedWiFiBands 应指示已配置的 Wi-Fi 接口所支持的全部频段。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x8121</td>
+      <td><a href="#ref_ZigbeeDeviceInformation">ZigbeeDeviceInformation</a></td>
+      <td>Zigbee设备身份与安装信息</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4E8D</td>
       <td><a href="#ref_ZigbeeGeneralDiagnostics">ZigbeeGeneralDiagnostics</a></td>
       <td>Zigbee设备通用诊断信息上报</td>
@@ -93260,6 +93266,11 @@ SupportedWiFiBands 应指示已配置的 Wi-Fi 接口所支持的全部频段。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x8121</td>
+      <td><a href="#ref_ZigbeeDeviceInformation">ZigbeeDeviceInformation</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4E8D</td>
       <td><a href="#ref_ZigbeeGeneralDiagnostics">ZigbeeGeneralDiagnostics</a></td>
       <td>O</td>
@@ -93334,10 +93345,11 @@ ZigbeeNetworkDiagnostics 用于汇总 Zigbee 网络运行状态、链路质量�
 * `CurOperationMode` 应反映设备当前的 Zigbee 网络运行状态。
 * `PANID`、`Channel`、`ZigbeeExtendedPANID` 应描述设备当前所加入或所管理的 Zigbee 网络标识。
 * `ZigbeeNeighborInfo` 与 `ZigbeeGeneralDiagnostics` 应分别承载邻居信息列表与通用诊断统计信息；若设备内部采用更细粒度的诊断指标，也应通过这两个 Trait 的结构化值进行组织。
+* `ZigbeeDeviceInformation` 应承载设备的 Zigbee 身份与安装信息；其中 InstallCode 属于 commissioning-secret，SHALL NOT 经普通诊断接口回读。
 
 #### Trait 使用建议
 
-`ZigbeeNextHopMac`、`ZigbeeKeySeqNumber`、`ZigbeeCoordNetworkKey`、`ZigbeeCoordMac` 更偏向网络安全与网络身份信息；`RebootReason`、`PreOperationMode`、`CurOperationMode` 更偏向系统状态；`APSRetransmissionCount`、`MACRetransmissionCount`、`NWKRetransmissionCount`、`RoutingAgingCountThreshold`、`MessageTransmissionFailureCountThreshold`、`EnableNWKACK`、`EnableAPSACK`、`CCAMode` 更偏向链路策略；`ZigbeeTotalMessageInOneHour`、`ZigbeeResentMessageInOneHour`、`ZigbeeFrameCounter`、`ZigbeeAvgSuccessfulResendCount`、`ZigbeeFailedMessageInOneHour` 更偏向运行统计；`ZigbeeNeighborInfo`、`ZigbeeGeneralDiagnostics`、`LQI`、`PANID`、`Channel`、`ZigbeeExtendedPANID` 更偏向网络观测值。
+`ZigbeeNextHopMac`、`ZigbeeKeySeqNumber`、`ZigbeeCoordNetworkKey`、`ZigbeeCoordMac`、`ZigbeeDeviceInformation` 更偏向网络安全与网络身份信息；`RebootReason`、`PreOperationMode`、`CurOperationMode` 更偏向系统状态；`APSRetransmissionCount`、`MACRetransmissionCount`、`NWKRetransmissionCount`、`RoutingAgingCountThreshold`、`MessageTransmissionFailureCountThreshold`、`EnableNWKACK`、`EnableAPSACK`、`CCAMode` 更偏向链路策略；`ZigbeeTotalMessageInOneHour`、`ZigbeeResentMessageInOneHour`、`ZigbeeFrameCounter`、`ZigbeeAvgSuccessfulResendCount`、`ZigbeeFailedMessageInOneHour` 更偏向运行统计；`ZigbeeNeighborInfo`、`ZigbeeGeneralDiagnostics`、`LQI`、`PANID`、`Channel`、`ZigbeeExtendedPANID` 更偏向网络观测值。
 
 #### 数据更新原则
 
