@@ -38352,7 +38352,7 @@ Controls the device to convert the specified text into speech and play it throug
 
 ### Introduction
 
-Describes the power supply source and battery status of the device, including battery level, charging status, battery type and other information.
+Describes the power supply source and battery status of the device, including battery level, charging status, battery quantity, replaceability, and user-facing battery replacement specification descriptions, and other information.
 
 ### Function Identification
 
@@ -39191,7 +39191,7 @@ The Supported Value parameter provides the list of battery description strings s
 
 #### BatReplaceability Trait {#ref_BatReplaceability}
 
-This feature should indicate whether the battery is replaceable.
+This feature should indicate whether the battery is replaceable and the applicable replacement method: unspecified or unknown, not replaceable, user replaceable, or replaceable by factory-authorized personnel.
 
 <table>
   <thead>
@@ -63250,42 +63250,42 @@ This structure defines the Present Value field layout of the WiFiDiagnostics Tra
       <td>Mac</td>
       <td>uint64</td>
       <td>M</td>
-      <td>Zigbee MAC</td>
+      <td>The device's 64-bit Zigbee IEEE MAC address</td>
     </tr>
     <tr>
       <td>1</td>
       <td>InstallCode</td>
       <td>characterString</td>
-      <td>M</td>
-      <td>Install Code</td>
+      <td>O</td>
+      <td>Install Code; mandatory during the Magic Pair phase and optional in other scenarios</td>
     </tr>
     <tr>
       <td>2</td>
       <td>FirmwareVersion</td>
       <td>uint32</td>
       <td>O</td>
-      <td></td>
+      <td>Device firmware version number</td>
     </tr>
     <tr>
       <td>3</td>
       <td>HardwareVersion</td>
       <td>uint32</td>
       <td>O</td>
-      <td></td>
+      <td>Device hardware version number</td>
     </tr>
     <tr>
       <td>4</td>
       <td>ManufacturerCode</td>
       <td>uint16</td>
       <td>O</td>
-      <td></td>
+      <td>Zigbee manufacturer code</td>
     </tr>
     <tr>
       <td>5</td>
       <td>Model</td>
       <td>characterString</td>
       <td>O</td>
-      <td></td>
+      <td>Device model</td>
     </tr>
     <tr>
       <td>6</td>
@@ -63299,28 +63299,28 @@ This structure defines the Present Value field layout of the WiFiDiagnostics Tra
       <td>ZigbeeVersion</td>
       <td>uint8</td>
       <td>O</td>
-      <td></td>
+      <td>Zigbee protocol version</td>
     </tr>
     <tr>
       <td>8</td>
       <td>DeviceType</td>
       <td>uint8</td>
       <td>O</td>
-      <td></td>
+      <td>Zigbee device type</td>
     </tr>
     <tr>
       <td>9</td>
       <td>ExtendedXCode</td>
       <td>uint16</td>
       <td>O</td>
-      <td></td>
+      <td>Extended X code; the specific meaning depends on the product Profile definition</td>
     </tr>
     <tr>
       <td>10</td>
       <td>LastResetType</td>
       <td>uint8</td>
       <td>O</td>
-      <td>0 Invalid；1 Factory Reset；2 Network Reset</td>
+      <td>0 Invalid; 1 Factory Reset; 2 Network Reset</td>
     </tr>
   </tbody>
 </table>
@@ -92633,6 +92633,12 @@ Provides Zigbee network diagnostics capability, including channel, PAN, neighbor
       <td>O</td>
     </tr>
     <tr>
+      <td>0x8121</td>
+      <td><a href="#ref_ZigbeeDeviceInformation">ZigbeeDeviceInformation</a></td>
+      <td>Zigbee device identity and installation information</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4E8D</td>
       <td><a href="#ref_ZigbeeGeneralDiagnostics">ZigbeeGeneralDiagnostics</a></td>
       <td>Zigbee device general diagnostics information report</td>
@@ -93260,6 +93266,11 @@ This structure defines the Present Value field layout of the DeviceUnbindReason 
       <td>O</td>
     </tr>
     <tr>
+      <td>0x8121</td>
+      <td><a href="#ref_ZigbeeDeviceInformation">ZigbeeDeviceInformation</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4E8D</td>
       <td><a href="#ref_ZigbeeGeneralDiagnostics">ZigbeeGeneralDiagnostics</a></td>
       <td>O</td>
@@ -93334,10 +93345,11 @@ When a device does not have a full Zigbee network management view, it may implem
 * `CurOperationMode` should reflect the current Zigbee network operating state of the device.
 * `PANID`, `Channel`, `ZigbeeExtendedPANID` should describe the Zigbee network identifier the device is currently joined to or managing.
 * `ZigbeeNeighborInfo` and `ZigbeeGeneralDiagnostics` should carry the neighbor information list and general diagnostic statistics respectively; if the device internally uses finer-grained diagnostic metrics, they should also be organized through the structured values of these two Traits.
+* `ZigbeeDeviceInformation` should carry the device's Zigbee identity and installation information; InstallCode belongs to the commissioning-secret and SHALL NOT be read back through normal diagnostic interfaces.
 
 #### Trait Usage Recommendations
 
-`ZigbeeNextHopMac`, `ZigbeeKeySeqNumber`, `ZigbeeCoordNetworkKey`, `ZigbeeCoordMac` are more oriented toward network security and network identity information; `RebootReason`, `PreOperationMode`, `CurOperationMode` are more oriented toward system state; `APSRetransmissionCount`, `MACRetransmissionCount`, `NWKRetransmissionCount`, `RoutingAgingCountThreshold`, `MessageTransmissionFailureCountThreshold`, `EnableNWKACK`, `EnableAPSACK`, `CCAMode` are more oriented toward link policy; `ZigbeeTotalMessageInOneHour`, `ZigbeeResentMessageInOneHour`, `ZigbeeFrameCounter`, `ZigbeeAvgSuccessfulResendCount`, `ZigbeeFailedMessageInOneHour` are more oriented toward operation statistics; `ZigbeeNeighborInfo`, `ZigbeeGeneralDiagnostics`, `LQI`, `PANID`, `Channel`, `ZigbeeExtendedPANID` are more oriented toward network observation values.
+`ZigbeeNextHopMac`, `ZigbeeKeySeqNumber`, `ZigbeeCoordNetworkKey`, `ZigbeeCoordMac`, `ZigbeeDeviceInformation` are more oriented toward network security and network identity information; `RebootReason`, `PreOperationMode`, `CurOperationMode` are more oriented toward system state; `APSRetransmissionCount`, `MACRetransmissionCount`, `NWKRetransmissionCount`, `RoutingAgingCountThreshold`, `MessageTransmissionFailureCountThreshold`, `EnableNWKACK`, `EnableAPSACK`, `CCAMode` are more oriented toward link policy; `ZigbeeTotalMessageInOneHour`, `ZigbeeResentMessageInOneHour`, `ZigbeeFrameCounter`, `ZigbeeAvgSuccessfulResendCount`, `ZigbeeFailedMessageInOneHour` are more oriented toward operation statistics; `ZigbeeNeighborInfo`, `ZigbeeGeneralDiagnostics`, `LQI`, `PANID`, `Channel`, `ZigbeeExtendedPANID` are more oriented toward network observation values.
 
 #### Data Update Principles
 
