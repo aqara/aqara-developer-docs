@@ -39356,7 +39356,7 @@ Indicates whether a wired power source (power adapter) is detected.
 
 #### BatPercentRemaining Trait {#ref_BatPercentRemaining}
 
-Indicates the remaining battery charge percentage.
+Indicates the remaining battery charge percentage. When the current battery level is being obtained and is temporarily unavailable, the Present Value uses `255` as the status indicator; this value indicates that the battery level is being obtained, not an actual battery percentage, and is not constrained by the 0-100 percentage range.
 
 <table>
   <thead>
