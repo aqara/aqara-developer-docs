@@ -36431,6 +36431,12 @@ Provides media playback control capabilities, including play, pause, track switc
       <td>O</td>
     </tr>
     <tr>
+      <td>0x9DB6</td>
+      <td><a href="#ref_PlayMediaURL">PlayMediaURL</a></td>
+      <td>Play media by URL</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x811A</td>
       <td><a href="#ref_Off">Off</a></td>
       <td>Close</td>
@@ -36835,6 +36841,38 @@ Parameter structure of the SearchAndPlay Command.
       <td>characterString</td>
       <td>O</td>
       <td>Song name, used for precise filtering.</td>
+    </tr>
+  </tbody>
+</table>
+
+##### PlayMediaURL Command Structure Type {#ref_PlayMediaURLCommandStructure}
+
+Parameter structure of the PlayMediaURL Command.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>MediaURL</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>URL pointing to an audio resource that can be played directly. The device shall treat it as the playback target and shall not interpret it as a search keyword; URLs of ordinary web pages or search result pages are not directly playable resources.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Title</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>Media title, used only for display or media information; it does not change the playback target specified by MediaURL.</td>
     </tr>
   </tbody>
 </table>
@@ -37791,6 +37829,11 @@ Indicates the playback duration, in ms.
       <td>O</td>
     </tr>
     <tr>
+      <td>0x9DB6</td>
+      <td><a href="#ref_PlayMediaURL">PlayMediaURL</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x811A</td>
       <td><a href="#ref_Off">Off</a></td>
       <td>O</td>
@@ -37869,6 +37912,16 @@ Searches music content by keywords, artist, song name and other criteria, and pl
 ##### Parameters
 
 [SearchAndPlay Command Structure](#ref_SearchAndPlayCommandStructure)
+
+#### PlayMediaURL Command {#ref_PlayMediaURL}
+
+Plays the audio resource specified by `MediaURL` directly. This Command is used to play a direct link already known to the client and does not perform song search; to search by song name, artist or keyword, use `SearchAndPlay`. After the Command is executed, the device shall take the URL as the current playback item and start loading and playing it; if the resource pointed to by the URL is inaccessible, or its format or protocol is not supported by the device, the device shall not report it as playing and shall report a failure according to the Command execution mechanism. Supported URL protocols, audio formats and access conditions are determined by device capabilities, and the device implementation shall clearly define its supported scope. Resources requiring authentication can be played only when the device has the corresponding access credentials or authorization mechanism.
+
+`Title` is optional display information and is not used as a resource locator or search condition. Command acceptance or the start of loading does not mean that the audio has been played successfully; the playback process and current state shall be reflected through the playback-status-related Trait of this Function.
+
+##### Parameters
+
+[PlayMediaURL Command Structure](#ref_PlayMediaURLCommandStructure)
 
 #### PlayPlaylist Command {#ref_PlayPlaylist}
 
@@ -63236,10 +63289,10 @@ This structure defines the Present Value field layout of the WiFiDiagnostics Tra
     </tr>
     <tr>
       <td>6</td>
-      <td>NodeID</td>
+      <td>ShortAddr</td>
       <td>uint16</td>
       <td>O</td>
-      <td></td>
+      <td>The short address of the device in the Zigbee network.</td>
     </tr>
     <tr>
       <td>7</td>
