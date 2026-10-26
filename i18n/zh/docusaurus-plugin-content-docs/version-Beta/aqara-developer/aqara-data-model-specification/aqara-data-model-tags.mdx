@@ -39356,7 +39356,7 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
 
 #### BatPercentRemaining Trait（电量百分比） {#ref_BatPercentRemaining}
 
-指示剩余电池电量百分比。
+指示剩余电池电量百分比。当前电量值正在获取中、暂不可用时，Present Value 使用 `255` 作为状态标识；该值表示"电量获取中"，不是实际电量百分比，不受 0-100 的百分比范围约束。
 
 <table>
   <thead>
