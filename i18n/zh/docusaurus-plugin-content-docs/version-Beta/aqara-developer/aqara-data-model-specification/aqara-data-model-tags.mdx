@@ -264,6 +264,7 @@ Parameter ID 采用 16 位整数标识，有效范围为 `0x0001` ~ `0xFFFE`（1
       <th>Parameter ID</th>
       <th>Name</th>
       <th>BACnet Property</th>
+      <th>默认读写权限</th>
       <th>说明</th>
     </tr>
   </thead>
@@ -272,110 +273,150 @@ Parameter ID 采用 16 位整数标识，有效范围为 `0x0001` ~ `0xFFFE`（1
       <td>0x0001</td>
       <td>Present Value</td>
       <td>PROP_PRESENT_VALUE</td>
-      <td>当前值，表示 Trait 的实时状态</td>
+      <td>按具体 Trait 定义</td>
+      <td>当前值，表示 Trait 的实时状态。数据类型由 Trait 定义，可为整数、float、布尔、枚举、字符串或复合数据类型；数值型取值要求 <code>Minimum Value &amp;lt;= Present Value &amp;lt;= Maximum Value</code>，并满足步进及其他约束。</td>
     </tr>
     <tr>
       <td>0x0002</td>
       <td>Maximum Value</td>
       <td>PROP_MAX_PRES_VALUE</td>
-      <td>Present Value 的最大允许/可表示值；与 Minimum Value 共同描述数值范围，不是报警阈值。</td>
+      <td>RV</td>
+      <td>Present Value 的最大允许/可表示值，数据类型与数值型 Present Value 一致，支持整数和 float，且不得小于 Minimum Value；描述数值范围，不是报警阈值。</td>
     </tr>
     <tr>
       <td>0x0003</td>
       <td>Minimum Value</td>
       <td>PROP_MIN_PRES_VALUE</td>
-      <td>Present Value 的最小允许/可表示值；与 Maximum Value 共同描述数值范围，不是报警阈值。</td>
+      <td>RV</td>
+      <td>Present Value 的最小允许/可表示值，数据类型与数值型 Present Value 一致，支持整数和 float，且不得大于 Maximum Value；描述数值范围，不是报警阈值。</td>
     </tr>
     <tr>
       <td>0x0004</td>
       <td>Unit</td>
       <td>PROP_UNITS</td>
-      <td>工程单位</td>
+      <td>RV</td>
+      <td>工程单位，数据类型及有效单位编码由对应 Trait 的单位定义指定；数值及相关阈值应使用相容的单位。</td>
     </tr>
     <tr>
       <td>0x0005</td>
       <td>Step Value</td>
       <td>PROP_STEP_VALUE</td>
-      <td>步进值（Uint32）；仅适用于 Multi-state Input/Output Object</td>
+      <td>RV</td>
+      <td>数值步进值，数据类型与 Present Value 一致，支持整数和 float，取值须大于 0；用于描述有效数值的步进粒度。</td>
     </tr>
     <tr>
       <td>0x0006</td>
       <td>Supported Value</td>
       <td>PROP_SUPPORTED_VALUES</td>
-      <td>支持的取值列表（Array），数组元素类型须与 Present Value 一致</td>
+      <td>RV</td>
+      <td>支持的取值列表（Array/List），元素数据类型须与 Present Value 一致；各元素应满足该 Trait 的有效值约束。</td>
     </tr>
     <tr>
       <td>0x0007</td>
       <td>Default Value</td>
       <td>PROP_RELINQUISH_DEFAULT</td>
-      <td>Relinquish 默认值</td>
+      <td>RV</td>
+      <td>默认值（Relinquish 默认值），默认可读、可上报，不可写（Access 为 RV）。数据类型与 Present Value 一致，支持整数、float 及该 Trait 定义的其他数据类型；须满足 Present Value 的范围、步进、支持值列表及其他适用约束，具体采用时机由 Trait 定义。</td>
     </tr>
     <tr>
       <td>0x0008</td>
       <td>High Limit</td>
       <td>PROP_HIGH_LIMIT</td>
-      <td>高限监控阈值（Float）；可用于判断 Present Value 是否超过高侧阈值，不定义 Present Value 的量程。</td>
+      <td>RVW</td>
+      <td>高限监控阈值，数据类型与数值型 Present Value 一致，支持整数和 float；要求 <code>Minimum Value &amp;lt;= High Limit &amp;lt;= Maximum Value</code>，且 <code>High Limit &amp;gt; Low Limit</code>。不定义 Present Value 的量程。</td>
     </tr>
     <tr>
       <td>0x0009</td>
       <td>Low Limit</td>
       <td>PROP_LOW_LIMIT</td>
-      <td>低限监控阈值（Float）；可用于判断 Present Value 是否低于低侧阈值，不定义 Present Value 的量程。</td>
+      <td>RVW</td>
+      <td>低限监控阈值，数据类型与数值型 Present Value 一致，支持整数和 float；要求 <code>Minimum Value &amp;lt;= Low Limit &amp;lt;= Maximum Value</code>，且 <code>Low Limit &amp;lt; High Limit</code>。不定义 Present Value 的量程。</td>
     </tr>
     <tr>
       <td>0x000A</td>
       <td>COV Increment</td>
       <td>PROP_COV_INCREMENT</td>
-      <td>COV 增量（Float）</td>
+      <td>RVW</td>
+      <td>变化量上报阈值，适用于 Present Value 为 float 的 Trait，数据类型为 float，取值须大于 0，单位与 Present Value 一致；当前值与最近一次触发 COV 通知的基准值之差的绝对值达到或超过该阈值时触发通知，用于抑制微小波动产生的频繁上报。</td>
     </tr>
     <tr>
       <td>0x000B</td>
       <td>Maximum Actual Value</td>
       <td>PROP_MAX_ACTUAL_VALUE</td>
-      <td>Present Value 对应的实际量上端标定值（Float）；与 Minimum Actual Value 的映射关系由对象定义。</td>
+      <td>RVW</td>
+      <td>Present Value 对应的实际量上端标定值，可读、可写、可上报（Access 为 RVW），数据类型为 float，不支持整数数据类型；要求 <code>Minimum Value &amp;lt;= Maximum Actual Value &amp;lt;= Maximum Value</code>，且 <code>Maximum Actual Value &amp;gt; Minimum Actual Value</code>，映射关系由 Trait 定义。</td>
     </tr>
     <tr>
       <td>0x000C</td>
       <td>Minimum Actual Value</td>
       <td>PROP_MIN_ACTUAL_VALUE</td>
-      <td>Present Value 对应的实际量下端标定值（Float）；与 Maximum Actual Value 的映射关系由对象定义。</td>
+      <td>RVW</td>
+      <td>Present Value 对应的实际量下端标定值，可读、可写、可上报（Access 为 RVW），数据类型为 float，不支持整数数据类型；要求 <code>Minimum Value &amp;lt;= Minimum Actual Value &amp;lt;= Maximum Value</code>，且 <code>Minimum Actual Value &amp;lt; Maximum Actual Value</code>，映射关系由 Trait 定义。</td>
     </tr>
     <tr>
       <td>0x000D</td>
       <td>Is Null</td>
       <td>PROP_IS_NULL</td>
-      <td>指示 Present Value 当前无有效数据或未初始化（Bool）</td>
+      <td>RV</td>
+      <td>布尔型，取值为 true/false；true 表示 Present Value 当前无有效数据或未初始化，不应将其当前载荷作为有效业务值使用。</td>
     </tr>
     <tr>
       <td>0x000E</td>
       <td>Extended Supported Values</td>
       <td>PROP_EXTENDED_SUPPORTED_VALUES</td>
-      <td>扩展支持值列表（List[Struct]）</td>
+      <td>RV</td>
+      <td>扩展支持值列表（List[Struct]）；结构体字段、元素约束及列表长度由对应 Trait 定义。</td>
     </tr>
     <tr>
       <td>0x000F</td>
       <td>Max Item Num</td>
       <td>-</td>
-      <td>Present Value 为 Array/List 时允许的最大元素个数（Uint32）</td>
+      <td>RV</td>
+      <td>Present Value 为 Array/List 时允许的最大元素个数，数据类型为 uint32，取值范围为 0 ～ 4294967295；列表元素个数不得超过该值。</td>
     </tr>
     <tr>
       <td>0x0010</td>
       <td>Counter Generation</td>
       <td>-</td>
-      <td>Trait 的可选只读 Parameter（Uint32），用于标识累计计数器代际；当实现无法保证逻辑累计值连续且要求精确计算差值时必须提供。</td>
+      <td>RV</td>
+      <td>Trait 的可选只读、可上报 Parameter，数据类型为 uint32，取值范围为 0 ～ 4294967295，用于标识累计计数器代际；当实现无法保证逻辑累计值连续且要求精确计算差值时必须提供。</td>
     </tr>
   </tbody>
 </table>
+
+表中默认读写权限使用完整的 `Access` 标记：`RV` 表示可读、可上报，`RVW` 表示可读、可写、可上报。所有支持可读的 Parameter 均支持可上报，因此默认权限不使用单独的 `R` 或 `RW` 标记。具体 Trait 参数表中仅标记 `R` 或 `RW` 的 Parameter 也适用此上报支持规则；可上报表示具备上报能力，不表示每次读取或数值不变时均须发送通知，具体上报时机遵循对应 Trait 和交互协议定义。
+
+Present Value 不设默认读写权限，按具体 Trait 参数表的 `Access` 定义执行；当其支持可读时，同样支持可上报。具体 Trait 已明确的数据类型、读写权限和约束优先于通用默认约定；本表不自动扩展已有 Trait 的写权限，也不要求所有 Trait 实现全部 Parameter。
+
+前端默认依据本表的权限说明，确定 Parameter 的读取、写入及上报能力。若设备某个 Parameter 的实际权限与本表的默认权限不同，设备端 SHALL 上报该差异，或在前端可获取的预配置数据表中明确记录该差异。差异信息 SHALL 能够定位到适用的设备及其 Function、Trait、Parameter，并明确该 Parameter 的实际 `Access` 权限，使前端能够识别并应用。
+
+前端 SHALL 优先采用适用于目标设备及目标 Parameter 的明确差异信息；未提供适用差异信息时，采用本表的默认权限。Present Value 仍按具体 Trait 的实际定义确定权限，不从本表推导默认权限。上述权限信息用于前端的能力展示与交互控制，不替代设备端对实际访问权限的校验。
+
+表中的范围约束使用 `Minimum Value <= 参数值 <= Maximum Value` 表示，包含两个边界值；未显式提供边界参数时，遵循对应 Trait 声明的有效范围及数据类型边界。只有同时实现一对上下限参数时才进行两者的大小关系校验。对可写参数，写入后的值及参数组合仍须满足适用约束，不得通过写入使上下限关系失效。
 
 ### 数值边界参数
 
 #### Minimum Value 与 Maximum Value
 
-`Minimum Value`（`PROP_MIN_PRES_VALUE`）和 `Maximum Value`（`PROP_MAX_PRES_VALUE`）描述 `Present Value` 的数值范围下界和上界。读取这两个参数，可以了解该 Trait 声明的有效数值范围；客户端在写入 `Present Value` 时，应将目标值限制在该范围内，并同时遵守 Trait 自身定义的类型、步进值、枚举取值及其他约束。设备也应依据自己的 Trait 定义处理范围外的输入，不能把这两个边界当作报警阈值使用。
+`Minimum Value`（`PROP_MIN_PRES_VALUE`）和 `Maximum Value`（`PROP_MAX_PRES_VALUE`）描述 `Present Value` 的数值范围下界和上界。读取这两个参数，可以了解该 Trait 声明的有效数值范围；客户端在写入 `Present Value` 时，应将目标值限制在该范围内，并同时遵守 Trait 自身定义的数据类型、步进值、枚举取值及其他约束。设备也应依据自己的 Trait 定义处理范围外的输入，不能把这两个边界当作报警阈值使用。
 
 例如，若温度 Trait 的 `Minimum Value` 为 `-50`、`Maximum Value` 为 `100`，且 `Unit` 为摄氏度，则它声明的数值范围为 `-50°C` 至 `100°C`。客户端可用该范围校验用户输入或展示可调范围。若数值是只读传感器值，这些边界说明该 Trait 的范围，并不意味着客户端可以写入该值。
 
 这两个参数描述的是协议中 `Present Value` 的数值范围，不一定等同于传感器的物理测量能力、设备的报警范围或控制器的安全范围。它们是否存在、是否可读及其具体约束，以对应 Trait 参数表为准；不要假定每个 Trait 都同时定义这两个参数。
+
+### 步进值与默认值
+
+`Step Value` 与数值型 `Present Value` 使用相同的数据类型，既支持整数步进（如 `1`），也支持 float 步进（如 `0.1`）。步进值须大于 `0`；当 Trait 使用 Minimum Value 作为步进起点时，有效值按 `Minimum Value + n × Step Value` 确定，其中 `n` 为非负整数，且结果不得超过 Maximum Value。浮点运算的比较应考虑该数据类型的表示精度，不能依赖浮点余数恰好为零来判断步进合法性。
+
+`Default Value` 与 `Present Value` 使用相同的数据类型，并遵守相同的有效值约束。它的数据类型不限定为整数，也不表示读取不到当前值时可以静默返回该值。默认值是在恢复默认设置、释放控制或其他何种情况下被采用，应由对应 Trait 定义。
+
+### COV 增量参数
+
+`COV Increment` 参考 BACnet `COV_Increment` 的变化量通知语义，用于 float 型 `Present Value` 的变化上报过滤。设最近一次触发通知时的基准值为 `Vref`，当前有效值为 `V`，当 `abs(V - Vref) >= COV Increment` 时，满足当前值变化的 COV 通知条件；触发通知后，将基准更新为本次通知的值。比较基准不是上一次采样值，因此多次小幅变化的累计偏移仍可能触发通知。
+
+例如，`COV Increment = 0.5`、基准值为 `20.0` 时，当前值为 `20.2` 不触发变化量通知，继续变化至 `20.5` 或 `19.5` 时满足通知条件。该参数不是采样周期、周期上报间隔或报警死区，也不改变 Present Value 的读取精度和数值范围。
+
+本规范要求 COV Increment 为大于 `0` 的有限浮点数。首次订阅的初始通知、订阅有效期、其他状态变化及周期通知，仍按相应交互协议和 Trait 定义处理，不应被该变化量阈值阻止。仅定义本参数不代表已建立订阅或必然发送通知；本节仅借鉴 BACnet 的增量语义，不直接引入其全部订阅机制。
 
 ### 监控阈值参数
 
@@ -385,7 +426,7 @@ Parameter ID 采用 16 位整数标识，有效范围为 `0x0001` ~ `0xFFFE`（1
 
 例如，冷却水温度监控可以将 `Low Limit` 配为 `5°C`、`High Limit` 配为 `35°C`：当前值低于低限时可判定为低侧越限，高于高限时可判定为高侧越限。边界比较的具体规则（例如恰好等于阈值时是否算越限），应由对应对象或报警机制定义。
 
-仅定义或读取 `Low Limit`、`High Limit` 并不自动意味着设备会产生报警、事件或主动上报。要实现完整的告警行为，对象还需要支持相关机制，并按其定义处理使能条件、持续时间/延时、死区、事件状态和通知方式等因素。客户端不应只根据阈值参数存在，就推断报警已启用或告警通知一定会发送。阈值也应处于与被监控 `Present Value` 相容的单位和语义下；它们可以位于正常值范围边缘之外，但不能因此用来替代 `Minimum Value` 或 `Maximum Value`。
+仅定义或读取 `Low Limit`、`High Limit` 并不自动意味着设备会产生报警、事件或主动上报。要实现完整的告警行为，对象还需要支持相关机制，并按其定义处理使能条件、持续时间/延时、死区、事件状态和通知方式等因素。客户端不应只根据阈值参数存在，就推断报警已启用或告警通知一定会发送。阈值应与被监控 `Present Value` 使用相同的数据类型和相容的单位，取值须满足 `Minimum Value <= Low Limit < High Limit <= Maximum Value`。阈值可以位于业务正常运行区间之外，但不得超出声明的数值范围，也不能用来替代 `Minimum Value` 或 `Maximum Value`。
 
 ### 实际量标定参数
 
@@ -397,13 +438,15 @@ Parameter ID 采用 16 位整数标识，有效范围为 `0x0001` ~ `0xFFFE`（1
 
 这组参数用于说明数值端点与实际量之间的对应关系，不是 `Present Value` 的协议允许范围（由 `Minimum Value` / `Maximum Value` 描述），也不是运行报警阈值（由 `Low Limit` / `High Limit` 描述）。例如，调光灯具的 `Present Value` 控制范围可以是 `0%` 至 `100%`，而对应的实际亮度范围是额定亮度的 `20%` 至 `80%`。
 
+两个 Actual Value 参数的数据类型均为 float，不支持整数数据类型，不要求与 `Present Value` 的数据类型一致；取值须满足 `Minimum Value <= Minimum Actual Value < Maximum Actual Value <= Maximum Value`。实际量的单位及映射仍须由对应 Trait 明确，并保证端点值可在声明的范围内表示。
+
 ### 三组参数的使用区分
 
 * *Minimum Value / Maximum Value*：校验或理解 `Present Value` 在协议层面的数值边界--"这个值允许/可表示到哪里？"
 * *Low Limit / High Limit*：判断运行值是否达到监控阈值--"运行到什么程度算低侧/高侧越限？"
 * *Minimum Actual Value / Maximum Actual Value*：在对象定义支持的前提下，说明 `Present Value` 与实际物理量端点的对应关系--"这个数值端点对应多少实际量？"
 
-三组参数不能互相替代，也不保证在同一个 Trait 中全部出现。实现和客户端应先查看具体 Trait 的参数表、类型、单位、访问权限和约束，再按该 Trait 定义解释和使用；只有对象明确约定线性映射时，才可使用线性插值换算实际量。
+三组参数不能互相替代，也不保证在同一个 Trait 中全部出现。实现和客户端应先查看具体 Trait 的参数表、数据类型、单位、访问权限和约束，再按该 Trait 定义解释和使用；只有对象明确约定线性映射时，才可使用线性插值换算实际量。
 
 ## 权限标记
 
@@ -10885,7 +10928,7 @@ StepBrightness Command 的参数结构体。
       <td>float</td>
       <td></td>
       <td></td>
-      <td>R</td>
+      <td>RVW</td>
       <td>O</td>
     </tr>
     <tr>
@@ -10894,7 +10937,7 @@ StepBrightness Command 的参数结构体。
       <td>float</td>
       <td></td>
       <td></td>
-      <td>R</td>
+      <td>RVW</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -19231,7 +19274,7 @@ ThirdPartySnapshotTrigger Command 的参数结构体。该 Command 由第三方�
 
 #### PeriodicSnapshotUploadEnable Trait（定时上传图片使能） {#ref_PeriodicSnapshotUploadEnable}
 
-启用或禁用定期快照上传至云端（每 10 分钟）。
+启用或禁用定期快照上传至云端。实现 [PeriodicSnapshotInterval](#ref_PeriodicSnapshotInterval) 时，抓拍间隔由该 Trait 配置；未实现时保持每 10 分钟上传一帧的行为。
 
 <table>
   <thead>
@@ -40733,6 +40776,103 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
   </tbody>
 </table>
 
+##### LockDataTypeEnum8 Type {#ref_LockDataTypeEnum8}
+
+该枚举标识 AqaraUserChange 事件中发生变更的数据类别。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>User</td>
+      <td>用户记录</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Credential</td>
+      <td>通用凭证记录</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Schedule</td>
+      <td>用户有效期日程</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>NFC</td>
+      <td>NFC 卡凭证</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>Fingerprint</td>
+      <td>指纹凭证</td>
+    </tr>
+    <tr>
+      <td>0x05</td>
+      <td>Face</td>
+      <td>人脸凭证</td>
+    </tr>
+    <tr>
+      <td>0x06</td>
+      <td>FingerVein</td>
+      <td>指静脉凭证</td>
+    </tr>
+    <tr>
+      <td>0x07</td>
+      <td>Password</td>
+      <td>数字或字母数字密码凭证</td>
+    </tr>
+    <tr>
+      <td>0x08</td>
+      <td>UWB</td>
+      <td>超宽带凭证</td>
+    </tr>
+    <tr>
+      <td>0x09</td>
+      <td>Palm</td>
+      <td>掌纹凭证</td>
+    </tr>
+  </tbody>
+</table>
+
+##### DataOperationTypeEnum8 Type {#ref_DataOperationTypeEnum8}
+
+该枚举标识 AqaraUserChange 事件对用户或凭证数据库条目执行的操作类型。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Add</td>
+      <td>新增数据库条目</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Delete</td>
+      <td>删除已有数据库条目</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Modify</td>
+      <td>修改已有数据库条目</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### AqaraUserErrorTraitPresentValueStructure Type {#ref_AqaraUserErrorTraitPresentValueStructure}
 
 该结构体定义 AqaraUserError Trait 的 Present Value 字段布局。
@@ -40774,7 +40914,7 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
 
 ##### AqaraUserChangeTraitPresentValueStructure Type {#ref_AqaraUserChangeTraitPresentValueStructure}
 
-该结构体定义 AqaraUserChange Trait 的 Present Value 字段布局。
+该结构体定义 AqaraUserChange Trait 的 Present Value 字段布局。该 Trait 仅在用户或凭证数据库成功变更后上报相关状态；凭证变更时，Credential 可携带完整的 AqaraCredentialItemStruct（包括凭证类型及其内容）。Extension 事件中的 CheckNumber 仅供网关内部使用，不属于 Trait，不得上报至 App 或云端。
 
 <table>
   <thead>
@@ -40789,38 +40929,45 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
   <tbody>
     <tr>
       <td>0</td>
+      <td>LockDataType</td>
+      <td><a href="#ref_LockDataTypeEnum8">LockDataTypeEnum8</a></td>
+      <td>M</td>
+      <td>被变更的数据类别。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>DataOperationType</td>
+      <td><a href="#ref_DataOperationTypeEnum8">DataOperationTypeEnum8</a></td>
+      <td>M</td>
+      <td>对数据执行的操作类型。</td>
+    </tr>
+    <tr>
+      <td>2</td>
       <td>UserId</td>
       <td>uint16</td>
       <td>M</td>
       <td>变更涉及的用户 ID。</td>
     </tr>
     <tr>
-      <td>1</td>
-      <td>ChangeType</td>
-      <td>enum8</td>
-      <td>M</td>
-      <td>变更类型（新增、修改或删除）。</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>UserType</td>
-      <td>uint8</td>
-      <td>O</td>
-      <td>用户类型；变更类型为修改时可选。</td>
-    </tr>
-    <tr>
       <td>3</td>
-      <td>UserName</td>
-      <td>characterString</td>
-      <td>O</td>
-      <td>用户名；变更类型为修改时可选。</td>
+      <td>UserType</td>
+      <td><a href="#ref_AqaraUserTypeEnum8">AqaraUserTypeEnum8</a></td>
+      <td>M</td>
+      <td>变更后用户的类型及访问权限等级。</td>
     </tr>
     <tr>
       <td>4</td>
-      <td>Status</td>
-      <td>enum8</td>
-      <td>M</td>
-      <td>变更结果状态。</td>
+      <td>UserName</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>变更后用户名，UTF-8 编码，最大 20 字节；未设置时可为 null。</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Credential</td>
+      <td><a href="#ref_AqaraCredentialItemStruct">AqaraCredentialItemStruct</a></td>
+      <td>O</td>
+      <td>变更涉及的完整凭证信息，包含凭证属性、类型、ID、索引、名称、有效期及类型对应的凭证内容；无相关凭证、删除凭证或设备未提供敏感凭证内容时可省略或为 null。</td>
     </tr>
   </tbody>
 </table>
@@ -68564,6 +68711,12 @@ OpenMatterCommissioningWindow Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5248</td>
+      <td><a href="#ref_P2PCaptureInterval">P2PCaptureInterval</a></td>
+      <td>首页卡片抓图时间间隔</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4E44</td>
       <td><a href="#ref_P2PCaptureStatus">P2PCaptureStatus</a></td>
       <td>P2P动态取图状态</td>
@@ -68600,6 +68753,72 @@ OpenMatterCommissioningWindow Command 的参数结构体。
 </table>
 
 ### 数据类型
+
+#### P2PCaptureIntervalEnum8 Type {#ref_P2PCaptureIntervalEnum8}
+
+该枚举定义 P2PCaptureInterval Trait 的 Present Value 有效取值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Auto</td>
+      <td>自动</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Seconds10</td>
+      <td>10 秒</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Seconds20</td>
+      <td>20 秒</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Seconds30</td>
+      <td>30 秒</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>Minutes1</td>
+      <td>1 分钟</td>
+    </tr>
+    <tr>
+      <td>0x05</td>
+      <td>Minutes2</td>
+      <td>2 分钟</td>
+    </tr>
+    <tr>
+      <td>0x06</td>
+      <td>Minutes5</td>
+      <td>5 分钟</td>
+    </tr>
+    <tr>
+      <td>0x07</td>
+      <td>Minutes10</td>
+      <td>10 分钟</td>
+    </tr>
+    <tr>
+      <td>0x08</td>
+      <td>Minutes30</td>
+      <td>30 分钟</td>
+    </tr>
+    <tr>
+      <td>0x09</td>
+      <td>Hours1</td>
+      <td>1 小时</td>
+    </tr>
+  </tbody>
+</table>
 
 #### SensitivityLevelEnum8 Type {#ref_SensitivityLevelEnum8}
 
@@ -69469,6 +69688,11 @@ WakeupDevice Command 的参数结构体。Server 下发该 Command，用于将�
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5248</td>
+      <td><a href="#ref_P2PCaptureInterval">P2PCaptureInterval</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4E44</td>
       <td><a href="#ref_P2PCaptureStatus">P2PCaptureStatus</a></td>
       <td>O</td>
@@ -69476,6 +69700,70 @@ WakeupDevice Command 的参数结构体。Server 下发该 Command，用于将�
     <tr>
       <td>0x51ED</td>
       <td><a href="#ref_VibrationIntensity">VibrationIntensity</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### P2PCaptureInterval Trait（首页卡片抓图时间间隔） {#ref_P2PCaptureInterval}
+
+首页卡片抓图时间间隔，由云端维护。启用 [P2PCaptureEnabled](#ref_P2PCaptureEnabled) 后可配置并生效。`0` 表示由云端自动决定抓图间隔，非零值按枚举指定的间隔执行。默认值为 `0`，可读、可写、可上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5248</td>
+      <td>P2PCaptureInterval</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_P2PCaptureIntervalEnum8">P2PCaptureIntervalEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_P2PCaptureIntervalEnum8">P2PCaptureIntervalEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_P2PCaptureIntervalEnum8">P2PCaptureIntervalEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -123479,6 +123767,11 @@ WashDryCombinationCommand Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5242</td>
+      <td><a href="#ref_SupportedLedGridMask">SupportedLedGridMask</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5034</td>
       <td><a href="#ref_FlowMode">FlowMode</a></td>
       <td>O</td>
@@ -124368,6 +124661,11 @@ RemoveUserDefinedEffects Command 的参数结构体。
     <tr>
       <td>0x5033</td>
       <td><a href="#ref_LedGridMask">LedGridMask</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5242</td>
+      <td><a href="#ref_SupportedLedGridMask">SupportedLedGridMask</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -125311,9 +125609,7 @@ EffectData 的二进制封装、CBOR 负载格式、字段定义、ActionType �
 
 #### LedGridMask Trait {#ref_LedGridMask}
 
-该 Trait 指示并允许控制各可配置 LED 网格单元的启用状态；可写位范围由 Supported Value 约束。
-
-位值为 `1` 表示对应网格单元启用，位值为 `0` 表示对应单元禁用。若写入超出可配置位范围，设备应拒绝写入并保持原值。
+该 Trait 指示并允许客户端通过掩码控制设备上各可配置 LED 网格单元的启用状态。位 `1` 表示对应网格单元已启用（参与效果渲染），位 `0` 表示对应网格单元已禁用（不参与效果渲染）。客户端可修改的位由 SupportedLedGridMask Trait 定义；尝试修改 SupportedLedGridMask 中值为 `0` 的位时，设备必须拒绝写入并保持该属性原值。
 
 <table>
   <thead>
@@ -125326,6 +125622,54 @@ EffectData 的二进制封装、CBOR 负载格式、字段定义、ActionType �
     <tr>
       <td>0x5033</td>
       <td>LedGridMask</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>characterString</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### SupportedLedGridMask Trait {#ref_SupportedLedGridMask}
+
+该 Trait 指示客户端可通过 LedGridEnableMask 配置设备上的哪些 LED 网格单元，掩码格式遵循 LedGridMask Type。位 `1` 表示对应网格单元实际存在于设备上，且开放给客户端配置；位 `0` 表示对应位置不可配置，原因可能是设备没有该物理网格单元，或服务端未开放该单元供客户端控制。该 Trait 描述固定的硬件或产品能力，在设备生命周期内不得改变。
+
+Present Value 使用字符串承载该掩码；字符串编码应与设备采用的 LedGridMask 表示一致。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5242</td>
+      <td>SupportedLedGridMask</td>
     </tr>
   </tbody>
 </table>
@@ -131324,6 +131668,24 @@ height（uint32）：指定单位下的区域总高度。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5245</td>
+      <td><a href="#ref_RecordingDurationType">RecordingDurationType</a></td>
+      <td>录像时长类型</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5246</td>
+      <td><a href="#ref_MinRecordingDuration">MinRecordingDuration</a></td>
+      <td>最小录像时长</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5247</td>
+      <td><a href="#ref_MaxRecordingDuration">MaxRecordingDuration</a></td>
+      <td>最大录像时长</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5025</td>
       <td><a href="#ref_SetNASSharedFolder">SetNASSharedFolder</a></td>
       <td>设置共享文件夹</td>
@@ -131426,6 +131788,32 @@ height（uint32）：指定单位下的区域总高度。
 </table>
 
 ### 数据类型
+
+##### RecordingDurationTypeEnum8 Type {#ref_RecordingDurationTypeEnum8}
+
+该枚举定义 RecordingDurationType Trait 的 Present Value 有效取值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Auto</td>
+      <td>自动；设备根据电量等信息自动决定最小和最大录像时长</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Custom</td>
+      <td>自定义；用户通过 MinRecordingDuration 和 MaxRecordingDuration 配置录像时长</td>
+    </tr>
+  </tbody>
+</table>
 
 ##### NASServerBindingStatusEnum8 Type {#ref_NASServerBindingStatusEnum8}
 
@@ -131776,6 +132164,21 @@ FormatSDCardCommand Command 的参数结构体。
     <tr>
       <td>0x4FD2</td>
       <td><a href="#ref_RecordingMode">RecordingMode</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5245</td>
+      <td><a href="#ref_RecordingDurationType">RecordingDurationType</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5246</td>
+      <td><a href="#ref_MinRecordingDuration">MinRecordingDuration</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5247</td>
+      <td><a href="#ref_MaxRecordingDuration">MaxRecordingDuration</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -132719,6 +133122,234 @@ NAS 视频存储的当前状态。
       <td></td>
       <td></td>
       <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### RecordingDurationType Trait（录像时长类型） {#ref_RecordingDurationType}
+
+设备侧录像时长类型。`0` 为自动，设备根据电量等信息自动决定最小和最大录像时长；`1` 为自定义，使用 [MinRecordingDuration](#ref_MinRecordingDuration) 和 [MaxRecordingDuration](#ref_MaxRecordingDuration) 配置的时长。默认值为 `0`，可读、可写、可上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5245</td>
+      <td>RecordingDurationType</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_RecordingDurationTypeEnum8">RecordingDurationTypeEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_RecordingDurationTypeEnum8">RecordingDurationTypeEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_RecordingDurationTypeEnum8">RecordingDurationTypeEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### MinRecordingDuration Trait（最小录像时长） {#ref_MinRecordingDuration}
+
+设备侧最小录像时长，单位为秒（s），范围为 1 至 6，步长为 1，默认值为 6。[RecordingDurationType](#ref_RecordingDurationType) 为自定义时使用该配置。开始录像后，即使侦测对象停止移动或离开视野，也会持续录像至最小录像时长，以确保记录足够的事件画面。可读、可写、可上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5246</td>
+      <td>MinRecordingDuration</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td>1..6</td>
+      <td>6</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>6</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>Step Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint8</td>
+      <td>1..6</td>
+      <td>6</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### MaxRecordingDuration Trait（最大录像时长） {#ref_MaxRecordingDuration}
+
+设备侧最大录像时长，单位为秒（s），范围为 10 至 30，步长为 1，默认值为 30。[RecordingDurationType](#ref_RecordingDurationType) 为自定义时使用该配置。开始录像后，如果侦测对象停止移动或离开视野，在达到最小录像时长后停止录像以节能；如果侦测对象持续移动，则持续录像直至最大录像时长。可读、可写、可上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5247</td>
+      <td>MaxRecordingDuration</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td>10..30</td>
+      <td>30</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>30</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>10</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>Step Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint8</td>
+      <td>10..30</td>
+      <td>30</td>
+      <td>RW</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -137490,9 +138121,62 @@ CameraActiveToggle Command 的参数结构体。
 
 ## Playback（回放） {#ref_Aqara_Spec_Playback}
 
+### 交互流程
+
+#### 下载本地录像索引文件 {#ref_LocalRecord_FlowDownloadIndex}
+
+本节描述App 通过webrtc DataChannel下载本地录像索引文件流程。
+索引的粒度是*天*，一天最多一条。一次查询可以跨多天，响应成员 `LocalRecordIndex` 是这些天的列表。天数不多时 `MaxCount` / `Cursor` 通常用不上。
+
+* Command：[LocalRecordQuery](#ref_LocalRecordQuery)，`QueryLocalRecordType=LocalRecordIndex`，参数在成员 `LocalRecordIndex`。经 `InvokeCommand` 在 label `aqara.control` 上收发，请求 OpCode `0x008D`，响应 OpCode `0x038D`。
+* 响应：该 Command 的 ComplexACK。成员 0 为 `Status`，成员 `LocalRecordIndex` 为 [LocalRecordIndexEntryStructure](#ref_LocalRecordIndexEntryStructure) 列表。
+
+```mermaid
+sequenceDiagram
+    participant App as App
+    participant Dev as 摄像头
+
+    Note over App,Dev: 1. LocalRecordQuery on aqara.control
+    App->>Dev: InvokeCommand QueryLocalRecordType LocalRecordIndex
+    Dev-->>App: ComplexACK QueryLocalRecordType LocalRecordIndex
+
+    Note over App,Dev: 2. 逐个 FileDescriptor 取索引文件
+    loop one FileDescriptor at a time
+        App->>Dev: FileTransfer aqara.download
+    end
+```
+
+要查一段时间就传整段区间，设备按天逐条放进响应成员 `LocalRecordIndex`。文件传输用的是该条的 [FileDescriptor](#ref_FileDescriptorStructure)，写入 initRequest。`Date` 不进入传输。label `aqara.download` 上一次只传一个 `FileDescriptor`，前一个结束前不得再发 `initRequest`。块的交互不在本图展开。
+
+#### 下载本地录像文件 {#ref_LocalRecord_FlowDownloadFile}
+
+本节描述App 通过webrtc DataChannel下载本地录像索引流程。
+App 先下载本地录像索引文件，从索引文件中读出要取的 `timestamp`，再查询本地录像文件描述。
+
+* Command：同一条 [LocalRecordQuery](#ref_LocalRecordQuery)，`QueryLocalRecordType=LocalRecordSegment`，参数在成员 `LocalRecordSegment`，其中 `Timestamps` 来自索引。经 `InvokeCommand` 在 label `aqara.control` 上收发。
+* 响应：该 Command 的 ComplexACK。成员 `LocalRecordSegment` 与 `Timestamps` 等长且顺序相同，每条都是 [FileDescriptorStructure](#ref_FileDescriptorStructure)。
+
+```mermaid
+sequenceDiagram
+    participant App as App
+    participant Dev as 摄像头
+
+    Note over App,Dev: 0. 索引文件已下载
+    Note over App,Dev: 1. LocalRecordQuery on aqara.control
+    App->>Dev: InvokeCommand QueryLocalRecordType LocalRecordSegment
+    Dev-->>App: ComplexACK QueryLocalRecordType LocalRecordSegment
+
+    Note over App,Dev: 2. 逐个 FileDescriptor 取录像文件
+    loop one FileDescriptor at a time
+        App->>Dev: FileTransfer aqara.download
+    end
+```
+
+label `aqara.download` 上一次只传一个 `FileDescriptor`，前一个结束前不得再发 `initRequest`。某一条 `fileSize` 为 0 时，跳过该条，不对它发 `initRequest`。块的交互不在本图展开。列表超出单条消息时，由 App 拆成多次请求。超时重发同一条查询是安全的，查询不改变设备状态。
+
 ### 简介
 
-管理录像回放与历史记录，包括云端小视频类型识别及本地录像下载能力。
+管理录像回放与历史记录，包括云端小视频类型识别、本地录像下载能力，以及本地回放会话的状态与播放位置。回放会话由 `WebRTCProvideOffer`（`StreamUsage=LocalPlayback`）建立，暂停、继续、定位和倍速由 `LocalPlaybackControl` 承担。本地录像索引与录像文件描述由 `LocalRecordQuery` 查询。
 
 ### Function 标识
 
@@ -137537,12 +138221,40 @@ CameraActiveToggle Command 的参数结构体。
       <td>是否支持本地录像下载</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5243</td>
+      <td><a href="#ref_LocalPlaybackStatus">LocalPlaybackStatus</a></td>
+      <td>本地回放状态</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
 ### Command
 
-本 Function 不包含 Command。
+本 Function 的 Command 在回放会话的 `aqara.control` 上以 `InvokeCommand` 收发。
+
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Code</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9DB7</td>
+      <td><a href="#ref_LocalPlaybackControl">LocalPlaybackControl</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DB8</td>
+      <td><a href="#ref_LocalRecordQuery">LocalRecordQuery</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
 
 ### 数据类型
 
@@ -137582,6 +138294,522 @@ CameraActiveToggle Command 的参数结构体。
   </tbody>
 </table>
 
+##### LocalPlaybackStateEnum8 Type {#ref_LocalPlaybackStateEnum8}
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Idle</td>
+      <td>未在播放</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Playing</td>
+      <td>播放中</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Paused</td>
+      <td>已暂停，PeerConnection 保持</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Eof</td>
+      <td>已播到文件末尾</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>Stopped</td>
+      <td>设备侧已停止</td>
+    </tr>
+    <tr>
+      <td>0x05</td>
+      <td>StorageUnavailable</td>
+      <td>SD 卡拔出或不可读</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalPlaybackStatusStructure Type {#ref_LocalPlaybackStatusStructure}
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>State</td>
+      <td><a href="#ref_LocalPlaybackStateEnum8">LocalPlaybackStateEnum8</a></td>
+      <td>M</td>
+      <td>当前状态</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>SessionId</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>COIP 上报或读取时携带。DataChannel 上报省略，会话由该通道确定</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalRecordTypeEnum Type {#ref_LocalRecordTypeEnum}
+
+该枚举是按天子索引文件里每条记录的 `type`。App 从下载的索引文件里读取，查询响应不再带回。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>FullRecording</td>
+      <td>全时录像</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>EventTriggered</td>
+      <td>事件触发</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>AlarmRecord</td>
+      <td>告警记录</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalPlaybackControlOpEnum8 Type {#ref_LocalPlaybackControlOpEnum8}
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Pause</td>
+      <td>暂停。停止读帧，PeerConnection 保持</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Play</td>
+      <td>继续播放</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Seek</td>
+      <td>定位。<code>Timestamp</code> 有效</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Speed</td>
+      <td>倍速。<code>Speed</code> 有效</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalPlaybackControl Command Structure Type {#ref_LocalPlaybackControlCommandStructure}
+
+`LocalPlaybackControl` 的请求结构。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Op</td>
+      <td><a href="#ref_LocalPlaybackControlOpEnum8">LocalPlaybackControlOpEnum8</a></td>
+      <td>M</td>
+      <td>操作</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Speed</td>
+      <td>uint8</td>
+      <td>C</td>
+      <td><code>Op=Speed</code> 时取 <code>1</code> / <code>2</code> / <code>4</code>；其他 <code>Op</code> SHALL 省略</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Timestamp</td>
+      <td>uint32</td>
+      <td>C</td>
+      <td><code>Op=Seek</code> 时的目标 UTC 时间戳（秒），与索引条目里的 <code>timestamp</code> 对齐；其他 <code>Op</code> SHALL 省略</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>SessionId</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>COIP 携带，指定要控制的回放会话。DataChannel 省略，会话由该通道确定</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalPlaybackControlResponse Command Structure Type {#ref_LocalPlaybackControlResponseCommandStructure}
+
+`LocalPlaybackControl` 的响应结构。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td><a href="#ref_StatusCodeEnum8">StatusCodeEnum8</a></td>
+      <td>M</td>
+      <td>命令执行结果，取值见命令定义</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>CurrentTimestamp</td>
+      <td>uint32</td>
+      <td>M</td>
+      <td>执行后设备端当前播放位置（秒）</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 录像查询
+
+查询只分 `LocalRecordIndex` 与 `LocalRecordSegment`。`QueryLocalRecordType` 指明是哪一种，请求和响应里只出现它指向的那一个成员。文件描述用 [FileDescriptorStructure](#ref_FileDescriptorStructure)，由设备填写。App SHALL 把它原样写入 initRequest，SHALL NOT 用日期或时间戳自行拼接 `fileDesignator`。
+
+`ContentType` 仍是业务约定，查询和文件传输都不携带。
+
+`LocalRecordIndex` 与 `LocalRecordSegment` 是两级。索引列出有哪些天；段解析不负责列段。
+
+<table>
+  <thead>
+    <tr>
+      <th></th>
+      <th>回答</th>
+      <th>对应设备上的东西</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>LocalRecordIndex</code></td>
+      <td>按查询条件有哪些天的索引文件</td>
+      <td>按天的子索引文件。下载后，文件里每条记录给出一段录像的 <code>timestamp</code>、时长和类型</td>
+    </tr>
+    <tr>
+      <td><code>LocalRecordSegment</code></td>
+      <td>这些 <code>timestamp</code> 对应的录像文件</td>
+      <td>设备用 <code>timestamp</code> 定位录像文件，回 <a href="#ref_FileDescriptorStructure">FileDescriptorStructure</a></td>
+    </tr>
+  </tbody>
+</table>
+
+索引条目在 `FileDescriptorStructure` 之外另带 UTC 日期，只用于显示，不进入 `initRequest`。段解析的响应就是 `FileDescriptorStructure`。
+
+##### QueryLocalRecordTypeEnum8 Type {#ref_QueryLocalRecordTypeEnum8}
+
+`LocalRecordQuery` 用它选定本次查询的参数和结果。与索引文件内的 [LocalRecordTypeEnum](#ref_LocalRecordTypeEnum) 不是同一个枚举。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>LocalRecordIndex</td>
+      <td>查询哪些天有索引文件。参数与结果用成员 <code>LocalRecordIndex</code></td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>LocalRecordSegment</td>
+      <td>把索引中的 <code>timestamp</code> 解析成录像文件描述。参数与结果用成员 <code>LocalRecordSegment</code></td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalRecordQuery Command Structure Type {#ref_LocalRecordQueryCommandStructure}
+
+`QueryLocalRecordType` 决定哪一个条件成员出现。出现的成员与取值不一致，或两个条件成员都出现、都不出现，响应 `Status` 为 `INVALID_COMMAND`。`Cursor` 与 `MaxCount` 只在 `QueryLocalRecordType=LocalRecordIndex` 时出现。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Type</td>
+      <td><a href="#ref_QueryLocalRecordTypeEnum8">QueryLocalRecordTypeEnum8</a></td>
+      <td>M</td>
+      <td>本次查询种类</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Index</td>
+      <td><a href="#ref_LocalRecordIndexQueryParamsStructure">LocalRecordIndexQueryParamsStructure</a></td>
+      <td>C</td>
+      <td><code>QueryLocalRecordType=LocalRecordIndex</code> 时出现</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Segment</td>
+      <td><a href="#ref_LocalRecordSegmentQueryParamsStructure">LocalRecordSegmentQueryParamsStructure</a></td>
+      <td>C</td>
+      <td><code>QueryLocalRecordType=LocalRecordSegment</code> 时出现</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Cursor</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>仅 <code>LocalRecordIndex</code>。匹配结果中的条目序号，从 0 起。取自上一次响应的 <code>NextCursor</code>；省略或 <code>0</code> 表示从第一条开始</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>MaxCount</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>仅 <code>LocalRecordIndex</code>。期望的最大条目数；省略或 <code>0</code> 表示由设备决定</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalRecordIndexQueryParamsStructure Type {#ref_LocalRecordIndexQueryParamsStructure}
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>StartTimestamp</td>
+      <td>uint32</td>
+      <td>O</td>
+      <td>区间起点（UTC，秒）；省略表示不限下界</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>EndTimestamp</td>
+      <td>uint32</td>
+      <td>O</td>
+      <td>区间终点（UTC，秒）；省略表示不限上界</td>
+    </tr>
+  </tbody>
+</table>
+
+两个字段都是 Unix 秒时间戳，与规范全局字段名 `timestamp` 同义；设备负责把它落到对应的 UTC 日。要一天就传 `[当天 00:00, 次日 00:00)` 这两个值。返回条目里的日期是 `YYYYMMDD`，取文件用的是同条里的 `FileDescriptor`。
+
+##### FileDescriptorStructure Type {#ref_FileDescriptorStructure}
+
+文件传输业务交互协议 在 `initRequest` 之前要求取得的文件描述。字段含义以该协议的依赖一节为准。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>fileDesignator</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>文件引用。UTF-8 不超过 256 字节，绑定授权身份与固定版本，不得为本地绝对路径。写入 <code>initRequest</code> 成员 0。在 <code>LocalRecordIndex</code> 与 <code>LocalRecordSegment</code> 各自的结果里标识一个文件</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>fileSize</td>
+      <td>uint64</td>
+      <td>M</td>
+      <td>完整长度，单位字节。为 0 时条目仍可返回，但不得对该项发 <code>initRequest</code>。取整个文件时作为 <code>initRequest</code> 的 <code>length</code></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>fileVersion</td>
+      <td>uint32</td>
+      <td>M</td>
+      <td>文件版本，范围 0..4294967295。写入 <code>initRequest</code> 成员 1</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalRecordIndexEntryStructure Type {#ref_LocalRecordIndexEntryStructure}
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>FileDescriptor</td>
+      <td><a href="#ref_FileDescriptorStructure">FileDescriptorStructure</a></td>
+      <td>M</td>
+      <td>该天索引文件。取字节时写入 <code>initRequest</code></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Date</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>该索引对应的 UTC 日期 <code>YYYYMMDD</code>，例如 <code>&amp;quot;20261013&amp;quot;</code>。只用于显示，不进入 <code>initRequest</code></td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalRecordSegmentQueryParamsStructure Type {#ref_LocalRecordSegmentQueryParamsStructure}
+
+输入来自已经下载的索引文件，不是时间窗。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Timestamps</td>
+      <td>list[uint32]</td>
+      <td>M</td>
+      <td>索引条目中的 <code>timestamp</code>，一条或多条。空列表为非法参数</td>
+    </tr>
+  </tbody>
+</table>
+
+响应的 `LocalRecordSegment` SHALL 与请求的 `Timestamps` 等长，顺序一致。每一条都是 [FileDescriptorStructure](#ref_FileDescriptorStructure)。
+
+##### LocalRecordQuery Response Command Structure Type {#ref_LocalRecordQueryResponseCommandStructure}
+
+`QueryLocalRecordType` 回显请求中的值，并决定结果列表出现在哪一个成员。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td><a href="#ref_StatusCodeEnum8">StatusCodeEnum8</a></td>
+      <td>M</td>
+      <td><code>SUCCESS</code> 查询成功，结果列表可以为空。<code>INVALID_COMMAND</code> 参数不合法。<code>INVALID_IN_STATE</code> 存储不可用。<code>DYNAMIC_CONSTRAINT_ERROR</code> 游标已失效</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Type</td>
+      <td><a href="#ref_QueryLocalRecordTypeEnum8">QueryLocalRecordTypeEnum8</a></td>
+      <td>M</td>
+      <td>回显请求中的值</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Index</td>
+      <td>list[<a href="#ref_LocalRecordIndexEntryStructure">LocalRecordIndexEntryStructure</a>]</td>
+      <td>C</td>
+      <td><code>QueryLocalRecordType=LocalRecordIndex</code> 时出现</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Segment</td>
+      <td>list[<a href="#ref_FileDescriptorStructure">FileDescriptorStructure</a>]</td>
+      <td>C</td>
+      <td><code>QueryLocalRecordType=LocalRecordSegment</code> 时出现。与 <code>Timestamps</code> 逐条对应</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>NextCursor</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>仅索引查询。下一页第一条的条目序号；省略表示已查完</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>TotalCount</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>两种查询都返回。索引查询是时间区间内的匹配条数，不受 <code>Cursor</code>、<code>MaxCount</code> 影响；段查询是本次 <code>Timestamps</code> 的条数</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait 定义
 
 <table>
@@ -137601,6 +138829,11 @@ CameraActiveToggle Command 的参数结构体。
     <tr>
       <td>0x4FC1</td>
       <td><a href="#ref_SupportLocalVideoDownload">SupportLocalVideoDownload</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5243</td>
+      <td><a href="#ref_LocalPlaybackStatus">LocalPlaybackStatus</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -137725,9 +138958,175 @@ CameraActiveToggle Command 的参数结构体。
   </tbody>
 </table>
 
+#### LocalPlaybackStatus Trait（本地回放状态） {#ref_LocalPlaybackStatus}
+
+回放状态与播放位置。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5243</td>
+      <td>LocalPlaybackStatus</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_LocalPlaybackStatusStructure">LocalPlaybackStatusStructure</a></td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+上报时机：状态发生变化时。在 `aqara.control` 上上报时省略 `SessionId`；经 COIP 上报或读取时携带 `SessionId`。
+
 ### Command 定义
 
-本 Function 不包含 Command。
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9DB7</td>
+      <td><a href="#ref_LocalPlaybackControl">LocalPlaybackControl</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DB8</td>
+      <td><a href="#ref_LocalRecordQuery">LocalRecordQuery</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### LocalPlaybackControl Command {#ref_LocalPlaybackControl}
+
+本地 SD 卡回放会话（`StreamUsage=LocalPlayback`）的播放控制。
+
+##### 参数
+
+[LocalPlaybackControl Command Structure](#ref_LocalPlaybackControlCommandStructure)
+
+##### 响应
+
+[LocalPlaybackControlResponse Command Structure](#ref_LocalPlaybackControlResponseCommandStructure)，`Status` 取值：
+
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>SUCCESS</code></td>
+      <td>命令已接受</td>
+    </tr>
+    <tr>
+      <td><code>INVALID_IN_STATE</code></td>
+      <td>会话不是回放会话</td>
+    </tr>
+    <tr>
+      <td><code>INVALID_COMMAND</code></td>
+      <td><code>Op</code> 无效或参数缺失。从 COIP 到达时未携带 <code>SessionId</code> 也取此值</td>
+    </tr>
+    <tr>
+      <td><code>NOT_FOUND</code></td>
+      <td><code>SessionId</code> 不是活跃会话，或 <code>Timestamp</code> 无法映射到录像位置。DataChannel 上携带了与该通道不一致的 <code>SessionId</code> 也取此值</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 处理
+
+* 从 `aqara.control` 到达时省略 `SessionId`，会话是该通道所属回放会话。携带了不一致的 `SessionId` -> 回 `NOT_FOUND`。从 COIP 到达时 SHALL 携带 `SessionId`，省略 -> 回 `INVALID_COMMAND`。
+* `Pause` 与 `Play` 归为一类，同类只保留最后一条；`Seek` 一类；`Speed` 一类。被覆盖的命令不再上报，但每条命令都有各自的响应。
+* `Op=Seek` 生效后 SHALL 从新位置送出关键帧。
+
+#### LocalRecordQuery Command {#ref_LocalRecordQuery}
+
+查询本地录像索引，并把索引里的 `timestamp` 解析成录像文件描述。本 Command 属于 Playback Function，经 `InvokeCommand` 在回放会话的 `aqara.control` 上收发。
+
+* 请求 OpCode `0x008D`。`objectIdentifier` 填承载 Playback Function 的对象。`propertyIdentifier` 为本 Command 的 Command ID。`propertyValue` 为 [LocalRecordQuery Command Structure](#ref_LocalRecordQueryCommandStructure)。`source` 与其它命令相同。
+* 响应 OpCode `0x038D`。`propertyValue` 为 [LocalRecordQuery Response Command Structure](#ref_LocalRecordQueryResponseCommandStructure)，成员 0 为 `Status`。参数不合法、存储不可用、游标失效都留在这条 ComplexACK 里。
+
+`QueryLocalRecordType=LocalRecordIndex` 时走成员 `LocalRecordIndex`，有界（`MaxCount` + `Cursor`），一问一答，没有过程通知。`QueryLocalRecordType=LocalRecordSegment` 时走成员 `LocalRecordSegment`，没有游标：请求给出哪些 `timestamp`，响应就按同样顺序回哪些文件描述。两种查询都返回 `TotalCount`。
+
+##### 参数
+
+[LocalRecordQuery Command Structure](#ref_LocalRecordQueryCommandStructure)
+
+##### 响应
+
+[LocalRecordQuery Response Command Structure](#ref_LocalRecordQueryResponseCommandStructure)
+
+流程见 [下载录像索引文件](#ref_LocalRecord_FlowDownloadIndex) 与 [下载录像文件](#ref_LocalRecord_FlowDownloadFile)。
+
+##### 分页规则
+
+分页只用于 `LocalRecordIndex`。`LocalRecordSegment` 的范围就是请求里的 `Timestamps`。
+
+<table>
+  <thead>
+    <tr>
+      <th>维度</th>
+      <th>参数</th>
+      <th>回答</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>范围</td>
+      <td><code>LocalRecordIndex</code> 的时间戳区间（<code>StartTimestamp</code> / <code>EndTimestamp</code>）</td>
+      <td>要哪些天的索引</td>
+    </tr>
+    <tr>
+      <td>分页</td>
+      <td><code>MaxCount</code> / <code>Cursor</code></td>
+      <td>这一次响应装多少条索引。<code>TotalCount</code> 是整个区间的条数</td>
+    </tr>
+  </tbody>
+</table>
+
+* `Cursor` 与 `NextCursor` 是匹配结果中的条目序号，从 0 起，不是时间。App SHALL 只回传上一次响应里的 `NextCursor`，SHALL NOT 用 `Date` 或时间戳自行计算。
+* `TotalCount` 两种查询都返回。索引查询是该时间区间的匹配条数；段查询是本次 `Timestamps` 的条数。循环覆盖时，索引查询后一页的值可以与前一页不同。是否查完看 `NextCursor`。
+* 一次响应 SHALL NOT 超过承载单条消息的上限。设备在给定 `MaxCount` 之外 SHALL 继续按这个上限收敛。
+* `NextCursor` 省略表示查询已结束；`LocalRecordIndex` 为空且带 `NextCursor` 是合法的（该页被过滤条件排空）。
+* 游标失效时 SHALL 回 `Status = DYNAMIC_CONSTRAINT_ERROR`，App 从头重查。
+* 跨页期间循环录像可能已覆盖旧数据，条目可能重复或缺失。设备 SHOULD 在游标生存期内保证结果一致；做不到时由 App 按 `fileDesignator` 去重。
+* 空洞重取式的重复查询 SHOULD 遵守最小间隔（现网对索引查询取 500 ms）。
 
 ## CloudRecording（云录像） {#ref_Aqara_Spec_CloudRecording}
 
@@ -137905,6 +139304,12 @@ CameraActiveToggle Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5249</td>
+      <td><a href="#ref_PeriodicSnapshotInterval">PeriodicSnapshotInterval</a></td>
+      <td>定时抓拍时间间隔</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4F91</td>
       <td><a href="#ref_CameraRTSPEnable">CameraRTSPEnable</a></td>
       <td>摄像机RTSP使能</td>
@@ -137942,6 +139347,52 @@ CameraActiveToggle Command 的参数结构体。
 本 Function 不包含 Command。
 
 ### 数据类型
+
+##### PeriodicSnapshotIntervalEnum8 Type {#ref_PeriodicSnapshotIntervalEnum8}
+
+该枚举定义 PeriodicSnapshotInterval Trait 的 Present Value 有效取值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Auto</td>
+      <td>自动</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Minutes10</td>
+      <td>10 分钟</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Minutes30</td>
+      <td>30 分钟</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Minutes60</td>
+      <td>60 分钟</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>Minutes120</td>
+      <td>120 分钟</td>
+    </tr>
+    <tr>
+      <td>0x05</td>
+      <td>Minutes240</td>
+      <td>240 分钟</td>
+    </tr>
+  </tbody>
+</table>
 
 #### ClientKeepAliveReqEnum8 Type {#ref_ClientKeepAliveReqEnum8}
 
@@ -137983,6 +139434,11 @@ CameraActiveToggle Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5249</td>
+      <td><a href="#ref_PeriodicSnapshotInterval">PeriodicSnapshotInterval</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4F91</td>
       <td><a href="#ref_CameraRTSPEnable">CameraRTSPEnable</a></td>
       <td>O</td>
@@ -138012,7 +139468,7 @@ CameraActiveToggle Command 的参数结构体。
 
 #### PeriodicSnapshotUploadEnable Trait（定时上传图片使能） {#ref_PeriodicSnapshotUploadEnable}
 
-启用或禁用定期快照上传至云端（每 10 分钟）。
+启用或禁用定期快照上传至云端。实现 [PeriodicSnapshotInterval](#ref_PeriodicSnapshotInterval) 时，抓拍间隔由该 Trait 配置；未实现时保持每 10 分钟上传一帧的行为。
 
 <table>
   <thead>
@@ -138057,6 +139513,70 @@ CameraActiveToggle Command 的参数结构体。
       <td>0x0007</td>
       <td>Default Value</td>
       <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### PeriodicSnapshotInterval Trait（定时抓拍时间间隔） {#ref_PeriodicSnapshotInterval}
+
+设备侧定时抓拍时间间隔。启用 [PeriodicSnapshotUploadEnable](#ref_PeriodicSnapshotUploadEnable) 后可配置并生效，替代固定每 10 分钟抓拍一帧的间隔。`0` 表示由设备自动决定间隔，非零值按枚举指定的间隔执行。默认值为 `0`，可读、可写、可上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5249</td>
+      <td>PeriodicSnapshotInterval</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_PeriodicSnapshotIntervalEnum8">PeriodicSnapshotIntervalEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_PeriodicSnapshotIntervalEnum8">PeriodicSnapshotIntervalEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_PeriodicSnapshotIntervalEnum8">PeriodicSnapshotIntervalEnum8</a></td>
       <td></td>
       <td>0</td>
       <td>RW</td>
@@ -144343,7 +145863,7 @@ Camera AV Stream Management 功能定义了 Aqara 摄像头音视频流管理能
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x0126</td>
       <td>CameraAVStreamManagement</td>
       <td>摄像头音视频流管理</td>
     </tr>
@@ -144363,76 +145883,70 @@ Camera AV Stream Management 功能定义了 Aqara 摄像头音视频流管理能
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x511D</td>
       <td><a href="#ref_CAVSMMaxConcurrentEncoders">CAVSMMaxConcurrentEncoders</a></td>
-      <td>M</td>
       <td></td>
+      <td>M</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x511E</td>
       <td><a href="#ref_CAVSMMaxEncodedPixelRate">CAVSMMaxEncodedPixelRate</a></td>
-      <td>M</td>
       <td></td>
+      <td>M</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x511F</td>
       <td><a href="#ref_CAVSMVideoSensorParams">CAVSMVideoSensorParams</a></td>
-      <td>M</td>
       <td></td>
+      <td>M</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x5120</td>
       <td><a href="#ref_CAVSMRateDistortionTradeOffPoints">CAVSMRateDistortionTradeOffPoints</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x5121</td>
       <td><a href="#ref_CAVSMMicrophoneCapabilities">CAVSMMicrophoneCapabilities</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x5122</td>
       <td><a href="#ref_CAVSMTwoWayTalkSupport">CAVSMTwoWayTalkSupport</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x5123</td>
       <td><a href="#ref_CAVSMMaxNetworkBandwidth">CAVSMMaxNetworkBandwidth</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMLocalVideoRecordingEnabled">CAVSMLocalVideoRecordingEnabled</a></td>
-      <td>O</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>TBD</td>
+      <td>0x5125</td>
       <td><a href="#ref_CAVSMSupportedStreamUsages">CAVSMSupportedStreamUsages</a></td>
-      <td>M</td>
       <td></td>
+      <td>M</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x5126</td>
       <td><a href="#ref_CAVSMAllocatedVideoStreams">CAVSMAllocatedVideoStreams</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x5127</td>
       <td><a href="#ref_CAVSMAllocatedAudioStreams">CAVSMAllocatedAudioStreams</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x5128</td>
       <td><a href="#ref_CAVSMStreamUsagePriorities">CAVSMStreamUsagePriorities</a></td>
-      <td>M</td>
       <td></td>
+      <td>M</td>
     </tr>
   </tbody>
 </table>
@@ -144450,34 +145964,34 @@ Camera AV Stream Management 功能定义了 Aqara 摄像头音视频流管理能
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x9D8A</td>
       <td><a href="#ref_CAVSMVideoStreamAllocate">CAVSMVideoStreamAllocate</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x9D8B</td>
       <td><a href="#ref_CAVSMVideoStreamDeallocate">CAVSMVideoStreamDeallocate</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x9D8C</td>
       <td><a href="#ref_CAVSMAudioStreamAllocate">CAVSMAudioStreamAllocate</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x9D8D</td>
       <td><a href="#ref_CAVSMAudioStreamDeallocate">CAVSMAudioStreamDeallocate</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x9D8E</td>
       <td><a href="#ref_CAVSMSetStreamPriorities">CAVSMSetStreamPriorities</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
   </tbody>
 </table>
@@ -144618,11 +146132,11 @@ Camera AV Stream Management 功能定义了 Aqara 摄像头音视频流管理能
   </tbody>
 </table>
 
-*注意：* `0x04`-`0xEF` 预留给 Matter 未来标准扩展。`LocalPlayback` 表示回放编码通道用途；设备仅一份本地录像文件，由 `CAVSMLocalVideoRecordingEnabled` 使能，无需 App 指定片源。
+*注意：* `0x04`-`0xEF` 预留给 Matter 未来标准扩展。`LocalPlayback` 表示回放编码通道用途；设备仅一份本地录像文件，无需 App 指定片源。
 
 ##### StatusCodeEnum8 Type {#ref_StatusCodeEnum8}
 
-该枚举定义 Command 响应状态码有效取值。
+该枚举定义 CameraAVStreamManagement Function 的 Command 响应状态码有效取值。
 
 <table>
   <thead>
@@ -145353,78 +146867,6 @@ CAVSMSetStreamPriorities Command 的响应参数结构体。
 
 ### Trait 定义
 
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Name</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMMaxConcurrentEncoders">CAVSMMaxConcurrentEncoders</a></td>
-      <td>M</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMMaxEncodedPixelRate">CAVSMMaxEncodedPixelRate</a></td>
-      <td>M</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMVideoSensorParams">CAVSMVideoSensorParams</a></td>
-      <td>M</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMRateDistortionTradeOffPoints">CAVSMRateDistortionTradeOffPoints</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMMicrophoneCapabilities">CAVSMMicrophoneCapabilities</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMTwoWayTalkSupport">CAVSMTwoWayTalkSupport</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMMaxNetworkBandwidth">CAVSMMaxNetworkBandwidth</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMLocalVideoRecordingEnabled">CAVSMLocalVideoRecordingEnabled</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMSupportedStreamUsages">CAVSMSupportedStreamUsages</a></td>
-      <td>M</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMAllocatedVideoStreams">CAVSMAllocatedVideoStreams</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMAllocatedAudioStreams">CAVSMAllocatedAudioStreams</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMStreamUsagePriorities">CAVSMStreamUsagePriorities</a></td>
-      <td>M</td>
-    </tr>
-  </tbody>
-</table>
-
 #### CAVSMMaxConcurrentEncoders Trait {#ref_CAVSMMaxConcurrentEncoders}
 
 最大并发硬件视频编码器数量。
@@ -145438,7 +146880,7 @@ CAVSMSetStreamPriorities Command 的响应参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x511D</td>
       <td>CAVSMMaxConcurrentEncoders</td>
     </tr>
   </tbody>
@@ -145502,7 +146944,7 @@ CAVSMSetStreamPriorities Command 的响应参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x511E</td>
       <td>CAVSMMaxEncodedPixelRate</td>
     </tr>
   </tbody>
@@ -145575,7 +147017,7 @@ CAVSMSetStreamPriorities Command 的响应参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x511F</td>
       <td>CAVSMVideoSensorParams</td>
     </tr>
   </tbody>
@@ -145621,7 +147063,7 @@ CAVSMSetStreamPriorities Command 的响应参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x5120</td>
       <td>CAVSMRateDistortionTradeOffPoints</td>
     </tr>
   </tbody>
@@ -145667,7 +147109,7 @@ CAVSMSetStreamPriorities Command 的响应参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x5121</td>
       <td>CAVSMMicrophoneCapabilities</td>
     </tr>
   </tbody>
@@ -145713,7 +147155,7 @@ CAVSMSetStreamPriorities Command 的响应参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x5122</td>
       <td>CAVSMTwoWayTalkSupport</td>
     </tr>
   </tbody>
@@ -145759,7 +147201,7 @@ CAVSMSetStreamPriorities Command 的响应参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x5123</td>
       <td>CAVSMMaxNetworkBandwidth</td>
     </tr>
   </tbody>
@@ -145819,54 +147261,6 @@ CAVSMSetStreamPriorities Command 的响应参数结构体。
   </tbody>
 </table>
 
-#### CAVSMLocalVideoRecordingEnabled Trait {#ref_CAVSMLocalVideoRecordingEnabled}
-
-本地存储录像是否开启；`true` 表示已启用 SD 卡录像。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>TBD</td>
-      <td>CAVSMLocalVideoRecordingEnabled</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td></td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-*注意：* 语义对齐 Matter `LocalVideoRecordingEnabled`（STOR Feature），表示本地存储录像是否开启。Matter 摄像头经网关 CASE 映射；非 STOR 设备 MAY 不实现本 Trait。设备仅维护一份本地录像文件；`LocalPlayback` 流分配与 WebRTC 回放会话 SHALL 在本值为 `true` 且文件可读时进行。
-
 #### CAVSMSupportedStreamUsages Trait {#ref_CAVSMSupportedStreamUsages}
 
 设备支持的 Stream Usage 列表。
@@ -145880,7 +147274,7 @@ CAVSMSetStreamPriorities Command 的响应参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x5125</td>
       <td>CAVSMSupportedStreamUsages</td>
     </tr>
   </tbody>
@@ -145926,7 +147320,7 @@ CAVSMSetStreamPriorities Command 的响应参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x5126</td>
       <td>CAVSMAllocatedVideoStreams</td>
     </tr>
   </tbody>
@@ -145972,7 +147366,7 @@ CAVSMSetStreamPriorities Command 的响应参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x5127</td>
       <td>CAVSMAllocatedAudioStreams</td>
     </tr>
   </tbody>
@@ -146018,7 +147412,7 @@ Stream Usage 优先级（Index 0 最高）。
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x5128</td>
       <td>CAVSMStreamUsagePriorities</td>
     </tr>
   </tbody>
@@ -146053,43 +147447,6 @@ Stream Usage 优先级（Index 0 最高）。
 
 ### Command 定义
 
-<table>
-  <thead>
-    <tr>
-      <th>Command ID</th>
-      <th>Name</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMVideoStreamAllocate">CAVSMVideoStreamAllocate</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMVideoStreamDeallocate">CAVSMVideoStreamDeallocate</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMAudioStreamAllocate">CAVSMAudioStreamAllocate</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMAudioStreamDeallocate">CAVSMAudioStreamDeallocate</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_CAVSMSetStreamPriorities">CAVSMSetStreamPriorities</a></td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
 #### CAVSMVideoStreamAllocate Command {#ref_CAVSMVideoStreamAllocate}
 
 分配视频编码流。成功后设备 SHALL **Report** 更新后的 `CAVSMAllocatedVideoStreams`。
@@ -146120,11 +147477,6 @@ Stream Usage 优先级（Index 0 最高）。
     <tr>
       <td>StreamUsage</td>
       <td>SHALL 为 Recording、Analysis、LiveView 或 LocalPlayback；SHALL 存在于 <code>CAVSMStreamUsagePriorities</code> 及 <code>CAVSMSupportedStreamUsages</code></td>
-      <td>INVALID_IN_STATE</td>
-    </tr>
-    <tr>
-      <td>StreamUsage</td>
-      <td>为 LocalPlayback 时，<code>CAVSMLocalVideoRecordingEnabled</code> SHALL 为 <code>true</code>（若设备实现该 Trait）</td>
       <td>INVALID_IN_STATE</td>
     </tr>
     <tr>
@@ -146260,11 +147612,6 @@ Stream Usage 优先级（Index 0 最高）。
     <tr>
       <td>StreamUsage</td>
       <td>SHALL 为 Recording、Analysis、LiveView 或 LocalPlayback；SHALL 存在于 <code>CAVSMStreamUsagePriorities</code> 及 <code>CAVSMSupportedStreamUsages</code></td>
-      <td>INVALID_IN_STATE</td>
-    </tr>
-    <tr>
-      <td>StreamUsage</td>
-      <td>为 LocalPlayback 时，<code>CAVSMLocalVideoRecordingEnabled</code> SHALL 为 <code>true</code>（若设备实现该 Trait）</td>
       <td>INVALID_IN_STATE</td>
     </tr>
     <tr>
@@ -146409,376 +147756,205 @@ Stream Usage 优先级（Index 0 最高）。
 
 ## WebRTC（WebRTC 传输） {#ref_Aqara_Spec_WebRTC}
 
+### 简介
+
+WebRTC Transport 功能定义了 Client 与 Server 之间的 WebRTC 信令接口，涵盖实时直播（`LiveView`）及本地 SD 卡录像回放（`LocalPlayback`）会话。Client 通过 Aqara Spec Command 向 Server 提交信令，Server 通过 Response 与 Report 返回处理结果及信令事件；双方通过 WebRTC 传输双向媒体（P2P/TURN）。本地回放假定 Server 仅有一份本地录像文件，可直接回放该文件，无需指定片源 ID。
+
+### 依赖 {#ref_WebRTC_CAVSMDependency}
+
+WebRTC 会话依赖 [CameraAVStreamManagement](#ref_Aqara_Spec_CameraAVStreamManagement) 提供已分配的音视频流。Client SHALL 在发起 `WebRTCProvideOffer` 新建会话或 `WebRTCSolicitOffer` 前，取得本次会话所需的 `VideoStreamID` 和 `AudioStreamID`；WebRTC 信令协商不代替流分配。
+
+1. Client SHALL 查询 [CAVSMMicrophoneCapabilities](#ref_CAVSMMicrophoneCapabilities)、[CAVSMVideoSensorParams](#ref_CAVSMVideoSensorParams)、[CAVSMRateDistortionTradeOffPoints](#ref_CAVSMRateDistortionTradeOffPoints)、[CAVSMAllocatedAudioStreams](#ref_CAVSMAllocatedAudioStreams) 与 [CAVSMAllocatedVideoStreams](#ref_CAVSMAllocatedVideoStreams)，取得音视频能力和已分配流列表。
+1. Client SHALL 根据上述能力及本次会话需求，确定音视频流参数。音频参数包括 `AudioCodec`、`ChannelCount`、`SampleRate`、`BitDepth` 和 `BitRate`；其中编解码器、通道数、采样率和位深 SHALL 满足麦克风能力约束。视频参数包括 `VideoCodec`、帧率、分辨率范围、码率范围及关键帧间隔；分辨率和帧率 SHALL 满足 `CAVSMVideoSensorParams` 的约束，`VideoCodec` 与分辨率档位 SHALL 根据 `CAVSMRateDistortionTradeOffPoints` 的 `Codec`、`Resolution` 选择，码率 MAY 参考对应档位的 `MinBitRate`。固定分辨率时，`MinResolution` 与 `MaxResolution` 均设为所选档位；需要多档切换时，两者分别设为所需档位范围的下限与上限。
+1. Client SHALL 根据本次会话的 `StreamUsage` 和已确定的音视频参数，分别判断列表中是否已有可复用的音频流和视频流；已有匹配流时，复用其 ID，跳过对应 Allocate 步骤。
+1. 没有匹配的视频流时，Client SHALL 使用已确定的视频参数调用 [CAVSMVideoStreamAllocate](#ref_CAVSMVideoStreamAllocate)；没有匹配的音频流时，Client SHALL 使用已确定的音频参数调用 [CAVSMAudioStreamAllocate](#ref_CAVSMAudioStreamAllocate)。
+1. Client SHALL 等待所需流分配成功并取得响应中的流 ID，再发起 WebRTC 会话；任一所需流分配失败时，SHALL NOT 使用该次失败分配的结果继续建连。
+1. Client SHALL 将已取得的视频流 ID 填入 `VideoStreams`，音频流 ID 填入 `AudioStreams`。所引用的流 SHALL 已在 Server 分配，且其 `StreamUsage` SHALL 与本次会话一致；仅使用一种媒体时，只需准备并携带对应类型的流 ID。
+
+以下前置交互适用于 `LiveView` 与 `LocalPlayback`；仅使用一种媒体时，跳过另一种媒体的能力查询、参数选择、列表查询及匹配与分配步骤。
+
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Server as Server
+
+    Client->>Server: 读 CAVSMMicrophoneCapabilities、CAVSMVideoSensorParams、CAVSMRateDistortionTradeOffPoints、CAVSMAllocatedAudioStreams、CAVSMAllocatedVideoStreams
+    Server-->>Client: 音视频能力、已分配音频流列表、已分配视频流列表
+    Client->>Client: 根据能力及会话需求确定音频参数和视频参数
+
+    alt 已有匹配的视频流
+        Client->>Client: 复用 VideoStreamID
+    else 没有匹配的视频流
+        Client->>Server: CAVSMVideoStreamAllocate(StreamUsage, VideoCodec, MinResolution, MaxResolution, 其他视频参数)
+        Server-->>Client: Allocate Response(SUCCESS, VideoStreamID)
+    end
+
+    alt 已有匹配的音频流
+        Client->>Client: 复用 AudioStreamID
+    else 没有匹配的音频流
+        Client->>Server: CAVSMAudioStreamAllocate(StreamUsage, 音频参数)
+        Server-->>Client: Allocate Response(SUCCESS, AudioStreamID)
+    end
+
+    Note over Client,Server: 所需流均已分配且取得 ID 后，才发起 WebRTC 会话
+```
+
 ### 交互流程
 
-#### 拓扑总览
+#### 交互角色
 
-**处理逻辑**
+本节统一使用 Client 和 Server 描述交互，不区分具体接入拓扑。
 
-<table>
-  <thead>
-    <tr>
-      <th>维度</th>
-      <th>第一类：Aqara 摄像头直连云端</th>
-      <th>第二类：Matter 摄像头经网关接入</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>角色</td>
-      <td>App、云端、Aqara 摄像头</td>
-      <td>App、云端、Matter 网关、第三方 Matter 摄像头</td>
-    </tr>
-    <tr>
-      <td>信令协议</td>
-      <td>纯 Aqara Spec（无 Matter）</td>
-      <td>云端 &lt;-> 网关 Aqara Spec；网关 &lt;-> 摄像头 Matter CASE</td>
-    </tr>
-    <tr>
-      <td>信令路径</td>
-      <td>App -> 云端 -> Aqara 摄像头</td>
-      <td>App -> 云端 -> 网关 -> Matter 摄像头</td>
-    </tr>
-    <tr>
-      <td>媒体路径</td>
-      <td>App &lt;-> Aqara 摄像头</td>
-      <td>App &lt;-> Matter 摄像头</td>
-    </tr>
-    <tr>
-      <td>典型设备</td>
-      <td>原生支持 Aqara Spec 的摄像头</td>
-      <td>仅支持 Matter WebRTC 的第三方摄像头</td>
-    </tr>
-  </tbody>
-</table>
+* Client：请求、接收媒体并发起控制的一侧，合并表示 App 与云端。
+* Server：提供媒体并处理请求的一侧，合并表示网关与摄像头。
 
-*注意：* 两类拓扑下 App 均不直连设备侧信令端点，统一经云端转发 Aqara Spec Command 与 Report。
+Client 与 Server 通过 Aqara Spec Command / Response / Report 完成信令交互，通过 WebRTC 传输双向媒体（P2P/TURN）。各侧内部的转发与协议转换不在流程图中展开。
 
-#### 第一类：Aqara 摄像头直连云端
+#### WebRTCProvideOffer 流程 {#ref_WebRTC_FlowProvideOffer}
 
-##### WebRTCProvideOffer 流程
-
-App 本地生成 SDP Offer，经云端提交；Aqara 摄像头回 Answer。
+Client 先完成 [CameraAVStreamManagement 前置交互](#ref_WebRTC_CAVSMDependency)，再生成并提交 SDP Offer；Server 返回 Answer。
 
 ```mermaid
 sequenceDiagram
-    participant App as App
-    participant Cloud as 云端
-    participant Cam as Aqara 摄像头
+    participant Client as Client
+    participant Server as Server
 
     par SDP
-        App->>Cloud: 发送 Cmd WebRTCProvideOffer(offerSdp)
-        Cloud->>Cam: Cmd WebRTCProvideOffer(offerSdp)
-        Cam-->>Cloud: WebRTCProvideOffer Response(sessionId)
-        Cloud-->>App: 推送 WebRTCProvideOffer Response
-        Cam-->>Cloud: Report WebRTCSignalingEvent(Answer)
-        Cloud-->>App: 推送 WebRTCSignalingEvent(Answer)
+        Client->>Server: 发送 Cmd WebRTCProvideOffer(offerSdp, VideoStreams, AudioStreams)
+        Server-->>Client: WebRTCProvideOffer Response(sessionId)
+        Server-->>Client: Report WebRTCSignalingEvent(Answer)
     end
 
     par ICE
-        Cam-->>Cloud: Report WebRTCSignalingEvent(ICE)
-        Cloud-->>App: 推送 WebRTCSignalingEvent(ICE)
-        App->>Cloud: 发送 Cmd WebRTCProvideICECandidates
-        Cloud->>Cam: Cmd WebRTCProvideICECandidates
-        Cam-->>Cloud: WebRTCProvideICECandidates Response
-        Cloud-->>App: 推送 WebRTCProvideICECandidates Response
+        Server-->>Client: Report WebRTCSignalingEvent(ICE)
+        Client->>Server: 发送 Cmd WebRTCProvideICECandidates
+        Server-->>Client: WebRTCProvideICECandidates Response
     end
 
-    Note over App,Cam: WebRTC 媒体（双向，P2P/TURN）
+    Note over Client,Server: WebRTC 媒体（双向，P2P/TURN）
 
-    par App 主动结束
-        App->>Cloud: 结束观看
-        Cloud->>Cam: Cmd WebRTCEndSession
+    par Client 主动结束
+        Client->>Server: Cmd WebRTCEndSession
     end
 
-    par 摄像头主动结束
-        Cam-->>Cloud: Report WebRTCSignalingEvent(End)
-        Cloud-->>App: 推送 End
+    par Server 主动结束
+        Server-->>Client: Report WebRTCSignalingEvent(End)
     end
 ```
 
-##### WebRTCSolicitOffer 流程
+#### WebRTCSolicitOffer 流程 {#ref_WebRTC_FlowSolicitOffer}
 
-适用于待机唤醒等场景；摄像头延迟下发 Offer，App 再提交 Answer。
-
-```mermaid
-sequenceDiagram
-    participant App as App
-    participant Cloud as 云端
-    participant Cam as Aqara 摄像头
-
-    App->>Cloud: 发送 Cmd WebRTCSolicitOffer
-    Cloud->>Cam: Cmd WebRTCSolicitOffer
-    Note over Cam: 待机唤醒
-    Cam-->>Cloud: WebRTCSolicitOffer Response(sessionId)
-    Cloud-->>App: 推送 WebRTCSolicitOffer Response
-    Cam-->>Cloud: Report WebRTCSignalingEvent(Offer)
-    Cloud-->>App: 推送 WebRTCSignalingEvent(Offer)
-    App->>App: 生成 answerSdp
-    App->>Cloud: 发送 Cmd WebRTCProvideAnswer(answerSdp)
-    Cloud->>Cam: Cmd WebRTCProvideAnswer
-    Cam-->>Cloud: WebRTCProvideAnswer Response
-    Cloud-->>App: 推送 WebRTCProvideAnswer Response
-
-    par ICE
-        Cam-->>Cloud: Report WebRTCSignalingEvent(ICE)
-        Cloud-->>App: 推送 WebRTCSignalingEvent(ICE)
-        App->>Cloud: 发送 Cmd WebRTCProvideICECandidates
-        Cloud->>Cam: Cmd WebRTCProvideICECandidates
-        Cam-->>Cloud: WebRTCProvideICECandidates Response
-        Cloud-->>App: 推送 WebRTCProvideICECandidates Response
-    end
-
-    Note over App,Cam: WebRTC 媒体（双向，P2P/TURN）
-
-    par App 主动结束
-        App->>Cloud: 结束观看
-        Cloud->>Cam: Cmd WebRTCEndSession
-    end
-
-    par 摄像头主动结束
-        Cam-->>Cloud: Report WebRTCSignalingEvent(End)
-        Cloud-->>App: 推送 End
-    end
-```
-
-#### 第二类：Matter 摄像头经网关接入
-
-##### WebRTCProvideOffer 流程
-
-App 本地生成 SDP Offer；网关将 Aqara Spec 映射为 Matter Provider 命令与摄像头交互。
+Client 先完成 [CameraAVStreamManagement 前置交互](#ref_WebRTC_CAVSMDependency)。本流程适用于待机唤醒等场景；Server 延迟下发 Offer，Client 再提交 Answer。
 
 ```mermaid
 sequenceDiagram
-    participant App as App
-    participant Cloud as 云端
-    participant GW as Matter 网关
-    participant Cam as Matter 摄像头
+    participant Client as Client
+    participant Server as Server
 
-    par SDP
-        App->>Cloud: 发送 Cmd WebRTCProvideOffer(offerSdp)
-        Cloud->>GW: Cmd WebRTCProvideOffer(offerSdp)
-        GW->>Cam: Matter Provider::ProvideOffer
-        Cam-->>GW: ProvideOfferResponse
-        GW-->>Cloud: Cmd Response(sessionId)
-        Cloud-->>App: 推送 sessionId
-        Cam->>GW: Matter Requestor::Answer
-        GW-->>Cloud: Report WebRTCSignalingEvent(Answer)
-        Cloud-->>App: 推送 Answer
-    end
+    Client->>Server: 发送 Cmd WebRTCSolicitOffer(VideoStreams, AudioStreams)
+    Note over Server: 待机唤醒
+    Server-->>Client: WebRTCSolicitOffer Response(sessionId, deferredOffer)
+    Server-->>Client: Report WebRTCSignalingEvent(Offer)
+    Client->>Client: 生成 answerSdp
+    Client->>Server: 发送 Cmd WebRTCProvideAnswer(answerSdp)
+    Server-->>Client: WebRTCProvideAnswer Response
 
     par ICE
-        Cam->>GW: Requestor::ICECandidates
-        GW-->>Cloud: Report WebRTCSignalingEvent(ICE)
-        Cloud-->>App: 推送 ICE
-        App->>Cloud: 发送 Cmd WebRTCProvideICECandidates(localCandidates)
-        Cloud->>GW: Cmd WebRTCProvideICECandidates
-        GW->>Cam: Provider::ProvideICECandidates
+        Server-->>Client: Report WebRTCSignalingEvent(ICE)
+        Client->>Server: 发送 Cmd WebRTCProvideICECandidates
+        Server-->>Client: WebRTCProvideICECandidates Response
     end
 
-    Note over App,Cam: WebRTC 媒体（双向，P2P/TURN）
+    Note over Client,Server: WebRTC 媒体（双向，P2P/TURN）
 
-    par App 主动结束
-        App->>Cloud: 结束观看
-        Cloud->>GW: Cmd WebRTCEndSession
-        GW->>Cam: Provider::EndSession
+    par Client 主动结束
+        Client->>Server: Cmd WebRTCEndSession
     end
 
-    par 摄像头主动结束
-        Cam->>GW: Requestor::End
-        GW-->>Cloud: Report WebRTCSignalingEvent(End)
-        Cloud-->>App: 推送 End
-    end
-```
-
-##### WebRTCSolicitOffer 流程
-
-网关转发 WebRTCSolicitOffer；摄像头经 Matter Requestor 下发 Offer。
-
-```mermaid
-sequenceDiagram
-    participant App as App
-    participant Cloud as 云端
-    participant GW as Matter 网关
-    participant Cam as Matter 摄像头
-
-    App->>Cloud: 发送 Cmd WebRTCSolicitOffer
-    Cloud->>GW: Cmd WebRTCSolicitOffer
-    GW->>Cam: Matter Provider::SolicitOffer
-    Cam-->>GW: SolicitOfferResponse(deferredOffer)
-    GW-->>Cloud: Cmd Response(sessionId, deferredOffer)
-    Cloud-->>App: 推送 sessionId
-
-    Note over Cam: 待机唤醒
-    Note over App: 可提前收集本地 ICE
-
-    Cam->>GW: Matter Requestor::Offer
-    GW-->>Cloud: Report WebRTCSignalingEvent(Offer)
-    Cloud-->>App: 推送 Offer
-
-    App->>App: 生成 answerSdp
-    App->>Cloud: 发送 Cmd WebRTCProvideAnswer(answerSdp)
-    Cloud->>GW: Cmd WebRTCProvideAnswer
-    GW->>Cam: Provider::ProvideAnswer
-
-    par ICE
-        Cam->>GW: Requestor::ICECandidates
-        GW-->>Cloud: Report WebRTCSignalingEvent(ICE)
-        Cloud-->>App: 推送 ICE
-        App->>Cloud: 发送 Cmd WebRTCProvideICECandidates(localCandidates)
-        Cloud->>GW: Cmd WebRTCProvideICECandidates
-        GW->>Cam: Provider::ProvideICECandidates
-    end
-
-    Note over App,Cam: WebRTC 媒体（双向，P2P/TURN）
-
-    par App 主动结束
-        App->>Cloud: 结束观看
-        Cloud->>GW: Cmd WebRTCEndSession
-        GW->>Cam: Provider::EndSession
-    end
-
-    par 摄像头主动结束
-        Cam->>GW: Requestor::End
-        GW-->>Cloud: Report WebRTCSignalingEvent(End)
-        Cloud-->>App: 推送 End
+    par Server 主动结束
+        Server-->>Client: Report WebRTCSignalingEvent(End)
     end
 ```
 
 #### 分辨率切换
 
-在 Matter / Aqara 多流模型下，「分辨率」对应不同的 `VideoStreamID` 及独立的 RTP **SSRC**，**不是**在同一路 RTP 内动态修改宽高。切换档位即切换接收（或启停）哪条 SSRC 对应的媒体流。
+Client SHALL 使用 `WebRTCSetResolution` Command，将本会话已绑定的一路 `VideoStreamID` 切到目标分辨率。
 
-##### 前置：多档流预分配与绑定
+##### 切换条件
 
-App 若需在会话内无 re-offer 切换分辨率，SHALL 在 **Camera AV Stream Management** 上预先分配多档 `LiveView` 流（如 1080p、480p 各对应一个 `VideoStreamID`），并在 `WebRTCProvideOffer` / `WebRTCSolicitOffer` 中将多路一并绑定：
+* `VideoStreamID` SHALL 为本会话已绑定的 `StreamUsage=LiveView` 流，且该流的 `MinResolution` SHALL 小于 `MaxResolution`。
+* 目标 `Resolution` SHALL 落在该流的 `MinResolution`-`MaxResolution` 之间，且 SHALL 是 `CAVSMRateDistortionTradeOffPoints` 中的一档。
+* `StreamUsage=LocalPlayback` 的回放会话不支持分辨率切换。
 
+##### 切换流程与结果
+
+本流程以 WebRTC 会话已建立并绑定可切换分辨率的视频流为前提，适用于 [WebRTCProvideOffer 流程](#ref_WebRTC_FlowProvideOffer) 与 [WebRTCSolicitOffer 流程](#ref_WebRTC_FlowSolicitOffer) 两种建连方式。
+
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Server as Server
+
+    Note over Client,Server: 已建立会话，目标 VideoStreamID 已绑定
+    Client->>Server: WebRTCSetResolution(VideoStreamID, Resolution)
+    Server-->>Client: Response(Status：SUCCESS 或失败状态)
+    alt Status 为 SUCCESS
+        Server->>Server: 切换到指定分辨率
+        Server-->>Client: 同一 SSRC 指定分辨率的 IDR（携带新的 SPS）
+        Server-->>Client: aqara.control WebRTCStreamResolution（目标流为指定分辨率）
+    else Status 为失败状态
+        Note over Client,Server: 保持原分辨率
+    end
 ```
-VideoStreams = [hdStreamId, sdStreamId]
-```
 
-若建连时 `VideoStreams` 仅含一路，则档位切换只能经 **re-offer** 或 **EndSession 后新建会话** 改绑 `VideoStreamID`，开销较大。
+分辨率切换：
 
-##### Answer SDP 中的 SSRC
+1. Client 下发 `WebRTCSetResolution`，携带 `VideoStreamID` 和目标 `Resolution`。
+1. Server 按 [WebRTCSetResolution](#ref_WebRTCSetResolution) Command 定义校验请求并返回成功或失败响应。
+1. 返回 `SUCCESS` 后，Server SHALL 将目标流切换到指定分辨率，保持 `VideoStreamID` 和 SSRC 不变；新分辨率从新的 IDR 开始，IDR 携带新的 SPS。新档 IDR 送出后，通过 [WebRTCStreamResolution](#ref_WebRTCStreamResolution) 上报该会话各视频流当前正在发送的分辨率，目标流 SHALL 为指定分辨率。
+1. 请求失败时，Server SHALL 返回相应的非 `SUCCESS` 状态并保持原分辨率；SHALL NOT 返回 `SUCCESS` 后以未等到目标档 IDR 为由保持原档。
 
-摄像头在 Answer SDP 中按 `VideoStreams` 列表为**每一路视频**生成独立的媒体描述，SSRC 在 SDP / WebRTC 协商阶段产生，**不经 Aqara Spec Command 传递**：
+若目标即当前分辨率且无进行中的切换，Server SHALL 返回 `SUCCESS` 并立即上报一次 `WebRTCStreamResolution`。
 
-* 每路视频一条 `m=video` 媒体行，绑定一个发送方 **SSRC**（会话内唯一，由摄像头 Provider 分配）。
-* 每条 `m=` SHOULD 携带 RFC 8851 `a=rid`（`max-width`、`max-height`、`max-fps`、`max-br`），取值来自 `CAVSMAllocatedVideoStreams` 中对应 `VideoStreamID` 条目，供 App 识别档位。
-* App SHALL 建立 `VideoStreamID` &lt;-> SSRC 映射（依据 `a=rid` 与 `m=` 顺序），再选择解码哪一路。
-
-Answer SDP 经 **Report** `WebRTCSignalingEvent(Answer)` 下发给 App（第二类拓扑由网关映射 Matter Answer）。
-
-##### 切换 SSRC 的方式
-
-Aqara Spec **未定义**专用的「切换分辨率」Command；单用户场景下可选方式如下：
-
-<table>
-  <thead>
-    <tr>
-      <th>方式</th>
-      <th>协议 / 通路</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>App 本地选路</td>
-      <td>无额外信令；已建立的 WebRTC 媒体连接</td>
-      <td>多路已绑定且 Answer 含多 SSRC 时，App 仅解码/渲染目标 SSRC 对应 track。<strong>推荐</strong>用于日常高清 &lt;-> 流畅切换，延迟最低。</td>
-    </tr>
-    <tr>
-      <td>RTCP PAUSE / UNPAUSE</td>
-      <td>RTCP（RFC 7728）；与 RTP rtcp-mux，走 P2P/TURN，不经云端</td>
-      <td>App 对不需要的 SSRC 发 PAUSE、对目标路发 UNPAUSE，摄像头停发/恢复对应 RTP。适用于弱网降档且需节省摄像头上行与编码资源。</td>
-    </tr>
-    <tr>
-      <td>SDP <code>a=inactive</code> + UNPAUSE</td>
-      <td>建连时 SDP 约定；之后 RTCP UNPAUSE</td>
-      <td>Answer 中某路 <code>m=</code> 初始为 inactive，需要时再 UNPAUSE 开启。适用于预绑多路但初始只开一路。</td>
-    </tr>
-    <tr>
-      <td>Re-offer</td>
-      <td>Aqara Spec：<code>WebRTCProvideOffer</code>（携带 <code>SessionId</code> 字段）</td>
-      <td>修改 <code>VideoStreams</code> 列表或 SDP 结构，重新 Offer/Answer，可能需重新 trickle ICE。开销大、易有中断感；仅用于增减 <code>VideoStreamID</code> 种类或无法预绑多路时。</td>
-    </tr>
-  </tbody>
-</table>
-
-<table>
-  <thead>
-    <tr>
-      <th>方式</th>
-      <th>延迟</th>
-      <th>Aqara Spec 交互</th>
-      <th>适用</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>App 本地选路</td>
-      <td>低</td>
-      <td>无</td>
-      <td>已预绑多档，切换显示档位</td>
-    </tr>
-    <tr>
-      <td>RTCP PAUSE/UNPAUSE</td>
-      <td>低</td>
-      <td>无</td>
-      <td>省上行/编码，单路发送</td>
-    </tr>
-    <tr>
-      <td>Re-offer / 新会话</td>
-      <td>高</td>
-      <td>有</td>
-      <td>改绑流种类或仅单路建连</td>
-    </tr>
-  </tbody>
-</table>
+每次 `WebRTCStreamResolution` 上报 SHALL 携带该会话的整份视频流分辨率列表，未受影响的其它路保持原值。Client SHALL 根据上报值确认实际分辨率。
 
 #### 本地 SD 卡录像回放
 
-本节仅定义**回放会话**建立与控制。设备仅维护一份本地录像文件；`CAVSMLocalVideoRecordingEnabled=true` 时，App 发起 `LocalPlayback` 会话即回放该文件，无需携带片源标识。
+本节仅定义**回放会话**的建立。Server 仅维护一份本地录像文件，Client 发起 `LocalPlayback` 会话即回放该文件，无需携带片源标识。播放控制与录像查询在 [Playback](#ref_Aqara_Spec_Playback)。
 
 ##### 回放会话建立流程
 
 ```mermaid
 sequenceDiagram
-    participant App as App
-    participant Cloud as 云端
-    participant Dev as 摄像头/网关
+    participant Client as Client
+    participant Server as Server
 
-    Note over App,Dev: 0. 前置：本地录像已使能
-    App->>Cloud: 读 CAVSMLocalVideoRecordingEnabled
+    Note over Client,Server: 1. 分配回放流（CAVSM）
+    Client->>Server: CAVSMVideoStreamAllocate(StreamUsage=LocalPlayback)
+    Client->>Server: CAVSMAudioStreamAllocate(StreamUsage=LocalPlayback)
+    Server-->>Client: Report 流 ID
 
-    Note over App,Dev: 1. 分配回放流（CAVSM）
-    App->>Cloud: CAVSMVideoStreamAllocate(StreamUsage=LocalPlayback)
-    App->>Cloud: CAVSMAudioStreamAllocate(StreamUsage=LocalPlayback)
-    Dev-->>App: Report 流 ID
+    Note over Client,Server: 2. 建 WebRTC 会话
+    Client->>Server: WebRTCProvideOffer(StreamUsage=LocalPlayback, VideoStreams, AudioStreams, MetadataEnabled=true)
+    Server-->>Client: Response SessionId
+    Server-->>Client: Report WebRTCSignalingEvent(Answer)
 
-    Note over App,Dev: 2. 建 WebRTC 会话
-    App->>Cloud: WebRTCProvideOffer(StreamUsage=LocalPlayback, VideoStreams, AudioStreams, MetadataEnabled=true)
-    Dev-->>App: Response SessionId
-    Dev-->>App: Report WebRTCSignalingEvent(Answer)
+    Note over Client,Server: 3. DataChannel
+    Client->>Server: open aqara.control and aqara.download
 
-    Note over App,Dev: 3. DataChannel 元数据
-    Dev-->>App: 录像标签流（RecordingTags）
+    Note over Client,Server: 4. playback control
+    Server-->>Client: RTP playback
+    Client->>Server: LocalPlaybackControl
+    Server-->>Client: Status and current position
 
-    Note over App,Dev: 4. 播放与 Seek
-    Dev-->>App: RTP 回放音视频
-    App->>Cloud: WebRTCLocalPlaybackSeek(Timestamp)
-    Dev-->>App: Response Status + 新关键帧
-
-    App->>Cloud: WebRTCEndSession
+    Client->>Server: WebRTCEndSession
 ```
 
-*注意：* `StreamUsage=LocalPlayback` 时 SHALL 设 `MetadataEnabled=true` 以建立 DataChannel；录像标签经 DataChannel 流式传输（见 [附加协议](#ref_WebRTC_附加协议)），不经 Aqara Spec Report。Seek 经 `WebRTCLocalPlaybackSeek` 下发目标 `Timestamp`，不走 RTCP。
-
-### 简介
-
-WebRTC Transport 功能定义了 Aqara App/云端与设备之间的 WebRTC 信令接口，涵盖实时直播（`LiveView`）及本地 SD 卡录像回放（`LocalPlayback`）会话。信令一律经**云端中转**：App 与云端为业务层，云端与设备侧（Aqara 摄像头或 Matter 网关）走 **Aqara Spec**（Command / Report）；媒体面为 App 与摄像头之间的双向 WebRTC（P2P/TURN），不经云端转发 RTP。本地回放假定设备仅有一份本地录像文件：当 `CAVSMLocalVideoRecordingEnabled=true` 时可直接回放该文件，无需指定片源 ID。
+*注意：* `StreamUsage=LocalPlayback` 时 SHALL 设 `MetadataEnabled=true`，以便在这条 PeerConnection 上打开 DataChannel。会话内的分辨率、回放控制和录像查询走 `aqara.control` 上的 `InvokeCommand`；录像文件字节走 `aqara.download` 上的 文件传输业务交互协议。播放控制、录像索引与录像文件下载的定义见 [Playback](#ref_Aqara_Spec_Playback)。承载见 DataChannel。
 
 ### Function 标识
+
+**处理逻辑**
 
 <table>
   <thead>
@@ -146790,7 +147966,7 @@ WebRTC Transport 功能定义了 Aqara App/云端与设备之间的 WebRTC 信�
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x001D</td>
       <td>WebRTC</td>
       <td>WebRTC 传输</td>
     </tr>
@@ -146798,6 +147974,8 @@ WebRTC Transport 功能定义了 Aqara App/云端与设备之间的 WebRTC 信�
 </table>
 
 ### Trait
+
+Server 上报使用下面的 Trait。
 
 <table>
   <thead>
@@ -146810,27 +147988,35 @@ WebRTC Transport 功能定义了 Aqara App/云端与设备之间的 WebRTC 信�
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x5129</td>
       <td><a href="#ref_WebRTCCurrentSessions">WebRTCCurrentSessions</a></td>
-      <td>M</td>
       <td></td>
+      <td>M</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x512A</td>
       <td><a href="#ref_WebRTCSignalingEvent">WebRTCSignalingEvent</a></td>
-      <td>M</td>
       <td></td>
+      <td>M</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x512B</td>
       <td><a href="#ref_WebRTCSessionStatus">WebRTCSessionStatus</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5244</td>
+      <td><a href="#ref_WebRTCStreamResolution">WebRTCStreamResolution</a></td>
+      <td></td>
+      <td>O</td>
     </tr>
   </tbody>
 </table>
 
 ### Command
+
+Client 请求使用下面的 Command。
 
 <table>
   <thead>
@@ -146843,45 +148029,108 @@ WebRTC Transport 功能定义了 Aqara App/云端与设备之间的 WebRTC 信�
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x9D8F</td>
       <td><a href="#ref_WebRTCSolicitOffer">WebRTCSolicitOffer</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x9D90</td>
       <td><a href="#ref_WebRTCProvideOffer">WebRTCProvideOffer</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x9D91</td>
       <td><a href="#ref_WebRTCProvideAnswer">WebRTCProvideAnswer</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x9D92</td>
       <td><a href="#ref_WebRTCProvideICECandidates">WebRTCProvideICECandidates</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
+      <td>0x9D93</td>
       <td><a href="#ref_WebRTCEndSession">WebRTCEndSession</a></td>
-      <td>O</td>
       <td></td>
+      <td>O</td>
     </tr>
     <tr>
-      <td>TBD</td>
-      <td><a href="#ref_WebRTCLocalPlaybackSeek">WebRTCLocalPlaybackSeek</a></td>
-      <td>O</td>
+      <td>0x9D94</td>
+      <td>WebRTCLocalPlaybackSeek</td>
       <td></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DB9</td>
+      <td><a href="#ref_WebRTCSetResolution">WebRTCSetResolution</a></td>
+      <td></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DBA</td>
+      <td><a href="#ref_WebRTCTalk">WebRTCTalk</a></td>
+      <td></td>
+      <td>O</td>
     </tr>
   </tbody>
 </table>
 
 ### 数据类型
+
+##### WebRTCStatusCodeEnum8 Type {#ref_WebRTCStatusCodeEnum8}
+
+该枚举定义 WebRTC Function 的 Command 响应状态码有效取值；独立于其他 Function 的状态码定义。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>SUCCESS</td>
+      <td>成功</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>NOT_FOUND</td>
+      <td>未找到</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>INVALID_IN_STATE</td>
+      <td>状态无效</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>INVALID_COMMAND</td>
+      <td>命令无效</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>DYNAMIC_CONSTRAINT_ERROR</td>
+      <td>动态约束错误</td>
+    </tr>
+    <tr>
+      <td>0x05</td>
+      <td>RESOURCE_EXHAUSTED</td>
+      <td>资源耗尽</td>
+    </tr>
+    <tr>
+      <td>0x06</td>
+      <td>ALREADY_EXISTS</td>
+      <td>已存在</td>
+    </tr>
+  </tbody>
+</table>
 
 ##### SignalingEventTypeEnum8 Type {#ref_SignalingEventTypeEnum8}
 
@@ -146914,7 +148163,7 @@ WebRTC Transport 功能定义了 Aqara App/云端与设备之间的 WebRTC 信�
     <tr>
       <td>0x03</td>
       <td>End</td>
-      <td>摄像头结束会话</td>
+      <td>Server 结束会话</td>
     </tr>
   </tbody>
 </table>
@@ -146960,7 +148209,7 @@ WebRTC Transport 功能定义了 Aqara App/云端与设备之间的 WebRTC 信�
     <tr>
       <td>0x05</td>
       <td>NoUserMedia</td>
-      <td>无本地媒体设备</td>
+      <td>无本地媒体 Server</td>
     </tr>
     <tr>
       <td>0x06</td>
@@ -146970,7 +148219,7 @@ WebRTC Transport 功能定义了 Aqara App/云端与设备之间的 WebRTC 信�
     <tr>
       <td>0x07</td>
       <td>AnsweredElsewhere</td>
-      <td>其他设备接听</td>
+      <td>其他 Server 接听</td>
     </tr>
     <tr>
       <td>0x08</td>
@@ -147144,7 +148393,7 @@ WebRTC Transport 功能定义了 Aqara App/云端与设备之间的 WebRTC 信�
 
 ##### ExtensionOptionsStructure Type {#ref_ExtensionOptionsStructure}
 
-扩展选项，用于配置 WebRTC 建连各阶段的超时时间及其他扩展参数。Struct 整体及各字段均为可选；未携带字段时网关 SHALL 使用实现默认值。下游 Matter WebRTC 协议不支持的选项由网关在 Aqara Spec 侧解释并执行。
+扩展选项，用于配置 WebRTC 建连各阶段的超时时间及其他扩展参数。Struct 整体及各字段均为可选；未携带字段时 Server SHALL 使用实现默认值。扩展选项由 Server 解释并执行。
 
 <table>
   <thead>
@@ -147310,7 +148559,7 @@ WebRTC Transport 功能定义了 Aqara App/云端与设备之间的 WebRTC 信�
 
 ##### SessionStatusStructure Type {#ref_SessionStatusStructure}
 
-会话状态上报结构。网关根据 WebRTC 媒体栈选路结果及会话生命周期 **Report**；下游 Matter 协议无对应能力时由网关汇总后上报。
+会话状态上报结构。Server 根据 WebRTC 媒体栈选路结果及会话生命周期 **Report**。
 
 <table>
   <thead>
@@ -147432,14 +148681,14 @@ WebRTCSolicitOffer Command 的请求参数结构体。
       <td>VideoStreams</td>
       <td>list[uint16]</td>
       <td>O</td>
-      <td>VideoStreamID 列表（1 至 16）。</td>
+      <td>VideoStreamID 列表（1 至 16）；使用视频时 SHALL 携带，且 SHALL 引用已按本次 StreamUsage 分配的流，见 <a href="#ref_WebRTC_CAVSMDependency">前置依赖</a>。</td>
     </tr>
     <tr>
       <td>6</td>
       <td>AudioStreams</td>
       <td>list[uint16]</td>
       <td>O</td>
-      <td>AudioStreamID 列表（1 至 16）。</td>
+      <td>AudioStreamID 列表（1 至 16）；使用音频时 SHALL 携带，且 SHALL 引用已按本次 StreamUsage 分配的流，见 <a href="#ref_WebRTC_CAVSMDependency">前置依赖</a>。</td>
     </tr>
     <tr>
       <td>7</td>
@@ -147469,9 +148718,9 @@ WebRTCSolicitOffer Command 的响应参数结构体。
     <tr>
       <td>0</td>
       <td>Status</td>
-      <td><a href="#ref_StatusCodeEnum8">StatusCodeEnum8</a></td>
+      <td><a href="#ref_WebRTCStatusCodeEnum8">WebRTCStatusCodeEnum8</a></td>
       <td>M</td>
-      <td>处理状态；定义见 <a href="#ref_Aqara_Spec_CameraAVStreamManagement">CameraAVStreamManagement</a>。</td>
+      <td>处理状态；定义见 <a href="#ref_WebRTCStatusCodeEnum8">WebRTCStatusCodeEnum8</a>。</td>
     </tr>
     <tr>
       <td>1</td>
@@ -147484,15 +148733,15 @@ WebRTCSolicitOffer Command 的响应参数结构体。
       <td>2</td>
       <td>SessionId</td>
       <td>uint16</td>
-      <td>M</td>
-      <td>分配的会话 ID。</td>
+      <td>O</td>
+      <td><code>Status=SUCCESS</code> 时 SHALL 携带分配的会话 ID；失败时 SHALL 省略。</td>
     </tr>
     <tr>
       <td>3</td>
       <td>DeferredOffer</td>
       <td>boolean</td>
-      <td>M</td>
-      <td>是否延迟下发 Offer。</td>
+      <td>O</td>
+      <td>是否延迟下发 Offer；<code>Status=SUCCESS</code> 时 SHALL 携带；失败时 SHALL 省略。</td>
     </tr>
   </tbody>
 </table>
@@ -147566,14 +148815,14 @@ WebRTCProvideOffer Command 的请求参数结构体。
       <td>VideoStreams</td>
       <td>list[uint16]</td>
       <td>O</td>
-      <td>VideoStreamID 列表（1 至 16）。</td>
+      <td>VideoStreamID 列表（1 至 16）；使用视频时 SHALL 携带，且 SHALL 引用已按本次 StreamUsage 分配的流，见 <a href="#ref_WebRTC_CAVSMDependency">前置依赖</a>。</td>
     </tr>
     <tr>
       <td>8</td>
       <td>AudioStreams</td>
       <td>list[uint16]</td>
       <td>O</td>
-      <td>AudioStreamID 列表（1 至 16）。</td>
+      <td>AudioStreamID 列表（1 至 16）；使用音频时 SHALL 携带，且 SHALL 引用已按本次 StreamUsage 分配的流，见 <a href="#ref_WebRTC_CAVSMDependency">前置依赖</a>。</td>
     </tr>
     <tr>
       <td>9</td>
@@ -147603,7 +148852,7 @@ WebRTCProvideOffer Command 的响应参数结构体。
     <tr>
       <td>0</td>
       <td>Status</td>
-      <td><a href="#ref_StatusCodeEnum8">StatusCodeEnum8</a></td>
+      <td><a href="#ref_WebRTCStatusCodeEnum8">WebRTCStatusCodeEnum8</a></td>
       <td>M</td>
       <td>处理状态。</td>
     </tr>
@@ -147618,8 +148867,8 @@ WebRTCProvideOffer Command 的响应参数结构体。
       <td>2</td>
       <td>SessionId</td>
       <td>uint16</td>
-      <td>M</td>
-      <td>会话 ID。</td>
+      <td>O</td>
+      <td><code>Status=SUCCESS</code> 时 SHALL 携带新建或更新的会话 ID；失败时 SHALL 省略。</td>
     </tr>
   </tbody>
 </table>
@@ -147674,7 +148923,7 @@ WebRTCProvideAnswer Command 的响应参数结构体。
     <tr>
       <td>0</td>
       <td>Status</td>
-      <td><a href="#ref_StatusCodeEnum8">StatusCodeEnum8</a></td>
+      <td><a href="#ref_WebRTCStatusCodeEnum8">WebRTCStatusCodeEnum8</a></td>
       <td>M</td>
       <td>处理状态。</td>
     </tr>
@@ -147738,7 +148987,7 @@ WebRTCProvideICECandidates Command 的响应参数结构体。
     <tr>
       <td>0</td>
       <td>Status</td>
-      <td><a href="#ref_StatusCodeEnum8">StatusCodeEnum8</a></td>
+      <td><a href="#ref_WebRTCStatusCodeEnum8">WebRTCStatusCodeEnum8</a></td>
       <td>M</td>
       <td>处理状态。</td>
     </tr>
@@ -147784,9 +149033,9 @@ WebRTCEndSession Command 的请求参数结构体。
   </tbody>
 </table>
 
-##### WebRTCLocalPlaybackSeek Command Structure Type {#ref_WebRTCLocalPlaybackSeekCommandStructure}
+##### WebRTCTalk Command Structure Type {#ref_WebRTCTalkCommandStructure}
 
-WebRTCLocalPlaybackSeek Command 的请求参数结构体。
+WebRTCTalk Command 的请求参数结构体。
 
 <table>
   <thead>
@@ -147801,24 +149050,24 @@ WebRTCLocalPlaybackSeek Command 的请求参数结构体。
   <tbody>
     <tr>
       <td>0</td>
-      <td>SessionId</td>
-      <td>uint16</td>
+      <td>Enabled</td>
+      <td>boolean</td>
       <td>M</td>
-      <td>回放会话 ID。</td>
+      <td><code>true</code> 打开并占用；<code>false</code> 关闭并释放</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>Timestamp</td>
-      <td>uint32</td>
-      <td>M</td>
-      <td>目标 UTC 时间戳（4 字节），与录像标签 <code>Timestamp</code> 对齐。</td>
+      <td>SessionId</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>COIP 携带，指定要控制的会话。DataChannel 省略，会话由该通道确定</td>
     </tr>
   </tbody>
 </table>
 
-##### WebRTCLocalPlaybackSeekResponse Command Structure Type {#ref_WebRTCLocalPlaybackSeekResponseCommandStructure}
+##### WebRTCTalk Response Command Structure Type {#ref_WebRTCTalkResponseCommandStructure}
 
-WebRTCLocalPlaybackSeek Command 的响应参数结构体。
+WebRTCTalk Command 的响应参数结构体。
 
 <table>
   <thead>
@@ -147834,48 +149083,140 @@ WebRTCLocalPlaybackSeek Command 的响应参数结构体。
     <tr>
       <td>0</td>
       <td>Status</td>
-      <td><a href="#ref_StatusCodeEnum8">StatusCodeEnum8</a></td>
+      <td><a href="#ref_WebRTCStatusCodeEnum8">WebRTCStatusCodeEnum8</a></td>
       <td>M</td>
-      <td>处理状态。</td>
+      <td>命令执行结果，取值见命令定义</td>
+    </tr>
+  </tbody>
+</table>
+
+##### WebRTCSetResolution Command Structure Type {#ref_WebRTCSetResolutionCommandStructure}
+
+`WebRTCSetResolution` 的请求结构。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>VideoStreamID</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>本会话已绑定的视频流 ID</td>
     </tr>
     <tr>
       <td>1</td>
+      <td>Resolution</td>
+      <td><a href="#ref_VideoResolutionStructure">VideoResolutionStructure</a></td>
+      <td>M</td>
+      <td>目标分辨率</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>SessionId</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>COIP 携带，指定要控制的会话。DataChannel 省略，会话由该通道确定</td>
+    </tr>
+  </tbody>
+</table>
+
+##### WebRTCSetResolutionResponse Command Structure Type {#ref_WebRTCSetResolutionResponseCommandStructure}
+
+`WebRTCSetResolution` 的响应结构。该命令没有其它响应参数。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td><a href="#ref_WebRTCStatusCodeEnum8">WebRTCStatusCodeEnum8</a></td>
+      <td>M</td>
+      <td>命令执行结果，取值见命令定义</td>
+    </tr>
+  </tbody>
+</table>
+
+##### StreamResolutionStructure Type {#ref_WebRTC_StreamResolutionStructure}
+
+一条记录对应一个会话；会话里绑了几路 `VideoStreamID`，列表里就有几项。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
       <td>SessionId</td>
       <td>uint16</td>
       <td>M</td>
-      <td>回放会话 ID。</td>
+      <td>WebRTC 会话 ID，见 <a href="#ref_SessionStructure">SessionStructure</a>。同一个 <code>VideoStreamID</code> 被多个会话引用时各自汇报</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>VideoStreams</td>
+      <td>list[<a href="#ref_WebRTC_VideoStreamResolutionStructure">VideoStreamResolutionStructure</a>]</td>
+      <td>M</td>
+      <td>该会话下每一路当前正在发送的分辨率，顺序与 <code>WebRTCProvideOffer</code> 里 <code>VideoStreams</code> 的顺序一致</td>
+    </tr>
+  </tbody>
+</table>
+
+##### VideoStreamResolutionStructure Type {#ref_WebRTC_VideoStreamResolutionStructure}
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>VideoStreamID</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>该路视频流 ID</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Resolution</td>
+      <td><a href="#ref_VideoResolutionStructure">VideoResolutionStructure</a></td>
+      <td>M</td>
+      <td>该路当前正在发送的分辨率</td>
     </tr>
   </tbody>
 </table>
 
 ### Trait 定义
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Name</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_WebRTCCurrentSessions">WebRTCCurrentSessions</a></td>
-      <td>M</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_WebRTCSignalingEvent">WebRTCSignalingEvent</a></td>
-      <td>M</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_WebRTCSessionStatus">WebRTCSessionStatus</a></td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
 
 #### WebRTCCurrentSessions Trait {#ref_WebRTCCurrentSessions}
 
@@ -147890,7 +149231,7 @@ WebRTCLocalPlaybackSeek Command 的响应参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x5129</td>
       <td>WebRTCCurrentSessions</td>
     </tr>
   </tbody>
@@ -147925,7 +149266,7 @@ WebRTCLocalPlaybackSeek Command 的响应参数结构体。
 
 #### WebRTCSignalingEvent Trait {#ref_WebRTCSignalingEvent}
 
-摄像头产生的信令事件。
+Server 产生的信令事件。
 
 <table>
   <thead>
@@ -147936,7 +149277,7 @@ WebRTCLocalPlaybackSeek Command 的响应参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x512A</td>
       <td>WebRTCSignalingEvent</td>
     </tr>
   </tbody>
@@ -147982,7 +149323,7 @@ WebRTCLocalPlaybackSeek Command 的响应参数结构体。
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
+      <td>0x512B</td>
       <td>WebRTCSessionStatus</td>
     </tr>
   </tbody>
@@ -148017,60 +149358,73 @@ WebRTCLocalPlaybackSeek Command 的响应参数结构体。
 
 :::note
 
-网关 SHALL 在以下时机 **Report** 本 Trait：
+Server SHALL 在以下时机 **Report** 本 Trait：
 
 * 媒体通道建立且选路完成（`EventType=MediaConnected`）：上报 `SessionId`、实际 `MediaTransport`（P2P 或 TURN）及 `SignalingDurationMs`。
 * 会话结束（`EventType=SessionEnded`）：上报 `DurationMs`、`MediaTransport`、`VideoFrameCount` 及 `DisconnectReason`。
 
 :::
 
-### Command 定义
+#### WebRTCStreamResolution Trait {#ref_WebRTCStreamResolution}
+
+上报各会话各视频流当前正在发送的分辨率。
 
 <table>
   <thead>
     <tr>
-      <th>Command ID</th>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5244</td>
+      <td>WebRTCStreamResolution</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
       <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
       <th>Conformance</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>TBD</td>
-      <td><a href="#ref_WebRTCSolicitOffer">WebRTCSolicitOffer</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_WebRTCProvideOffer">WebRTCProvideOffer</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_WebRTCProvideAnswer">WebRTCProvideAnswer</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_WebRTCProvideICECandidates">WebRTCProvideICECandidates</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_WebRTCEndSession">WebRTCEndSession</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>TBD</td>
-      <td><a href="#ref_WebRTCLocalPlaybackSeek">WebRTCLocalPlaybackSeek</a></td>
-      <td>O</td>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_WebRTC_StreamResolutionStructure">StreamResolutionStructure</a>]</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>M</td>
     </tr>
   </tbody>
 </table>
 
+上报时机：每次上报携带该会话的*整份列表*，不是只报变化的那一路。
+
+* 某一路新分辨率的 IDR 已送出 -> 该路在新列表里是新档。
+* 请求失败 -> 保持原分辨率，不因该次失败请求触发分辨率变更上报。
+* 目标即当前分辨率且无进行中的切换 -> 返回 `SUCCESS`，并立即上报当前分辨率。
+* 同一会话里没受影响的其它路，照原值出现在同一份列表里。
+
+通路：Server SHALL 在会话的 `aqara.control` 上以 ProtocolID `0x00`、OpCode `0x018A`（`UnconfirmedCOVNotificationMultiple`）发送；Trait 的 Present Value SHALL 同步更新，MAY 另经 Report 通路上报。
+
+### Command 定义
+
 #### WebRTCSolicitOffer Command {#ref_WebRTCSolicitOffer}
 
-请求设备发起 WebRTC Offer。`DeferredOffer=true` 时，后续 Offer 经 **Report** `WebRTCSignalingEvent` 下发，App 再发 `WebRTCProvideAnswer`。
+Client SHALL 先完成 [CameraAVStreamManagement 前置交互](#ref_WebRTC_CAVSMDependency)，再请求 Server 发起 WebRTC Offer。`DeferredOffer=true` 时，后续 Offer 经 **Report** `WebRTCSignalingEvent` 下发，Client 再发 `WebRTCProvideAnswer`。
 
 ##### 参数
 
@@ -148082,7 +149436,7 @@ WebRTCLocalPlaybackSeek Command 的响应参数结构体。
 
 #### WebRTCProvideOffer Command {#ref_WebRTCProvideOffer}
 
-提交 SDP Offer 建立或更新 WebRTC 会话。成功后摄像头经 Matter 发 Answer，网关 **Report** `WebRTCSignalingEvent(Answer)`。
+提交 SDP Offer 建立或更新 WebRTC 会话。新建会话前 Client SHALL 完成 [CameraAVStreamManagement 前置交互](#ref_WebRTC_CAVSMDependency)。成功后 Server 通过 **Report** `WebRTCSignalingEvent(Answer)` 返回 Answer。
 
 ##### 参数
 
@@ -148098,8 +149452,8 @@ WebRTCLocalPlaybackSeek Command 的响应参数结构体。
 
 * SHALL 设 `MetadataEnabled=true`。
 * `VideoStreams` / `AudioStreams` SHALL 为 `StreamUsage=LocalPlayback` 的 CAVSM 已分配流 ID。
-* `CAVSMLocalVideoRecordingEnabled` SHALL 为 `true`，且设备 SHALL 存在可读的本地录像文件；否则返回 `INVALID_IN_STATE` 或 `NOT_FOUND`。
-* 设备 SHALL 回放唯一的本地录像文件，从文件起点或当前实现定义的续播位置开始。
+* Server SHALL 存在可读的本地录像文件；否则返回 `INVALID_IN_STATE` 或 `NOT_FOUND`。
+* Server SHALL 回放唯一的本地录像文件，从文件起点或当前实现定义的续播位置开始。
 
 :::
 
@@ -148135,188 +149489,600 @@ WebRTCLocalPlaybackSeek Command 的响应参数结构体。
 
 [WebRTCEndSession Command Structure](#ref_WebRTCEndSessionCommandStructure)
 
-#### WebRTCLocalPlaybackSeek Command {#ref_WebRTCLocalPlaybackSeek}
+#### WebRTCTalk Command {#ref_WebRTCTalk}
 
-在本地 SD 卡录像回放会话中 seek 至指定时间点。
+会话级对讲开关。Server 同时只允许一个会话打开对讲。COIP 转发的 `InvokeCommand` 与该会话 `aqara.control` 上的 `InvokeCommand` 使用同一份 [WebRTCTalk Command Structure](#ref_WebRTCTalkCommandStructure)。请求 OpCode `0x008D`，响应 OpCode `0x038D`。
 
 ##### 参数
 
-[WebRTCLocalPlaybackSeek Command Structure](#ref_WebRTCLocalPlaybackSeekCommandStructure)
+[WebRTCTalk Command Structure](#ref_WebRTCTalkCommandStructure)
 
 ##### 响应
 
-[WebRTCLocalPlaybackSeekResponse Command Structure](#ref_WebRTCLocalPlaybackSeekResponseCommandStructure)
-
-:::note
-
-仅用于 `StreamUsage=LocalPlayback` 的活跃会话。收到本 Command 后，设备 SHALL 在本地存储上 seek 至 `Timestamp` 对应位置，并发送新的关键帧 RTP。
-
-**参数校验**
+[WebRTCTalk Response Command Structure](#ref_WebRTCTalkResponseCommandStructure)，`Status` 取值：
 
 <table>
   <thead>
     <tr>
-      <th>参数</th>
-      <th>校验规则</th>
-      <th>失败 Status</th>
+      <th>Status</th>
+      <th>含义</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>SessionId</td>
-      <td>SHALL 为存在且 <code>StreamUsage=LocalPlayback</code> 的会话</td>
-      <td>NOT_FOUND</td>
+      <td><code>SUCCESS</code></td>
+      <td>该 <code>SessionId</code> 已打开并占用，或已关闭并释放。本会话已经是目标状态时同样成功</td>
     </tr>
     <tr>
-      <td>Timestamp</td>
-      <td>SHALL 对应本地录像中可定位的时间点</td>
-      <td>NOT_FOUND</td>
+      <td><code>NOT_FOUND</code></td>
+      <td><code>SessionId</code> 不是活跃会话。从 DataChannel 到达时，与该通道所属会话不一致也取此值</td>
+    </tr>
+    <tr>
+      <td><code>INVALID_IN_STATE</code></td>
+      <td>Server 不支持对讲，或该会话不是 <code>LiveView</code></td>
+    </tr>
+    <tr>
+      <td><code>INVALID_COMMAND</code></td>
+      <td><code>Enabled</code> 缺失。从 COIP 到达时未携带 <code>SessionId</code> 也取此值</td>
+    </tr>
+    <tr>
+      <td><code>RESOURCE_EXHAUSTED</code></td>
+      <td>对讲已被其它会话占用，该 <code>SessionId</code> 不能打开</td>
     </tr>
   </tbody>
 </table>
 
-* 会话不存在或不是回放会话 -> 返回 `NOT_FOUND`。
-* `Timestamp` 无法映射到本地录像位置 -> 返回 `NOT_FOUND`。
-* 校验通过 -> 执行 seek，返回 `SUCCESS`；设备发送 IDR。
+##### 处理
 
-:::
+* 从 `aqara.control` 到达时省略 `SessionId`，会话是该通道所属会话。携带了不一致的 `SessionId` -> 回 `NOT_FOUND`。从 COIP 到达时 SHALL 携带 `SessionId`，省略 -> 回 `INVALID_COMMAND`。
+* `Enabled=true` 且尚无占用 -> 本会话占用，回 `SUCCESS`。
+* 本会话已经占用时再次打开 -> 回 `SUCCESS`，不构成第二次占用。
+* 其它会话已经占用时再打开 -> 回 `RESOURCE_EXHAUSTED`。本会话保持关闭，不抢占。
+* 占用方下发 `Enabled=false` -> 释放，回 `SUCCESS`。
+* 非占用方下发 `Enabled=false` -> 回 `SUCCESS`，不释放占用方。
+* 占用方 `WebRTCEndSession`、其 DataChannel 关闭或 PeerConnection 结束 -> 释放占用。
 
-#### 附加协议 {#ref_WebRTC_附加协议}
+#### WebRTCSetResolution Command {#ref_WebRTCSetResolution}
 
-本节定义 WebRTC **DataChannel** 媒体面承载的附加协议，不经 Aqara Spec Command / Report 传输。当 `MetadataEnabled=true` 时，App 与设备在已建立的 WebRTC 连接上以**流式**发送二进制消息。当前用于 `StreamUsage=LocalPlayback` 场景下推送**录像标签**。
+把本会话已绑定的一路 `VideoStreamID` 切到目标分辨率。切换不换 SSRC；新分辨率从该路新的 IDR 开始，IDR 携带新的 SPS。返回 `SUCCESS` 后 SHALL 完成指定分辨率的切换，实际分辨率由 [WebRTCStreamResolution](#ref_WebRTCStreamResolution) 上报；请求失败时返回非 `SUCCESS` 状态并保持原分辨率。
 
-##### 传输约定
+##### 参数
 
-* 消息编码字节序 SHALL 为网络字节序。
-* 每条消息由 [公共头](#ref_PlaybackMetadataHeaderStruct) 与负载组成；不分片，负载在单条消息内完整携带。
-* 设备 MAY 连续发送多条消息以流式更新录像标签列表；App SHALL 按接收顺序解析并合并。
-* DataChannel 使用 WebRTC 协商建立的 SCTP 通道，与 RTP 媒体同 ICE 连接，不经云端转发。
+[WebRTCSetResolution Command Structure](#ref_WebRTCSetResolutionCommandStructure)
 
-##### 数据类型
+##### 响应
 
-###### PlaybackMetadataMessageTypeEnum {#ref_PlaybackMetadataMessageTypeEnum}
-
-**处理逻辑**
+[WebRTCSetResolutionResponse Command Structure](#ref_WebRTCSetResolutionResponseCommandStructure)，`Status` 取值：
 
 <table>
   <thead>
     <tr>
-      <th>值</th>
-      <th>名称</th>
+      <th>Status</th>
+      <th>含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>SUCCESS</code></td>
+      <td>请求成功，Server SHALL 切换到指定分辨率；目标已为当前分辨率时保持并立即上报</td>
+    </tr>
+    <tr>
+      <td><code>NOT_FOUND</code></td>
+      <td><code>SessionId</code> 不是活跃会话，或目标 ID 不在该会话。DataChannel 上携带了与该通道不一致的 <code>SessionId</code> 也取此值</td>
+    </tr>
+    <tr>
+      <td><code>INVALID_IN_STATE</code></td>
+      <td>该路不可切（<code>MinResolution</code> = <code>MaxResolution</code>、非 <code>LiveView</code>、回放会话）</td>
+    </tr>
+    <tr>
+      <td><code>INVALID_COMMAND</code></td>
+      <td>目标分辨率超出该 ID 的 Min/Max，或不是能力集中的一档。从 COIP 到达时未携带 <code>SessionId</code> 也取此值</td>
+    </tr>
+    <tr>
+      <td><code>RESOURCE_EXHAUSTED</code></td>
+      <td>命令队列已满</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 校验与处理
+
+* 从 `aqara.control` 到达时省略 `SessionId`，会话是该通道所属会话。携带了不一致的 `SessionId` -> 回 `NOT_FOUND`。从 COIP 到达时 SHALL 携带 `SessionId`，省略 -> 回 `INVALID_COMMAND`。
+* `VideoStreamID` SHALL 为本会话已绑定的 `StreamUsage=LiveView` 流；该 ID 的 `MinResolution` SHALL 小于 `MaxResolution`。
+* 目标分辨率 SHALL 落在该 ID 的 `MinResolution`-`MaxResolution` 之间，且 SHALL 是 `CAVSMRateDistortionTradeOffPoints` 中的一档。
+* 目标即当前分辨率且无进行中的切换 -> 回 `SUCCESS`，并立即上报一次 `WebRTCStreamResolution`。
+* 请求可执行 -> 回 `SUCCESS`；Server SHALL 完成切换，在指定分辨率的新 IDR 送出后上报 `WebRTCStreamResolution`。
+* 请求无法执行 -> 回相应的非 `SUCCESS` 状态，保持原分辨率。
+* 同一路的请求 SHALL 按顺序处理；SHALL NOT 覆盖已返回 `SUCCESS` 但尚未完成的切换。命令队列已满时返回 `RESOURCE_EXHAUSTED`。
+
+#### DataChannel
+
+会话内 DataChannel 的传输、通道、报文与文件传输绑定见 DataChannel。
+
+<a id="ref_WebRTC_DataChannel"></a>
+## DataChannel {#ref_WebRTC_附加协议}
+
+### 概述
+
+本节定义 WebRTC 会话内 DataChannel 上的 Trait、Command 与承载。这些 Trait 与 Command 仍属于 [WebRTC](#ref_Aqara_Spec_WebRTC) Function，Command ID 与云端信令同一张表。会话内命令与状态是 ProtocolID `0x00` 的 `InvokeCommand` 与 `UnconfirmedCOVNotificationMultiple`，在 `aqara.control` 上收发，不经云端中转。文件字节使用 文件传输业务交互协议（ProtocolID `0x02`）。字段、OpCode 与交互以该协议为准，本节不另写一套。
+
+### 传输 {#ref_WebRTC_DataChannelTransport}
+
+WebRTC DataChannel（RFC 8831）的传输栈是 SCTP over DTLS over ICE。一条 `m=application` 是一条 SCTP association。这条 association 上有两个 Data Channel。每个 Data Channel 双向，进出方向各一条 SCTP stream，两条 stream 使用同一个 stream id。
+
+<table>
+  <thead>
+    <tr>
+      <th>层</th>
+      <th>作用</th>
+      <th>对本绑定的意义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ICE</td>
+      <td>打洞或中继（P2P / TURN）</td>
+      <td>与音视频共用一对候选与一条连接</td>
+    </tr>
+    <tr>
+      <td>DTLS</td>
+      <td>加密与身份</td>
+      <td>与音视频共用同一张证书；<code>a=setup</code> 决定 active / passive</td>
+    </tr>
+    <tr>
+      <td>SCTP</td>
+      <td>可靠、有序、面向消息（RFC 4960）</td>
+      <td>本绑定直接依赖它</td>
+    </tr>
+    <tr>
+      <td>DCEP（RFC 8832）</td>
+      <td>在 association 上开通道</td>
+      <td>label、Channel Type 与 Priority 在这里，不进 SDP</td>
+    </tr>
+  </tbody>
+</table>
+
+可靠与顺序由 SCTP 保证。文件传输复用这条交付，不另做确认、重传或整文件校验。完整性由 DTLS 承担。CoAP `Type` 与 `Message ID` 不承担确认。块的请求次序见 blockRequest。取消只有 Requestor 能发，见 abortRequest。
+
+### 通道 {#ref_WebRTC_DataChannelChannels}
+
+一条 WebRTC 会话最多一条 `m=application`。这一行媒体描述承载一条 SCTP association，association 跑在同一条 DTLS 上。association 上有两个 Data Channel（RFC 8831）。每个 Data Channel 双向，进出方向各一条 SCTP stream，stream id 相同，名字是 DCEP 的 Label：
+
+<table>
+  <thead>
+    <tr>
+      <th>label</th>
+      <th>用途</th>
+      <th>Channel Type</th>
+      <th>Priority</th>
+      <th>Content-Format</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>aqara.control</code></td>
+      <td>业务命令与响应、设备状态通知。录像查询与切档、回放同在这个 Data Channel</td>
+      <td><code>0x00</code> 可靠有序</td>
+      <td><code>1024</code></td>
+      <td><code>50</code>（JSON）</td>
+    </tr>
+    <tr>
+      <td><code>aqara.download</code></td>
+      <td>按 文件传输业务交互协议 取文件字节</td>
+      <td><code>0x00</code> 可靠有序</td>
+      <td><code>128</code></td>
+      <td><code>60</code>（CBOR）</td>
+    </tr>
+  </tbody>
+</table>
+
+会话内按消息属于哪一个已分配的业务协议来选 ProtocolID，不按 Data Channel 另起一套协议：
+
+<table>
+  <thead>
+    <tr>
+      <th>ProtocolID</th>
+      <th>业务协议族</th>
+      <th>本会话内承载</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>0x00</code></td>
+      <td>Aqara 物模型业务交互协议</td>
+      <td>InvokeCommand（含录像查询）与 <code>UnconfirmedCOVNotificationMultiple</code></td>
+    </tr>
+    <tr>
+      <td><code>0x02</code></td>
+      <td>文件传输业务交互协议</td>
+      <td>只承载文件获取</td>
+    </tr>
+  </tbody>
+</table>
+
+`0x00` 的 OpCode 沿用物模型：高字节是 PDU Type，低字节是 Service Choice。本绑定不新增这类 OpCode。
+
+<table>
+  <thead>
+    <tr>
+      <th>OpCode</th>
+      <th>PDU Type</th>
+      <th>服务名称</th>
       <th>说明</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>0</td>
-      <td>RecordingTags</td>
-      <td>录像标签列表</td>
+      <td><code>0x008D</code></td>
+      <td>Confirmed-Request</td>
+      <td>InvokeCommand</td>
+      <td>会话内业务命令。<code>propertyIdentifier</code> 为 Command ID，<code>propertyValue</code> 为命令请求参数</td>
+    </tr>
+    <tr>
+      <td><code>0x038D</code></td>
+      <td>ComplexACK</td>
+      <td>InvokeCommand</td>
+      <td>命令响应。<code>propertyValue</code> 为命令响应结构，成员 0 为 <code>Status</code></td>
+    </tr>
+    <tr>
+      <td><code>0x018A</code></td>
+      <td>Unconfirmed-Request</td>
+      <td>UnconfirmedCOVNotificationMultiple</td>
+      <td>设备主动上报 <code>WebRTCStreamResolution</code> 与 <a href="#ref_LocalPlaybackStatus">LocalPlaybackStatus</a></td>
     </tr>
   </tbody>
 </table>
 
-###### RecordingTagTypeEnum {#ref_RecordingTagTypeEnum}
+`0x02` 使用文件传输协议自己的功能编号。字段与交互见下表所链的定义，本节不另写一套。
 
 <table>
   <thead>
     <tr>
-      <th>值</th>
-      <th>名称</th>
+      <th>OpCode</th>
+      <th>功能名</th>
       <th>说明</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>0</td>
-      <td>FullRecording</td>
-      <td>全时录像</td>
+      <td><code>0x0000</code> / <code>0x0001</code></td>
+      <td>initRequest / initResponse</td>
+      <td>建立传输</td>
     </tr>
     <tr>
-      <td>1</td>
-      <td>EventTriggered</td>
-      <td>事件触发</td>
+      <td><code>0x0002</code> / <code>0x0003</code></td>
+      <td>blockRequest / blockResponse</td>
+      <td>按范围批量拉取，每块响应携带 <code>blockCounter</code> 与 <code>data</code></td>
     </tr>
     <tr>
-      <td>2</td>
-      <td>AlarmRecord</td>
-      <td>告警记录</td>
+      <td><code>0x0004</code> / <code>0x0005</code></td>
+      <td>EOFRequest / EOFResponse</td>
+      <td>请求方确认末块已处理</td>
+    </tr>
+    <tr>
+      <td><code>0x0006</code> / <code>0x0007</code></td>
+      <td>abortRequest / abortResponse</td>
+      <td>请求方取消</td>
+    </tr>
+    <tr>
+      <td><code>0x0008</code></td>
+      <td>errorResponse</td>
+      <td>业务失败。不使用物模型 Error PDU</td>
     </tr>
   </tbody>
 </table>
-
-###### RecordingTagStruct {#ref_RecordingTagStruct}
-
-单条录像标签；负载为 `RecordingTagStruct` 数组，条目数 = `PayloadLength / 8`。
 
 <table>
   <thead>
     <tr>
-      <th>字段</th>
-      <th>值/描述</th>
-      <th>格式</th>
-      <th>必选</th>
+      <th>label</th>
+      <th>承载</th>
+      <th>OpCode</th>
+      <th>方向</th>
+      <th>典型消息</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>Timestamp(0)</td>
-      <td>录像开始 UTC 时间戳</td>
-      <td>Uint32（4 字节）</td>
-      <td>M</td>
+      <td><code>aqara.control</code></td>
+      <td>InvokeCommand（ProtocolID <code>0x00</code>）</td>
+      <td><code>0x008D</code> / <code>0x038D</code></td>
+      <td>App -> 设备 / 回</td>
+      <td><a href="#ref_WebRTCSetResolution">WebRTCSetResolution</a>、<a href="#ref_WebRTCTalk">WebRTCTalk</a>、<a href="#ref_LocalPlaybackControl">LocalPlaybackControl</a>、<a href="#ref_LocalRecordQuery">LocalRecordQuery</a></td>
     </tr>
     <tr>
-      <td>Len(1)</td>
-      <td>录像时长</td>
-      <td>Uint24（3 字节，小端）</td>
-      <td>M</td>
+      <td><code>aqara.control</code></td>
+      <td>UnconfirmedCOVNotificationMultiple（ProtocolID <code>0x00</code>）</td>
+      <td><code>0x018A</code></td>
+      <td>设备 -> App</td>
+      <td><code>WebRTCStreamResolution</code>、<a href="#ref_LocalPlaybackStatus">LocalPlaybackStatus</a></td>
     </tr>
     <tr>
-      <td>Type(2)</td>
-      <td>标签类型</td>
-      <td><a href="#ref_RecordingTagTypeEnum">RecordingTagTypeEnum</a>（1 字节）</td>
-      <td>M</td>
+      <td><code>aqara.download</code></td>
+      <td>文件传输（ProtocolID <code>0x02</code>）</td>
+      <td>0x0000-0x0008</td>
+      <td>App 请求，设备响应</td>
+      <td>init、block、EOF、abort、error</td>
     </tr>
   </tbody>
 </table>
 
-*注意：* 每条 `RecordingTagStruct` 固定 **8 字节**：`Timestamp`(4) + `Len`(3) + `Type`(1)。`Len` 单位由设备实现定义，SHALL 在设备文档中与 App 约定一致。
+上表规定哪类消息使用哪个 label：
 
-###### PlaybackMetadataHeaderStruct {#ref_PlaybackMetadataHeaderStruct}
+* 同一条 CoAP 消息 SHALL NOT 出现在两个 label 上。
+* 两个 Data Channel 各自有序，互不排队，控制消息不会排在文件块后面。它们共用这一条 SCTP association、同一条 DTLS / ICE 与同一个拥塞窗口，SHALL NOT 各开 `m=`。
+* App 在 `WebRTCProvideOffer` 之后按 label 创建（`negotiated=false`）。设备在 `onDataChannel` 中按 label 收纳，label 不匹配的 SHALL 被忽略。某个 label 的 `DATA_CHANNEL_OPEN` 尚未完成前，App SHALL NOT 在该 label 上发消息。
+* App 是 Offer 方时，label `aqara.control` 的 stream id 为 `0`，label `aqara.download` 为 `2`。
+* 两个 Data Channel 的 Channel Type 都是 `0x00`（`DATA_CHANNEL_RELIABLE`），Reliability Parameter SHALL 为 `0`。SHALL NOT 使用其它 Channel Type。
+* label `aqara.control` 的 Content-Format SHALL 为 `50`。label `aqara.download` SHALL 为 `60`。文件块是 `octetString`，SHALL NOT 用 JSON 把它编成 Base64。
+* 录像查询是 label `aqara.control` 上的 `LocalRecordQuery`。索引文件和录像文件的字节走 label `aqara.download`。
+
+### 报文
+
+一个 SCTP 用户消息（PPID = `53`）SHALL 恰好承载一条完整 CoAP 消息。本绑定把 CoAP 头固定为 `Type=NON`、`Message ID=0`。文件传输协议正文里的报文图按带 Length 的可靠传输书写；OpCode 与 Payload 相同，见 文件传输业务交互协议。
+
+```
+SCTP User Message (PPID = 53)
+└─ CoAP Message
+   ├─ Version: 1
+   ├─ Type: NON
+   ├─ Code: 0.02 POST / 允许的响应类 Code
+   ├─ Message ID: 0
+   ├─ Token
+   ├─ Options
+   ├─ Payload Marker: 0xFF
+   └─ Payload
+```
+
+* `Type` SHALL 为 `NON`。`CON`、`ACK`、`RST` SHALL NOT 使用。
+* `Message ID` SHALL 为 `0`。收发双方 SHALL 忽略它，SHALL NOT 用它做去重或关联。
+* 请求与响应 SHALL 通过 `Token` 关联。`Token` 长度 SHALL 为 1-8 字节，同一连接同一时刻 SHALL NOT 重复。
+* 不需要响应的消息 SHALL 使用空 `Token`。
+* 一条 SCTP 用户消息 SHALL NOT 承载多条 CoAP 消息；一条 CoAP 消息 SHALL NOT 跨多条 SCTP 用户消息。
 
 <table>
   <thead>
     <tr>
-      <th>字段</th>
-      <th>值/描述</th>
-      <th>格式</th>
-      <th>必选</th>
+      <th>名称</th>
+      <th>Option ID</th>
+      <th>出现性</th>
+      <th>本绑定取值</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>Version(0)</td>
-      <td>协议版本，当前为 1</td>
-      <td>Uint8</td>
+      <td>Uri-Path</td>
+      <td><code>11</code></td>
       <td>M</td>
+      <td>两个 Option，值依次为 <code>coip</code>、<code>interaction</code></td>
     </tr>
     <tr>
-      <td>MessageType(1)</td>
-      <td>消息类型</td>
-      <td><a href="#ref_PlaybackMetadataMessageTypeEnum">PlaybackMetadataMessageTypeEnum</a></td>
+      <td>Content-Format</td>
+      <td><code>12</code></td>
       <td>M</td>
+      <td><code>aqara.control</code> 为 <code>50</code>；<code>aqara.download</code> 为 <code>60</code></td>
     </tr>
     <tr>
-      <td>PayloadLength(2)</td>
-      <td>负载字节长度</td>
-      <td>Uint32</td>
+      <td>Accept</td>
+      <td><code>17</code></td>
+      <td>C</td>
+      <td>带负载的请求 SHALL 携带。<code>aqara.download</code> 的取值见 文件传输编码规则</td>
+    </tr>
+    <tr>
+      <td>InteractionVersion</td>
+      <td><code>2048</code></td>
       <td>M</td>
+      <td><code>0</code></td>
+    </tr>
+    <tr>
+      <td>SourceDeviceID</td>
+      <td><code>2052</code></td>
+      <td>O</td>
+      <td>SHALL 省略</td>
+    </tr>
+    <tr>
+      <td>DestinationDeviceID</td>
+      <td><code>2056</code></td>
+      <td>O</td>
+      <td>SHALL 省略</td>
+    </tr>
+    <tr>
+      <td>ProtocolID</td>
+      <td><code>2064</code></td>
+      <td>M</td>
+      <td><code>0x00</code> 或 <code>0x02</code></td>
+    </tr>
+    <tr>
+      <td>OpCode</td>
+      <td><code>2072</code></td>
+      <td>M</td>
+      <td>见 <a href="#ref_WebRTC_DataChannelChannels">通道</a> 的 OpCode 表，SHALL 使用最短 uint 编码</td>
+    </tr>
+    <tr>
+      <td>PayloadEncryption</td>
+      <td><code>2076</code></td>
+      <td>M</td>
+      <td><code>0</code></td>
     </tr>
   </tbody>
 </table>
 
-##### 消息负载
+<table>
+  <thead>
+    <tr>
+      <th>场景</th>
+      <th>发送方</th>
+      <th>接收方</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>业务命令（含录像查询）</td>
+      <td>Code <code>0.02</code>，非空 Token</td>
+      <td><code>2.04 Changed</code>，回显同一 Token</td>
+    </tr>
+    <tr>
+      <td>文件传输</td>
+      <td>Code <code>0.02</code>，非空 Token</td>
+      <td><code>2.04 Changed</code>，回显同一 Token。交互见 OpCode 总表</td>
+    </tr>
+    <tr>
+      <td>分辨率与回放状态上报</td>
+      <td>Code <code>0.02</code>，空 Token，OpCode <code>0x018A</code></td>
+      <td>不返回 CoAP 响应</td>
+    </tr>
+    <tr>
+      <td>物模型命令的业务失败</td>
+      <td>-</td>
+      <td>留在 <code>InvokeCommand</code> 的 ComplexACK 里，成员 0 为 <code>Status</code></td>
+    </tr>
+    <tr>
+      <td>文件传输的业务失败</td>
+      <td>-</td>
+      <td>errorResponse，不是 <code>StatusCodeEnum8</code></td>
+    </tr>
+  </tbody>
+</table>
 
-`MessageType=RecordingTags` 时，负载 SHALL 为连续的 `RecordingTagStruct` 数组，长度为 `PayloadLength` 字节；`PayloadLength` SHALL 为 8 的整数倍。
+`aqara.control` 的结构体编码为 JSON Object，成员键为成员序号的十进制字符串。`aqara.download` 的编码见 文件传输编码规则。标记为必须、但语义上可空的 JSON 成员无值时编码为 `null`，不省略该键。`LocalRecordQuery` 的 `QueryLocalRecordType` 指明种类。`LocalRecordIndex` 与 `LocalRecordSegment` 只出现它指向的那一个。
+
+### SDP 与 DCEP
+
+`m=application` 在 Offer 与 Answer 里都只有下面几行。ICE 候选、`a=setup` 与指纹和音视频共用。这条 `m=` 的 `mid` 放进会话级的 `a=group:BUNDLE`。
+
+Offer（App）：
+
+```
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=mid:2
+a=sctp-port:5000
+a=setup:actpass
+a=ice-ufrag:offerufrag
+a=ice-pwd:offericepwd0123456789abcd
+a=fingerprint:sha-256 AA:BB:CC:DD
+```
+
+Answer（设备）：
+
+```
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=mid:2
+a=sctp-port:5000
+a=setup:passive
+a=ice-ufrag:answerufrag
+a=ice-pwd:answericepwd0123456789abcd
+a=fingerprint:sha-256 EE:FF:00:11
+```
+
+设备不接受这条 `m=` 时，端口写 `0` 并加 `a=inactive`。会话照常建立，只是没有 DataChannel。切档、查询与文件传输都不可用，媒体仍按开播分辨率发送。
+
+`label`、Channel Type 与 Priority 不写进 SDP，由 RFC 8832（WebRTC Data Channel Establishment Protocol）在 association 上打开。App 是 Offer 方时 stream id 取偶。
+
+`DATA_CHANNEL_OPEN` 的格式见 RFC 8832 第 5.1 节：
+
+```
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Message Type |  Channel Type |            Priority           |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Reliability Parameter                      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Label Length          |       Protocol Length         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+\                                                               /
+|                             Label                             |
+/                                                               \
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+\                                                               /
+|                            Protocol                           |
+/                                                               \
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+```
+
+`DATA_CHANNEL_ACK` 的格式见 RFC 8832 第 5.2 节：
+
+```
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Message Type |
++-+-+-+-+-+-+-+-+
+```
+
+App 为每个 Data Channel 发一条 `DATA_CHANNEL_OPEN`。表的第一列是 Label 字段的取值：
+
+<table>
+  <thead>
+    <tr>
+      <th>label</th>
+      <th>Priority</th>
+      <th>stream id</th>
+      <th>报文（十六进制）</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>aqara.control</code></td>
+      <td><code>1024</code></td>
+      <td><code>0</code></td>
+      <td><code>03 00 04 00 00 00 00 00 00 0D 00 00</code> + <code>61 71 61 72 61 2E 63 6F 6E 74 72 6F 6C</code></td>
+    </tr>
+    <tr>
+      <td><code>aqara.download</code></td>
+      <td><code>128</code></td>
+      <td><code>2</code></td>
+      <td><code>03 00 00 80 00 00 00 00 00 0E 00 00</code> + <code>61 71 61 72 61 2E 64 6F 77 6E 6C 6F 61 64</code></td>
+    </tr>
+  </tbody>
+</table>
+
+本绑定的取值：Message Type `0x03`，Channel Type `0x00`（`DATA_CHANNEL_RELIABLE`），Reliability Parameter 为 `0`，Protocol Length 为 `0`，Protocol 为空。Priority、Label Length 与 Label 见上表。`DATA_CHANNEL_ACK` 的 Message Type 为 `0x02`。`a=max-message-size` 不写，缺省单条 SCTP 用户消息 65536 字节。stream id 不在 OPEN 报文体里。App 把这条 OPEN 发在该 Data Channel 的 stream id 上，进出方向使用同一个 stream id。
+
+```mermaid
+sequenceDiagram
+    participant App as App DTLS Client
+    participant Dev as Device DTLS Server
+    App->>Dev: Offer setup actpass
+    Dev-->>App: Answer setup passive
+    Note over App,Dev: ICE and DTLS are shared with media
+    Note over App,Dev: SCTP association comes up
+    App->>Dev: DATA_CHANNEL_OPEN label aqara.control
+    App->>Dev: DATA_CHANNEL_OPEN label aqara.download
+    Dev-->>App: DATA_CHANNEL_ACK for each label
+    Note over App,Dev: CoAP starts on an open label
+    Note over App,Dev: EndSession drops unfinished transfers
+```
+
+设备收到某个 label 的 `DATA_CHANNEL_OPEN` 并回 `DATA_CHANNEL_ACK` 之后，才认为该 label 可用。在此之前，App SHALL NOT 在该 label 上发消息。`m=application`、DTLS 与 SCTP association 不随 label 再建立一次。消息按 label 隔离，见 [通道](#ref_WebRTC_DataChannelChannels)。
+
+### 通道上报 Trait
+
+* [WebRTCStreamResolution](#ref_WebRTCStreamResolution)
+* [LocalPlaybackStatus](#ref_LocalPlaybackStatus)
+
+### 通道命令 Command
+
+当前 label `aqara.control` 上支持的 Command。规格见 [WebRTC](#ref_Aqara_Spec_WebRTC) 的 DataChannel 通道命令表与对应 Command 定义。
+
+* [WebRTCSetResolution](#ref_WebRTCSetResolution)
+* [WebRTCTalk](#ref_WebRTCTalk)
+* [LocalPlaybackControl](#ref_LocalPlaybackControl)
+* [LocalRecordQuery](#ref_LocalRecordQuery)
+
+### 文件传输绑定
+
+App 是 Requestor，设备是 Provider。`LocalRecordQuery` 的条目给出 [FileDescriptorStructure](#ref_FileDescriptorStructure)。字段含义见 文件传输业务交互协议 的依赖一节，并原样写入 initRequest。编码见 文件传输编码规则。
+
+* label `aqara.download` 只承载 ProtocolID `0x02`。设备不在该 label 上主动下发字节，当前只有请求方拉取。
+* 该 label 上同时只有一个未结束的 `transferId`。第二个 `initRequest` 回 `Busy`（errorResponse）。
+* 块的请求次序、末块与取消遵循 blockRequest、EOFRequest 与 abortRequest。
+* 本绑定把「安全会话」定为这一条 PeerConnection 的 DTLS 会话。`transferId` 在该会话内唯一、非零。`WebRTCEndSession`、DataChannel 关闭或 DTLS 结束时，未完成的传输作废，双方释放资源。
+* 拔卡、循环覆盖或读失败不由设备另发取消。当前批次或下一次请求上的结果见 errorResponse。
+* 媒体类型不在文件传输协议里。mp4 与索引原格式由业务对象决定。
+* 协商 `maxBlockSize` 时，为 CoAP 封装和 CBOR 开销预留空间，见文件传输协议的文件块报文。`blockResponse` 的 CBOR Map 还包含当前块号 `blockCounter`，封装开销随块号和 data 长度的 CBOR 编码宽度变化，不再按固定 25 字节计算。示例取 `maxBlockSize` 为 `32768`。
 
 ## SO2（二氧化硫） {#ref_Aqara_Spec_SO2}
 
