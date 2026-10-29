@@ -40733,6 +40733,103 @@ This structure defines the Present Value field layout of the DoorLogReport Trait
   </tbody>
 </table>
 
+##### LockDataTypeEnum8 Type {#ref_LockDataTypeEnum8}
+
+This enumeration identifies the data category of the change in the AqaraUserChange event.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>User</td>
+      <td>User record</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Credential</td>
+      <td>Generic credential record</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Schedule</td>
+      <td>User validity schedule</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>NFC</td>
+      <td>NFC card credential</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>Fingerprint</td>
+      <td>Fingerprint credential</td>
+    </tr>
+    <tr>
+      <td>0x05</td>
+      <td>Face</td>
+      <td>Face credential</td>
+    </tr>
+    <tr>
+      <td>0x06</td>
+      <td>FingerVein</td>
+      <td>Finger vein credential</td>
+    </tr>
+    <tr>
+      <td>0x07</td>
+      <td>Password</td>
+      <td>Numeric or alphanumeric password credential</td>
+    </tr>
+    <tr>
+      <td>0x08</td>
+      <td>UWB</td>
+      <td>Ultra-wideband credential</td>
+    </tr>
+    <tr>
+      <td>0x09</td>
+      <td>Palm</td>
+      <td>Palm print credential</td>
+    </tr>
+  </tbody>
+</table>
+
+##### DataOperationTypeEnum8 Type {#ref_DataOperationTypeEnum8}
+
+This enumeration identifies the operation type performed by the AqaraUserChange event on a user or credential database entry.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Add</td>
+      <td>Add a database entry</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Delete</td>
+      <td>Delete an existing database entry</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Modify</td>
+      <td>Modify an existing database entry</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### AqaraUserErrorTraitPresentValueStructure Type {#ref_AqaraUserErrorTraitPresentValueStructure}
 
 This structure defines the Present Value field layout of the AqaraUserError Trait.
@@ -56696,6 +56793,72 @@ This structure defines the Present Value field layout of the BitmaskRegionSettin
   </tbody>
 </table>
 
+#### P2PCaptureIntervalEnum8 Type {#ref_P2PCaptureIntervalEnum8}
+
+This enumeration defines the valid values of the Present Value of the P2PCaptureInterval Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Auto</td>
+      <td>Automatic</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Seconds10</td>
+      <td>10 seconds</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Seconds20</td>
+      <td>20 seconds</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Seconds30</td>
+      <td>30 seconds</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>Minutes1</td>
+      <td>1 minute</td>
+    </tr>
+    <tr>
+      <td>0x05</td>
+      <td>Minutes2</td>
+      <td>2 minutes</td>
+    </tr>
+    <tr>
+      <td>0x06</td>
+      <td>Minutes5</td>
+      <td>5 minutes</td>
+    </tr>
+    <tr>
+      <td>0x07</td>
+      <td>Minutes10</td>
+      <td>10 minutes</td>
+    </tr>
+    <tr>
+      <td>0x08</td>
+      <td>Minutes30</td>
+      <td>30 minutes</td>
+    </tr>
+    <tr>
+      <td>0x09</td>
+      <td>Hours1</td>
+      <td>1 hour</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### SensitivityLevelEnum8 Type {#ref_SensitivityLevelEnum8}
 
 This enumeration defines the valid values of the Present Value of the SensitivityLevelEnum Trait.
@@ -69476,6 +69639,70 @@ This enumeration defines the valid values of the Present Value of the PublicCapO
     <tr>
       <td>0x51ED</td>
       <td><a href="#ref_VibrationIntensity">VibrationIntensity</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### P2PCaptureInterval Trait (Home Page Card Capture Interval) {#ref_P2PCaptureInterval}
+
+The home page card capture interval, maintained by the cloud. It can be configured and takes effect after [P2PCaptureEnabled](#ref_P2PCaptureEnabled) is enabled. A value of `0` means the cloud decides the capture interval automatically; a non-zero value follows the interval specified by the enumeration. The default value is `0`, and it is readable, writable, and reportable.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5248</td>
+      <td>P2PCaptureInterval</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_P2PCaptureIntervalEnum8">P2PCaptureIntervalEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_P2PCaptureIntervalEnum8">P2PCaptureIntervalEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_P2PCaptureIntervalEnum8">P2PCaptureIntervalEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -125357,6 +125584,54 @@ A bit value of `1` means the corresponding grid cell is enabled, and a bit value
   </tbody>
 </table>
 
+#### SupportedLedGridMask Trait {#ref_SupportedLedGridMask}
+
+This Trait indicates which LED grid cells on the device the client can configure through LedGridEnableMask; the mask format follows the LedGridMask Type. A bit of `1` means the corresponding grid cell physically exists on the device and is open for client configuration; a bit of `0` means the corresponding position is not configurable, either because the device does not have that physical grid cell, or the server has not opened that cell for client control. This Trait describes a fixed hardware or product capability and SHALL NOT change over the device lifetime.
+
+The Present Value carries the mask as a string; the string encoding SHALL be consistent with the LedGridMask representation used by the device.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5242</td>
+      <td>SupportedLedGridMask</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>characterString</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
 #### FlowMode Trait {#ref_FlowMode}
 
 This Trait indicates the currently configured Flow Mode effect engine.
@@ -131427,6 +131702,32 @@ Manages local SD card recording, formatting, recording modes, and storage status
 
 ### Data Types
 
+##### RecordingDurationTypeEnum8 Type {#ref_RecordingDurationTypeEnum8}
+
+This enumeration defines the valid values of the Present Value of the RecordingDurationType Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Auto</td>
+      <td>Automatic; the device decides the minimum and maximum recording duration automatically based on battery level and other information</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Custom</td>
+      <td>Custom; the user configures the recording duration through MinRecordingDuration and MaxRecordingDuration</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### NASServerBindingStatusEnum8 Type {#ref_NASServerBindingStatusEnum8}
 
 This enumeration defines the valid values of the Present Value for the NASServerBindingStatus Trait.
@@ -132719,6 +133020,268 @@ The current status of NAS video storage.
       <td></td>
       <td></td>
       <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+### Command Definitions
+
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9D45</td>
+      <td><a href="#ref_DeleteNASServer">DeleteNASServer</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9D3F</td>
+      <td><a href="#ref_TriggerSDCardStatusUpload">TriggerSDCardStatusUpload</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9D3C</td>
+      <td><a href="#ref_NASClearHistoryVideos">NASClearHistoryVideos</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9D3B</td>
+      <td><a href="#ref_FormatSDCardCommand">FormatSDCardCommand</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### RecordingDurationType Trait (Recording Duration Type) {#ref_RecordingDurationType}
+
+The recording duration type on the device side. `0` is automatic: the device decides the minimum and maximum recording duration automatically based on battery level and other information; `1` is custom: the durations configured by [MinRecordingDuration](#ref_MinRecordingDuration) and [MaxRecordingDuration](#ref_MaxRecordingDuration) are used. The default value is `0`, and it is readable, writable, and reportable.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5245</td>
+      <td>RecordingDurationType</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_RecordingDurationTypeEnum8">RecordingDurationTypeEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_RecordingDurationTypeEnum8">RecordingDurationTypeEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_RecordingDurationTypeEnum8">RecordingDurationTypeEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### MinRecordingDuration Trait (Minimum Recording Duration) {#ref_MinRecordingDuration}
+
+The minimum recording duration on the device side, in seconds (s), ranging from 1 to 6 with a step of 1 and a default value of 6. This configuration is used when [RecordingDurationType](#ref_RecordingDurationType) is Custom. After recording starts, even if the detected object stops moving or leaves the field of view, recording continues until the minimum recording duration is reached, to ensure sufficient event footage is captured. It is readable, writable, and reportable.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5246</td>
+      <td>MinRecordingDuration</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td>1..6</td>
+      <td>6</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>6</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>Step Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint8</td>
+      <td>1..6</td>
+      <td>6</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### MaxRecordingDuration Trait (Maximum Recording Duration) {#ref_MaxRecordingDuration}
+
+The maximum recording duration on the device side, in seconds (s), ranging from 10 to 30 with a step of 1 and a default value of 30. This configuration is used when [RecordingDurationType](#ref_RecordingDurationType) is Custom. After recording starts, if the detected object stops moving or leaves the field of view, recording stops after the minimum recording duration is reached to save power; if the detected object keeps moving, recording continues until the maximum recording duration is reached. It is readable, writable, and reportable.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5247</td>
+      <td>MaxRecordingDuration</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td>10..30</td>
+      <td>30</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>30</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>10</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>Step Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint8</td>
+      <td>10..30</td>
+      <td>30</td>
+      <td>RW</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -137546,6 +138109,141 @@ This Function does not contain any Commands.
 
 ### Data Types
 
+#### Downloading the Local Recording Index File {#ref_LocalRecord_FlowDownloadIndex}
+
+This section describes the flow in which the App downloads the local recording index file over the WebRTC DataChannel.
+The index granularity is *day*: at most one entry per day. A single query can span multiple days, and the response member `LocalRecordIndex` is the list of those days. When the number of days is small, `MaxCount` / `Cursor` are usually not needed.
+
+* Command: [LocalRecordQuery](#ref_LocalRecordQuery) with `QueryLocalRecordType=LocalRecordIndex`; the parameters are in the member `LocalRecordIndex`. It is exchanged via `InvokeCommand` on label `aqara.control`; the request OpCode is `0x008D` and the response OpCode is `0x038D`.
+* Response: the ComplexACK of this Command. Member 0 is `Status`, and the member `LocalRecordIndex` is a list of [LocalRecordIndexEntryStructure](#ref_LocalRecordIndexEntryStructure).
+
+```mermaid
+sequenceDiagram
+    participant App as App
+    participant Dev as Camera
+
+    Note over App,Dev: 1. LocalRecordQuery on aqara.control
+    App->>Dev: InvokeCommand QueryLocalRecordType LocalRecordIndex
+    Dev-->>App: ComplexACK QueryLocalRecordType LocalRecordIndex
+
+    Note over App,Dev: 2. Fetch index files one FileDescriptor at a time
+    loop one FileDescriptor at a time
+        App->>Dev: FileTransfer aqara.download
+    end
+```
+
+To query a time range, pass the whole range; the device puts one entry per day into the response member `LocalRecordIndex`. The file transfer uses the [FileDescriptor](#ref_FileDescriptorStructure) of that entry, written into initRequest. `Date` does not enter the transfer. On label `aqara.download`, only one `FileDescriptor` is transferred at a time; a new `initRequest` SHALL NOT be issued before the previous one finishes. Block interactions are not expanded in this diagram.
+
+#### Downloading Local Recording Files {#ref_LocalRecord_FlowDownloadFile}
+
+This section describes the flow in which the App downloads local recording files over the WebRTC DataChannel.
+The App first downloads the local recording index file, reads the `timestamp` values to fetch from the index file, and then queries the local recording file descriptors.
+
+* Command: the same [LocalRecordQuery](#ref_LocalRecordQuery) with `QueryLocalRecordType=LocalRecordSegment`; the parameters are in the member `LocalRecordSegment`, where `Timestamps` come from the index. It is exchanged via `InvokeCommand` on label `aqara.control`.
+* Response: the ComplexACK of this Command. The member `LocalRecordSegment` has the same length and order as `Timestamps`, and each entry is a [FileDescriptorStructure](#ref_FileDescriptorStructure).
+
+```mermaid
+sequenceDiagram
+    participant App as App
+    participant Dev as Camera
+
+    Note over App,Dev: 0. Index file downloaded
+    Note over App,Dev: 1. LocalRecordQuery on aqara.control
+    App->>Dev: InvokeCommand QueryLocalRecordType LocalRecordSegment
+    Dev-->>App: ComplexACK QueryLocalRecordType LocalRecordSegment
+
+    Note over App,Dev: 2. Fetch recording files one FileDescriptor at a time
+    loop one FileDescriptor at a time
+        App->>Dev: FileTransfer aqara.download
+    end
+```
+
+On label `aqara.download`, only one `FileDescriptor` is transferred at a time; a new `initRequest` SHALL NOT be issued before the previous one finishes. When a certain entry has a `fileSize` of 0, skip that entry and do not issue an `initRequest` for it. Block interactions are not expanded in this diagram. When the list exceeds a single message, the App splits it into multiple requests. Retransmitting the same query after a timeout is safe; queries do not change device state.
+
+### Overview
+
+Manages recording playback and history, including cloud clip type identification, local recording download capability, and the state and playback position of local playback sessions. Playback sessions are established by `WebRTCProvideOffer` (`StreamUsage=LocalPlayback`); pause, resume, seek, and speed are handled by `LocalPlaybackControl`. Local recording index and recording file descriptors are queried by `LocalRecordQuery`.
+
+### Function Identification
+
+<table>
+  <thead>
+    <tr>
+      <th>Function ID</th>
+      <th>Code</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x010A</td>
+      <td>Playback</td>
+      <td>Playback</td>
+    </tr>
+  </tbody>
+</table>
+
+### Trait
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4FE9</td>
+      <td><a href="#ref_CloudClipRecordingType">CloudClipRecordingType</a></td>
+      <td>Cloud clip recording type</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x4FC1</td>
+      <td><a href="#ref_SupportLocalVideoDownload">SupportLocalVideoDownload</a></td>
+      <td>Whether local video download is supported</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5243</td>
+      <td><a href="#ref_LocalPlaybackStatus">LocalPlaybackStatus</a></td>
+      <td>Local playback status</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+### Command
+
+The Commands of this Function are exchanged via `InvokeCommand` on the `aqara.control` label of the playback session.
+
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Code</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9DB7</td>
+      <td><a href="#ref_LocalPlaybackControl">LocalPlaybackControl</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DB8</td>
+      <td><a href="#ref_LocalRecordQuery">LocalRecordQuery</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+### Data Types
+
 ##### CloudClipRecordingTypeEnum8 Type {#ref_CloudClipRecordingTypeEnum8}
 
 This enumeration defines the valid values of the Present Value for the CloudClipRecordingType Trait.
@@ -137602,6 +138300,513 @@ This enumeration defines the valid values of the Present Value for the CloudClip
       <td>0x4FC1</td>
       <td><a href="#ref_SupportLocalVideoDownload">SupportLocalVideoDownload</a></td>
       <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalPlaybackStateEnum8 Type {#ref_LocalPlaybackStateEnum8}
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Idle</td>
+      <td>Not playing</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Playing</td>
+      <td>Playing</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Paused</td>
+      <td>Paused; the PeerConnection is kept</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Eof</td>
+      <td>Played to the end of the file</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>Stopped</td>
+      <td>Stopped by the device side</td>
+    </tr>
+    <tr>
+      <td>0x05</td>
+      <td>StorageUnavailable</td>
+      <td>SD card removed or unreadable</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalPlaybackStatusStructure Type {#ref_LocalPlaybackStatusStructure}
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member Index</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>State</td>
+      <td><a href="#ref_LocalPlaybackStateEnum8">LocalPlaybackStateEnum8</a></td>
+      <td>M</td>
+      <td>Current state</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>SessionId</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>Carried when reporting or reading over COIP. Omitted in DataChannel reporting; the session is determined by that channel</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalRecordTypeEnum Type {#ref_LocalRecordTypeEnum}
+
+This enumeration is the `type` of each record in the per-day sub-index file. The App reads it from the downloaded index file; query responses do not return it again.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>FullRecording</td>
+      <td>Full-time recording</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>EventTriggered</td>
+      <td>Event triggered</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>AlarmRecord</td>
+      <td>Alarm record</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalPlaybackControlOpEnum8 Type {#ref_LocalPlaybackControlOpEnum8}
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Pause</td>
+      <td>Pause. Stops reading frames; the PeerConnection is kept</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Play</td>
+      <td>Resume playback</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Seek</td>
+      <td>Seek. <code>Timestamp</code> is valid</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Speed</td>
+      <td>Speed. <code>Speed</code> is valid</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalPlaybackControl Command Structure Type {#ref_LocalPlaybackControlCommandStructure}
+
+The request structure of `LocalPlaybackControl`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member Index</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Op</td>
+      <td><a href="#ref_LocalPlaybackControlOpEnum8">LocalPlaybackControlOpEnum8</a></td>
+      <td>M</td>
+      <td>Operation</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Speed</td>
+      <td>uint8</td>
+      <td>C</td>
+      <td>Shall be `1` / `2` / `4` when <code>Op=Speed</code>; SHALL be omitted for other <code>Op</code> values</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Timestamp</td>
+      <td>uint32</td>
+      <td>C</td>
+      <td>The target UTC timestamp (seconds) when <code>Op=Seek</code>, aligned with the <code>timestamp</code> in the index entry; SHALL be omitted for other <code>Op</code> values</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>SessionId</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>Carried over COIP to specify the playback session to control. Omitted on DataChannel; the session is determined by that channel</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalPlaybackControlResponse Command Structure Type {#ref_LocalPlaybackControlResponseCommandStructure}
+
+The response structure of `LocalPlaybackControl`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member Index</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td><a href="#ref_StatusCodeEnum8">StatusCodeEnum8</a></td>
+      <td>M</td>
+      <td>Command execution result; see the command definition for values</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>CurrentTimestamp</td>
+      <td>uint32</td>
+      <td>M</td>
+      <td>The current playback position (seconds) on the device side after execution</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Recording Queries
+
+Queries only distinguish `LocalRecordIndex` and `LocalRecordSegment`. `QueryLocalRecordType` indicates which one it is, and only the member it points to appears in the request and response. File descriptors use [FileDescriptorStructure](#ref_FileDescriptorStructure), filled in by the device. The App SHALL write it into initRequest as-is and SHALL NOT construct `fileDesignator` by itself from dates or timestamps.
+
+`ContentType` remains a business convention and is not carried in queries or file transfers.
+
+`LocalRecordIndex` and `LocalRecordSegment` form two levels. The index lists which days exist; segment resolution is not responsible for listing segments.
+
+<table>
+  <thead>
+    <tr>
+      <th></th>
+      <th>Answers</th>
+      <th>What it corresponds to on the device</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>LocalRecordIndex</code></td>
+      <td>Which days have index files matching the query conditions</td>
+      <td>Per-day sub-index files. After download, each record in the file gives the <code>timestamp</code>, duration, and type of a recording segment</td>
+    </tr>
+    <tr>
+      <td><code>LocalRecordSegment</code></td>
+      <td>The recording files corresponding to these <code>timestamp</code> values</td>
+      <td>The device locates recording files by <code>timestamp</code> and returns <a href="#ref_FileDescriptorStructure">FileDescriptorStructure</a></td>
+    </tr>
+  </tbody>
+</table>
+
+Index entries additionally carry a UTC date outside `FileDescriptorStructure`, used only for display and not entering `initRequest`. The response of segment resolution is `FileDescriptorStructure`.
+
+##### QueryLocalRecordTypeEnum8 Type {#ref_QueryLocalRecordTypeEnum8}
+
+`LocalRecordQuery` uses it to select the parameters and results of this query. It is not the same enumeration as [LocalRecordTypeEnum](#ref_LocalRecordTypeEnum) inside the index file.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>LocalRecordIndex</td>
+      <td>Query which days have index files. The parameters and results use the member <code>LocalRecordIndex</code></td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>LocalRecordSegment</td>
+      <td>Resolve the <code>timestamp</code> values in the index into recording file descriptors. The parameters and results use the member <code>LocalRecordSegment</code></td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalRecordQuery Command Structure Type {#ref_LocalRecordQueryCommandStructure}
+
+`QueryLocalRecordType` decides which condition member appears. If the appearing member is inconsistent with the value, or both condition members appear, or neither appears, the response `Status` is `INVALID_COMMAND`. `Cursor` and `MaxCount` appear only when `QueryLocalRecordType=LocalRecordIndex`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member Index</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Type</td>
+      <td><a href="#ref_QueryLocalRecordTypeEnum8">QueryLocalRecordTypeEnum8</a></td>
+      <td>M</td>
+      <td>Kind of this query</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Index</td>
+      <td><a href="#ref_LocalRecordIndexQueryParamsStructure">LocalRecordIndexQueryParamsStructure</a></td>
+      <td>C</td>
+      <td>Appears when <code>QueryLocalRecordType=LocalRecordIndex</code></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Segment</td>
+      <td><a href="#ref_LocalRecordSegmentQueryParamsStructure">LocalRecordSegmentQueryParamsStructure</a></td>
+      <td>C</td>
+      <td>Appears when <code>QueryLocalRecordType=LocalRecordSegment</code></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Cursor</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>Only for <code>LocalRecordIndex</code>. The entry index within the matching results, starting from 0. Taken from the <code>NextCursor</code> of the previous response; omitted or <code>0</code> means starting from the first entry</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>MaxCount</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>Only for <code>LocalRecordIndex</code>. The desired maximum number of entries; omitted or <code>0</code> means decided by the device</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalRecordIndexQueryParamsStructure Type {#ref_LocalRecordIndexQueryParamsStructure}
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member Index</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>StartTimestamp</td>
+      <td>uint32</td>
+      <td>O</td>
+      <td>Start of the range (UTC, seconds); omitted means no lower bound</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>EndTimestamp</td>
+      <td>uint32</td>
+      <td>O</td>
+      <td>End of the range (UTC, seconds); omitted means no upper bound</td>
+    </tr>
+  </tbody>
+</table>
+
+Both fields are Unix second timestamps, synonymous with the global field name `timestamp` in this specification; the device is responsible for mapping them to the corresponding UTC day. To query a single day, pass `[00:00 of that day, 00:00 of the next day)`. The date in the returned entries is `YYYYMMDD`; fetching the file uses the `FileDescriptor` in the same entry.
+
+##### FileDescriptorStructure Type {#ref_FileDescriptorStructure}
+
+This structure is shared by the data model and the file transfer business interaction protocol. The data model SHALL construct the fields below in the same way as that protocol and fill in the local recording file descriptor. After the App receives it, it SHALL write it into the fields of initRequest as-is; it SHALL NOT construct the fields by itself from the day, time, or file name.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member Index</th>
+<th>Field Name</th>
+<th>Type</th>
+<th>Mandatory</th>
+<th>Description</th>
+</tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+<td>File ID</td>
+      <td>uint32</td>
+      <td>M</td>
+      <td>File identifier, unique within the same transfer session</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>File Size</td>
+      <td>uint32</td>
+      <td>M</td>
+      <td>File size in bytes</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Max Block Size</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>The maximum block size negotiated for this file, in bytes; the actual block size shall not exceed it</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>File Designator</td>
+      <td>octetString</td>
+      <td>M</td>
+      <td>File designator; the App SHALL write it into initRequest as-is</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalRecordIndexEntryStructure Type {#ref_LocalRecordIndexEntryStructure}
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member Index</th>
+<th>Field Name</th>
+<th>Type</th>
+<th>Mandatory</th>
+<th>Description</th>
+</tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+<td>Date</td>
+      <td>uint32</td>
+      <td>M</td>
+      <td>UTC date in <code>YYYYMMDD</code>, for display and query reference only; it does not enter initRequest</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>File Descriptor</td>
+      <td><a href="#ref_FileDescriptorStructure">FileDescriptorStructure</a></td>
+      <td>M</td>
+<td>Descriptor of the per-day sub-index file; the App downloads it via the file transfer protocol</td>
+    </tr>
+  </tbody>
+</table>
+
+##### LocalRecordSegmentQueryParamsStructure Type {#ref_LocalRecordSegmentQueryParamsStructure}
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member Index</th>
+<th>Field Name</th>
+<th>Type</th>
+<th>Mandatory</th>
+<th>Description</th>
+</tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+<td>Timestamps</td>
+      <td>list[uint32]</td>
+      <td>O</td>
+      <td>The <code>timestamp</code> values to resolve, taken from the index file</td>
+    </tr>
+  </tbody>
+</table>
+
+Each element corresponds one-to-one to an element of the response member `LocalRecordSegment` in order. If a timestamp does not exist or has expired (for example, the file has been recycled or the card has been replaced), the device returns an entry whose File Descriptor member is all zeros with `fileSize=0`; the App skips it and does not issue initRequest for it.
+
+##### LocalRecordQuery Response Command Structure Type {#ref_LocalRecordQueryResponseCommandStructure}
+
+`QueryLocalRecordType` decides which result member appears. If the appearing member is inconsistent with the value, or both appear, the response `Status` is `INVALID_COMMAND`.
+
+<table>
+  <thead>
+    <tr>
+<th>Struct Member Index</th>
+<th>Field Name</th>
+<th>Type</th>
+<th>Mandatory</th>
+<th>Description</th>
+</tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td><a href="#ref_StatusCodeEnum8">StatusCodeEnum8</a></td>
+      <td>M</td>
+      <td>Command execution result; see the command definition for values</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Index</td>
+      <td>list[<a href="#ref_LocalRecordIndexEntryStructure">LocalRecordIndexEntryStructure</a>]</td>
+      <td>C</td>
+      <td>Appears when <code>QueryLocalRecordType=LocalRecordIndex</code> and <code>Status=SUCCESS</code></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Segment</td>
+      <td>list[<a href="#ref_FileDescriptorStructure">FileDescriptorStructure</a>]</td>
+      <td>C</td>
+      <td>Appears when <code>QueryLocalRecordType=LocalRecordSegment</code> and <code>Status=SUCCESS</code>; one-to-one with the request <code>Timestamps</code></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>NextCursor</td>
+      <td>uint16</td>
+      <td>O</td>
+<td>Only for <code>LocalRecordIndex</code>. The next entry index to use as <code>Cursor</code> in the next request; when the last page is reached, the device returns <code>0xFFFF</code>, which is a stop mark, not a cursor. The semantics of each page follow the device's page strategy, and the App does not rely on any specific page size</td>
     </tr>
   </tbody>
 </table>
@@ -137728,6 +138933,153 @@ Indicates whether the device supports downloading local videos from the SD card 
 ### Command Definitions
 
 This Function does not contain any Commands.
+
+#### LocalPlaybackStatus Trait (Local Playback Status) {#ref_LocalPlaybackStatus}
+
+Reports the local playback status of each playback session in the current WebRTC session. The member structure is [LocalPlaybackStatusStructure](#ref_LocalPlaybackStatusStructure). A session is created by `WebRTCProvideOffer` with `StreamUsage=LocalPlayback`; when the SessionId over COIP and the DataChannel binding use the same session, this Trait reports that session only.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+<th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5243</td>
+      <td>LocalPlaybackStatus</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_LocalPlaybackStatusStructure">LocalPlaybackStatusStructure</a>]</td>
+      <td></td>
+<td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+This Trait is reported periodically on label `aqara.control` via `UnconfirmedCOVNotificationMultiple` (ProtocolID `0x00`, OpCode `0x018A`). The device SHALL NOT report this Trait through the Report path.
+
+#### LocalPlaybackControl Command (Local Playback Control) {#ref_LocalPlaybackControl}
+
+Controls local playback: pause, resume, seek, and speed. The request is [LocalPlaybackControl Command Structure](#ref_LocalPlaybackControlCommandStructure), and the response is [LocalPlaybackControlResponse Command Structure](#ref_LocalPlaybackControlResponseCommandStructure). This Command is exchanged on label `aqara.control`; the request OpCode is `0x008D` and the response OpCode is `0x038D`.
+
+##### Parameters
+
+[LocalPlaybackControl Command Structure](#ref_LocalPlaybackControlCommandStructure)
+
+##### Response
+
+[LocalPlaybackControlResponse Command Structure](#ref_LocalPlaybackControlResponseCommandStructure), with `Status` values:
+
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>SUCCESS</code></td>
+      <td>Operation accepted. For <code>Op=Pause</code>, frame reading stops immediately; for <code>Op=Play</code>, playback resumes; for <code>Op=Seek</code>, the playback position moves to <code>Timestamp</code>; for <code>Op=Speed</code>, the playback speed changes to <code>Speed</code></td>
+    </tr>
+    <tr>
+      <td><code>NOT_FOUND</code></td>
+      <td><code>SessionId</code> is not an active playback session. When it arrives from the DataChannel and is inconsistent with the session to which that channel belongs, this value is also taken</td>
+    </tr>
+    <tr>
+      <td><code>INVALID_COMMAND</code></td>
+      <td>Invalid combination or omitted field. For example, <code>Op=Seek</code> without <code>Timestamp</code>, <code>Op=Speed</code> with an unsupported <code>Speed</code>, or <code>Speed</code> carried while <code>Op</code> is not <code>Speed</code></td>
+    </tr>
+    <tr>
+      <td><code>INVALID_IN_STATE</code></td>
+      <td>Seek or speed on an unsupported stream, such as a live-view session that does not support seek, or a playback session without recorded data. Speed on a non-playing session also takes this value</td>
+    </tr>
+    <tr>
+      <td><code>RESOURCE_EXHAUSTED</code></td>
+      <td>The device is busy decoding, or the command queue is full</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Processing
+
+* When <code>Op=Pause</code>: the device SHALL stop reading frames and keep the PeerConnection; the state changes to <code>Paused</code>. Pausing a session that is already <code>Paused</code>, <code>Idle</code>, or at the end of the file returns <code>SUCCESS</code> without changing the state. Seeking while paused also takes effect.
+* When <code>Op=Play</code>: resume playback. When <code>Op=Pause</code> or the device is at the end of the file, resume playback from the current position. If <code>Op=Play</code> is received while already playing, it returns <code>SUCCESS</code> and playback continues from the current position.
+* When <code>Op=Seek</code>: move to <code>Timestamp</code>. The timestamp SHALL be aligned with the <code>timestamp</code> in the index entry of the file being played. Seeking to a position beyond the end of the file returns <code>SUCCESS</code> and reaches the end; the state becomes <code>Eof</code>. The device SHALL return <code>INVALID_COMMAND</code> when the timestamp has no corresponding frame or is not in the index. A seek does not change the speed.
+* When <code>Op=Speed</code>: change the playback speed. Supported speeds are <code>1</code>, <code>2</code>, and <code>4</code> (inclusive); other values return <code>INVALID_COMMAND</code>. If the device cannot support speed changes during a playback session, it returns <code>INVALID_IN_STATE</code>. A speed change SHALL NOT change the current playback position.
+* Playback reaches the end of the file: the state becomes <code>Eof</code> and frame sending stops. The state and position are reported via [LocalPlaybackStatus](#ref_LocalPlaybackStatus).
+* Playback stops on the device side (for example, the SD card is removed): the state becomes <code>Stopped</code>; the device SHALL report [LocalPlaybackStatus](#ref_LocalPlaybackStatus) and stop the playback session.
+
+#### LocalRecordQuery Command (Local Recording Query) {#ref_LocalRecordQuery}
+
+Queries local recording days or recording file descriptors. The request is [LocalRecordQuery Command Structure](#ref_LocalRecordQueryCommandStructure), and the response is [LocalRecordQuery Response Command Structure](#ref_LocalRecordQueryResponseCommandStructure). This Command is exchanged on label `aqara.control`; the request OpCode is `0x008D` and the response OpCode is `0x038D`.
+
+##### Parameters
+
+[LocalRecordQuery Command Structure](#ref_LocalRecordQueryCommandStructure)
+
+##### Response
+
+[LocalRecordQuery Response Command Structure](#ref_LocalRecordQueryResponseCommandStructure), with `Status` values:
+
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>SUCCESS</code></td>
+      <td>Query completed, and the result is in the member pointed to by <code>QueryLocalRecordType</code></td>
+    </tr>
+    <tr>
+      <td><code>NOT_FOUND</code></td>
+      <td>The query range does not contain any matching records</td>
+    </tr>
+    <tr>
+      <td><code>INVALID_COMMAND</code></td>
+      <td>Invalid parameter combination, such as an unsupported <code>QueryLocalRecordType</code>, or <code>Cursor</code> / <code>MaxCount</code> present in segment resolution</td>
+    </tr>
+    <tr>
+      <td><code>RESOURCE_EXHAUSTED</code></td>
+      <td>The device is busy with another query, or the result set is too large to process</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Processing
+
+* The query SHALL only return existing days or files; SHALL NOT fabricate empty records to fill the response.
+* The day index SHALL cover the full day from 00:00:00 to 23:59:59; an entry whose recording does not exist but is covered by the range is still listed and carries a descriptor for the sub-index file.
+* When <code>QueryLocalRecordType=LocalRecordIndex</code>: the device returns up to <code>MaxCount</code> entries starting from <code>Cursor</code>. If <code>MaxCount</code> is omitted, the device decides the page size. When the last page is reached, <code>NextCursor</code> is <code>0xFFFF</code>.
+* When <code>QueryLocalRecordType=LocalRecordSegment</code>: the device resolves the <code>timestamp</code> values one by one. If a value is out of range or the file has been recycled, the corresponding entry is returned with <code>fileSize=0</code> and the File Descriptor all zeros; other entries are returned normally. The response SHALL have the same length and order as the request.
+* Timestamp range queries without a valid range (for example, <code>StartTimestamp</code> is not less than <code>EndTimestamp</code>) return <code>INVALID_COMMAND</code>.
 
 ## CloudRecording (Cloud Recording) {#ref_Aqara_Spec_CloudRecording}
 
@@ -137943,6 +139295,50 @@ This Function does not contain any Commands.
 
 ### Data Types
 
+##### PeriodicSnapshotIntervalEnum8 Type {#ref_PeriodicSnapshotIntervalEnum8}
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Off</td>
+      <td>Off</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Seconds5</td>
+      <td>5 seconds</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Seconds10</td>
+      <td>10 seconds</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Seconds30</td>
+      <td>30 seconds</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>Minutes1</td>
+      <td>1 minute</td>
+    </tr>
+    <tr>
+      <td>0x05</td>
+      <td>Minutes5</td>
+      <td>5 minutes</td>
+    </tr>
+  </tbody>
+</table>
+
 #### ClientKeepAliveReqEnum8 Type {#ref_ClientKeepAliveReqEnum8}
 
 This enumeration defines the valid values of the Present Value for the ClientKeepAliveReq Trait.
@@ -138057,6 +139453,70 @@ Enables or disables the periodic upload of snapshots to the cloud (every 10 minu
       <td>0x0007</td>
       <td>Default Value</td>
       <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### PeriodicSnapshotInterval Trait (Periodic Snapshot Interval) {#ref_PeriodicSnapshotInterval}
+
+It only takes effect in P2P live view mode. With P2P enabled, when [P2PCaptureEnabled](#ref_P2PCaptureEnabled) is `1` and the device is in a periodic snapshot state, the device uploads one snapshot at the configured interval; a value of `0` turns periodic snapshots off. When [P2PCaptureEnabled](#ref_P2PCaptureEnabled) is `0`, the device SHALL NOT generate periodic snapshots regardless of the value. The default is `0`, and it is readable, writable, and reportable.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+<th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5249</td>
+      <td>PeriodicSnapshotInterval</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_PeriodicSnapshotIntervalEnum8">PeriodicSnapshotIntervalEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_PeriodicSnapshotIntervalEnum8">PeriodicSnapshotIntervalEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_PeriodicSnapshotIntervalEnum8">PeriodicSnapshotIntervalEnum8</a></td>
       <td></td>
       <td>0</td>
       <td>RW</td>
@@ -146883,6 +148343,212 @@ The WebRTC Transport Function defines the WebRTC signaling interface between the
 
 ### Data Types
 
+#### WebRTC and CAVSM Dependencies {#ref_WebRTC_CAVSMDependency}
+
+This binding inherits the CAVSM transport stack (ICE / DTLS / SRTP) and adds a file transfer protocol and the local recording binding. The dependency relationship is as follows:
+
+* CAVSM owns the peer connection, the session lifecycle, the Offer / Answer exchange, the camera data path (ICE / DTLS / SRTP), and the SDP `m=video` description. This binding reuses them as-is; the protocol data (SDP, candidate pairs, DTLS fingerprint) is managed by CAVSM, and this binding does not define a second set.
+* The file transfer protocol defines the transfer of file bytes between the App and the device. This binding defines the SDP extension lines `m=application` and the DataChannel; the file transfer protocol is used for the bytes on label `aqara.download`.
+* This binding inherits the camera data path of CAVSM (the same peer connection, the same DTLS session, and the same ICE pair); the SCTP association runs on the same DTLS session and uses the same fingerprint and certificate as the media.
+* This binding does not define SIP; SIP exists only in the signaling of CAVSM. In [WebRTCProvideOffer](#ref_WebRTC_FlowProvideOffer), SIP INVITE (if any) follows CAVSM semantics.
+
+#### WebRTCProvideOffer Flow {#ref_WebRTC_FlowProvideOffer}
+
+App as the offerer:
+
+```mermaid
+sequenceDiagram
+    participant App as App
+    participant Dev as Camera
+
+    Note over App,Dev: 1. Fetch candidate pairs and fingerprints, and obtain an authorization ticket
+    App->>Dev: CAVSM obtains tickets and candidate pairs
+    Dev-->>App: Return the ticket and candidate pair information
+
+    Note over App,Dev: 2. Create the offer SDP
+    App->>Dev: Offer (m=video, m=application)
+
+    Note over App,Dev: 3. Establish the session
+    Dev-->>App: Answer (m=video, m=application)
+    Note over App,Dev: ICE / DTLS / SRTP / SCTP come up
+    Note over App,Dev: 4. DataChannel opens
+    App->>Dev: DATA_CHANNEL_OPEN
+    Dev-->>App: DATA_CHANNEL_ACK
+    Note over App,Dev: 5. Command channel available
+    App->>Dev: WebRTCProvideOffer Command on aqara.control
+    Dev-->>App: ComplexACK with Status
+```
+
+App as the offerer initiates the command on label `aqara.control` after the DataChannel is open: request OpCode `0x008D`, response OpCode `0x038D`.
+
+#### WebRTCSolicitOffer Flow {#ref_WebRTC_FlowSolicitOffer}
+
+App as the offer solicitor:
+
+```mermaid
+sequenceDiagram
+    participant App as App
+    participant Dev as Camera
+
+    Note over App,Dev: 1. Fetch candidate pairs and fingerprints, and obtain an authorization ticket
+    App->>Dev: CAVSM obtains tickets and candidate pairs
+    Dev-->>App: Return the ticket and candidate pair information
+
+    Note over App,Dev: 2. Solicit the offer
+    App->>Dev: WebRTCSolicitOffer Command
+    Dev-->>App: ComplexACK with Status
+
+    Note over App,Dev: 3. Device answers
+    App->>Dev: Create the offer SDP
+    Dev-->>App: Answer (m=video, m=application)
+    Note over App,Dev: ICE / DTLS / SRTP / SCTP come up
+
+    Note over App,Dev: 4. DataChannel opens
+    App->>Dev: DATA_CHANNEL_OPEN
+    Dev-->>App: DATA_CHANNEL_ACK
+    Note over App,Dev: 5. Command channel available
+    App->>Dev: WebRTCProvideOffer Command on aqara.control
+    Dev-->>App: ComplexACK with Status
+```
+
+When the App is the offer solicitor, the subsequent session establishment is the same as in [WebRTCProvideOffer](#ref_WebRTC_FlowProvideOffer): after ICE / DTLS / SRTP / SCTP come up, the DataChannel opens, and then the WebRTCProvideOffer Command is invoked on label `aqara.control` (request OpCode `0x008D`, response OpCode `0x038D`). After `SUCCESS`, the session enters the established state, media flows, and [WebRTCStreamResolution](#ref_WebRTCStreamResolution) is reported. The session is established in the local playback usage, live view usage, or specified video stream usage requested by the App.
+
+#### Local SD Card Recording Playback
+
+The previous content is the general part of WebRTC. The following is the binding of local SD card recording playback.
+
+Local SD card recording playback is an Aqara WebRTC binding that plays local recording files stored on the camera's SD card through WebRTC, including playback of local recording files and downloads of local recording index / recording files.
+
+Session usage:
+
+* Local playback: `WebRTCProvideOffer` with `StreamUsage=LocalPlayback`, only one such session is allowed at a time; establishing another while one is active returns `RESOURCE_EXHAUSTED`. The session is also bound to label `aqara.download`, on which the App obtains the bytes of the local recording index and recording files via the file transfer protocol. At most one playback session in this usage can be active in one peer connection; the second one returns `RESOURCE_EXHAUSTED`.
+* Live view: a session in live view usage does not have the local recording binding; it only provides the media path, and label `aqara.download` is not bound to it. In live view usage, [LocalRecordQuery](#ref_LocalRecordQuery) and [LocalPlaybackControl](#ref_LocalPlaybackControl) are unavailable; the Commands return `INVALID_IN_STATE`.
+
+Playback control: see [LocalPlaybackControl](#ref_LocalPlaybackControl).
+
+Recording queries: see [LocalRecordQuery](#ref_LocalRecordQuery).
+
+### Function Identification
+
+<table>
+  <thead>
+    <tr>
+      <th>Function ID</th>
+      <th>Code</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x010A</td>
+      <td>Playback</td>
+      <td>Playback</td>
+    </tr>
+  </tbody>
+</table>
+
+### Trait
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4FE9</td>
+      <td><a href="#ref_CloudClipRecordingType">CloudClipRecordingType</a></td>
+      <td>Cloud clip recording type</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x4FC1</td>
+      <td><a href="#ref_SupportLocalVideoDownload">SupportLocalVideoDownload</a></td>
+      <td>Whether local video download is supported</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5243</td>
+      <td><a href="#ref_LocalPlaybackStatus">LocalPlaybackStatus</a></td>
+      <td>Local playback status</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+### Command
+
+The Commands of this Function are exchanged via `InvokeCommand` on the `aqara.control` label of the playback session.
+
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Code</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9DB7</td>
+      <td><a href="#ref_LocalPlaybackControl">LocalPlaybackControl</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DB8</td>
+      <td><a href="#ref_LocalRecordQuery">LocalRecordQuery</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+### Data Types
+
+##### WebRTCStatusCodeEnum8 Type {#ref_WebRTCStatusCodeEnum8}
+
+This enumeration is specific to WebRTC session Commands and is used by [WebRTCProvideOffer](#ref_WebRTC_FlowProvideOffer), [WebRTCSolicitOffer](#ref_WebRTC_FlowSolicitOffer), [WebRTCEndSession](#ref_WebRTCEndSession), [WebRTCTalk](#ref_WebRTCTalk), and [WebRTCSetResolution](#ref_WebRTCSetResolution).
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0000</td>
+      <td>SUCCESS</td>
+      <td>The operation completed successfully</td>
+    </tr>
+    <tr>
+      <td>0x0001</td>
+      <td>NOT_FOUND</td>
+      <td>The target does not exist, for example, the session does not exist, or the SessionId carried does not match the session to which the channel belongs</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>INVALID_IN_STATE</td>
+      <td>Not allowed in the current state, for example, operating a session whose establishment is not complete or has ended</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>INVALID_COMMAND</td>
+      <td>The request is invalid, for example, the SessionId is missing, or the SDP carried in the answer is invalid</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>RESOURCE_EXHAUSTED</td>
+      <td>Resources are exhausted, for example, too many sessions or the command queue is full</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### SignalingEventTypeEnum8 Type {#ref_SignalingEventTypeEnum8}
 
 This enumeration defines the valid values of the signaling event types in the WebRTCSignalingEvent Trait.
@@ -147877,6 +149543,212 @@ Response parameter structure of the WebRTCLocalPlaybackSeek Command.
   </tbody>
 </table>
 
+##### WebRTCTalk Command Structure Type {#ref_WebRTCTalkCommandStructure}
+
+The request structure of `WebRTCTalk`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member Index</th>
+<th>Field Name</th>
+<th>Type</th>
+<th>Mandatory</th>
+<th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Enabled</td>
+      <td>boolean</td>
+      <td>M</td>
+      <td>Turn talk on or off. <code>true</code> opens talk, <code>false</code> closes talk</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>SessionId</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>Carried over COIP to specify the session to open or close talk on. Omitted on DataChannel; the session is determined by that channel</td>
+    </tr>
+  </tbody>
+</table>
+
+##### WebRTCTalkResponse Command Structure Type {#ref_WebRTCTalkResponseCommandStructure}
+
+The response structure of `WebRTCTalk`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member Index</th>
+<th>Field Name</th>
+<th>Type</th>
+<th>Mandatory</th>
+<th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td><a href="#ref_WebRTCStatusCodeEnum8">WebRTCStatusCodeEnum8</a></td>
+      <td>M</td>
+      <td>Command execution result; see the command definition for values</td>
+    </tr>
+  </tbody>
+</table>
+
+##### WebRTCSetResolution Command Structure Type {#ref_WebRTCSetResolutionCommandStructure}
+
+The request structure of `WebRTCSetResolution`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member Index</th>
+<th>Field Name</th>
+<th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>VideoStreamID</td>
+      <td>uint8</td>
+      <td>M</td>
+      <td>The video stream ID to switch</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Resolution</td>
+      <td><a href="#ref_WebRTC_VideoStreamResolutionStructure">VideoStreamResolutionStructure</a></td>
+      <td>M</td>
+      <td>The target resolution</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>SessionId</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>Carried over COIP to specify the session. Omitted on DataChannel; the session is determined by that channel</td>
+    </tr>
+  </tbody>
+</table>
+
+##### WebRTCSetResolutionResponse Command Structure Type {#ref_WebRTCSetResolutionResponseCommandStructure}
+
+The response structure of `WebRTCSetResolution`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member Index</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td><a href="#ref_WebRTCStatusCodeEnum8">WebRTCStatusCodeEnum8</a></td>
+      <td>M</td>
+      <td>Command execution result; see the command definition for values</td>
+    </tr>
+  </tbody>
+</table>
+
+##### StreamResolutionStructure Type {#ref_WebRTC_StreamResolutionStructure}
+
+Used by [WebRTCStreamResolution](#ref_WebRTCStreamResolution). It describes the resolution actually being sent on one video stream of one session.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member Index</th>
+<th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>VideoStreamID</td>
+      <td>uint8</td>
+      <td>M</td>
+      <td>Video stream ID</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Resolution</td>
+      <td><a href="#ref_WebRTC_VideoStreamResolutionStructure">VideoStreamResolutionStructure</a></td>
+      <td>M</td>
+      <td>Resolution currently being sent</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Changing</td>
+      <td>boolean</td>
+      <td>M</td>
+      <td>Whether a resolution switch is in progress</td>
+    </tr>
+  </tbody>
+</table>
+
+##### VideoStreamResolutionStructure Type {#ref_WebRTC_VideoStreamResolutionStructure}
+
+Used by [WebRTCSetResolution](#ref_WebRTCSetResolution) and [WebRTCStreamResolution](#ref_WebRTCStreamResolution). The device reports the current configuration of each resolution capability point through Supported Value (list). The meaning of the configuration fields is consistent with CAVSM.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member Index</th>
+<th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Width</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>Width in pixels</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Height</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>Height in pixels</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>FrameRate</td>
+      <td>uint8</td>
+      <td>M</td>
+      <td>Frame rate in fps</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>BitRate</td>
+      <td>uint32</td>
+      <td>M</td>
+      <td>Bit rate in bps</td>
+    </tr>
+  </tbody>
+</table>
+
 #### WebRTCCurrentSessions Trait {#ref_WebRTCCurrentSessions}
 
 List of currently active WebRTC sessions.
@@ -148067,6 +149939,63 @@ The gateway SHALL **Report** this Trait at the following moments:
     </tr>
   </tbody>
 </table>
+
+#### WebRTCStreamResolution Trait {#ref_WebRTCStreamResolution}
+
+Reports the resolution currently being sent on each video stream of each session.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5244</td>
+      <td>WebRTCStreamResolution</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_WebRTC_StreamResolutionStructure">StreamResolutionStructure</a>]</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+Reporting timing: each report carries the *whole list* of that session, not only the stream that changed.
+
+* The IDR of a new resolution of one stream has been sent -> that stream appears in the new list with the new tier.
+* A request failed -> keep the original resolution; do not trigger a resolution change report because of that failed request.
+* The target is already the current resolution and there is no switch in progress -> return `SUCCESS` and report the current resolution immediately.
+* Other unaffected streams in the same session appear in the same list with their original values.
+
+Path: the Server SHALL send it on the session's `aqara.control` with ProtocolID `0x00`, OpCode `0x018A` (`UnconfirmedCOVNotificationMultiple`); the Trait's Present Value SHALL be updated synchronously, and it MAY additionally be reported through the Report path.
+
+### Command Definitions
 
 #### WebRTCSolicitOffer Command {#ref_WebRTCSolicitOffer}
 
@@ -148317,6 +150246,601 @@ Single recording tag; the payload is an array of `RecordingTagStruct`, with the 
 ##### Message Payload
 
 When `MessageType=RecordingTags`, the payload SHALL be a continuous array of `RecordingTagStruct` with a length of `PayloadLength` bytes; `PayloadLength` SHALL be an integer multiple of 8.
+
+#### WebRTCTalk Command {#ref_WebRTCTalk}
+
+Session-level talk switch. The Server allows only one session with talk open at a time. The `InvokeCommand` forwarded by COIP and the `InvokeCommand` on that session's `aqara.control` use the same [WebRTCTalk Command Structure](#ref_WebRTCTalkCommandStructure). The request OpCode is `0x008D` and the response OpCode is `0x038D`.
+
+##### Parameters
+
+[WebRTCTalk Command Structure](#ref_WebRTCTalkCommandStructure)
+
+##### Response
+
+[WebRTCTalk Response Command Structure](#ref_WebRTCTalkResponseCommandStructure), with `Status` values:
+
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>SUCCESS</code></td>
+      <td>The <code>SessionId</code> has been opened and occupied, or closed and released. It also succeeds when the session is already in the target state</td>
+    </tr>
+    <tr>
+      <td><code>NOT_FOUND</code></td>
+      <td><code>SessionId</code> is not an active session. When it arrives from the DataChannel and is inconsistent with the session to which that channel belongs, this value is also taken</td>
+    </tr>
+    <tr>
+      <td><code>INVALID_IN_STATE</code></td>
+      <td>The Server does not support talk, or the session is not <code>LiveView</code></td>
+    </tr>
+    <tr>
+      <td><code>INVALID_COMMAND</code></td>
+      <td><code>Enabled</code> is missing. When it arrives from COIP without <code>SessionId</code>, this value is also taken</td>
+    </tr>
+    <tr>
+      <td><code>RESOURCE_EXHAUSTED</code></td>
+      <td>Talk is already occupied by another session, and this <code>SessionId</code> cannot be opened</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Processing
+
+* When it arrives from `aqara.control` without `SessionId`, the session is the one to which that channel belongs. A carried inconsistent `SessionId` -> return `NOT_FOUND`. When it arrives from COIP, `SessionId` SHALL be carried; omission -> return `INVALID_COMMAND`.
+* `Enabled=true` and not yet occupied -> this session occupies, return `SUCCESS`.
+* Opening again while this session already occupies -> return `SUCCESS`; it does not constitute a second occupation.
+* Opening while another session occupies -> return `RESOURCE_EXHAUSTED`. This session stays closed and does not preempt.
+* The occupier sends `Enabled=false` -> release, return `SUCCESS`.
+* A non-occupier sends `Enabled=false` -> return `SUCCESS`, and the occupier is not released.
+* The occupier's `WebRTCEndSession`, its DataChannel closing, or the PeerConnection ending -> release the occupation.
+
+#### WebRTCSetResolution Command {#ref_WebRTCSetResolution}
+
+Switches a bound `VideoStreamID` of this session to the target resolution. The switch does not change the SSRC; the new resolution starts from the new IDR of that stream, and the IDR carries the new SPS. After returning `SUCCESS`, the switch to the specified resolution SHALL be completed, and the actual resolution is reported by [WebRTCStreamResolution](#ref_WebRTCStreamResolution); on failure, a non-`SUCCESS` status is returned and the original resolution is kept.
+
+##### Parameters
+
+[WebRTCSetResolution Command Structure](#ref_WebRTCSetResolutionCommandStructure)
+
+##### Response
+
+[WebRTCSetResolutionResponse Command Structure](#ref_WebRTCSetResolutionResponseCommandStructure), with `Status` values:
+
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>SUCCESS</code></td>
+      <td>The request succeeded; the Server SHALL switch to the specified resolution. When the target is already the current resolution, it keeps it and reports immediately</td>
+    </tr>
+    <tr>
+      <td><code>NOT_FOUND</code></td>
+      <td><code>SessionId</code> is not an active session, or the target ID is not in that session. A <code>SessionId</code> inconsistent with the channel carried on the DataChannel also takes this value</td>
+    </tr>
+    <tr>
+      <td><code>INVALID_IN_STATE</code></td>
+      <td>The stream cannot be switched (<code>MinResolution</code> = <code>MaxResolution</code>, non-<code>LiveView</code>, or a playback session)</td>
+    </tr>
+    <tr>
+      <td><code>INVALID_COMMAND</code></td>
+      <td>The target resolution exceeds the Min/Max of that ID, or is not a tier of the capability set. When it arrives from COIP without <code>SessionId</code>, this value is also taken</td>
+    </tr>
+    <tr>
+      <td><code>RESOURCE_EXHAUSTED</code></td>
+      <td>The command queue is full</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Validation and Processing
+
+* When it arrives from `aqara.control` without `SessionId`, the session is the one to which that channel belongs. A carried inconsistent `SessionId` -> return `NOT_FOUND`. When it arrives from COIP, `SessionId` SHALL be carried; omission -> return `INVALID_COMMAND`.
+* `VideoStreamID` SHALL be a stream bound to this session with `StreamUsage=LiveView`; the `MinResolution` of that ID SHALL be less than `MaxResolution`.
+* The target resolution SHALL fall between the `MinResolution` and `MaxResolution` of that ID, and SHALL be a tier of `CAVSMRateDistortionTradeOffPoints`.
+* The target is already the current resolution and there is no switch in progress -> return `SUCCESS` and report `WebRTCStreamResolution` once immediately.
+* The request is executable -> return `SUCCESS`; the Server SHALL complete the switch and report `WebRTCStreamResolution` after the new IDR at the specified resolution is sent.
+* The request is not executable -> return the corresponding non-`SUCCESS` status and keep the original resolution.
+* Requests on the same stream SHALL be processed in order; SHALL NOT override a switch that has returned `SUCCESS` but has not yet completed. When the command queue is full, return `RESOURCE_EXHAUSTED`.
+
+#### DataChannel
+
+The transport, channels, messages, and file transfer binding of the in-session DataChannel are described in DataChannel.
+
+<a id="ref_WebRTC_DataChannel"></a>
+## DataChannel {#ref_WebRTC_附加协议}
+
+### Overview
+
+This section defines the Trait, Command, and carrier on the DataChannel within a WebRTC session. These Trait and Command still belong to the [WebRTC](#ref_Aqara_Spec_WebRTC) Function, and Command IDs share the same table as cloud signaling. In-session commands and states are `InvokeCommand` and `UnconfirmedCOVNotificationMultiple` with ProtocolID `0x00`, sent and received on `aqara.control`, without passing through the cloud. File bytes use the file transfer business interaction protocol (ProtocolID `0x02`). Fields, OpCodes, and interactions follow that protocol; this section does not define another set.
+
+### Transport {#ref_WebRTC_DataChannelTransport}
+
+The transport stack of the WebRTC DataChannel (RFC 8831) is SCTP over DTLS over ICE. One `m=application` is one SCTP association. There are two Data Channels on this association. Each Data Channel is bidirectional, with one SCTP stream in each direction, and the two streams use the same stream id.
+
+<table>
+  <thead>
+    <tr>
+      <th>Layer</th>
+      <th>Role</th>
+      <th>Meaning for this binding</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ICE</td>
+      <td>Hole punching or relay (P2P / TURN)</td>
+      <td>Shares one candidate pair and one connection with audio/video</td>
+    </tr>
+    <tr>
+      <td>DTLS</td>
+      <td>Encryption and identity</td>
+      <td>Shares the same certificate as audio/video; <code>a=setup</code> decides active / passive</td>
+    </tr>
+    <tr>
+      <td>SCTP</td>
+      <td>Reliable, ordered, message-oriented (RFC 4960)</td>
+      <td>This binding depends directly on it</td>
+    </tr>
+    <tr>
+      <td>DCEP (RFC 8832)</td>
+      <td>Opens channels on the association</td>
+      <td>label, Channel Type, and Priority live here and do not enter the SDP</td>
+    </tr>
+  </tbody>
+</table>
+
+Reliability and ordering are guaranteed by SCTP. File transfer reuses this delivery and does not add its own acknowledgment, retransmission, or whole-file checksum. Integrity is borne by DTLS. CoAP `Type` and `Message ID` do not carry acknowledgment. The request order of blocks is described in blockRequest. Only the Requestor can cancel, as described in abortRequest.
+
+### Channels {#ref_WebRTC_DataChannelChannels}
+
+A WebRTC session has at most one `m=application`. This media description carries one SCTP association, and the association runs on the same DTLS. There are two Data Channels (RFC 8831) on the association. Each Data Channel is bidirectional, with one SCTP stream in each direction, the same stream id, and the name is the DCEP Label:
+
+<table>
+  <thead>
+    <tr>
+      <th>label</th>
+      <th>Purpose</th>
+      <th>Channel Type</th>
+      <th>Priority</th>
+      <th>Content-Format</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>aqara.control</code></td>
+      <td>Business commands and responses, device status notifications. Recording queries and tier switching, and playback are also on this Data Channel</td>
+      <td><code>0x00</code> reliable ordered</td>
+      <td><code>1024</code></td>
+      <td><code>50</code> (JSON)</td>
+    </tr>
+    <tr>
+      <td><code>aqara.download</code></td>
+      <td>Fetch file bytes according to the file transfer business interaction protocol</td>
+      <td><code>0x00</code> reliable ordered</td>
+      <td><code>128</code></td>
+      <td><code>60</code> (CBOR)</td>
+    </tr>
+  </tbody>
+</table>
+
+The ProtocolID is selected by which allocated business protocol a message in the session belongs to, and no separate protocol is defined per Data Channel:
+
+<table>
+  <thead>
+    <tr>
+      <th>ProtocolID</th>
+      <th>Business protocol family</th>
+      <th>Carrier in this session</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>0x00</code></td>
+      <td>Aqara data model business interaction protocol</td>
+      <td>InvokeCommand (including recording queries) and <code>UnconfirmedCOVNotificationMultiple</code></td>
+    </tr>
+    <tr>
+      <td><code>0x02</code></td>
+      <td>File transfer business interaction protocol</td>
+      <td>Carries file fetching only</td>
+    </tr>
+  </tbody>
+</table>
+
+The OpCodes of `0x00` follow the data model: the high byte is the PDU Type and the low byte is the Service Choice. This binding does not add such OpCodes.
+
+<table>
+  <thead>
+    <tr>
+      <th>OpCode</th>
+      <th>PDU Type</th>
+      <th>Service name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>0x008D</code></td>
+      <td>Confirmed-Request</td>
+      <td>InvokeCommand</td>
+      <td>In-session business command. <code>propertyIdentifier</code> is the Command ID and <code>propertyValue</code> is the command request parameters</td>
+    </tr>
+    <tr>
+      <td><code>0x038D</code></td>
+      <td>ComplexACK</td>
+      <td>InvokeCommand</td>
+      <td>Command response. <code>propertyValue</code> is the command response structure, member 0 is <code>Status</code></td>
+    </tr>
+    <tr>
+      <td><code>0x018A</code></td>
+      <td>Unconfirmed-Request</td>
+      <td>UnconfirmedCOVNotificationMultiple</td>
+      <td>Device actively reports <code>WebRTCStreamResolution</code> and <a href="#ref_LocalPlaybackStatus">LocalPlaybackStatus</a></td>
+    </tr>
+  </tbody>
+</table>
+
+`0x02` uses the function numbers of the file transfer protocol itself. Fields and interactions are described in the definitions linked in the table below; this section does not define another set.
+
+<table>
+  <thead>
+    <tr>
+      <th>OpCode</th>
+      <th>Function name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>0x0000</code> / <code>0x0001</code></td>
+      <td>initRequest / initResponse</td>
+      <td>Establish the transfer</td>
+    </tr>
+    <tr>
+      <td><code>0x0002</code> / <code>0x0003</code></td>
+      <td>blockRequest / blockResponse</td>
+      <td>Pull by range in batches; each block response carries <code>blockCounter</code> and <code>data</code></td>
+    </tr>
+    <tr>
+      <td><code>0x0004</code> / <code>0x0005</code></td>
+      <td>EOFRequest / EOFResponse</td>
+      <td>The requestor confirms that the last block has been processed</td>
+    </tr>
+    <tr>
+      <td><code>0x0006</code> / <code>0x0007</code></td>
+      <td>abortRequest / abortResponse</td>
+      <td>The requestor cancels</td>
+    </tr>
+    <tr>
+      <td><code>0x0008</code></td>
+      <td>errorResponse</td>
+      <td>Business failure. The data model Error PDU is not used</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>label</th>
+      <th>Carrier</th>
+      <th>OpCode</th>
+      <th>Direction</th>
+      <th>Typical messages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>aqara.control</code></td>
+      <td>InvokeCommand (ProtocolID <code>0x00</code>)</td>
+      <td><code>0x008D</code> / <code>0x038D</code></td>
+      <td>App -> Device / back</td>
+      <td><a href="#ref_WebRTCSetResolution">WebRTCSetResolution</a>, <a href="#ref_WebRTCTalk">WebRTCTalk</a>, <a href="#ref_LocalPlaybackControl">LocalPlaybackControl</a>, <a href="#ref_LocalRecordQuery">LocalRecordQuery</a></td>
+    </tr>
+    <tr>
+      <td><code>aqara.control</code></td>
+      <td>UnconfirmedCOVNotificationMultiple (ProtocolID <code>0x00</code>)</td>
+      <td><code>0x018A</code></td>
+      <td>Device -> App</td>
+      <td><code>WebRTCStreamResolution</code>, <a href="#ref_LocalPlaybackStatus">LocalPlaybackStatus</a></td>
+    </tr>
+    <tr>
+      <td><code>aqara.download</code></td>
+      <td>File transfer (ProtocolID <code>0x02</code>)</td>
+      <td>0x0000-0x0008</td>
+      <td>App requests, device responds</td>
+      <td>init, block, EOF, abort, error</td>
+    </tr>
+  </tbody>
+</table>
+
+The table above specifies which type of message uses which label:
+
+* The same CoAP message SHALL NOT appear on two labels.
+* The two Data Channels are each ordered and do not queue on each other; control messages are not queued behind file blocks. They share this one SCTP association, the same DTLS / ICE, and the same congestion window, and SHALL NOT each open an `m=`.
+* The App creates labels after `WebRTCProvideOffer` (`negotiated=false`). The device collects them in `onDataChannel` by label; labels that do not match SHALL be ignored. Before `DATA_CHANNEL_OPEN` of a label completes, the App SHALL NOT send messages on that label.
+* When the App is the offerer, the stream id of label `aqara.control` is `0`, and label `aqara.download` is `2`.
+* The Channel Type of both Data Channels is `0x00` (`DATA_CHANNEL_RELIABLE`), and the Reliability Parameter SHALL be `0`. Other Channel Types SHALL NOT be used.
+* The Content-Format of label `aqara.control` SHALL be `50`. Label `aqara.download` SHALL be `60`. File blocks are `octetString` and SHALL NOT be Base64-encoded into JSON.
+* Recording queries are `LocalRecordQuery` on label `aqara.control`. The bytes of the index file and recording files go over label `aqara.download`.
+
+### Messages
+
+One SCTP user message (PPID = `53`) SHALL carry exactly one complete CoAP message. This binding fixes the CoAP header to `Type=NON`, `Message ID=0`. The message diagrams in the file transfer protocol body are written for reliable transport with Length; OpCode and Payload are the same, see the file transfer business interaction protocol.
+
+```
+SCTP User Message (PPID = 53)
+└─ CoAP Message
+   ├─ Version: 1
+   ├─ Type: NON
+   ├─ Code: 0.02 POST / allowed response Codes
+   ├─ Message ID: 0
+   ├─ Token
+   ├─ Options
+   ├─ Payload Marker: 0xFF
+   └─ Payload
+```
+
+* `Type` SHALL be `NON`. `CON`, `ACK`, and `RST` SHALL NOT be used.
+* `Message ID` SHALL be `0`. Both sides SHALL ignore it and SHALL NOT use it for deduplication or correlation.
+* Requests and responses SHALL be correlated through `Token`. The `Token` length SHALL be 1-8 bytes and SHALL NOT repeat on the same connection at the same time.
+* Messages that do not require a response SHALL use an empty `Token`.
+* One SCTP user message SHALL NOT carry multiple CoAP messages; one CoAP message SHALL NOT span multiple SCTP user messages.
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Option ID</th>
+      <th>Appearance</th>
+      <th>Value in this binding</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Uri-Path</td>
+      <td><code>11</code></td>
+      <td>M</td>
+      <td>Two Options, values in order <code>coip</code>, <code>interaction</code></td>
+    </tr>
+    <tr>
+      <td>Content-Format</td>
+      <td><code>12</code></td>
+      <td>M</td>
+      <td><code>aqara.control</code> is <code>50</code>; <code>aqara.download</code> is <code>60</code></td>
+    </tr>
+    <tr>
+      <td>Accept</td>
+      <td><code>17</code></td>
+      <td>C</td>
+      <td>Requests with a payload SHALL carry it. The value for <code>aqara.download</code> is described in the file transfer encoding rules</td>
+    </tr>
+    <tr>
+      <td>InteractionVersion</td>
+      <td><code>2048</code></td>
+      <td>M</td>
+      <td><code>0</code></td>
+    </tr>
+    <tr>
+      <td>SourceDeviceID</td>
+      <td><code>2052</code></td>
+      <td>O</td>
+      <td>SHALL be omitted</td>
+    </tr>
+    <tr>
+      <td>DestinationDeviceID</td>
+      <td><code>2056</code></td>
+      <td>O</td>
+      <td>SHALL be omitted</td>
+    </tr>
+    <tr>
+      <td>ProtocolID</td>
+      <td><code>2064</code></td>
+      <td>M</td>
+      <td><code>0x00</code> or <code>0x02</code></td>
+    </tr>
+    <tr>
+      <td>OpCode</td>
+      <td><code>2072</code></td>
+      <td>M</td>
+      <td>See the OpCode table of <a href="#ref_WebRTC_DataChannelChannels">Channels</a>; SHALL use the shortest uint encoding</td>
+    </tr>
+    <tr>
+      <td>PayloadEncryption</td>
+      <td><code>2076</code></td>
+      <td>M</td>
+      <td><code>0</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>Scenario</th>
+      <th>Sender</th>
+      <th>Receiver</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Business commands (including recording queries)</td>
+      <td>Code <code>0.02</code>, non-empty Token</td>
+      <td><code>2.04 Changed</code>, echoing the same Token</td>
+    </tr>
+    <tr>
+      <td>File transfer</td>
+      <td>Code <code>0.02</code>, non-empty Token</td>
+      <td><code>2.04 Changed</code>, echoing the same Token. Interactions follow the OpCode master table</td>
+    </tr>
+    <tr>
+      <td>Resolution and playback status reports</td>
+      <td>Code <code>0.02</code>, empty Token, OpCode <code>0x018A</code></td>
+      <td>No CoAP response</td>
+    </tr>
+    <tr>
+      <td>Business failure of data model commands</td>
+      <td>-</td>
+      <td>Stays in the ComplexACK of <code>InvokeCommand</code>, member 0 is <code>Status</code></td>
+    </tr>
+    <tr>
+      <td>Business failure of file transfer</td>
+      <td>-</td>
+      <td>errorResponse, not <code>StatusCodeEnum8</code></td>
+    </tr>
+  </tbody>
+</table>
+
+The structure encoding of `aqara.control` is a JSON Object, with member keys being the decimal strings of member indices. The encoding of `aqara.download` is described in the file transfer encoding rules. Mandatory JSON members that are semantically nullable are encoded as `null` when empty and SHALL NOT omit the key. `LocalRecordQuery`'s `QueryLocalRecordType` indicates the kind, and only the member it points to appears: `LocalRecordIndex` or `LocalRecordSegment`.
+
+### SDP and DCEP
+
+`m=application` has only the following lines in both the Offer and the Answer. ICE candidates, `a=setup`, and the fingerprint are shared with audio/video. The `mid` of this `m=` goes into the session-level `a=group:BUNDLE`.
+
+Offer (App):
+
+```
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=mid:2
+a=sctp-port:5000
+a=setup:actpass
+a=ice-ufrag:offerufrag
+a=ice-pwd:offericepwd0123456789abcd
+a=fingerprint:sha-256 AA:BB:CC:DD
+```
+
+Answer (Device):
+
+```
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=mid:2
+a=sctp-port:5000
+a=setup:passive
+a=ice-ufrag:answerufrag
+a=ice-pwd:answericepwd0123456789abcd
+a=fingerprint:sha-256 EE:FF:00:11
+```
+
+When the device does not accept this `m=`, it writes port `0` and adds `a=inactive`. The session is still established normally, only without a DataChannel. Tier switching, queries, and file transfer are all unavailable, and media is still sent at the broadcast resolution.
+
+`label`, Channel Type, and Priority are not written into the SDP; they are opened on the association by RFC 8832 (WebRTC Data Channel Establishment Protocol). When the App is the offerer, stream ids are even.
+
+The format of `DATA_CHANNEL_OPEN` is in Section 5.1 of RFC 8832:
+
+```
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Message Type |  Channel Type |            Priority           |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Reliability Parameter                      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Label Length          |       Protocol Length         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+\                                                               /
+|                             Label                             |
+/                                                               \
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+\                                                               /
+|                            Protocol                           |
+/                                                               \
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+```
+
+The format of `DATA_CHANNEL_ACK` is in Section 5.2 of RFC 8832:
+
+```
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Message Type |
++-+-+-+-+-+-+-+-+
+```
+
+The App sends one `DATA_CHANNEL_OPEN` for each Data Channel. The first column of the table is the value of the Label field:
+
+<table>
+  <thead>
+    <tr>
+      <th>label</th>
+      <th>Priority</th>
+      <th>stream id</th>
+      <th>Message (hex)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>aqara.control</code></td>
+      <td><code>1024</code></td>
+      <td><code>0</code></td>
+      <td><code>03 00 04 00 00 00 00 00 00 0D 00 00</code> + <code>61 71 61 72 61 2E 63 6F 6E 74 72 6F 6C</code></td>
+    </tr>
+    <tr>
+      <td><code>aqara.download</code></td>
+      <td><code>128</code></td>
+      <td><code>2</code></td>
+      <td><code>03 00 00 80 00 00 00 00 00 0E 00 00</code> + <code>61 71 61 72 61 2E 64 6F 77 6E 6C 6F 61 64</code></td>
+    </tr>
+  </tbody>
+</table>
+
+Values in this binding: Message Type `0x03`, Channel Type `0x00` (`DATA_CHANNEL_RELIABLE`), Reliability Parameter `0`, Protocol Length `0`, and Protocol empty. Priority, Label Length, and Label are in the table above. The Message Type of `DATA_CHANNEL_ACK` is `0x02`. `a=max-message-size` is not written; the default single SCTP user message is 65536 bytes. The stream id is not in the OPEN message body. The App sends this OPEN on the stream id of that Data Channel, and both directions use the same stream id.
+
+```mermaid
+sequenceDiagram
+    participant App as App DTLS Client
+    participant Dev as Device DTLS Server
+    App->>Dev: Offer setup actpass
+    Dev-->>App: Answer setup passive
+    Note over App,Dev: ICE and DTLS are shared with media
+    Note over App,Dev: SCTP association comes up
+    App->>Dev: DATA_CHANNEL_OPEN label aqara.control
+    App->>Dev: DATA_CHANNEL_OPEN label aqara.download
+    Dev-->>App: DATA_CHANNEL_ACK for each label
+    Note over App,Dev: CoAP starts on an open label
+    Note over App,Dev: EndSession drops unfinished transfers
+```
+
+Only after the device receives `DATA_CHANNEL_OPEN` of a label and returns `DATA_CHANNEL_ACK` does it consider that label available. Before that, the App SHALL NOT send messages on that label. `m=application`, DTLS, and the SCTP association are not established again per label. Messages are isolated by label, see [Channels](#ref_WebRTC_DataChannelChannels).
+
+### Channel Reporting Trait
+
+* [WebRTCStreamResolution](#ref_WebRTCStreamResolution)
+* [LocalPlaybackStatus](#ref_LocalPlaybackStatus)
+
+### Channel Command Command
+
+The Commands currently supported on label `aqara.control`. The specifications are in the DataChannel channel command table of [WebRTC](#ref_Aqara_Spec_WebRTC) and the corresponding Command definitions.
+
+* [WebRTCSetResolution](#ref_WebRTCSetResolution)
+* [WebRTCTalk](#ref_WebRTCTalk)
+* [LocalPlaybackControl](#ref_LocalPlaybackControl)
+* [LocalRecordQuery](#ref_LocalRecordQuery)
+
+### File Transfer Binding
+
+The App is the Requestor and the device is the Provider. The entries of `LocalRecordQuery` give [FileDescriptorStructure](#ref_FileDescriptorStructure). The field meanings follow the dependency section of the file transfer business interaction protocol and are written into initRequest as-is. Encoding follows the file transfer encoding rules.
+
+* Label `aqara.download` carries only ProtocolID `0x02`. The device does not proactively send bytes on that label; currently only the requestor pulls.
+* Only one unfinished `transferId` exists on that label at a time. A second `initRequest` returns `Busy` (errorResponse).
+* Block request order, last block, and cancellation follow blockRequest, EOFRequest, and abortRequest.
+* This binding defines the "secure session" as the DTLS session of this PeerConnection. `transferId` is unique and non-zero within that session. When `WebRTCEndSession`, the DataChannel closes, or DTLS ends, unfinished transfers are invalidated and both sides release resources.
+* Card removal, circular overwrite, or read failures are not separately cancelled by the device. The result is shown on the current batch or the next request via errorResponse.
+* Media types are not in the file transfer protocol. mp4 and the original index format are decided by the business object.
+* When negotiating `maxBlockSize`, reserve space for CoAP encapsulation and CBOR overhead, see the file block message of the file transfer protocol. The CBOR Map of `blockResponse` also carries the current block number `blockCounter`; the encapsulation overhead varies with the CBOR encoding width of the block number and data length, and is no longer calculated as a fixed 25 bytes. The example uses `maxBlockSize` of `32768`.
 
 ## SO2 (Sulfur Dioxide) {#ref_Aqara_Spec_SO2}
 
