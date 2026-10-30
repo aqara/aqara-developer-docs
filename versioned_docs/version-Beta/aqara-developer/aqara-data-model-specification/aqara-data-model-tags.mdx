@@ -150014,7 +150014,7 @@ Path: the Server SHALL send it on the session's `aqara.control` with ProtocolID 
 
 #### WebRTCSolicitOffer Command {#ref_WebRTCSolicitOffer}
 
-Requests the device to initiate a WebRTC Offer. When `DeferredOffer=true`, the subsequent Offer is delivered via the **Report** `WebRTCSignalingEvent`, and the App then sends `WebRTCProvideAnswer`.
+The Client SHALL first complete the [CameraAVStreamManagement pre-interaction](#ref_WebRTC_CAVSMDependency), and then request the Server to initiate a WebRTC Offer. When `DeferredOffer=true`, the subsequent Offer is delivered via the **Report** `WebRTCSignalingEvent`, and the App then sends `WebRTCProvideAnswer`.
 
 ##### Parameters
 
@@ -150026,7 +150026,7 @@ Requests the device to initiate a WebRTC Offer. When `DeferredOffer=true`, the s
 
 #### WebRTCProvideOffer Command {#ref_WebRTCProvideOffer}
 
-Submits an SDP Offer to establish or update a WebRTC session. On success, the camera sends an Answer through Matter, and the gateway **Reports** `WebRTCSignalingEvent(Answer)`.
+Submits an SDP Offer to establish or update a WebRTC session. Before creating a new session, the Client SHALL complete the [CameraAVStreamManagement pre-interaction](#ref_WebRTC_CAVSMDependency). On success, the camera sends an Answer through Matter, and the gateway **Reports** `WebRTCSignalingEvent(Answer)`.
 
 ##### Parameters
 
