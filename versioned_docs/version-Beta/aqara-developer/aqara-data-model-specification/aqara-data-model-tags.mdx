@@ -138776,17 +138776,17 @@ The file descriptor required by the file transfer business interaction protocol 
   <tbody>
     <tr>
       <td>0</td>
-<td>Date</td>
-      <td>uint32</td>
+      <td>FileDescriptor</td>
+      <td><a href="#ref_FileDescriptorStructure">FileDescriptorStructure</a></td>
       <td>M</td>
-      <td>UTC date in <code>YYYYMMDD</code>, for display and query reference only; it does not enter initRequest</td>
+      <td>Per-day index file; written to <code>initRequest</code> when fetching bytes</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>File Descriptor</td>
-      <td><a href="#ref_FileDescriptorStructure">FileDescriptorStructure</a></td>
+      <td>Date</td>
+      <td>characterString</td>
       <td>M</td>
-<td>Descriptor of the per-day sub-index file; the App downloads it via the file transfer protocol</td>
+      <td>UTC date of this index in <code>YYYYMMDD</code>, e.g. <code>&amp;quot;20261013&amp;quot;</code>. For display only; it does not enter <code>initRequest</code></td>
     </tr>
   </tbody>
 </table>
@@ -147934,15 +147934,6 @@ After receiving this Command, SHALL validate the `StreamPriorities` and process 
 
 ### Interaction Flow
 
-#### Interaction Roles
-
-This section uniformly uses Client and Server to describe interactions without distinguishing specific access topologies.
-
-* Client: the side that requests and receives media and initiates control, collectively representing the App and the cloud.
-* Server: the side that provides media and handles requests, collectively representing the gateway and the camera.
-
-The Client and Server complete signaling interactions through Aqara Spec Command / Response / Report and transmit bidirectional media over WebRTC (P2P/TURN). Internal forwarding and protocol conversion within each side are not expanded in the flow diagrams.
-
 #### Topology Overview
 
 **Processing Logic**
@@ -148473,6 +148464,17 @@ sequenceDiagram
 
     Note over Client,Server: Initiate the WebRTC session only after all required streams are allocated and IDs are obtained
 ```
+
+### Interaction Flow
+
+#### Interaction Roles
+
+This section uniformly uses Client and Server to describe interactions without distinguishing specific access topologies.
+
+* Client: the side that requests and receives media and initiates control, collectively representing the App and the cloud.
+* Server: the side that provides media and handles requests, collectively representing the gateway and the camera.
+
+The Client and Server complete signaling interactions through Aqara Spec Command / Response / Report and transmit bidirectional media over WebRTC (P2P/TURN). Internal forwarding and protocol conversion within each side are not expanded in the flow diagrams.
 
 #### WebRTCProvideOffer Flow {#ref_WebRTC_FlowProvideOffer}
 
@@ -149645,14 +149647,14 @@ The request structure of `WebRTCSetResolution`.
     <tr>
       <td>0</td>
       <td>VideoStreamID</td>
-      <td>uint8</td>
+      <td>uint16</td>
       <td>M</td>
       <td>The video stream ID to switch</td>
     </tr>
     <tr>
       <td>1</td>
       <td>Resolution</td>
-      <td><a href="#ref_WebRTC_VideoStreamResolutionStructure">VideoStreamResolutionStructure</a></td>
+      <td><a href="#ref_VideoResolutionStructure">VideoResolutionStructure</a></td>
       <td>M</td>
       <td>The target resolution</td>
     </tr>
