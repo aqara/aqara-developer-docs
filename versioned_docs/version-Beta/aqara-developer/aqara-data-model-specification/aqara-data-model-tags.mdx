@@ -138878,6 +138878,36 @@ The response member `LocalRecordSegment` SHALL have the same length and order as
   </tbody>
 </table>
 
+### Trait Definitions
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4FE9</td>
+      <td><a href="#ref_CloudClipRecordingType">CloudClipRecordingType</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x4FC1</td>
+      <td><a href="#ref_SupportLocalVideoDownload">SupportLocalVideoDownload</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5243</td>
+      <td><a href="#ref_LocalPlaybackStatus">LocalPlaybackStatus</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+
 #### CloudClipRecordingType Trait (Cloud Clip Recording Type) {#ref_CloudClipRecordingType}
 
 Indicates the recording type of the triggered cloud short video (clip). Value 0 = default (unspecified), 1 = recording (general event), 22 = related event (triggered by other sensors/devices), 27 = security related event (for example, home security alarm). This feature can be read, written, and proactively reported by the device.
@@ -149188,14 +149218,14 @@ Request parameter structure of the WebRTCSolicitOffer Command.
       <td>VideoStreams</td>
       <td>list[uint16]</td>
       <td>O</td>
-      <td>List of VideoStreamIDs (1 to 16).</td>
+      <td>List of VideoStreamIDs (1 to 16); SHALL be carried when video is used and SHALL reference the streams allocated for this StreamUsage, see <a href="#ref_WebRTC_CAVSMDependency">CameraAVStreamManagement pre-interaction</a>.</td>
     </tr>
     <tr>
       <td>6</td>
       <td>AudioStreams</td>
       <td>list[uint16]</td>
       <td>O</td>
-      <td>List of AudioStreamIDs (1 to 16).</td>
+      <td>List of AudioStreamIDs (1 to 16); SHALL be carried when audio is used and SHALL reference the streams allocated for this StreamUsage, see <a href="#ref_WebRTC_CAVSMDependency">CameraAVStreamManagement pre-interaction</a>.</td>
     </tr>
     <tr>
       <td>7</td>
@@ -149225,9 +149255,9 @@ Response parameter structure of the WebRTCSolicitOffer Command.
     <tr>
       <td>0</td>
       <td>Status</td>
-      <td><a href="#ref_StatusCodeEnum8">StatusCodeEnum8</a></td>
+      <td><a href="#ref_WebRTCStatusCodeEnum8">WebRTCStatusCodeEnum8</a></td>
       <td>M</td>
-      <td>Processing status; definition see <a href="#ref_Aqara_Spec_CameraAVStreamManagement">CameraAVStreamManagement</a>.</td>
+      <td>Processing status; definition see <a href="#ref_WebRTCStatusCodeEnum8">WebRTCStatusCodeEnum8</a>.</td>
     </tr>
     <tr>
       <td>1</td>
@@ -149240,15 +149270,15 @@ Response parameter structure of the WebRTCSolicitOffer Command.
       <td>2</td>
       <td>SessionId</td>
       <td>uint16</td>
-      <td>M</td>
-      <td>Allocated session ID.</td>
+      <td>O</td>
+      <td>SHALL be carried with the allocated session ID when <code>Status=SUCCESS</code>; SHALL be omitted on failure.</td>
     </tr>
     <tr>
       <td>3</td>
       <td>DeferredOffer</td>
       <td>boolean</td>
-      <td>M</td>
-      <td>Whether the Offer is delivered with a delay.</td>
+      <td>O</td>
+      <td>Whether the Offer is delivered with a delay; SHALL be carried when <code>Status=SUCCESS</code>; SHALL be omitted on failure.</td>
     </tr>
   </tbody>
 </table>
@@ -149322,14 +149352,14 @@ Request parameter structure of the WebRTCProvideOffer Command.
       <td>VideoStreams</td>
       <td>list[uint16]</td>
       <td>O</td>
-      <td>List of VideoStreamIDs (1 to 16).</td>
+      <td>List of VideoStreamIDs (1 to 16); SHALL be carried when video is used and SHALL reference the streams allocated for this StreamUsage, see <a href="#ref_WebRTC_CAVSMDependency">CameraAVStreamManagement pre-interaction</a>.</td>
     </tr>
     <tr>
       <td>8</td>
       <td>AudioStreams</td>
       <td>list[uint16]</td>
       <td>O</td>
-      <td>List of AudioStreamIDs (1 to 16).</td>
+      <td>List of AudioStreamIDs (1 to 16); SHALL be carried when audio is used and SHALL reference the streams allocated for this StreamUsage, see <a href="#ref_WebRTC_CAVSMDependency">CameraAVStreamManagement pre-interaction</a>.</td>
     </tr>
     <tr>
       <td>9</td>
@@ -149359,7 +149389,7 @@ Response parameter structure of the WebRTCProvideOffer Command.
     <tr>
       <td>0</td>
       <td>Status</td>
-      <td><a href="#ref_StatusCodeEnum8">StatusCodeEnum8</a></td>
+      <td><a href="#ref_WebRTCStatusCodeEnum8">WebRTCStatusCodeEnum8</a></td>
       <td>M</td>
       <td>Processing status.</td>
     </tr>
@@ -149374,8 +149404,8 @@ Response parameter structure of the WebRTCProvideOffer Command.
       <td>2</td>
       <td>SessionId</td>
       <td>uint16</td>
-      <td>M</td>
-      <td>Session ID.</td>
+      <td>O</td>
+      <td>SHALL be carried with the new or updated session ID when <code>Status=SUCCESS</code>; SHALL be omitted on failure.</td>
     </tr>
   </tbody>
 </table>
