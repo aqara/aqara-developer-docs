@@ -139540,7 +139540,7 @@ This enumeration defines the valid values of the Present Value for the ClientKee
 
 #### PeriodicSnapshotUploadEnable Trait (Periodic Snapshot Upload Enable) {#ref_PeriodicSnapshotUploadEnable}
 
-Enables or disables the periodic upload of snapshots to the cloud (every 10 minutes).
+Enables or disables periodic snapshot upload to the cloud. When [PeriodicSnapshotInterval](#ref_PeriodicSnapshotInterval) is implemented, the capture interval is configured by that Trait; when it is not implemented, the behavior of uploading one frame every 10 minutes is maintained.
 
 <table>
   <thead>
@@ -146208,7 +146208,7 @@ This enumeration defines the valid values of the audio/video stream usage.
 
 ##### StatusCodeEnum8 Type {#ref_StatusCodeEnum8}
 
-This enumeration defines the valid values of the Command response status codes.
+This enumeration defines the valid values of the Command response status codes of the CameraAVStreamManagement Function.
 
 <table>
   <thead>
@@ -149462,7 +149462,7 @@ Response parameter structure of the WebRTCProvideAnswer Command.
     <tr>
       <td>0</td>
       <td>Status</td>
-      <td><a href="#ref_StatusCodeEnum8">StatusCodeEnum8</a></td>
+      <td><a href="#ref_WebRTCStatusCodeEnum8">WebRTCStatusCodeEnum8</a></td>
       <td>M</td>
       <td>Processing status.</td>
     </tr>
@@ -149526,7 +149526,7 @@ Response parameter structure of the WebRTCProvideICECandidates Command.
     <tr>
       <td>0</td>
       <td>Status</td>
-      <td><a href="#ref_StatusCodeEnum8">StatusCodeEnum8</a></td>
+      <td><a href="#ref_WebRTCStatusCodeEnum8">WebRTCStatusCodeEnum8</a></td>
       <td>M</td>
       <td>Processing status.</td>
     </tr>
