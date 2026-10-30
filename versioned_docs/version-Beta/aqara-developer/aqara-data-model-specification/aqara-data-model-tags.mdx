@@ -138459,6 +138459,11 @@ This enumeration defines the valid values of the Present Value for the CloudClip
       <td><a href="#ref_SupportLocalVideoDownload">SupportLocalVideoDownload</a></td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5243</td>
+      <td><a href="#ref_LocalPlaybackStatus">LocalPlaybackStatus</a></td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -139139,6 +139144,31 @@ Reports the local playback status of each playback session in the current WebRTC
 </table>
 
 This Trait is reported periodically on label `aqara.control` via `UnconfirmedCOVNotificationMultiple` (ProtocolID `0x00`, OpCode `0x018A`). The device SHALL NOT report this Trait through the Report path.
+
+### Command Definitions
+
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9DB7</td>
+      <td><a href="#ref_LocalPlaybackControl">LocalPlaybackControl</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DB8</td>
+      <td><a href="#ref_LocalRecordQuery">LocalRecordQuery</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
 
 #### LocalPlaybackControl Command (Local Playback Control) {#ref_LocalPlaybackControl}
 
