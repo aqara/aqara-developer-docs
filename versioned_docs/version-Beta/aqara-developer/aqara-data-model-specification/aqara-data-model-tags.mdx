@@ -139392,6 +139392,8 @@ This Function does not contain any Commands.
 
 ##### PeriodicSnapshotIntervalEnum8 Type {#ref_PeriodicSnapshotIntervalEnum8}
 
+This enumeration defines the valid values of the Present Value for the PeriodicSnapshotInterval Trait.
+
 <table>
   <thead>
     <tr>
@@ -139403,33 +139405,33 @@ This Function does not contain any Commands.
   <tbody>
     <tr>
       <td>0x00</td>
-      <td>Off</td>
-      <td>Off</td>
+      <td>Auto</td>
+      <td>Auto</td>
     </tr>
     <tr>
       <td>0x01</td>
-      <td>Seconds5</td>
-      <td>5 seconds</td>
+      <td>Minutes10</td>
+      <td>10 minutes</td>
     </tr>
     <tr>
       <td>0x02</td>
-      <td>Seconds10</td>
-      <td>10 seconds</td>
+      <td>Minutes30</td>
+      <td>30 minutes</td>
     </tr>
     <tr>
       <td>0x03</td>
-      <td>Seconds30</td>
-      <td>30 seconds</td>
+      <td>Minutes60</td>
+      <td>60 minutes</td>
     </tr>
     <tr>
       <td>0x04</td>
-      <td>Minutes1</td>
-      <td>1 minute</td>
+      <td>Minutes120</td>
+      <td>120 minutes</td>
     </tr>
     <tr>
       <td>0x05</td>
-      <td>Minutes5</td>
-      <td>5 minutes</td>
+      <td>Minutes240</td>
+      <td>240 minutes</td>
     </tr>
   </tbody>
 </table>
@@ -147902,6 +147904,15 @@ After receiving this Command, SHALL validate the `StreamPriorities` and process 
 
 ### Interaction Flow
 
+#### Interaction Roles
+
+This section uniformly uses Client and Server to describe interactions without distinguishing specific access topologies.
+
+* Client: the side that requests and receives media and initiates control, collectively representing the App and the cloud.
+* Server: the side that provides media and handles requests, collectively representing the gateway and the camera.
+
+The Client and Server complete signaling interactions through Aqara Spec Command / Response / Report and transmit bidirectional media over WebRTC (P2P/TURN). Internal forwarding and protocol conversion within each side are not expanded in the flow diagrams.
+
 #### Topology Overview
 
 **Processing Logic**
@@ -148267,6 +148278,8 @@ The WebRTC Transport Function defines the WebRTC signaling interface between the
 
 ### Function Identifier
 
+**Processing Logic**
+
 <table>
   <thead>
     <tr>
@@ -148285,6 +148298,8 @@ The WebRTC Transport Function defines the WebRTC signaling interface between the
 </table>
 
 ### Trait
+
+The Server reports using the following Trait.
 
 <table>
   <thead>
@@ -148324,6 +148339,8 @@ The WebRTC Transport Function defines the WebRTC signaling interface between the
 </table>
 
 ### Command
+
+The Client requests using the following Command.
 
 <table>
   <thead>
@@ -150142,6 +150159,7 @@ Switches one `VideoStreamID` bound to this session to the target resolution. The
 
 The transport, channels, messages, and file transfer binding of the in-session DataChannel are described in DataChannel.
 
+<a id="ref_WebRTC_DataChannel"></a>
 ## DataChannel {#ref_WebRTC_附加协议}
 
 ### Overview
