@@ -131668,6 +131668,24 @@ Manages local SD card recording, formatting, recording modes, and storage status
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5245</td>
+      <td><a href="#ref_RecordingDurationType">RecordingDurationType</a></td>
+      <td>Recording duration type</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5246</td>
+      <td><a href="#ref_MinRecordingDuration">MinRecordingDuration</a></td>
+      <td>Minimum recording duration</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5247</td>
+      <td><a href="#ref_MaxRecordingDuration">MaxRecordingDuration</a></td>
+      <td>Maximum recording duration</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5025</td>
       <td><a href="#ref_SetNASSharedFolder">SetNASSharedFolder</a></td>
       <td>Set shared folder</td>
@@ -132146,6 +132164,24 @@ Parameter structure of the FormatSDCardCommand Command.
     <tr>
       <td>0x4FD2</td>
       <td><a href="#ref_RecordingMode">RecordingMode</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5245</td>
+      <td><a href="#ref_RecordingDurationType">RecordingDurationType</a></td>
+      <td>Recording duration type</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5246</td>
+      <td><a href="#ref_MinRecordingDuration">MinRecordingDuration</a></td>
+      <td>Minimum recording duration</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5247</td>
+      <td><a href="#ref_MaxRecordingDuration">MaxRecordingDuration</a></td>
+      <td>Maximum recording duration</td>
       <td>O</td>
     </tr>
     <tr>
@@ -138122,9 +138158,62 @@ This Command is used to perform the "Camera Sleep Toggle Command" operation.
 
 ## Playback (Playback) {#ref_Aqara_Spec_Playback}
 
+### Interaction Flow
+
+#### Downloading the Local Recording Index File {#ref_LocalRecord_FlowDownloadIndex}
+
+This section describes the flow in which the App downloads the local recording index file over the WebRTC DataChannel.
+The index granularity is *day*: at most one entry per day. A single query can span multiple days, and the response member `LocalRecordIndex` is the list of those days. When the number of days is small, `MaxCount` / `Cursor` are usually not needed.
+
+* Command: [LocalRecordQuery](#ref_LocalRecordQuery) with `QueryLocalRecordType=LocalRecordIndex`; the parameters are in the member `LocalRecordIndex`. It is exchanged via `InvokeCommand` on label `aqara.control`; the request OpCode is `0x008D` and the response OpCode is `0x038D`.
+* Response: the ComplexACK of this Command. Member 0 is `Status`, and the member `LocalRecordIndex` is a list of [LocalRecordIndexEntryStructure](#ref_LocalRecordIndexEntryStructure).
+
+```mermaid
+sequenceDiagram
+    participant App as App
+    participant Dev as Camera
+
+    Note over App,Dev: 1. LocalRecordQuery on aqara.control
+    App->>Dev: InvokeCommand QueryLocalRecordType LocalRecordIndex
+    Dev-->>App: ComplexACK QueryLocalRecordType LocalRecordIndex
+
+    Note over App,Dev: 2. Fetch index files one FileDescriptor at a time
+    loop one FileDescriptor at a time
+        App->>Dev: FileTransfer aqara.download
+    end
+```
+
+To query a time range, pass the whole range; the device puts one entry per day into the response member `LocalRecordIndex`. The file transfer uses the [FileDescriptor](#ref_FileDescriptorStructure) of that entry, written into initRequest. `Date` does not enter the transfer. On label `aqara.download`, only one `FileDescriptor` is transferred at a time; a new `initRequest` SHALL NOT be issued before the previous one finishes. Block interactions are not expanded in this diagram.
+
+#### Downloading Local Recording Files {#ref_LocalRecord_FlowDownloadFile}
+
+This section describes the flow in which the App downloads local recording files over the WebRTC DataChannel.
+The App first downloads the local recording index file, reads the `timestamp` values to fetch from the index file, and then queries the local recording file descriptors.
+
+* Command: the same [LocalRecordQuery](#ref_LocalRecordQuery) with `QueryLocalRecordType=LocalRecordSegment`; the parameters are in the member `LocalRecordSegment`, where `Timestamps` come from the index. It is exchanged via `InvokeCommand` on label `aqara.control`.
+* Response: the ComplexACK of this Command. The member `LocalRecordSegment` has the same length and order as `Timestamps`, and each entry is a [FileDescriptorStructure](#ref_FileDescriptorStructure).
+
+```mermaid
+sequenceDiagram
+    participant App as App
+    participant Dev as Camera
+
+    Note over App,Dev: 0. Index file downloaded
+    Note over App,Dev: 1. LocalRecordQuery on aqara.control
+    App->>Dev: InvokeCommand QueryLocalRecordType LocalRecordSegment
+    Dev-->>App: ComplexACK QueryLocalRecordType LocalRecordSegment
+
+    Note over App,Dev: 2. Fetch recording files one FileDescriptor at a time
+    loop one FileDescriptor at a time
+        App->>Dev: FileTransfer aqara.download
+    end
+```
+
+On label `aqara.download`, only one `FileDescriptor` is transferred at a time; a new `initRequest` SHALL NOT be issued before the previous one finishes. When an entry has a `fileSize` of 0, skip that entry and do not issue an `initRequest` for it. Block interactions are not expanded in this diagram. When the list exceeds a single message, the App splits it into multiple requests. Retransmitting the same query after a timeout is safe; queries do not change device state.
+
 ### Introduction
 
-Manages video playback and history records, including cloud clip type identification and local video download capabilities.
+Manages recording playback and history, including cloud clip type identification, local recording download capability, and the state and playback position of local playback sessions. Playback sessions are established by `WebRTCProvideOffer` (`StreamUsage=LocalPlayback`); pause, resume, seek, and speed are handled by `LocalPlaybackControl`. Local recording index and recording file descriptors are queried by `LocalRecordQuery`.
 
 ### Function Identifier
 
