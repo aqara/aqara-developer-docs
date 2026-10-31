@@ -26865,11 +26865,11 @@ After receiving the command, the device should validate the `EffectData` encodin
 
 * On validation success: the device should enter preview state and execute the corresponding effect, without writing to persistent storage.
 * On validation failure: the device SHALL return a parameter or data format error semantic status.
-* On validation failure: the device should return a parameter or data format error semantic status.
+
 During preview, `EffectOperationState` SHALL reflect `Previewing`; after completion, it SHALL return to idle or an implementation-defined state.
-During preview, EffectOperationState should reflect `Previewing`, and after completion should restore to idle or an implementation-defined state.
+
 ##### Parameters
-##### Parameters
+
 [PreviewEffect Command Structure](#ref_PreviewEffectCommandStructure)
 
 #### RemoveUserDefinedEffect Command {#ref_RemoveUserDefinedEffect}
@@ -26930,7 +26930,7 @@ After receiving the command, the device should validate whether `EffectID` exist
 
 * On validation success: the device should return the corresponding `EffectData`.
 * On validation failure: SHALL return an "invalid scene ID" or "scene not found" semantic error.
-* On validation failure: return an "invalid effect ID" or "effect not found" semantic error.
+
 ##### Parameters
 
 [GetEffectData Command Structure](#ref_GetEffectDataCommandStructure)
@@ -147760,7 +147760,7 @@ After receiving this Command, SHALL validate the `StreamPriorities` and process 
 
 The WebRTC Transport Function defines the WebRTC signaling interface between the Client and the Server, covering live streaming (`LiveView`) and local SD card recording playback (`LocalPlayback`) sessions. The Client submits signaling to the Server via Aqara Spec Command, and the Server returns processing results and signaling events via Response and Report; both parties transmit bidirectional media over WebRTC (P2P/TURN). Local playback assumes the Server has only one local recording file, which can be played back directly without specifying a source clip ID.
 
-#### WebRTC and CAVSM Dependencies {#ref_WebRTC_CAVSMDependency}
+### WebRTC and CAVSM Dependencies {#ref_WebRTC_CAVSMDependency}
 
 WebRTC sessions depend on [CameraAVStreamManagement](#ref_Aqara_Spec_CameraAVStreamManagement) to provide allocated audio/video streams. Before initiating `WebRTCProvideOffer` to create a new session or `WebRTCSolicitOffer`, the Client SHALL obtain the `VideoStreamID` and `AudioStreamID` required for this session; WebRTC signaling negotiation does not replace stream allocation.
 
