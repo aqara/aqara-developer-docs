@@ -139077,7 +139077,9 @@ Playback status and playback position.
   </tbody>
 </table>
 
-Reporting timing: when the status changes. When reporting on `aqara.control`, `SessionId` is omitted; when reporting via COIP or reading, `SessionId` is included.### Command Definitions
+Reporting timing: when the status changes. When reporting on `aqara.control`, `SessionId` is omitted; when reporting via COIP or reading, `SessionId` is included.
+
+### Command Definitions
 
 <table>
   <thead>
@@ -148617,6 +148619,133 @@ sequenceDiagram
 ```
 
 *Note:* With `StreamUsage=LocalPlayback`, `MetadataEnabled=true` SHALL be set so that the DataChannel can be opened on this PeerConnection. Resolution, playback control, and recording queries within the session go through `InvokeCommand` on `aqara.control`; recording file bytes go through the file transfer business interaction protocol on `aqara.download`. Definitions of playback control, recording index, and recording file download are in [Playback](#ref_Aqara_Spec_Playback). Carriage is via DataChannel.
+
+### Function Identification
+
+**Processing Logic**
+
+<table>
+  <thead>
+    <tr>
+      <th>Function ID</th>
+      <th>Code</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x001D</td>
+      <td>WebRTC</td>
+      <td>WebRTC transport</td>
+    </tr>
+  </tbody>
+</table>
+
+### Trait
+
+The Server uses the following Traits for reporting.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5129</td>
+      <td><a href="#ref_WebRTCCurrentSessions">WebRTCCurrentSessions</a></td>
+      <td></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x512A</td>
+      <td><a href="#ref_WebRTCSignalingEvent">WebRTCSignalingEvent</a></td>
+      <td></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x512B</td>
+      <td><a href="#ref_WebRTCSessionStatus">WebRTCSessionStatus</a></td>
+      <td></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5244</td>
+      <td><a href="#ref_WebRTCStreamResolution">WebRTCStreamResolution</a></td>
+      <td></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+### Command
+
+The Client uses the following Commands for requests.
+
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Code</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9D8F</td>
+      <td><a href="#ref_WebRTCSolicitOffer">WebRTCSolicitOffer</a></td>
+      <td></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9D90</td>
+      <td><a href="#ref_WebRTCProvideOffer">WebRTCProvideOffer</a></td>
+      <td></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9D91</td>
+      <td><a href="#ref_WebRTCProvideAnswer">WebRTCProvideAnswer</a></td>
+      <td></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9D92</td>
+      <td><a href="#ref_WebRTCProvideICECandidates">WebRTCProvideICECandidates</a></td>
+      <td></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9D93</td>
+      <td><a href="#ref_WebRTCEndSession">WebRTCEndSession</a></td>
+      <td></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9D94</td>
+      <td>WebRTCLocalPlaybackSeek</td>
+      <td></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DB9</td>
+      <td><a href="#ref_WebRTCSetResolution">WebRTCSetResolution</a></td>
+      <td></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DBA</td>
+      <td><a href="#ref_WebRTCTalk">WebRTCTalk</a></td>
+      <td></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Data Types
 
