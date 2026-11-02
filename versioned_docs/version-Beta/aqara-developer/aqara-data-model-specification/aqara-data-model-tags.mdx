@@ -28701,25 +28701,25 @@ When a cumulative value is a member of a structure list, each independent counte
   <tbody>
     <tr>
       <td>General electrical parameters or power-consuming equipment</td>
-      <td>ElectricityMetering</td>
+      <td><code>EnergyManagement</code></td>
       <td>Voltage, current, power, cumulative energy consumption</td>
       <td>The <code>CumulativeEnergyConsumption</code> in this Function represents consumption, not generation.</td>
     </tr>
     <tr>
       <td>PV inverter/generating equipment</td>
-      <td>SolarEnergy</td>
-      <td>Generation power/energy</td>
+      <td><code>EnergyManagement</code></td>
+      <td><code>GeneratedActivePower</code>, <code>CumulativeGeneratedActiveEnergy</code></td>
       <td>Total generation is different from the PCC export energy; self-consumed energy is not counted in the export register.</td>
     </tr>
     <tr>
       <td>Battery energy storage system</td>
-      <td>EnergyStorage</td>
+      <td><code>EnergyManagement</code> + <code>EnergyStorage</code></td>
       <td>Grid/device electrical parameters, as well as SOC, capacity, charge/discharge, SOH</td>
       <td><code>PowerSource/BatPercentRemaining</code> is the remaining battery power of the device power supply, not the SOC of the storage system.</td>
     </tr>
     <tr>
       <td>Electricity meter/PCC metering device</td>
-      <td>ElectricityMetering</td>
+      <td><code>EnergyManagement</code> + <code>ElectricityMetering</code></td>
       <td>Import/export energy, directional grid power, demand, time-of-use registers</td>
       <td>The meter measurement position and time/tariff configuration determine the data meaning; not equivalent to PV generation metering.</td>
     </tr>
