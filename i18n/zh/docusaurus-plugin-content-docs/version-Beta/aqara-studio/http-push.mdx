@@ -46,31 +46,19 @@ HTTP Push 是实时、best-effort 的推送机制，不提供持久化消息队�
 
 Aqara Studio 会向接收端发送以下几类消息：
 
-| 消息 | 发送条件 |
-| --- | --- |
-| `TraitValueUpdate` | 设备点位值变化；“设备数据与结构事件”组合项开启时发送，默认开启。 |
-| `objectEvent` -> `DEVICE_ADDED`、`DEVICE_REMOVED` | 推送启用后默认发送，不受其他订阅项影响。 |
-| `objectEvent` -> `DEVICE_ENDPOINT_ADDED`、`DEVICE_ENDPOINT_REMOVED`、`DEVICE_TRAIT_PARAMETER_UPDATE` | 与点位值变化共用“设备数据与结构事件”组合项，暂不支持分别选择。 |
-| `objectEvent` -> 可配置对象事件 | 由自主订阅或全订阅控制，事件列表见下文。 |
-| `AlarmEvent` | 原始告警，默认关闭。 |
-| `WebhookVerification` | endpoint 验证及熔断恢复探测。 |
+:::tip
+下表中 `data.eventType` 是 `objectEvent` 消息的特定字段，用于区分具体事件类型，其他类型的消息没有该字段。阅读 [消息字段说明](#消息字段说明) 了解 Aqara Studio 推送消息的通用字段。
+:::
 
-`objectEvent` 根据 `data.eventType` 区分具体事件。当前可配置的对象事件为：
+| 消息类型（type） | data.eventType |发送条件 |
+| --- | --- | --- |
+| `WebhookVerification` |- |  endpoint 验证及熔断恢复探测。 |
+| `TraitValueUpdate` | - | 设备点位值变化；“设备数据与结构事件”组合项开启时发送，默认开启。 |
+| `objectEvent` |  <ul><li>`DEVICE_ADDED`（设备新增）</li><li>`DEVICE_REMOVED`（设备删除）</li></ul> | 推送启用后默认发送，不受其他订阅项影响。 |
+| `objectEvent` | <ul><li>`DEVICE_ENDPOINT_ADDED`（设备端点新增）</li><li>`DEVICE_ENDPOINT_REMOVED`（设备端点删除）</li><li>`DEVICE_TRAIT_PARAMETER_UPDATE`（设备功能点属性更新）</li></ul> | 与点位值变化共用“设备数据与结构事件”组合项，暂不支持分别选择。 |
+| `objectEvent` | <ul><li>`SPACE_ADDED`（空间新增）</li><li>`SPACE_REMOVED`（空间删除）</li><li>`SPACE_UPDATED`（空间更新）</li><li>`AUTOMATION_ADDED`（自动化新增）</li><li>`AUTOMATION_REMOVED`（自动化删除）</li><li>`AUTOMATION_UPDATED`（自动化更新）</li><li>`AUTOMATION_SPACE_UPDATED`（自动化空间更新）</li></ul> | 您需要自主订阅或全订阅了这些事件后，才会推送。 |
+| `AlarmEvent` | - |  原始告警，默认关闭。 |
 
-- `DEVICE_SPACE_UPDATED`
-- `SPACE_ADDED`、`SPACE_REMOVED`、`SPACE_UPDATED`
-- `AUTOMATION_ADDED`、`AUTOMATION_REMOVED`、`AUTOMATION_UPDATED`、`AUTOMATION_SPACE_UPDATED`
-
-除了 `WebhookVerification` 之外，其他消息都包含业务数据。业务消息正文复用了 [WebSocket `v1` 的消息 schema](./../aqara-developer/data-export-api/websocket-api/index.mdx)，通用字段如下：
-
-| 字段 | 说明 |
-| --- | --- |
-| `type` | 消息类型，例如 `TraitValueUpdate`、`objectEvent`、`AlarmEvent` |
-| `version` | 当前仅支持 `v1` |
-| `msgId` | 消息标识，用于链路追踪 |
-| `data` | 业务数据主体 |
-| `code` | 处理结果码，`0` 表示成功 |
-| `message` | 处理结果描述 |
 
 ## 在 Aqara Studio 配置消息推送
 
@@ -262,6 +250,19 @@ SHA256(raw-body)
 :::tip
 发生重试时，消息正文和 `X-Studio-Delivery-Id` 保持不变，但 `Time`、`Nonce` 和 `Sign` 会重新生成。
 :::
+
+### 消息字段说明
+
+HTTP Push 请求消息的通用字段如下：
+
+| 字段 | 说明 |
+| --- | --- |
+| `type` | 消息类型，当前支持 `WebhookVerification`、`TraitValueUpdate`、`objectEvent` 和 `AlarmEvent`。如需了解各类型消息的发送条件，清参考 [消息类型](#支持的消息类型) 的说明。 |
+| `version` | 当前仅支持 `v1` |
+| `msgId` | 消息标识，用于链路追踪 |
+| `data` | 业务数据主体，根据 Type 不同，数据结构不同。<ul><li>若 type 为 `WebhookVerification`，`data` 内为 `challenge` 字段，示例请见 [接收 WebhookVerification 消息](#接收-webhookverification-消息)。</li><li>若 `type` 为其他，data 内结构复用了 [WebSocket 同名响应的 data 结构](./../aqara-developer/data-export-api/websocket-api/index.mdx)。<ul><li>若 type 为 `objectEvent`，您需要通过 `data.eventType` 确定具体事件类型。</li></ul></li></ul> |
+| `code` | 处理结果码，`0` 表示成功 |
+| `message` | 处理结果描述 |
 
 ## 响应格式
 
