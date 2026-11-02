@@ -46,31 +46,18 @@ Before implementing HTTP Push, please ensure your receiver meets the following r
 
 Aqara Studio will send the following message types to your receiver:
 
-| Message | Sending Condition |
-| --- | --- |
-| `TraitValueUpdate` | Sent when a device point value changes and the "Device Data and Structure Events" group is enabled. This group is enabled by default. |
-| `objectEvent` -> `DEVICE_ADDED`, `DEVICE_REMOVED` | Sent by default after HTTP Push is enabled, regardless of other subscription settings. |
-| `objectEvent` -> `DEVICE_ENDPOINT_ADDED`, `DEVICE_ENDPOINT_REMOVED`, `DEVICE_TRAIT_PARAMETER_UPDATE` | Shares the "Device Data and Structure Events" group with device point value changes. These events cannot currently be selected individually. |
-| `objectEvent` -> configurable object events | Controlled by individual subscriptions or Full Subscription. See the event list below. |
-| `AlarmEvent` | Raw alarms; disabled by default. |
-| `WebhookVerification` | Used for endpoint verification and circuit-breaker recovery probes. |
+:::tip
+In the table below, `data.eventType` is a field specific to `objectEvent` messages and is used to distinguish concrete event types. Other message types do not have this field. For the common fields of HTTP Push request messages, see [Message Field Descriptions](#message-field-descriptions).
+:::
 
-Specific `objectEvent` events are identified by `data.eventType`. The currently configurable object events are:
-
-- `DEVICE_SPACE_UPDATED`
-- `SPACE_ADDED`, `SPACE_REMOVED`, `SPACE_UPDATED`
-- `AUTOMATION_ADDED`, `AUTOMATION_REMOVED`, `AUTOMATION_UPDATED`, `AUTOMATION_SPACE_UPDATED`
-
-All messages except `WebhookVerification` contain application data. Business message bodies reuse the [WebSocket `v1` message schema](./../aqara-developer/data-export-api/websocket-api/index.mdx), and the common fields are:
-
-| Field | Description |
-| --- | --- |
-| `type` | Message type, e.g., `TraitValueUpdate`, `objectEvent`, `AlarmEvent` |
-| `version` | Only `v1` is supported currently |
-| `msgId` | Unique message ID for delivery tracing |
-| `data` | Main data payload |
-| `code` | Processing result code; `0` indicates success |
-| `message` | Processing result description |
+| Message type (`type`) | `data.eventType` | Send condition |
+| --- | --- | --- |
+| `WebhookVerification` | - | Endpoint verification and circuit-breaker recovery probes. |
+| `TraitValueUpdate` | - | Device point value changes; sent when the "Device Data and Structure Events" group is enabled (enabled by default). |
+| `objectEvent` | <ul><li>`DEVICE_ADDED`</li><li>`DEVICE_REMOVED`</li></ul> | Sent by default after push is enabled; not affected by other subscription items. |
+| `objectEvent` | <ul><li>`DEVICE_ENDPOINT_ADDED`</li><li>`DEVICE_ENDPOINT_REMOVED`</li><li>`DEVICE_TRAIT_PARAMETER_UPDATE`</li></ul> | Shares the "Device Data and Structure Events" group with point value changes; individual selection is not currently supported. |
+| `objectEvent` | <ul><li>`SPACE_ADDED`</li><li>`SPACE_REMOVED`</li><li>`SPACE_UPDATED`</li><li>`AUTOMATION_ADDED`</li><li>`AUTOMATION_REMOVED`</li><li>`AUTOMATION_UPDATED`</li><li>`AUTOMATION_SPACE_UPDATED`</li></ul> | Pushed only after you selectively subscribe to these events or subscribe to all. |
+| `AlarmEvent` | - | Raw alarms; disabled by default. |
 
 ## Configuring Push in Aqara Studio
 
@@ -276,6 +263,19 @@ Each line refers to:
 On retry, the request body and `X-Studio-Delivery-Id` remain the same, but `Time`, `Nonce`, and `Sign` are regenerated.
 :::
 
+
+### Message Field Descriptions
+
+The common fields of an HTTP Push request message are as follows:
+
+| Field | Description |
+| --- | --- |
+| `type` | Message type. Currently supports `WebhookVerification`, `TraitValueUpdate`, `objectEvent`, and `AlarmEvent`. For the send conditions of each message type, see [Supported Message Types](#supported-message-types). |
+| `version` | Currently only `v1` is supported. |
+| `msgId` | Message identifier, used for traceability. |
+| `data` | Business data payload. The structure varies by `type`.<ul><li>If `type` is `WebhookVerification`, `data` contains a `challenge` field. For an example, see [Receiving a WebhookVerification Message](#receiving-a-webhookverification-message).</li><li>For other `type` values, the structure of `data` reuses the [structure of the WebSocket response with the same name](./../aqara-developer/data-export-api/websocket-api/index.mdx).<ul><li>If `type` is `objectEvent`, use `data.eventType` to determine the concrete event type.</li></ul></li></ul> |
+| `code` | Processing result code; `0` indicates success. |
+| `message` | Processing result description. |
 
 ## Response Format
 
