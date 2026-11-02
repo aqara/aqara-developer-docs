@@ -72452,7 +72452,7 @@ Server 下发该命令，用于将设备从睡眠或待机模式唤醒。该命�
       <td>HardwareAddress</td>
       <td>characterString</td>
       <td>M</td>
-      <td>MAC 地址字符串，最大长度 24。应为 48 位 IEEE MAC 或 64 位 IEEE MAC（EUI-64），采用大端/显示顺序（左侧为高位字节），示例：<code>00:1A:2B:3C:4D:5E</code>、<code>00:1A:2B:FF:FE:3C:4D:5E</code>。</td>
+      <td>MAC 地址字符串，最大长度 24。应为 48 位 IEEE MAC 或 64 位 IEEE MAC（EUI-64），采用<strong>大端</strong>/显示顺序（左侧为高位字节），示例：<code>00:1A:2B:3C:4D:5E</code>、<code>00:1A:2B:FF:FE:3C:4D:5E</code>。</td>
     </tr>
     <tr>
       <td>5</td>
@@ -96237,8 +96237,8 @@ EffectData 二进制格式由以下部分组成：
 
 ###### 可选字段
 
-* **PayloadLength**（2 字节，大端）：当 `Flags.bit0 = 1` 时存在，表示 Payload 的字节长度。
-* **CRC16**（2 字节，大端）：当 `Flags.bit1 = 1` 时存在，使用 CRC-16/MODBUS，对 Payload 本体计算，不包含 Header。
+* **PayloadLength**（2 字节，*大端*）：当 `Flags.bit0 = 1` 时存在，表示 Payload 的字节长度。
+* **CRC16**（2 字节，*大端*）：当 `Flags.bit1 = 1` 时存在，使用 CRC-16/MODBUS，对 Payload 本体计算，不包含 Header。
 
 ###### Payload 结构（CBOR）
 
@@ -96633,8 +96633,8 @@ EffectData 二进制格式由以下部分组成：
 
 ###### 可选字段
 
-* **PayloadLength**（2 字节，大端）：当 `Flags.bit0 = 1` 时存在，表示 Payload 的字节长度。
-* **CRC16**（2 字节，大端）：当 `Flags.bit1 = 1` 时存在，使用 CRC-16/MODBUS，对 Payload 本体计算，不包含 Header。
+* **PayloadLength**（2 字节，*大端*）：当 `Flags.bit0 = 1` 时存在，表示 Payload 的字节长度。
+* **CRC16**（2 字节，*大端*）：当 `Flags.bit1 = 1` 时存在，使用 CRC-16/MODBUS，对 Payload 本体计算，不包含 Header。
 
 ###### Payload 结构（CBOR）
 
