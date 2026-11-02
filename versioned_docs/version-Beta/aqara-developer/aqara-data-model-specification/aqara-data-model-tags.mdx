@@ -72452,7 +72452,7 @@ This structure defines the Present Value field layout of the NetworkInterfaces T
       <td>HardwareAddress</td>
       <td>characterString</td>
       <td>M</td>
-      <td>MAC address string, max length 24. Should be a 48-bit IEEE MAC or 64-bit IEEE MAC (EUI-64), in big-endian/display order (most significant byte on the left). Examples: <code>00:1A:2B:3C:4D:5E</code>, <code>00:1A:2B:FF:FE:3C:4D:5E</code>.</td>
+      <td>MAC address string, max length 24. Should be a 48-bit IEEE MAC or 64-bit IEEE MAC (EUI-64), in <strong>big-endian</strong>/display order (most significant byte on the left). Examples: <code>00:1A:2B:3C:4D:5E</code>, <code>00:1A:2B:FF:FE:3C:4D:5E</code>.</td>
     </tr>
     <tr>
       <td>5</td>
@@ -96237,8 +96237,8 @@ Common `Flags` values:
 
 ###### Optional Fields
 
-* **PayloadLength** (2 bytes, big-endian): present when `Flags.bit0 = 1`, indicating the byte length of the Payload.
-* **CRC16** (2 bytes, big-endian): present when `Flags.bit1 = 1`, computed using CRC-16/MODBUS over the Payload body, excluding the Header.
+* **PayloadLength** (2 bytes, *big-endian*): present when `Flags.bit0 = 1`, indicating the byte length of the Payload.
+* **CRC16** (2 bytes, *big-endian*): present when `Flags.bit1 = 1`, computed using CRC-16/MODBUS over the Payload body, excluding the Header.
 
 ###### Payload Structure (CBOR)
 
@@ -96633,8 +96633,8 @@ Common `Flags` values:
 
 ###### Optional Fields
 
-* **PayloadLength** (2 bytes, big-endian): present when `Flags.bit0 = 1`, indicating the byte length of the Payload.
-* **CRC16** (2 bytes, big-endian): present when `Flags.bit1 = 1`, computed using CRC-16/MODBUS over the Payload body, excluding the Header.
+* **PayloadLength** (2 bytes, *big-endian*): present when `Flags.bit0 = 1`, indicating the byte length of the Payload.
+* **CRC16** (2 bytes, *big-endian*): present when `Flags.bit1 = 1`, computed using CRC-16/MODBUS over the Payload body, excluding the Header.
 
 ###### Payload Structure (CBOR)
 
