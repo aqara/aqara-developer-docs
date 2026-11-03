@@ -48,6 +48,7 @@
 - Studio: https://docs.aqara.com/docs/aqara-developer/data-export-api/studio
 - Get Studio Statistics: https://docs.aqara.com/docs/aqara-developer/data-export-api/get-studio-statistics
 - WebSocket API Playground: https://docs.aqara.com/docs/aqara-developer/data-export-api/websocket-api/websocket-api
+- MQTT: https://docs.aqara.com/docs/aqara-developer/data-export-api/mqtt-api/mqtt-api
 - Infrared Device Integration: https://docs.aqara.com/docs/aqara-developer/local-studio-development/features/infrared-device-integration
 - Introduction: https://docs.aqara.com/docs/aqara-developer/aiot-api/introduction
 - Getting Started with the AIOT API: https://docs.aqara.com/docs/aqara-developer/aiot-api/getting-started-with-the-aiot-api

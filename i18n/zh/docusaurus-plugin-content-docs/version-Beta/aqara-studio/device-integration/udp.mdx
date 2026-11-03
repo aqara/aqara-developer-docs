@@ -14,9 +14,7 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "UDP 设备接入"]
 
 ## 学习并编写 JavaScript 脚本
 
-脚本结构与配置流程，参见 [第三方设备脚本接入指南](../ai-agent-device-onboarding.mdx)。
-
-请参考 [JavaScript 脚本（适用于 UDP 和 TCP）](./../unified-protocol-script.mdx#tcp-udp) 的编写方法，编写符合 **Aqara 物模型规范** 的 JavaScript 脚本。此脚本将用于指导 Aqara Studio 如何发现设备、添加与控制功能点等。
+请参考 [JavaScript 脚本（适用于 UDP 和 TCP）](./../javascript-for-udp-tcp-integration.mdx) 的编写方法，编写符合 **Aqara 物模型规范** 的 JavaScript 脚本。此脚本将用于指导 Aqara Studio 如何发现设备、添加与控制功能点等。
 
 ## 安装插件
 
@@ -64,10 +62,10 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "UDP 设备接入"]
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/UDP-Gear.png" alt="单击齿轮图标" /> 
 
     :::tip
-    [describe().discovery](../unified-protocol-script.mdx#tcp-udp-discovery) 可提供固定目标，或省略 UDP IP 由有效本机网卡计算广播地址。decode 根据真实发现回包返回 devices；没有发现协议时使用当前公开的手工创建入口，不能把静态地址清单当作已完成发现。
+    如果没有 UDP 服务端，可以跳过该设置。此时，建议在 [JS 脚本](#学习并编写-javascript-脚本) 中 [parseDiscoveryResponse](./../javascript-for-udp-tcp-integration.mdx#parsediscoveryresponse) 的返回结果里直接写明目标 UDP 设备的 IP 和端口号，实现设备的精准发现和接入。
     :::
 
-    按厂商协议填写 UDP 单播/广播/组播目标和端口，或使用脚本提供的发现配置；[encode(discoverDevices)](../unified-protocol-script.mdx#tcp-udp-discovery) 构造请求，decode 解析响应中的身份和通信地址。
+    在弹窗内填写 UDP 服务端的 IP 地址和端口号。该信息将用于 [JS 脚本](#学习并编写-javascript-脚本) 中的 [buildDiscoveryRequest](./../javascript-for-udp-tcp-integration.mdx#builddiscoveryrequest) 接口，指导 Aqara Studio 从指定地址自动发现所有 UDP 设备。
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/UDP-DiscoveryConfiguration.png" alt="配置服务端 IP 地址和 Port" style={{width: '50%'}} />
 
@@ -92,9 +90,10 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "UDP 设备接入"]
 2. 选择 **发现功能点** 按钮。
 
     :::tip
-    - 远端点表：encode(discoverPoints) 返回请求字节，decode 从真实响应返回 [pointDefinitions](../unified-protocol-script.mdx#point-definitions)。
-    - 静态点表：encode(discoverPoints) 返回 null，decode 收到 bytes=null 后返回 pointDefinitions，不发查询。
-    两种方式都需要选择并导入点。设备运行时选项变化另用 [动态枚举](../unified-protocol-script.mdx#dynamic-enums)，不是每次重新创建点。
+    - 若设备功能点为**动态**，请在 [JS 脚本](#学习并编写-javascript-脚本) 中实现 [buildDiscoverPointsRequest](./../javascript-for-udp-tcp-integration.mdx#builddiscoverpointsrequest) 接口和 [parseDiscoverPointsResponse](./../javascript-for-udp-tcp-integration.mdx#parsediscoverpointsresponse) 接口。   
+    此时，点击 **添加功能点** 按钮，Aqara Studio 会调用 [buildDiscoverPointsRequest](./../javascript-for-udp-tcp-integration.mdx#builddiscoverpointsrequest) 接口以动态发现设备功能点，并会将该接口的返回值作为 [parseDiscoverPointsResponse](./../javascript-for-udp-tcp-integration.mdx#parsediscoverpointsresponse) 接口的入参。
+    - 若设备功能点为**静态**，请在 [JS 脚本](#学习并编写-javascript-脚本) 中实现 [parseDiscoverPointsResponse](./../javascript-for-udp-tcp-integration.mdx#parsediscoverpointsresponse) 接口，并在返回值中**直接提供目标设备的功能点列表**。   
+    此时，点击 **添加功能点** 按钮，Aqara Studio 将直接发现这些功能点。
     :::
 
 3. 在 **发现功能点列表** 勾选需要的点，单击中间 **+** 按钮。

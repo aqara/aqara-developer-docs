@@ -1,42 +1,153 @@
 ---
 title: "Data Export by MQTT"
-description: "Aqara Studio comes with a built-in MQTT broker. This lets you export device data using the MQTT protocol, so third-party platforms can easily access and control all connected devices."
+description: "Aqara Studio comes with a built-in MQTT broker. You can export device data over MQTT so third-party platforms can query and control all connected devices."
 keywords: ["Aqara Docs", "Aqara Studio", "Data Export by MQTT"]
 ---
 # Data Export by MQTT
 
-Aqara Studio comes with a built-in MQTT broker. This lets you export device data using the MQTT protocol, so third-party platforms can easily access and control all connected devices.
+You can use the MQTT broker built into Aqara Studio, or integrate your own MQTT broker, to forward device data to third-party platforms so they can query and control connected devices.
 
 :::tip
-This guide will show you how to connect to MQTT and send/receive messages using the MQTTX desktop app.
+This guide uses the MQTTX desktop app to show how to connect to MQTT and how to subscribe to and publish messages.
 :::
 
-## Prerequisites
+## What can you do with MQTT export?
 
-Before you begin, please download and install the [MQTTX](https://mqttx.app/zh/downloads) desktop app.
+With MQTT export, you can send request messages through an MQTT Broker using publish/subscribe, and call the data export HTTP APIs that are already available. You can also keep the connection alive with a heartbeat, subscribe to or unsubscribe from device data, and receive device data changes and other object events.
 
-## Steps
+For the JSON objects used in the request and response bodies of these features, see Aqara Developer [Studio Local Development - MQTT](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx).
 
-1. In the left sidebar of Aqara Studio, go to **Developer** and enable the **MQTT transfer out** service.
+## Install the Plugin
 
-    You will then see all the information needed to connect to MQTT (such as local IP, MQTT port, username, password), as well as the formats for request and response topics.
+Refer to the [Plugin Market](./plugin-center.mdx) documentation:
+1. Go to [Aqara Builder Lab - Marketplace](https://builder.aqara.com/lab/plugin-store) and get the `MQTT Export` plugin.
+2. Assign it to Aqara Studio.
+3. In Aqara Studio, open **Plugin Center** and install the `MQTT Export` plugin.
 
-    ![Get MQTT connection info](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/mqtt-export-1.png) 
+## Enable the MQTT Export Service
+
+1. In the left sidebar of Aqara Studio, open **Plugin Center**, find the `MQTT Export` plugin, and click **Transfer Out**.
+
+    ![Find the MQTT Export plugin in Plugin Center and click Transfer Out](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MQTT-ClickTransferOut.png) 
+
+2. You are taken to the **Developer** page. **Enable MQTT transfer out**.
+
+    ![Enable the MQTT export service](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MQTT-EnableMQTTTransferOut.png) 
+
+## Choose a Broker
+
+Choose a Broker that fits your setup:
+- If you do not have your own MQTT Broker, [use the local Broker built into Aqara Studio](#use-the-local-broker).
+- If you do not want to use the Broker built into Aqara Studio, [use a third-party Broker](#use-a-third-party-broker).
+
+### Use the Local Broker
+
+To use the local Broker built into Aqara Studio, select **Local Broker**.
+
+Aqara Studio connects to this Broker by default.
+
+![Use the local Broker](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MQTTExport-SelectLocalBroker.png) 
+
+If the status is **Disconnected**, choose **... > Connect** to connect manually.
+
+![Connect manually](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MQTTExport-ConnectToLocalBroker.png) 
+
+### Use a Third-Party Broker
+
+To use a third-party MQTT Broker:
+1. Select **Third-party Broker** and fill in the following:
+
+    | Name | Description |
+    |----------|----------------------------|
+    | HOST | Address of the third-party MQTT Broker. |
+    | Port | Port number of the third-party MQTT Broker. |
+    | Client ID | The **unique** client identifier Aqara Studio uses to connect to this Broker. |
+    | Username | Username required to connect to the third-party MQTT Broker. |
+    | Password | Password required to connect to the third-party MQTT Broker. |
+    | Enable TLS | Whether to use TLS for encrypted transport.<ul><li>On: the MQTT Broker address must use the MQTTS protocol.</li><li>Off: use the MQTT protocol.</li></ul> |
+
+    ![Select a third-party Broker](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MQTTExport-SelectThirdPartyBroker.png) 
+
+2. (**If TLS is enabled**) Provide the following, depending on whether you want one-way or mutual authentication:
+
+    <table>
+        <thead>
+            <tr>
+                <th>Authentication</th>
+                <th>Required files</th>
+                <th>File extensions</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>One-way</td>
+                <td>CA certificate</td>
+                <td><ul><li>.pem</li><li>.crt</li><li>.cer (X.509)</li></ul></td>
+                <td>Used only to verify the Broker's identity.</td>
+            </tr>
+            <tr>
+                <td rowspan="3">Mutual (two-way)</td>
+                <td>CA certificate</td>
+                <td rowspan="2"><ul><li>.pem</li><li>.crt</li><li>.cer (X.509)</li></ul></td>
+                <td rowspan="3">In addition to one-way authentication, provide the client's own certificate and private key so the Broker can verify your identity.</td>
+            </tr>
+            <tr>
+                <td>Client certificate</td>
+            </tr>
+            <tr>
+                <td>Client private key</td>
+                <td><ul><li>.pem</li><li>.key</li></ul>If the private key is encrypted, enter the private key password.</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    :::tip
+    - Clearing an imported certificate only removes the reference. It does not delete the certificate file.
+    - If you upload a new certificate, disconnect and connect again for it to take effect.
+    :::
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MQTTExport-UploadCertificates.png" alt="Upload certificates" /> 
+
+3. Click the *...* button to open the action menu, select **Connect**, and wait until the connection succeeds.
+
+    ![Connect to a third-party Broker](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MQTTExport-ConnectToThirdPartyBroker.png) 
+
+## Test the MQTT Broker Connection
+
+:::tip
+- Before you start, download and install the [MQTTX](https://mqttx.app/downloads) desktop app, or another MQTT client.
+- The steps below use MQTTX as an example. For other MQTT clients, see their official documentation.
+:::
+
+1. On the **Developer** page in Aqara Studio, get everything you need to connect to MQTT (such as HOST, port, username, and password), as well as the request and response topic formats.
+
+    The following figure uses the local Broker as an example:
+
+    ![Get the MQTT connection information](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MQTTExport-FindInfo.png) 
 
 2. Follow the official MQTTX doc [Getting Started - Connect](https://mqttx.app/docs/get-started#connect), and use the information from the previous step to make the MQTT connection.
 
-    ![Connect via MQTT](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/mqtt-export-2.png) 
+    ![Connect via MQTT](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-2.png) 
 
-3. After you connect, click the **New Subscription** button. Use the **Response Topic Format** shown in Aqara Studio. Replace the ClientID in the topic with the actual ClientID automatically generated by MQTTX to subscribe for response messages.
+3. After you connect, click **New Subscription**.
 
-    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/mqtt-export-3.png" alt="Subscribe to a response" style={{width: '60%'}} /> 
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTX-NewSubscription.png" alt="New subscription" style={{width: '60%'}} /> 
 
-4. Now, for the subscription you just made, copy the **Request Topic Format** shown in Aqara Studio, replacing the ClientID with your real MQTTX ClientID. Paste this into the Topic field. Then, write a JSON message (based on the parameters in the Studio API) and send it. You'll get a response back.
+    Use the **Response Topic Format** shown in Aqara Studio. Replace the ClientID in the topic with the actual ClientID automatically generated by MQTTX to subscribe to response messages.
 
-    Here’s an example of sending a request to query the device information by pages:
+    Set QoS to 1, then click **Confirm** to create the subscription.
 
-    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/mqtt-export-4.png" alt="Send a request" style={{width: '70%'}} /> 
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-3.png" alt="Subscribe to a response" style={{width: '60%'}} /> 
 
-    And here’s what a sample response looks like:
+4. In the subscription you just created, replace the ClientID in the **Request Topic Format** from Aqara Studio with the actual ClientID automatically generated by MQTTX, and enter it in the Topic field.
+    
+    Write a JSON message using the request parameters for each API in Aqara Developer [Studio Local Development - MQTT](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx), then send it to get a response.
 
-    ![Receive a response](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/mqtt-export-5.png)     
+    The following figure uses a [subscribe to all device data](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx#subscribe-to-all-or-specific-devices) request as an example:
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-4.png" alt="Send a request" style={{width: '70%'}} /> 
+
+    The following is a sample response:
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-5.png" alt="Receive a response" style={{width: '70%'}} /> 

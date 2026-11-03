@@ -18,9 +18,7 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "MQTT 设备接入"]
 
 ## 学习并编写 JavaScript 脚本
 
-脚本结构与配置流程，参见 [第三方设备脚本接入指南](../ai-agent-device-onboarding.mdx)。
-
-请参考 [JavaScript 脚本（适用于 MQTT）](./../unified-protocol-script.mdx#mqtt) 的编写方法，编写符合 **Aqara 物模型规范** 的 JavaScript 脚本。此脚本将用于指导 Aqara Studio 如何发现设备、添加与控制功能点等。
+请参考 [JavaScript 脚本（适用于 MQTT）](./../javascript-for-mqtt-integration.mdx) 的编写方法，编写符合 **Aqara 物模型规范** 的 JavaScript 脚本。此脚本将用于指导 Aqara Studio 如何发现设备、添加与控制功能点等。
 
 ## 安装插件
 
@@ -115,9 +113,9 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "MQTT 设备接入"]
 | --- | --- | --- |
 | Friendly Name | ✔ | 功能点 ID。请咨询设备厂商获取功能点的真实 ID，以便 Aqara Studio 发现该点。 |
 | Point Name | ✘ | 您自定义的功能点名称。 |
-| Dev Type | ✘ | 对应 Aqara 物模型规范的 `deviceType`。基于 Aqara Spec 定义功能点时填写，具体可用值请阅读 [Aqara Spec 物模型标签 - Device Type 列表](../../aqara-developer/aqara-data-model-specification/aqara-data-model-tags.mdx#device-type-列表)。 |
-| Function Code | ✘ | 对应 Aqara 物模型规范的 `functionCode`。基于 Aqara Spec 定义功能点时填写，具体可用值请阅读 [Aqara Spec 物模型标签 - Function 索引](../../aqara-developer/aqara-data-model-specification/aqara-data-model-tags.mdx#ref_Aqara_Spec_FunctionIndex)。 |
-| Trait Code | ✘ | 对应 Aqara 物模型规范的 `traitCode`。基于 Aqara Spec 定义功能点时填写，具体可用值请阅读 [Aqara Spec 物模型标签](../../aqara-developer/aqara-data-model-specification/aqara-data-model-tags.mdx) 内各 Trait 的相关内容。 |
+| Dev Type | ✘ | 对应 Aqara 物模型规范的 `deviceType`。基于 Aqara Spec 定义功能点时填写，具体可用值请阅读 [Aqara 物模型标签 - Device Type 列表](../../aqara-developer/aqara-data-model-specification/aqara-data-model-tags.mdx#device-type-列表)。 |
+| Function Code | ✘ | 对应 Aqara 物模型规范的 `functionCode`。基于 Aqara Spec 定义功能点时填写，具体可用值请阅读 [Aqara 物模型标签 - Function 索引](../../aqara-developer/aqara-data-model-specification/aqara-data-model-tags.mdx#ref_Aqara_Spec_FunctionIndex)。 |
+| Trait Code | ✘ | 对应 Aqara 物模型规范的 `traitCode`。基于 Aqara Spec 定义功能点时填写，具体可用值请阅读 [Aqara 物模型标签](../../aqara-developer/aqara-data-model-specification/aqara-data-model-tags.mdx) 中对各 trait 的描述。 |
 | Data Type | ✘ | 功能点数据类型，支持以下取值：<ul><li><code>bool</code>：布尔型</li><li><code>numerical</code>：数值型</li><li><code>text</code>：文本型</li></ul>  |
 | Access | ✘ | 读写类型，<ul><li>1：仅可读</li><li>2：可读可写</li></ul> |
 | Sub Topic | ✘ | Aqara Studio 通过订阅该 Topic 获取功能点的最新数据。具体 Topic 请根据设备协议或厂商文档填写。 |

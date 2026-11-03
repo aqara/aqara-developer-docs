@@ -20,10 +20,9 @@ servers:
     variables:
       host:
         description: |
-          Please enter your Aqara Studio service address. This can be a local LAN address (http) or a remote access address (https).
+          Please enter your Aqara Studio service address. This can be a local LAN IP (http).
           For example:
           - http://10.11.50.56
-          - https://xxx.edge-xxx.aqara.com/
         default: '<Aqara_Studio_URL>'
 
 # Global Security: All endpoints require Bearer Token

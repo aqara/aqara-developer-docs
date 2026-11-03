@@ -56,7 +56,7 @@ Aqara Studio 会向接收端发送以下几类消息：
 | `TraitValueUpdate` | - | 设备点位值变化；“设备数据与结构事件”组合项开启时发送，默认开启。 |
 | `objectEvent` |  <ul><li>`DEVICE_ADDED`（设备新增）</li><li>`DEVICE_REMOVED`（设备删除）</li></ul> | 推送启用后默认发送，不受其他订阅项影响。 |
 | `objectEvent` | <ul><li>`DEVICE_ENDPOINT_ADDED`（设备端点新增）</li><li>`DEVICE_ENDPOINT_REMOVED`（设备端点删除）</li><li>`DEVICE_TRAIT_PARAMETER_UPDATE`（设备功能点属性更新）</li></ul> | 与点位值变化共用“设备数据与结构事件”组合项，暂不支持分别选择。 |
-| `objectEvent` | <ul><li>`SPACE_ADDED`（空间新增）</li><li>`SPACE_REMOVED`（空间删除）</li><li>`SPACE_UPDATED`（空间更新）</li><li>`AUTOMATION_ADDED`（自动化新增）</li><li>`AUTOMATION_REMOVED`（自动化删除）</li><li>`AUTOMATION_UPDATED`（自动化更新）</li><li>`AUTOMATION_SPACE_UPDATED`（自动化空间更新）</li></ul> | 您需要自主订阅或全订阅了这些事件后，才会推送。 |
+| `objectEvent` | <ul><li>`SPACE_ADDED`（空间新增）</li><li>`SPACE_REMOVED`（空间删除）</li><li>`SPACE_UPDATED`（空间更新）</li><li>`AUTOMATION_ADDED`（自动化新增）</li><li>`AUTOMATION_REMOVED`（自动化删除）</li><li>`AUTOMATION_UPDATED`（自动化更新）</li><li>`AUTOMATION_SPACE_UPDATED`（自动化空间更新）</li><li>`AUTOMATION_EXECUTION_RESULT`（自动化执行结果）</li><li>`SCENE_EXECUTION_RESULT`（场景执行结果）</li></ul> | 您需要自主订阅或全订阅了这些事件后，才会推送。 |
 | `AlarmEvent` | - |  原始告警，默认关闭。 |
 
 

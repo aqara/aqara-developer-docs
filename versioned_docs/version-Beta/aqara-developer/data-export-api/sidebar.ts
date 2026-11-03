@@ -88,8 +88,20 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "version-Beta/aqara-developer/data-export-api/delete-device-point",
+          label: "Delete A Function",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
           id: "version-Beta/aqara-developer/data-export-api/add-virtual-device",
           label: "Add A Virtual Device",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
+          id: "version-Beta/aqara-developer/data-export-api/unbind-device",
+          label: "Unbind A Device",
           className: "api-method post",
         },
       ],
@@ -103,6 +115,12 @@ const sidebar: SidebarsConfig = {
       },
       collapsed: false,
       items: [
+        {
+          type: "doc",
+          id: "version-Beta/aqara-developer/data-export-api/get-gateways",
+          label: "List Gateways",
+          className: "api-method get",
+        },
         {
           type: "doc",
           id: "version-Beta/aqara-developer/data-export-api/join-subdevice",
