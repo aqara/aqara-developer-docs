@@ -1,0 +1,53 @@
+---
+title: "Custom Device"
+description: "This document introduces how to integrate custom devices into Aqara Studio, helping you conveniently manage and control custom devices via Aqara Studio."
+keywords: ["Aqara Docs", "Aqara Studio", "Device Integration", "Virtual Devices", "Custom Device"]
+---
+# Custom Device
+
+This document will guide you on how to create a virtual custom device in Aqara Studio and consolidate multiple function points from different devices, enabling more efficient unified management and control of your devices.
+
+## Create Custom Device
+
+1. Click on **Device Management** in the left sidebar. Under **Protocols and Devices**, click the **...** button and select **Add Protocol**.  
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Devices-AddProtocol.png" alt="Add Protocol" />
+
+2. In the popup, select `Virtual` to add a `Virtual` node.  
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Devices-SelectVirtual.png" alt="Select Virtual" style={{width: '70%'}} />
+
+3. Select this node and click the `Add Device` button.  
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Virtual-AddDevice.png" alt="Add Device" />
+
+4. In the dialog, set **Virtual Device Type** to **Custom Device**, configure the equipment **Name**. You can also assign a space to the equipment.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/CustomDevice-ConfigureVirtualTypeAndName.png" alt="Configure virtual device type and name" style={{width: '60%'}} />
+
+5. Select a device from the **Source device of the function points** dropdown.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/CustomDevice-SelectADevice.png" alt="Select a device" />
+
+    In the function point list of the selected device, check several function points, then click the **+** button to add them to the custom device.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/CustomDevice-SelectPoints.png" alt="Select function points" />
+    
+    You can then view the added function points in the **Added function points** list.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/CustomDevice-AddedPointList.png" alt="Added function points list" />
+
+    If you want to add function points from other devices to the custom device, continue selecting other devices from the **Source device of the function points** dropdown and check the corresponding function points.
+
+    After adding all function points, click the **Done** button to finish creating the custom device.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/CustomDevice-Done.png" alt="Done" />
+
+6. At this point, you will see the successfully added device under the `Virtual` node in the left **Protocols and Devices** panel, as well as in the device list on the `Virtual` management page.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/CustomDevice-ViewAddedDevice.png" alt="View added device" />
+
+
+## Next Step
+
+Now, you can [view details and control the device](./../../device-management/basic-information.mdx), or [use the device in automation](./../../automation.mdx).

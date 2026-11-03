@@ -7,6 +7,27 @@ keywords: ["Aqara Docs", "Aqara Studio", "Device Integration", "BACnet"]
 
 This document explains how to connect BACnet devices to Aqara Studio.
 
+## Supported BACnet Object Types
+
+When integrating a BACnet device with Aqara Studio, ensure that its point object types are supported by Aqara Studio, as listed below:
+
+| Category | Object Types |
+|----|----|
+| Analog Objects | <ul><li>Analog Input</li><li>Analog Output</li><li>Analog Value</li></ul> |
+| Binary Objects | <ul><li>Binary Input</li><li>Binary Output</li><li>Binary Value</li></ul> |
+| Multi-state Objects | <ul><li>Multi-state Input</li><li>Multi-state Output</li><li>Multi-state Value</li></ul> |
+| Additional Object Types | <ul><li>Integer Value</li><li>Binary Lighting Output</li><li>Channel</li><li>Color Temperature</li><li>Lighting Output</li><li>Color</li><li>Accumulator</li></ul> |
+
+## Tested BACnet Devices
+
+The following BACnet devices have been tested by Aqara and can be integrated with Aqara Studio:
+
+| Brand | Model |
+|----|----|
+| Honeywell | HT9610P0100 |
+| Shanghai Sunfull Automation | HMI2004-ARM |
+| CHINT | DDSU6665 |
+
 ## Prerequisites
 
 Before you start, please make sure your network meets these conditions based on your device type:
@@ -72,7 +93,7 @@ Before you start, please make sure your network meets these conditions based on 
             <tr>
                 <td>Device Object Instance Number</td>
                 <td>✔</td>
-                <td>A unique identifier for the BACnet device on the BACnet network. Range: [0, 4194303].</td>
+                <td>A unique identifier for the BACnet device on the BACnet network. Range: [0, 4194302].</td>
                 <td>1</td>
             </tr>
             <tr>
@@ -104,7 +125,7 @@ Before you start, please make sure your network meets these conditions based on 
             <tr>
                 <td>Segmentation Supported</td>
                 <td>✘</td>
-                <td>Options:<ul><li><strong>Segmented Both (default)</strong>: The device supports segmented APDU messages both for sending and receiving. </li><li><strong>Segmented Transmit</strong>: Only supports sending segmented messages. </li><li><strong>Segmented Receive</strong>: Only supports receiving segmented messages. </li><li><strong>No Segmentation</strong>: Does not support segmented messages. Only messages within the max APDU length are supported.</li></ul></td>
+                <td>Options:<ul><li><strong>Segmented Both</strong>: The device supports segmented APDU messages both for sending and receiving. </li><li><strong>Segmented Transmit</strong>: Only supports sending segmented messages. </li><li><strong>Segmented Receive</strong>: Only supports receiving segmented messages. </li><li><strong>No Segmentation</strong>: Does not support segmented messages. Only messages within the max APDU length are supported.</li></ul></td>
                 <td>Segmented Both</td>
             </tr>
             <tr>
@@ -116,8 +137,8 @@ Before you start, please make sure your network meets these conditions based on 
             <tr>
                 <td>APDU Timeout</td>
                 <td>✘</td>
-                <td>Applies only for non-segmented APDU transfers. Defines how long to wait for a response (such as ACK or Error). Default is 30000ms.</td>
-                <td>30s</td>
+                <td>Applies only for non-segmented APDU transfers. Defines how long to wait for a response (such as ACK or Error). Default is 3000ms.</td>
+                <td>3s</td>
             </tr>
             <tr>
                 <td>Character Set</td>
@@ -265,7 +286,7 @@ If Aqara Studio does not discover your BACnet device, please follow these steps 
         | MAC Address           | ✘       | MAC address of the device. | - |
         | Address Type          | ✘       | Specify the format and protocol type of MAC address:<ul><li>UNKNOWN: Unknown type</li><li>ETHERNET: 6-byte Ethernet MAC, format AA:BB:CC:DD:EE:FF</li><li>IP: 4-6 byte IP address, format 192.168.1.1:47808</li><li>MSTP: 1 byte, Master-Slave/Token-Passing</li><li>SC: 6-byte Secure Connection, WebSocket</li></ul> | - |
         | Max APDU Length Accepted (bytes) | ✘ | The maximum APDU (Application Protocol Data Unit) length in bytes. Recommended no larger than 1476. | 1076    |
-        | Segmentation Supported    | ✘ | Options: <ul><li>Send and Receive Segmentation (default): Supports both sending and receiving segmented APDUs.</li><li>Send Only: Only supports sending segmented messages.</li><li>Receive Only: Can only receive segmented messages.</li><li>No Segmentation: Only unsegmented messages within the length limit are supported.</li></ul> | Send and Receive Segmentation |
+        | Segmentation Supported    | ✘ | Options: <ul><li>Segmented Both: Supports both sending and receiving segmented APDUs.</li><li>Segmented Transmit: Only supports sending segmented messages.</li><li>Segmented Receive: Only supports receiving segmented messages.</li><li>No Segmentation: Only unsegmented messages within the length limit are supported.</li></ul> | Segmented Both |
         | Encoding              | ✘       | Character encoding used. Supported: <ul><li>ISO_10646_UTF8</li><li>IBM_MICROSOFT_DBCS</li><li>JIS_X0208</li><li>ISO_10646_UCS4</li><li>ISO_10646_UCS2</li><li>ISO_8859_1</li><li>UNKNOWN</li></ul> | ISO_10646_UTF8 |
 
     - Device Configuration:

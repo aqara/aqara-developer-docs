@@ -1,0 +1,81 @@
+---
+title: "Group Control Equipment"
+description: "This document explains how to create a virtual “group” (group control equipment) in Aqara Studio and add multiple smart devices with the same capabilities (for example, several lights in the same room) under it, so you can control all devices in the group with a single command instead of operating them one by one."
+keywords: ["Aqara Docs", "Aqara Studio", "Device Integration", "Virtual Devices", "Group Control Equipment"]
+---
+# Group Control Equipment
+
+This document explains how to create a virtual “group” (referred to as “group control equipment”) in Aqara Studio and add multiple smart devices with the same capabilities (for example, several lights in the same room) under it, so you can control all devices in the group with a single command instead of operating them one by one.
+
+## Create Group Control Equipment
+
+1. Click on **Device Management** in the left sidebar. Under **Protocols and Devices**, click the **...** button and select **Add Protocol**.  
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Devices-AddProtocol.png" alt="Add Protocol" />
+
+2. In the popup, select `Virtual` to add a `Virtual` node.  
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Devices-SelectVirtual.png" alt="Select Virtual" style={{width: '70%'}} />
+
+3. Select this node and click the `Add Device` button.  
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Virtual-AddDevice.png" alt="Add Device" />
+
+4. In the dialog, set **Virtual Device Type** to **Group Control Equipment**, configure the equipment **Name**, and select the **Group Type**. You can also assign a space to the equipment.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/GroupControlEquioment-ConfigureVirtualTypeAndName.png" alt="Configure virtual device type and name" style={{width: '60%'}} />
+
+5. In the **Add Members** dialog, the system finds and lists Endpoints from all your devices that match the selected **Group Type** and have the same capabilities. Select the Endpoints you want to add as members of the group control equipment.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/GroupControlEquioment-AddMemebers.png" alt="Add members" style={{width: '60%'}} />
+
+    After selecting, click **Confirm** to finish creating the group control equipment.
+
+## Control Function Points
+
+If you want to control group control equipment, follow the steps below so that all devices perform the operation in sync:
+
+1. In the left **Protocols and Devices** tree, expand the `Virtual` node, find and select the group control equipment you just created to view its point list (only points applicable to all devices are included) in the **Point** tab.
+
+2. Find the target function point in the list and use the **Control** column to operate on it.
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/GroupControlEquioment-ControlPoints.png" alt="Control equipment" style={{width: '60%'}} />
+
+## Group Member Management
+
+After creating group control equipment, you can [view](#view-group-members), [add](#add-members), or [remove](#remove-members) members.
+
+### View Group Members
+
+If you want to view the member (Endpoint) list of group control equipment, follow these steps:
+1. In the left **Protocols and Devices** tree, expand the `Virtual` node, find and select the group control equipment you just created.
+2. Switch to the **Group member management** tab to view the member list.
+3. In this list, you can view the following information for each group member:
+
+    | Field                 | Description                                                                                   |
+    | --------------------- | --------------------------------------------------------------------------------------------- |
+    | Member status         | Whether the member is online.                                                                 |
+    | Execution owner   | Indicates the actual device responsible for controlling this member—identifying which device ultimately executes the command. |
+    | Protocol handling     | The actual processing method (unicast or multicast) used by this member in the current group. |
+    
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/GroupControlEquioment-CheckMembers.png" alt="Manage group members" style={{width: '60%'}} />
+
+### Remove Members
+
+If you want to remove an Endpoint from group control equipment, follow these steps:
+1. Refer to the [View Group Members](#view-group-members) steps to open the member list of the group control equipment.
+2. Find the target Endpoint and click the **Remove** button to remove it from the group control equipment.
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/GroupControlEquioment-RemoveMembers.png" alt="Remove group members" style={{width: '60%'}} />
+
+### Add Members
+
+If you want to add a new Endpoint to existing group control equipment, follow these steps:
+1. Refer to the [View Group Members](#view-group-members) steps to open the member list of the group control equipment.
+2. Click the **Add Member** button to start the add flow.
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/GroupControlEquioment-AddMembers.png" alt="Add group members" style={{width: '60%'}} />
+
+## Next Step
+
+Now, you can [view details and control the device](./../../device-management/basic-information.mdx), or [use the device in automation](./../../automation.mdx).

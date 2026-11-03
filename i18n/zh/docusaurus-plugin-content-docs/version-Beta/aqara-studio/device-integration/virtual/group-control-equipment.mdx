@@ -1,0 +1,82 @@
+---
+title: "组控设备接入"
+description: "本文档将介绍如何在 Aqara Studio 中将多个功能相同的智能设备（例如同一房间的几盏灯）组合成一个虚拟的“组”，以便通过一条指令同时控制组内的所有设备，而无须逐个操作。"
+keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "虚拟设备", "组控设备接入", "Group Control Equipment"]
+---
+# 组控设备接入
+
+本文档将介绍如何在 Aqara Studio 中创建一个虚拟的“组”（以下称为“组控设备”），并在其下添加多个功能相同的智能设备（例如同一房间的几盏灯），以便通过一条指令同时控制组内的所有设备，而无须逐个操作。
+
+## 创建组控设备
+
+1. 在左侧侧边栏点击进入**设备管理**页面。在左侧 **协议和设备** 单击 **...** 按钮，选择 **添加协议**。   
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Devices-AddProtocol.png" alt="添加协议" /> 
+
+2. 在弹窗中选择 `Virtual`，以添加一个 `Virtual` 节点。   
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Devices-SelectVirtual.png" alt="选择 Virtual" style={{width: '70%'}} /> 
+
+3. 选择该节点，单击 `添加设备` 按钮。   
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Virtual-AddDevice.png" alt="添加设备" /> 
+
+4. 在弹窗中，将**虚拟设备类型**选择为**组控设备**，配置设备**名称**并选择**组类型**。此外，您还可以为该设备分配空间。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/GroupControlEquioment-ConfigureVirtualTypeAndName.png" alt="配置虚拟设备类型和名称" style={{width: '60%'}} />
+
+5. 在 **添加成员** 弹窗中，系统会从您的所有设备中找到并列出符合所选 **组类型** 要求、且功能相同的 Endpoint。勾选需要加入的 Endpoint，即可将其添加为组控设备的成员。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/GroupControlEquioment-AddMemebers.png" alt="添加成员" style={{width: '60%'}} />
+
+    完成勾选后，点击 **确认** 按钮，即可完成组控设备的创建。
+
+## 控制功能点
+
+若您希望控制组控设备时，遵循以下流程，即可让所有设备同步执行该操作：
+
+1. 在左侧 **协议和设备** 树中，展开 `Virtual` 节点，找到并选择刚创建的组控设备，即可在其 **功能点** 标签页下查看其功能点列表（仅包含适用于所有设备的功能点）。
+
+2. 在功能点列表中找到目标功能点，通过 **控制** 列即可对该功能点进行操作。
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/GroupControlEquioment-ControlPoints.png" alt="控制设备" style={{width: '60%'}} />
+
+## 组成员管理
+
+创建完组控设备后，您可以 [查看](#查看组成员)、[添加](#添加成员)或[移除](#移除成员)成员。
+
+### 查看组成员
+
+如果您希望查看组控设备的成员（Endpoint）列表，可以按照以下流程操作：
+1. 在左侧 **协议和设备** 树中，展开 `Virtual` 节点，找到并选择刚创建的组控设备。
+2. 切换至 **组成员管理** 标签页即可查看其成员列表。
+3. 您可以在该列表中查看组成员的如下信息：
+
+    | 字段 | 说明 |
+    | -- | -- |
+    | 成员状态 | 成员是否在线。 |
+    | 执行归属         | 显示实际负责控制该成员的设备，用于明确命令最终由哪个设备执行。 |
+    | 协议处理         | 此成员在当前组内采用的实际处理方式（单播或组播）。 |
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/GroupControlEquioment-CheckMembers.png" alt="管理组成员" style={{width: '60%'}} />
+
+
+### 移除成员
+
+如果您希望将某个 Endpoint 移除出组控设备，可以按照以下流程操作：
+1. 参考 [查看组成员](#查看组成员) 流程，查看待移除 Endpoint 的组控设备的成员列表。
+2. 找到目标 Endpoint，点击 **移除** 按钮即可将其移除出组控设备。
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/GroupControlEquioment-RemoveMembers.png" alt="移除组成员" style={{width: '60%'}} />
+
+### 添加成员
+
+如果您希望为某个现有的组控设备添加新的 Endpoint，可以按照以下流程操作：
+1. 参考 [查看组成员](#查看组成员) 流程，查看待添加 Endpoint 的组控设备的成员列表。
+2. 单击 **添加成员** 按钮，即可进入添加流程。
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/GroupControlEquioment-AddMembers.png" alt="添加组成员" style={{width: '60%'}} />
+
+## 下一步
+
+接下来，您可以直接 [查看该设备的详情和控制该设备](./../../device-management/basic-information.mdx)，还可以利用该设备 [编排自动化逻辑](./../../automation.mdx) 了。

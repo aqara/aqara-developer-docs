@@ -1,0 +1,55 @@
+---
+title: "自定义设备接入"
+description: "本文档将介绍如何将自定义设备集成到 Aqara Studio，帮助用户通过 Aqara Studio 实现对自定义设备的便捷管理与控制。"
+keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "虚拟设备", "自定义设备接入", "Custom Device"]
+---
+# 自定义设备接入
+
+本文档将指导您如何在 Aqara Studio 中创建虚拟自定义设备，并整合来自不同设备的多个功能点，实现更高效的设备统一管理与控制。
+
+## 创建自定义设备
+
+1. 在左侧侧边栏点击进入**设备管理**页面。在左侧 **协议和设备** 单击 **...** 按钮，选择 **添加协议**。   
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Devices-AddProtocol.png" alt="添加协议" /> 
+
+2. 在弹窗中选择 `Virtual`，以添加一个 `Virtual` 节点。   
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Devices-SelectVirtual.png" alt="选择 Virtual" style={{width: '70%'}} /> 
+
+3. 选择该节点，单击 `添加设备` 按钮。   
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Virtual-AddDevice.png" alt="添加设备" /> 
+
+4. 在弹窗中，将**虚拟设备类型**选择为**自定义设备**，配置设备**名称**。此外，您还可以为该设备分配空间。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/CustomDevice-ConfigureVirtualTypeAndName.png" alt="配置虚拟设备类型和名称" style={{width: '60%'}} />
+
+5. 在 **功能点的所属原设备** 下拉框中选择一个设备。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/CustomDevice-SelectADevice.png" alt="选择一个设备" />
+
+    在选中的设备的功能点列表中勾选若干个功能点，单击 **+** 按钮，将该功能点添加到自定义设备中，
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/CustomDevice-SelectPoints.png" alt="选择功能点" />
+    
+    此时，您可以在 **已添加的功能点** 列表中查看已添加的功能点。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/CustomDevice-AddedPointList.png" alt="已添加的功能点列表" />
+
+
+    如果您希望将其他设备的功能点添加到自定义设备中，请重复上述步骤，继续在 **功能点的所属原设备** 下拉框中选择其他设备，并勾选相应的功能点。
+
+    添加完所有功能点后，单击 **完成** 按钮，即可完成自定义设备的创建。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/CustomDevice-Done.png" alt="完成" />
+
+6. 此时，您将在左侧 **协议和设备** 的 `Virtual` 节点下，以及该 `Virtual` 管理页面的设备列表中，看到已成功添加的设备。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/CustomDevice-ViewAddedDevice.png" alt="查看已添加的设备" />
+
+## 下一步
+
+接下来，您可以直接 [查看该设备的详情和控制该设备](./../../device-management/basic-information.mdx)，还可以利用该设备 [编排自动化逻辑](./../../automation.mdx) 了。
+
+    
