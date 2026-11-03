@@ -1,0 +1,534 @@
+---
+title: "MQTT"
+description: "Use the MQTT OpenAPI v1 topics to call Aqara Studio APIs and receive real-time push messages."
+sidebar_label: "MQTT"
+---
+
+# MQTT API
+
+With the MQTT export feature, you can use an MQTT Broker to send request messages via publish/subscribe and call the [available data export HTTP APIs](#call-an-http-api). You can also implement [heartbeat keep-alive](#heartbeat-and-subscription-lease-renewal), [subscribe or unsubscribe to device data](#subscribe-to-device-data), and receive device data changes and other object events.
+
+## Obtain MQTT Connection Information
+
+Before you start publishing or subscribing to request messages, enable the MQTT Export service in Aqara Studio, select a local Broker or a third-party Broker, and obtain the MQTT connection information. For the related process, see [Data Export by MQTT](./../../../aqara-studio/data-export-by-mqtt.mdx).
+
+## Authentication
+
+MQTT channel authentication and topic access are enforced by the Broker connection credentials and ACL. You do not need to provide an OpenAPI Token, nor need to send a `AuthRequest` message for authentication when using MQTT.
+
+For production deployments, you should configure the Broker ACL so that your application can only publish to its assigned request topic and subscribe to its assigned response topic. 
+
+Do not grant an application access to `/open/api/v1/response/+`.
+
+## Topics
+
+| Topic Type | Direction | Format | Purpose |
+| --- | --- | --- | --- |
+| Request Topic | Application to Studio | `/open/api/v1/request/{clientId}` | API requests, heartbeat, subscribe, and unsubscribe messages |
+| Response Topic | Studio to application | `/open/api/v1/response/{clientId}` | API responses, subscription responses, push messages, and errors |
+
+:::tip
+The leading `/` in the request Topic and response Topic is part of the Topic name and must not be omitted.
+:::
+
+`clientId` identifies a third-party application's logical session and response route in the new MQTT channel. In the usual case, one MQTT connection represents one application, and the application should use the MQTT Client ID submitted in its `CONNECT` packet as the `{clientId}` in the topic.
+
+The `{clientId}` in the topic is not the Client ID configured for Aqara Studio under **MQTT Export**. Studio uses its own single MQTT connection to serve multiple third-party applications, so these two values should not be the same. The topic `{clientId}` may differ from an MQTT connection's Client ID only when a proxy uses one connection for multiple logical clients. In production, use the Broker ACL to restrict the request and response topics available to each application.
+
+`clientId` must contain 1–128 characters and may only contain letters, digits, `.`, `_`, `:`, and `-`.
+
+## Quality of Service
+
+Use QoS 1 for request publication and response subscription. 
+
+Subscribe to the response topic before publishing a request so that an immediate response is not missed.
+
+## Call an HTTP API
+
+To call the following available data export HTTP APIs:
+- [Space-related APIs](./../introduction.mdx#space)
+- [Device-related APIs](./../introduction.mdx#device)
+- [Automation-related APIs](./../introduction.mdx#automation)
+
+Write and send a request message with `type` set to `OpenApiRequest`.
+
+### Request fields
+
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| type | ✔ | string | Must be `OpenApiRequest`. |
+| version | ✔ | string | Must be `v1`. |
+| msgId | ✔ | string | Request identifier returned unchanged in the response. Must be 1–128 characters and may contain only letters, digits, `.`, `_`, `:`, `@`, and `-`. Use a new value for each logical operation, and keep it unchanged when retrying that operation. |
+| data.method | ✔ | string | One of `GET`, `POST`, `PATCH`, or `DELETE`. Use the method specified by the target HTTP API documentation. |
+| data.path | ✔ | string | Endpoint of the HTTP API to call, such as `/open/api/v1/devices`. |
+| data.query | ✘ | object | Query parameters as a JSON object. Values may be strings, numbers, booleans, or arrays of those types. See the **Request - Query Parameters** section of the corresponding HTTP API documentation. |
+| data.headers | ✘ | object | Optional OpenAPI metadata headers, such as `Lang`. Must not include `Authorization` or `Cookie`. Routing uses the `clientId` from the topic and cannot be overridden here. |
+| data.body | ✘ | object \| null | JSON request body. Omit this field or set it to `null` when the API has no body. See the **Request - Body** section of the corresponding HTTP API documentation. |
+
+### Request example
+
+```json
+{
+  "type": "OpenApiRequest",
+  "version": "v1",
+  "msgId": "devices-001",
+  "data": {
+    "method": "GET",
+    "path": "/open/api/v1/devices",
+    "query": {
+      "pageNum": 1,
+      "pageSize": 20
+    },
+    "headers": {
+      "Lang": "en-US"
+    },
+    "body": null
+  }
+}
+```
+
+### Response description
+
+The response topic receives the standard HTTP OpenAPI response body directly, so you can parse the response body according to the **Responses** section of the corresponding HTTP API documentation.
+
+### Response example
+
+```json
+{
+  "type": "GetDeviceInfoResponse",
+  "version": "v1",
+  "msgId": "devices-001",
+  "code": 0,
+  "message": "success",
+  "data": {
+    "totalCount": 1,
+    "pageNum": 1,
+    "pageSize": 20,
+    "data": []
+  }
+}
+```
+
+## Heartbeat and subscription lease renewal
+
+MQTT Keep Alive maintains the connection between an MQTT client and the Broker. The MQTT SDK normally sends `PINGREQ` packets and handles `PINGRESP` packets automatically. An application does not need to publish the JSON `ping` below merely to keep its Broker connection alive.
+
+The `ping` described here is a Studio application-level **logical subscription lease renewal message**. It tells Studio that the `clientId` associated with the request topic is still using its previously established data subscriptions. Apply the following rules:
+
+- A client that only calls OpenAPI endpoints and has not established a [data subscription](#subscribe-to-device-data) does not need to send periodic `ping` messages.
+- While a data subscription is active, any request received on that `clientId` request topic renews the subscription. If another request has been sent within the last 30 seconds, an additional `ping` is unnecessary.
+- When an active subscription is idle and there are no other requests to renew it, send a `ping` at least once every 30 seconds.
+- Studio renews the lease only from messages received on the request topic. Receiving push messages does not renew the subscription.
+- If Studio receives no message on the request topic for 90 consecutive seconds, the logical session expires. Studio removes all subscriptions for that `clientId` and stops their push messages. Sending `ping` after expiration creates a new logical session but does not restore removed subscriptions; the client must send the relevant subscription requests again.
+
+MQTT Keep Alive and Studio logical subscription lease renewal are independent and cannot replace each other. Configure MQTT Keep Alive separately according to the MQTT SDK and Broker being used.
+
+### Request fields
+
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| type | ✔ | string | Fixed to `ping`. |
+| version | ✔ | string | Fixed to `v1`. |
+| msgId | ✔ | string | Request identifier. The response uses the same value. The length is 1–128 characters and may contain only letters, digits, `.`, `_`, `:`, `@`, or `-`. Use a new value for each logical operation; keep it unchanged when retrying the same operation. |
+| data | ✘ | null | Fixed to `null`. |
+
+### Request example
+
+```json
+{
+  "type": "ping",
+  "version": "v1",
+  "msgId": "ping-001",
+  "data": null
+}
+```
+
+### Response fields
+
+Receiving the matching `pong` confirms that the application message path from the client through the Broker to Studio and back is currently available. If no `pong` is received, check the MQTT connection and retry with the original `msgId`. If the idle period might have exceeded 90 seconds, subscribe again after the message path recovers.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| type | string | Fixed to `pong`. |
+| version | string | Fixed to `v1`. |
+| msgId | string | Unique message identifier. A normal request and its response use the same msgId for correlation. Parsing failures, partial permission issues, or internal errors may return UNKNOWN. Server-initiated pushes are generated by the server and are not the same as the subscription request msgId. |
+| data | string | Fixed to `pong`. |
+| code | number | Response status code. 0 indicates success; a non-zero value indicates failure. |
+| message | string | Response message. |
+
+### Response example
+
+```json
+{
+  "type": "pong",
+  "version": "v1",
+  "msgId": "ping-001",
+  "data": "pong",
+  "code": 0,
+  "message": "success"
+}
+```
+
+## Subscribe to device data
+
+### Subscribe to all or specific devices
+
+To subscribe to data for all devices or for specified devices, send a request message with `type` set to `SubscribeAllRequest`. The related request and response fields are described below.
+
+`SubscribeAllRequest` replaces the current session's individual Trait subscriptions.
+
+#### Request fields
+
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| type | ✔ | string | Fixed to `SubscribeAllRequest`. |
+| version | ✔ | string | Fixed to `v1`. |
+| msgId | ✔ | string | Request identifier. The response uses the same value. The length is 1–128 characters and may contain only letters, digits, `.`, `_`, `:`, `@`, or `-`. Use a new value for each logical operation; keep it unchanged when retrying the same operation. |
+| data | ✘ | array | Array of device IDs. When this field is omitted, `null`, or an empty array, it subscribes to data for all currently accessible devices. When this field is a non-empty array of device IDs, it subscribes only to the specified devices. |
+
+#### Request example
+
+```json
+{
+  "type": "SubscribeAllRequest",
+  "version": "v1",
+  "msgId": "1789909097657_777ov8",
+  "data": null
+}
+```
+
+#### 响应字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| type | string | 固定为 `SubscribeAllResponse`。 |
+| version | string | 固定为 `v1`。 |
+| msgId | string | 消息唯一标识。正常请求和响应使用相同 msgId 关联；解析失败、部分权限或内部异常可能返回 UNKNOWN；服务端推送由服务端生成，不等同于订阅请求 msgId。非空，且长度不超过 64 个字符。 |
+| data | string | 默认值为空。 |
+| code | number | 必填。处理结果码，0 表示成功，非 0 表示失败。 |
+| message | string | 处理结果描述。 |
+
+#### 响应示例
+
+```json
+{
+  "type": "SubscribeAllResponse",
+  "version": "v1",
+  "msgId": "1789909303093_0jwcut",
+  "data": "",
+  "code": 0,
+  "message": ""
+}
+```
+
+
+### Unsubscribe from All or Specific Devices
+
+To unsubscribe from data for all or specific devices, send a request message with `type` set to `UnsubscribeAllRequest`. The related request and response fields are described below.
+
+`UnsubscribeAllRequest` only modifies device data and Trait subscriptions; for independent events and object events, you must use their respective unsubscribe messages.
+
+#### Request fields
+
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| type | ✔ | string | Fixed to `UnsubscribeAllRequest`. |
+| version | ✔ | string | Fixed to `v1`. |
+| msgId | ✔ | string | Unique message identifier. Normal requests and responses use the same msgId; for parsing failures, partial permissions, or internal errors, the response may return UNKNOWN; server push messages are generated by the server and do not correspond to the subscription request msgId. The value must not be empty and must be no longer than 64 characters. |
+| data | ✘ | string[] \| null | Array of device IDs. If omitted, set to `null`, or empty array, unsubscribes from all device data; if non-empty, only unsubscribes from the specified devices. Default is `null`. <br />If all device data was previously subscribed, unsubscribing only some devices is not effective — pass an empty value to unsubscribe all. <br />Within the same connection, `UnsubscribeAllRequest` also clears Trait subscriptions created via `SubscribeTraitValueRequest`. <br />Unsubscribing for specific devices only cancels device-level data subscriptions; this does not close all push messages for the current connection. |
+
+#### Request example
+
+```json
+{
+  "type": "UnsubscribeAllRequest",
+  "version": "v1",
+  "msgId": "1789909759573_4ozfm7",
+  "data": null
+}
+```
+
+#### Response fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| type | string | Fixed to `UnsubscribeAllResponse`. |
+| version | string | Fixed to `v1`. |
+| msgId | string | Unique message identifier. As with requests, a normal response uses the same msgId; for parsing failures, partial permission, or internal errors, the response may return UNKNOWN; server push messages are generated by the server and do not correspond to the subscription request msgId. The value must not be empty and must be no longer than 64 characters. |
+| data | string | Default is empty. |
+| code | number | Required. Result code; 0 means success, non-0 means failure. |
+| message | string | Description of the result. |
+
+#### Response example
+
+```json
+{
+  "type": "UnsubscribeAllResponse",
+  "version": "v1",
+  "msgId": "1789909884409_ln6tck",
+  "data": "",
+  "code": 0,
+  "message": ""
+}
+```
+
+### Subscribe to selected Trait values
+
+
+To subscribe to specific Trait values, send a request message with `type` set to `SubscribeTraitValueRequest`. The related request fields and response fields are described below.
+
+#### Request fields
+
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| type | ✔ | string | Fixed as `SubscribeTraitValueRequest`. |
+| version | ✔ | string | Fixed as `v1`. |
+| msgId | ✔ | string | Unique message identifier. Normal requests and responses use the same msgId for correlation; for parsing failures, partial permissions, or internal errors, the response may return UNKNOWN; server push messages are generated by the server and are not associated with the subscription request's msgId. Must not be empty and no longer than 64 characters. |
+| data | ✔ | object[] | List of Traits to subscribe. It is recommended to provide a non-empty array; omitting data will result in a parsing failure. In the current implementation, sending an empty array or empty traitCodes array may still return a success response, but will not create an effective TraitValueUpdate subscription. |
+| data[].deviceId | ✔ | string | Device ID. |
+| data[].endpointId | ✔ | int32 | Endpoint ID. |
+| data[].functionCode | ✔ | string | Function code. |
+| data[].traitCodes | ✔ | string[] | List of Trait feature code points. It is recommended to provide a non-empty array; if empty, it will not create or cancel a specific Trait subscription, though the current implementation may still return a success response. |
+
+#### Request example
+
+```json
+{
+  "type": "SubscribeTraitValueRequest",
+  "version": "v1",
+  "msgId": "subscribe-trait-001",
+  "data": [
+    {
+      "deviceId": "device-001",
+      "endpointId": 1,
+      "functionCode": "Light",
+      "traitCodes": ["OnOff"]
+    }
+  ]
+}
+```
+#### Response fields
+
+| Field   | Type    | Description |
+| ---     | ---     | --- |
+| type    | string  | Fixed as `SubscribeTraitValueResponse`. |
+| version | string  | Fixed as `v1`. |
+| msgId   | string  | Unique message identifier. Normal requests and responses use the same msgId for correlation. For parsing failures, partial permissions, or internal errors, the response may return UNKNOWN. Server push messages are generated by the server and are not associated with the subscription request's msgId. Must not be empty and must not exceed 64 characters. |
+| data    | string  | Default is empty. |
+| code    | int32   | Result code: 0 indicates success, non-zero indicates failure. |
+| message | string  | Description of the result. May be `null`. |
+
+#### Response example
+
+```json
+{
+  "type": "SubscribeTraitValueResponse",
+  "version": "v1",
+  "msgId": "1789957892004_ownm4j",
+  "data": "",
+  "code": 0,
+  "message": ""
+}
+```
+
+
+### Unsubscribe from Specified Trait Values
+
+To unsubscribe from specified Trait values, send a request message with `type` set to `UnsubscribeTraitValueRequest`. The relevant request and response fields are described below.
+
+#### Request Fields
+
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| type | ✔ | string | Fixed as `UnsubscribeTraitValueRequest`. |
+| version | ✔ | string | Fixed as `v1`. |
+| msgId | ✔ | string | Unique message identifier. Normal requests and responses use the same msgId for correlation; for parsing failures, partial permissions, or internal errors, the response may return UNKNOWN; server push messages are generated by the server and are not associated with the subscription request's msgId. Must not be empty and no longer than 64 characters. |
+| data | ✘ | object[] | List of Traits to unsubscribe from. It is recommended to provide a non-empty array. If data is omitted, or you send an empty array or an empty traitCodes array, no Trait subscription will be cancelled, though the current implementation may still return a success response. |
+| data[].deviceId | ✔ | string | Device ID. |
+| data[].endpointId | ✔ | int32 | Endpoint ID. |
+| data[].functionCode | ✔ | string | Function code. |
+| data[].traitCodes | ✔ | string[] | List of Trait feature code points. It is recommended to provide a non-empty array; if this array is empty, no specific Trait subscription will be created or cancelled, though the current implementation may still return a success response. |
+
+#### Request Example
+
+```json
+{
+  "type": "UnsubscribeTraitValueRequest",
+  "version": "v1",
+  "msgId": "1789960932713_6yexkw",
+  "data": [
+    {
+      "deviceId": "lumi3.86108040f2b03a4e",
+      "endpointId": 2,
+      "functionCode": "Speaker",
+      "traitCodes": [
+        "Volume"
+      ]
+    }
+  ]  
+}
+```
+
+#### Response Fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| type | string | Fixed as `UnsubscribeTraitValueResponse`. |
+| version | string | Fixed as `v1`. |
+| msgId | string | Unique message identifier. Normal requests and responses use the same msgId for correlation; for parsing failures, partial permissions, or internal errors, the response may return UNKNOWN; server push messages are generated by the server and are not associated with the subscription request's msgId. Must not be empty and must not exceed 64 characters. |
+| data | string | Default is empty. |
+| code | int32 | Result code: 0 indicates success, non-zero indicates failure. |
+| message | string | Description of the result. May be `null`. |
+
+#### Response Example
+
+```json
+{
+    "type": "UnsubscribeTraitValueResponse",
+    "version": "v1",
+    "msgId": "1789961117378_xd3ov7",
+    "data": "",
+    "code": 0,
+    "message": ""
+}
+```
+
+## Receive Push Messages
+
+All push messages are published to `/open/api/v1/response/{clientId}`.
+
+### Trait value update
+
+After you [subscribe to device data](#subscribe-to-all-or-specific-devices) or [subscribe to specific Trait values](#subscribe-to-selected-trait-values), Aqara Studio will push a `TraitValueUpdate` message whenever the target Trait value changes.
+
+#### Field Descriptions
+
+| Field | Type | Description |
+| --- | --- | --- |
+| type | string | Fixed as `TraitValueUpdate`. |
+| version | string | Fixed as `v1`. |
+| msgId | string | Unique message identifier. Generated by Aqara Studio and does not correspond to a specific subscription request. |
+| data | object[] | Array of Trait value changes. |
+| data[].deviceId | string | Device ID. |
+| data[].endpointId | int32 | Endpoint ID. |
+| data[].functionCode | string | Function code. |
+| data[].traitCode | string | Trait code. |
+| data[].value | — | Trait value. The type is determined by the specific function point definition. |
+| data[].time | int64 | Report time, Unix timestamp in milliseconds. |
+| code | int32 | Result code: 0 indicates success, non-zero indicates failure. |
+| message | string | Result description. May be `null`. |
+
+#### Example
+
+```json
+{
+  "type": "TraitValueUpdate",
+  "version": "v1",
+  "msgId": "1754469720110",
+  "data": [
+    {
+      "deviceId": "device-001",
+      "endpointId": 1,
+      "functionCode": "Light",
+      "traitCode": "OnOff",
+      "value": true,
+      "time": 1754469720110
+    }
+  ],
+  "code": 0,
+  "message": ""
+}
+```
+
+The value type is defined by the corresponding Trait. `time` is a Unix timestamp in milliseconds.
+
+### Object event
+
+When you [subscribe to device data](#subscribe-to-all-or-specific-devices) or [subscribe to specific Trait values](#subscribe-to-selected-trait-values), you will receive push messages of type `objectEvent` whenever the targeted device is added or removed, endpoints are added or removed, or the parameters of the target Trait are changed. The specific event types include:
+- `DEVICE_ADDED`: Device added.
+- `DEVICE_REMOVED`: Device removed.
+- `DEVICE_ENDPOINT_ADDED`: Endpoint added.
+- `DEVICE_ENDPOINT_REMOVED`: Endpoint removed.
+- `DEVICE_TRAIT_PARAMETER_UPDATE`: Trait parameter updated.
+
+Therefore, when you receive such an event push, you should first dispatch the event based on `eventType` and `objectId`, then parse the specific data structure inside `data.data`.
+
+#### Field Descriptions
+
+| Field | Type | Description |
+| --- | --- | --- |
+| type | string | Required. Fixed as `objectEvent`. |
+| version | string | Required. Fixed as `v1`. |
+| msgId | string | Unique message identifier. Generated by Aqara Studio and does not correspond to a specific subscription request. |
+| data | object | Required. Object event data. |
+| data.eventType | string | Required. Object event type. Possible values: `DEVICE_ADDED`, `DEVICE_REMOVED`, `DEVICE_ENDPOINT_ADDED`, `DEVICE_ENDPOINT_REMOVED`, `DEVICE_TRAIT_PARAMETER_UPDATE`. |
+| data.objectId | string | Required. Object ID, usually the device ID in the context of device events. |
+| data.time | int64 | Required. Event occurrence timestamp in milliseconds. |
+| data.data | object | May be `null`. The specific structure depends on `eventType`. |
+| data.data.* | any | May be `null`. Property names are not fixed and depend on `eventType`. |
+| code | int32 | Required. Result code; 0 indicates success, non-0 indicates failure. |
+| message | string | Required, can be `null`. Description of the result. |
+
+```json
+{
+  "type": "objectEvent",
+  "version": "v1",
+  "msgId": "1789961719076_fneua4",
+  "data": {
+    "eventType": "DEVICE_ADDED",
+    "objectId": "14d3b91",
+    "time": 1754469720110,
+    "data": {
+      "deviceId": "14d3b91",
+      "name": "",
+      "deviceTypesList": [
+        "Light"
+      ],
+      "endpointIds": [
+        0,
+        2,
+        3
+      ],
+      "time": 1754469720110
+    }
+  },
+  "code": 0,
+  "message": "success"
+}
+```
+
+### Error response
+
+When the request message format is incorrect, the message type is not applicable, the route is not open, or business processing fails, you will receive a push message with `type` set to `ErrorMessage`. The relevant field descriptions are as follows.
+
+#### Field Descriptions
+
+| Field   | Type    | Description                                                     |
+| ------- | ------- | --------------------------------------------------------------- |
+| type    | string  | Fixed as `ErrorMessage`.                                        |
+| version | string  | Fixed as `v1`.                                                  |
+| msgId   | string  | Unique message identifier. Generated by Aqara Studio, does not correspond to a specific subscription request. |
+| data    | object  | May be `null`.                                                  |
+| code    | int32   | Error code.                                                     |
+| message | string  | Error reason description.                                       |
+
+#### Example
+
+```json
+{
+  "type": "ErrorMessage",
+  "version": "v1",
+  "msgId": "devices-001",
+  "data": null,
+  "code": 400,
+  "message": "Invalid MQTT OpenAPI request"
+}
+```
+
+## Delivery and retry rules
+
+- A single MQTT OpenAPI request must not exceed 256 KiB.
+- Requests from the same logical `clientId` are processed in Broker arrival order. Different logical clients may be processed concurrently.
+- If no response is received, retry the same logical operation with the same `msgId`. Do not assign a new `msgId` until the actual operation state has been reconciled.
+- Studio temporarily reuses the final response for write requests to prevent a QoS 1 redelivery from executing the same mutation twice. Reusing a `msgId` for a different write request returns an error.
+- Reconnect with a clean session and actively retry requests whose result was not received. Do not rely on the Broker to queue control requests while Studio is disconnected.

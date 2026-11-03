@@ -7,11 +7,6 @@ const sidebar: SidebarsConfig = {
       id: "version-Beta/aqara-developer/data-export-api/data-export-api",
     },
     {
-      type: "doc",
-      id: "version-Beta/aqara-developer/data-export-api/websocket-api",
-      label: "WebSocket Playground",
-    },
-    {
       type: "category",
       label: "Space",
       link: {
@@ -93,8 +88,20 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "version-Beta/aqara-developer/data-export-api/delete-device-point",
+          label: "删除设备点位",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
           id: "version-Beta/aqara-developer/data-export-api/add-virtual-device",
           label: "添加虚拟设备",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
+          id: "version-Beta/aqara-developer/data-export-api/unbind-device",
+          label: "设备解绑",
           className: "api-method post",
         },
       ],
@@ -108,6 +115,12 @@ const sidebar: SidebarsConfig = {
       },
       collapsed: false,
       items: [
+        {
+          type: "doc",
+          id: "version-Beta/aqara-developer/data-export-api/get-gateways",
+          label: "查询网关列表",
+          className: "api-method get",
+        },
         {
           type: "doc",
           id: "version-Beta/aqara-developer/data-export-api/join-subdevice",

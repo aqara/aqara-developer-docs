@@ -7,6 +7,7 @@ keywords: ["Aqara Docs", "Aqara Studio", "Device Integration", "UDP"]
 
 This guide will show you how to integrate UDP protocol devices into Aqara Studio by writing JS scripts, and how to map device function points according to the **Aqara Data Model Specification**, enabling device discovery, addition, and control of function points.
 
+
 ## Tested UDP Devices
 
 The following UDP device has been tested by Aqara and can be integrated with Aqara Studio:
@@ -14,9 +15,7 @@ The following UDP device has been tested by Aqara and can be integrated with Aqa
 
 ## Learn and Write JavaScript Scripts
 
-For the shared script structure and configuration workflow, see the [third-party device script integration guide](../ai-agent-device-onboarding.mdx).
-
-Please refer to the [JavaScript script (for UDP and TCP)](./../unified-protocol-script.mdx#tcp-udp) guide to write a JavaScript script that complies with the **Aqara Data Model Specification**. This script instructs Aqara Studio how to discover devices, and add and control function points.
+Please refer to the [JavaScript script (for UDP and TCP)](./../javascript-for-udp-tcp-integration.mdx) guide to write a JavaScript script that complies with the **Aqara Data Model Specification**. This script instructs Aqara Studio how to discover devices, and add and control function points.
 
 ## Install the Plugin
 
@@ -61,10 +60,10 @@ Please refer to the [Plugin Market](./../plugin-center.mdx) instruction, and go 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/UDP-Gear.png" alt="Click the gear icon" /> 
 
     :::tip
-    [describe().discovery](../unified-protocol-script.mdx#tcp-udp-discovery) may specify a target or omit UDP IP for local broadcast calculation. Decode real replies into devices; use published manual creation if no discovery protocol exists. A static address list is not completed discovery.
+    If there is no UDP server, you can skip this configuration. In that case, it is recommended to directly specify the target UDP device's IP address and port number in the return value of [parseDiscoveryResponse](./../javascript-for-udp-tcp-integration.mdx#parsediscoveryresponse) in the [JS script](#learn-and-write-javascript-scripts) to achieve precise device discovery and integration.
     :::
 
-    Enter the vendor unicast/broadcast/multicast destination and port or use script discovery settings. [encode(discoverDevices)](../unified-protocol-script.mdx#tcp-udp-discovery) builds requests; decode parses identity/communication addresses from responses.
+    Enter the UDP server IP address and port number in the popup. This information will be used by the [buildDiscoveryRequest](./../javascript-for-udp-tcp-integration.mdx#builddiscoveryrequest) interface in the [JS script](#learn-and-write-javascript-scripts) to instruct Aqara Studio to automatically discover all UDP devices at the specified address.
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/UDP-DiscoveryConfiguration.png" alt="Configure server IP address and Port" style={{width: '50%'}} />
 
@@ -89,9 +88,10 @@ Please refer to the [Plugin Market](./../plugin-center.mdx) instruction, and go 
 2. Click the **Discover Points** button.
 
     :::tip
-    - Remote point lists: encode(discoverPoints) sends bytes; decode returns [pointDefinitions](../unified-protocol-script.mdx#point-definitions) from the actual response.
-    - Static point lists: encode(discoverPoints) returns null; decode receives bytes=null and returns pointDefinitions without a request.
-    Both require selecting/importing points. Runtime option changes use [dynamic enums](../unified-protocol-script.mdx#dynamic-enums), not repeated point creation.
+    - If the device function points are **dynamic**, implement the [buildDiscoverPointsRequest](./../javascript-for-udp-tcp-integration.mdx#builddiscoverpointsrequest) and [parseDiscoverPointsResponse](./../javascript-for-udp-tcp-integration.mdx#parsediscoverpointsresponse) interfaces in the [JS script](#learn-and-write-javascript-scripts).   
+    In this case, when you click the **Add Point** button, Aqara Studio calls [buildDiscoverPointsRequest](./../javascript-for-udp-tcp-integration.mdx#builddiscoverpointsrequest) to dynamically discover device function points, and uses the return value of that interface as the input of [parseDiscoverPointsResponse](./../javascript-for-udp-tcp-integration.mdx#parsediscoverpointsresponse).
+    - If the device function points are **static**, implement the [parseDiscoverPointsResponse](./../javascript-for-udp-tcp-integration.mdx#parsediscoverpointsresponse) interface in the [JS script](#learn-and-write-javascript-scripts), and **directly provide the target device's function-point list** in the return value.   
+    In this case, when you click the **Add Point** button, Aqara Studio will discover these function points directly.
     :::
 
 3. In the **Discovered Points** list, check the required points and click the middle **+** button.

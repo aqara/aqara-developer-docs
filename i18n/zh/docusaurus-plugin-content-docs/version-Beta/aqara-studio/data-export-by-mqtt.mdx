@@ -5,39 +5,149 @@ keywords: ["Aqara 文档", "Aqara Studio", "以 MQTT 转出设备数据", "data 
 ---
 # 以 MQTT 转出设备数据
 
-Aqara Studio 内置 MQTT broker，支持您通过 MQTT 协议将设备数据转出，便于第三方平台查询和控制已接入的所有设备。
+您可以通过 Aqara Studio 内置的 MQTT broker，或集成您自有的 MQTT broker，将设备数据便捷地转发至第三方平台，实现对已接入设备的查询与控制。
 
 :::tip
 本文将以 MQTTX 桌面端应用为例，详细讲解如何建立 MQTT 连接，并进行消息的订阅与发布。
 :::
 
-## 前提条件
+## 您可以通过 MQTT 转出实现哪些功能？
 
-在开始之前，请确保您已下载并安装 [MQTTX](https://mqttx.app/zh/downloads) 桌面端应用。
+通过 MQTT 转出功能，您可以借助 MQTT Broker，以发布/订阅方式发送请求消息，调用已开放的数据转出 HTTP API。此外，您还可以实现心跳保活、订阅或取消订阅设备数据，以及接收设备数据变化和其他对象事件。
 
-## 使用流程
+上述功能的请求体与响应体的 JSON 对象说明，请参考 Aqara Developer [Studio 本地开发 - MQTT](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx)。
 
-1. 在 Aqara Studio 左侧侧边栏进入 **开发者**，并开启 **MQTT转出** 服务。
+## 安装插件
 
-    此时，界面会展示建立 MQTT 连接所需的所有信息（如 Aqara Studio 本机 IP、MQTT 端口、用户名、密码），以及请求和响应 Topic 的格式。
+请参考 [插件市场](./plugin-center.mdx) 文档：
+1. 前往 [Aqara Builder 工坊 - 市场](https://builder.aqara.com/lab/plugin-store) 获取 `MQTT Export` 插件。
+2. 将其分配到 Aqara Studio。
+3. 并前往 Aqara Studio 的 **插件中心** 安装 `MQTT Export` 插件。
 
-    ![获取 MQTT 连接所需信息](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-1.png) 
+## 启用 MQTT 转出服务
 
-2. 参考 MQTT 官方文档 [开始使用 - 快速建立连接](https://mqttx.app/zh/docs/get-started#%E5%BF%AB%E9%80%9F%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5)，使用上述获取的信息，建立 MQTT 连接。
+1. 在 Aqara Studio 左侧侧边栏进入 **插件中心**，找到 `MQTT Export` 插件，点击 **转出**。
+
+    ![在插件中心找到 MQTT Export 插件，点击转出](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTT-ClickTransferOut.png) 
+
+2. 页面会跳转至 **开发者** 页面，请 **启用MQTT转出** 服务。
+
+    ![启用 MQTT 转出服务](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTT-EnableMQTTTransferOut.png) 
+
+## 选择 Broker
+
+根据您的实际需求选择合适的 Broker：
+- 如果您没有自建的 MQTT Broker，可直接 [使用 Aqara Studio 内置的本地 Broker](#使用本地-broker)。
+- 如果您不想使用 Aqara Studio 的内置 Broker，可选择 [使用第三方 Broker](#使用第三方-broker)。
+
+### 使用本地 Broker
+
+如需使用 Aqara Studio 内置的本地 Broker，请选择 **本地 Broker**。
+
+此时，Aqara Studio 默认连接该 Broker。
+
+![使用本地 Broker](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTExport-SelectLocalBroker.png) 
+
+如果连接状态为 **未连接**，您可以选择 **... > 连接** 来手动连接。
+
+![手动连接](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTExport-ConnectToLocalBroker.png) 
+
+### 使用第三方 Broker
+
+如需使用第三方 MQTT Broker，步骤如下：
+1. 选择 **第三方 Broker**，填写如下信息：
+
+    | 名称       | 说明                         |
+    |----------|----------------------------|
+    | HOST       | 第三方 MQTT Broker 的地址。              |
+    | 端口     | 第三方 MQTT Broker 的端口号。            |
+    | 客户端 ID | Aqara Studio 用于连接该 Broker 的客户端**唯一**标识。         |
+    | 用户名    | 连接第三方 MQTT Broker 时所需的用户名。            |
+    | 密码     | 连接第三方 MQTT Broker 时所需的密码。              |
+    | 启用 TLS | 是否启用 TLS 加密传输。<ul><li>开启：MQTT Broker 地址需使用 MQTTS 协议；</li><li>关闭：使用 MQTT 协议。</li></ul> |
+
+    ![选择第三方 Broker](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTExport-SelectThirdPartyBroker.png) 
+
+2. （**若已启用 TLS**）根据您希望实现单向认证，或是双向认证，您需要提供的如下内容：
+
+    <table>
+        <thead>
+            <tr>
+                <th>认证方式</th>
+                <th>必需文件</th>
+                <th>文件后缀</th>
+                <th>说明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>单向认证</td>
+                <td>CA 证书</td>
+                <td><ul><li>.pem</li><li>.crt</li><li>.cer（X.509）</li></ul></td>
+                <td>仅用于验证 Broker 身份。</td>
+            </tr>
+            <tr>
+                <td rowspan="3">双向认证</td>
+                <td>CA 证书</td>
+                <td rowspan="2"><ul><li>.pem</li><li>.crt</li><li>.cer（X.509）</li></ul></td>
+                <td rowspan="3">在单向基础上，额外提供客户端自己的证书和私钥，供 Broker 验证你的身份。</td>
+            </tr>
+            <tr>
+                <td>客户端证书</td>
+            </tr>
+            <tr>
+                <td>客户端私钥</td>
+                <td><ul><li>.pem</li><li>.key</li></ul>若私钥已加密，请填写私钥密码。</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    :::tip
+    - 若您清除已导入的证书，仅解除证书引用，不会删除证书文件。
+    - 如果您重新上传了新的证书，需要断开现有连接，重新连接才能生效。
+    :::
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTExport-UploadCertificates.png" alt="上传证书" /> 
+
+3. 点击 *...* 按钮，呼出操作菜单，选择 **连接**，等待连接成功。
+
+    ![连接第三方 Broker](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTExport-ConnectToThirdPartyBroker.png) 
+
+## 测试 MQTT Broker 连接
+
+:::tip
+- 开始测试前，请先下载并安装 [MQTTX](https://mqttx.app/zh/downloads) 桌面端应用，或其他同类 MQTT 客户端工具。
+- 下列步骤以 MQTTX 为例，其他 MQTT 客户端工具的使用方法请阅读其官方文档。
+:::
+
+1. 从上述 Aqara Studio 的 **开发者** 页面中获取 MQTT 连接所需的所有信息（如 HOST、端口、用户名、密码），以及请求和响应 Topic 的格式。
+
+    下图以使用本地 Broker 为例：
+
+    ![获取 MQTT 连接所需信息](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTExport-FindInfo.png) 
+
+2. 参考 MQTTX 官方文档 [开始使用 - 快速建立连接](https://mqttx.app/zh/docs/get-started#%E5%BF%AB%E9%80%9F%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5)，使用上述获取的信息，建立 MQTT 连接。
 
     ![建立 MQTT 连接](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-2.png) 
 
-3. 连接成功后，点击 **New Subscription** 按钮，根据 Aqara Studio 显示的 **响应 Topic 格式**，将其中的 ClientID 替换为 MQTTX 自动生成的实际 ClientID，以完成对响应消息的订阅。
+3. 连接成功后，点击 **New Subscription** 按钮。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTX-NewSubscription.png" alt="新建订阅" style={{width: '60%'}} /> 
+
+    根据 Aqara Studio 显示的 **响应 Topic 格式**，将其中的 ClientID 替换为 MQTTX 自动生成的实际 ClientID，以完成对响应消息的订阅。
+
+    选择 QoS 为 1，单击 **Confirm** 按钮，以创建订阅。
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-3.png" alt="订阅响应" style={{width: '60%'}} /> 
 
-4. 在已创建的订阅中，将 Aqara Studio 提供的 **请求 Topic 格式**中的 ClientID 替换为 MQTTX 自动生成的实际 ClientID，并填写到 Topic 输入框。参照 设备功能 API 文档中各接口的请求参数说明，编写 JSON 格式的消息并发送，即可获得响应。
+4. 在已创建的订阅中，将 Aqara Studio 提供的 **请求 Topic 格式**中的 ClientID 替换为 MQTTX 自动生成的实际 ClientID，并填写到 Topic 输入框。
+    
+    参照 Aqara Developer [Studio 本地开发 - MQTT](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx) 中各接口的请求参数说明，编写 JSON 格式的消息并发送，即可获得响应。
 
-    下图以 查询设备 ID 列表 的请求为例：
+    下图以 [订阅全部设备数据](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx#订阅全部或指定设备) 的请求为例：
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-4.png" alt="发送请求" style={{width: '70%'}} /> 
 
     以下为响应示意图：
 
-    ![接收响应](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-5.png)     
-
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-5.png" alt="收到响应" style={{width: '70%'}} /> 

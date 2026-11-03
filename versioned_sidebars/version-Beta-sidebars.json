@@ -503,7 +503,8 @@
               "items": [
                 "aqara-developer/data-export-api/websocket-api/websocket-api"
               ]
-            }
+            },
+            "aqara-developer/data-export-api/mqtt-api/mqtt-api"  
           ]
         },
         {

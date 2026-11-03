@@ -20,10 +20,9 @@ servers:
     variables:
       host:
         description: |
-          请输入您的 Aqara Studio 服务地址，可为本地局域网地址 (http) 或远程访问地址 (https)。
+          请输入您的 Aqara Studio 服务地址，可为本地局域网 IP(http)。
           例如：
           - http://10.11.50.56
-          - https://xxx.edge-xxx.aqara.com/
         default: '<Aqara_Studio_URL>'
 
 # 全局安全：所有接口均需 Bearer Token
