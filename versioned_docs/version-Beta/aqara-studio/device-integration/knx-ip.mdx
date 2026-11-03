@@ -7,6 +7,53 @@ keywords: ["Aqara Docs", "Aqara Studio", "Device Integration", "KNX IP"]
 
 This document explains how to connect KNX/IP devices to Aqara Studio.
 
+## Supported KNX DPT Types
+
+When integrating a KNX IP device with Aqara Studio, ensure that its DPT types are supported by Aqara Studio, as listed below:
+
+| Main Type | Supported Subtypes | Type and Usage |
+| --- | --- | --- |
+| 1 | <ul><li>.001–.019</li><li>.021–.024</li><li>.100</li><li>.1200</li><li>.1201</li></ul> | 1-bit Boolean; switching, enabling, alarms, occupancy, direction, day/night, heating/cooling, and more |
+| 2 | .001–.012 | 2-bit control; control bit and Boolean value, with raw encoding from 0 to 3 |
+| 3 | .007, .008 | 4-bit control; relative dimming and blind control using a direction and step code |
+| 4 | .001, .002 | Single character: ASCII or Latin-1 |
+| 5 | <ul><li>.001</li><li>.003–.006</li><li>.010</li><li>.100</li></ul> | 8-bit unsigned value; percentage, angle, tariff, count, fan speed, and more |
+| 6 | <ul><li>.001</li><li>.010</li><li>.020</li></ul> | 8-bit signed value; percentage, count, and status mode |
+| 7 | <ul><li>.001–.007</li><li>.010–.013</li><li>.600</li></ul> | 16-bit unsigned value; count, period, length, current, illuminance, and color temperature |
+| 8 | <ul><li>.001–.007</li><li>.010–.012</li></ul> | 16-bit signed value; count, time difference, percentage, angle, and length |
+| 9 | <ul><li>.001–.011</li><li>.020–.030</li></ul> | KNX 16-bit floating-point value; temperature, humidity, illuminance, wind speed, pressure, air quality, flow, voltage, current, power, and more |
+| 10 | .001 | Day of the week and time |
+| 11 | .001 | Date; supported library range: 1990–2089 |
+| 12 | <ul><li>.001</li><li>.100–.102</li><li>.1200</li><li>.1201</li></ul> | 32-bit unsigned value; count, period, and volume |
+| 13 | <ul><li>.001</li><li>.002</li><li>.010–.016</li><li>.100</li><li>.1200</li><li>.1201</li></ul> | 32-bit signed value; count, flow, energy, time difference, and volume difference |
+| 14 | <ul><li>.000–.080</li><li>.1200</li><li>.1201</li></ul> | IEEE 754 single-precision floating-point value covering 83 physical quantity subtypes |
+| 15 | .000 | 32-bit access control raw data |
+| 16 | .000, .001 | Fixed-length 14-byte ASCII or Latin-1 string |
+| 17 | .001 | Scene number; on-wire range 0–63, optionally displayed as 1–64 |
+| 18 | .001 | Scene activation and learning control |
+| 19 | .001 | Date and time; supported library range: 1900–2155 |
+| 20 | <ul><li>.001–.008</li><li>.011–.014</li><li>.017</li><li>.020–.022</li><li>.100–.115</li><li>.120–.122</li><li>.600–.613</li><li>.801–.804</li><li>.1000–.1005</li><li>.1200</li><li>.1202–.1209</li><li>.60104</li><li>.60105</li></ul> | 8-bit enumeration; operating modes, HVAC, control states, and more, covering 70 subtypes |
+| 21 | <ul><li>.001</li><li>.002</li><li>.100–.106</li><li>.601</li><li>.1000–.1002</li><li>.1010</li><li>.1200</li><li>.1201</li></ul> | 8-bit bitset and status mask |
+| 22 | .1010 | 16-bit bitset; 16-channel activation status |
+| 28 | .001 | Variable-length UTF-8 string |
+| 29 | .010–.012 | 64-bit signed energy value; the default numeric write path is not available; reading integers greater than 2^53 is not guaranteed to be accurate. |
+| 232 | .600 | RGB, with each component ranging from 0 to 255 |
+| 242 | .600 | xyY color |
+| 243 | .600 | xyY color with transition time |
+| 251 | .600 | RGBW, with each component ranging from 0% to 100% |
+| 252 | .600 | RGBW relative control |
+| 253 | .600 | xyY relative control |
+| 254 | .600 | RGB relative control |
+
+## Tested KNX IP Devices
+
+The following KNX IP devices have been tested by Aqara and can be integrated with Aqara Studio:
+
+| Brand | Model |
+|----|----|
+| ABB | IPR/S2.1 |
+| ABB | SA/S4.10.1 |
+
 ## Prerequisites
 
 Before you start, please make sure:

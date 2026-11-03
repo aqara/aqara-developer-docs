@@ -7,6 +7,27 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "BACnet 设备接入"
 
 本文说明如何将 BACnet 设备接入 Aqara Studio。
 
+## 支持的 BACnet 点位对象类型
+
+在将您的 BACnet 设备接入 Aqara Studio 时，请确保其点位对象类型在 Aqara Studio 支持的范围内（如下表所列）：
+
+| 范围 | 对象类型 |
+|----|----|
+| 模拟量三类 | <ul><li>Analog Input</li><li>Analog Output</li><li>Analog Value</li></ul> |
+| 二值三类 | <ul><li>Binary Input</li><li>Binary Output</li><li>Binary Value</li></ul> |
+| 多状态三类 | <ul><li>Multi-state Input</li><li>Multi-state Output</li><li>Multi-state Value</li></ul> |
+| 扩展映射 | <ul><li>Integer Value</li><li>Binary Lighting Output</li><li>Channel</li><li>Color Temperature</li><li>Lighting Output</li><li>Color</li><li>Accumulator</li></ul> |
+
+## 经测试的 BACnet 设备
+
+以下列出经 Aqara 测试可正常接入 Aqara Studio 的 BACnet 设备：
+
+| 品牌 | 型号 |
+|----|----|
+| Honeywell | HT9610P0100 |
+| 上海迅饶自动化 | HMI2004-ARM |
+| 浙江正泰电器 | CHNT DDSU6665 |
+
 ## 前提条件
 
 在开始之前，根据您的设备情况，确保以下网络条件满足：
@@ -72,7 +93,7 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "BACnet 设备接入"
             <tr>
                 <td>设备实例号</td>
                 <td>✔</td>
-                <td>BACnet 设备在 BACnet 网络中的唯一标识符；范围为 [0, 4194303]。</td>
+                <td>BACnet 设备在 BACnet 网络中的唯一标识符；范围为 [0, 4194302]。</td>
                 <td>1</td>
             </tr>
             <tr>
@@ -104,7 +125,7 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "BACnet 设备接入"
             <tr>
                 <td>是否支持报文分段</td>
                 <td>✘</td>
-                <td>可选支持项如下：<ul><li><strong>支持收发分段（默认）</strong>：设备支持发送和接收分段的 APDU 报文；</li><li><strong>仅发送分段</strong>：设备支持发送分段报文，但不支持接收分段报文；</li><li><strong>仅接收分段</strong>：设备不支持发送分段报文，但可接收分段报文；</li><li><strong>不支持分段</strong>：设备不支持发送或接收分段报文，仅支持长度不超过最大 APDU 限制的完整报文。</li></ul></td>
+                <td>可选支持项如下：<ul><li><strong>支持收发分段</strong>：设备支持发送和接收分段的 APDU 报文；</li><li><strong>仅发送分段</strong>：设备支持发送分段报文，但不支持接收分段报文；</li><li><strong>仅接收分段</strong>：设备不支持发送分段报文，但可接收分段报文；</li><li><strong>不支持分段</strong>：设备不支持发送或接收分段报文，仅支持长度不超过最大 APDU 限制的完整报文。</li></ul></td>
                 <td>支持收发分段</td>
             </tr>
             <tr>
@@ -116,8 +137,8 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "BACnet 设备接入"
             <tr>
                 <td>APDU 响应超时时间</td>
                 <td>✘</td>
-                <td>仅在传输未分段的完整 APDU 时生效，表示等待响应报文（如 ACK 或 Error）的超时时间，默认值为 30000ms。</td>
-                <td>30s</td>
+                <td>仅在传输未分段的完整 APDU 时生效，表示等待响应报文（如 ACK 或 Error）的超时时间，默认值为 3000ms。</td>
+                <td>3s</td>
             </tr>
             <tr>
                 <td>字符编码集</td>
@@ -267,7 +288,7 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "BACnet 设备接入"
         | MAC地址 | ✘ | 设备的 MAC 地址。 | - |
         | 地址类型 | ✘ | 指定 MAC 地址的格式和协议类型：<ul><li>UNKNOWN：未知类型；</li><li>ETHERNET：以太网 MAC 地址，6 字节，格式：AA:BB:CC:DD:EE:FF；</li><li>IP：IP 地址，4-6 字节，格式：192.168.1.1:47808）；</li><li>MSTP：MS/TP 地址，1 字节，主从令牌传递；</li><li>SC：安全连接地址，6 字节，WebSocket</li></ul> | - |
         | 可接收的最大APDU长度（单位：字节） | ✘ | 支持的最大 APDU（Application Protocol Data Unit，应用层协议数据单元）数据长度，单位为字节，建议不大于 1476。 | 1076 |
-        | 是否支持报文分段 | ✘ | 可选支持项如下：<ul><li>支持收发分段（默认）：设备支持发送和接收分段的 APDU 报文；</li><li>仅发送分段：设备支持发送分段报文，但不支持接收分段报文；</li><li>仅接收分段：设备不支持发送分段报文，但可接收分段报文；</li><li>不支持分段：设备不支持发送或接收分段报文，仅支持长度不超过最大 APDU 限制的完整报文。</li></ul> | 支持收发分段 |
+        | 是否支持报文分段 | ✘ | 可选支持项如下：<ul><li>支持收发分段：设备支持发送和接收分段的 APDU 报文；</li><li>仅发送分段：设备支持发送分段报文，但不支持接收分段报文；</li><li>仅接收分段：设备不支持发送分段报文，但可接收分段报文；</li><li>不支持分段：设备不支持发送或接收分段报文，仅支持长度不超过最大 APDU 限制的完整报文。</li></ul> | 支持收发分段 |
         | 编码 | ✘ | 使用的字符编码集，用于确保设备间文本信息的正确编码与解码。支持选项：<ul><li>ISO_10646_UTF8</li><li>IBM_MICROSOFT_DBCS</li><li>JIS_X0208</li><li>ISO_10646_UCS4</li><li>ISO_10646_UCS2</li><li>ISO_8859_1</li><li>UNKNOWN</li></ul> | ISO_10646_UTF8 | 
 
     - 设备配置：

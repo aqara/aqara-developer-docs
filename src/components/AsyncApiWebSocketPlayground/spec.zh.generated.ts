@@ -5,7 +5,7 @@ import type { PlaygroundSpec } from "./types";
 const aqaraLifeWebSocketSpecZh = {
   "title": "Studio WebSocket API",
   "version": "v1",
-  "description": "本文件描述客户端与 Studio WebSocket 服务之间的异步消息：\n- 客户端发送鉴权、心跳、订阅、取消订阅请求。\n- Studio 返回请求响应，并在订阅命中或设备事件发生时主动推送消息。\n- 本契约覆盖设备、Trait 和对象事件订阅，不覆盖 SubscribeEventRequest、UnsubscribeEventRequest 等独立告警事件订阅。\n- Studio 局域网 Studio 环境如未在握手阶段携带 Token，可在连接建立后首包发送 `AuthRequest`。\n\n视角说明：本 AsyncAPI 描述客户端应用需要实现的接入行为；`send` 表示客户端发送到 Studio，`receive` 表示客户端从 Studio 接收。\n",
+  "description": "本文件描述客户端与 Studio WebSocket 服务之间的异步消息：\n- 客户端发送鉴权、心跳、订阅、取消订阅请求。\n- Studio 返回请求响应，并在订阅命中或设备事件发生时主动推送消息。\n- 本契约覆盖设备、Trait、对象事件及独立告警事件的订阅、取消订阅和推送。告警通过 SubscribeEventRequest 显式订阅 ALARM。\n- Studio 局域网 Studio 环境如未在握手阶段携带 Token，可在连接建立后首包发送 `AuthRequest`。\n\n视角说明：本 AsyncAPI 描述客户端应用需要实现的接入行为；`send` 表示客户端发送到 Studio，`receive` 表示客户端从 Studio 接收。\n",
   "servers": [
     {
       "id": "lanStudio",
@@ -55,6 +55,8 @@ const aqaraLifeWebSocketSpecZh = {
         "UnsubscribeAllRequest",
         "SubscribeTraitValueRequest",
         "UnsubscribeTraitValueRequest",
+        "SubscribeEventRequest",
+        "UnsubscribeEventRequest",
         "SubscribeObjectEventRequest",
         "UnsubscribeObjectEventRequest"
       ]
@@ -67,6 +69,8 @@ const aqaraLifeWebSocketSpecZh = {
         "UnsubscribeAllResponse",
         "SubscribeTraitValueResponse",
         "UnsubscribeTraitValueResponse",
+        "SubscribeEventResponse",
+        "UnsubscribeEventResponse",
         "SubscribeObjectEventResponse",
         "UnsubscribeObjectEventResponse",
         "ErrorMessage"
@@ -77,6 +81,7 @@ const aqaraLifeWebSocketSpecZh = {
       "action": "receive",
       "messages": [
         "TraitValueUpdate",
+        "AlarmEvent",
         "ObjectEvent",
         "ErrorMessage"
       ]
@@ -832,6 +837,434 @@ const aqaraLifeWebSocketSpecZh = {
         }
       }
     },
+    "SubscribeEventRequest": {
+      "name": "SubscribeEventRequest",
+      "title": "订阅告警请求",
+      "description": "鉴权后发送，data 必须是非空事件类型数组，普通客户端使用 ALARM。订阅以当前会话为单位，重复操作幂等；不影响设备、Trait 和对象事件订阅。",
+      "examples": [
+        {
+          "name": "subscribeAlarmRequest",
+          "payload": {
+            "type": "SubscribeEventRequest",
+            "version": "v1",
+            "msgId": "alarm-subscribe-1",
+            "data": [
+              "ALARM"
+            ]
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "SubscribeEventRequest"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": [
+                "ALARM"
+              ]
+            },
+            "description": "告警使用 ALARM；不接受空数组、通配符或对象 ID 过滤。"
+          }
+        }
+      }
+    },
+    "SubscribeEventResponse": {
+      "name": "SubscribeEventResponse",
+      "title": "订阅告警响应",
+      "examples": [
+        {
+          "name": "subscribeAlarmResponse",
+          "payload": {
+            "type": "SubscribeEventResponse",
+            "version": "v1",
+            "msgId": "alarm-subscribe-1",
+            "data": "",
+            "code": 0,
+            "message": "success"
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "code",
+          "message",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "SubscribeEventResponse"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": ""
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "处理结果码，0 表示成功，非 0 表示失败。"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "处理结果描述。"
+          }
+        }
+      }
+    },
+    "UnsubscribeEventRequest": {
+      "name": "UnsubscribeEventRequest",
+      "title": "取消订阅告警请求",
+      "description": "鉴权后发送，data 必须是非空事件类型数组，普通客户端使用 ALARM。订阅以当前会话为单位，重复操作幂等；不影响设备、Trait 和对象事件订阅。",
+      "examples": [
+        {
+          "name": "unsubscribeAlarmRequest",
+          "payload": {
+            "type": "UnsubscribeEventRequest",
+            "version": "v1",
+            "msgId": "alarm-unsubscribe-1",
+            "data": [
+              "ALARM"
+            ]
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "UnsubscribeEventRequest"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": [
+                "ALARM"
+              ]
+            },
+            "description": "告警使用 ALARM；不接受空数组、通配符或对象 ID 过滤。"
+          }
+        }
+      }
+    },
+    "UnsubscribeEventResponse": {
+      "name": "UnsubscribeEventResponse",
+      "title": "取消订阅告警响应",
+      "examples": [
+        {
+          "name": "unsubscribeAlarmResponse",
+          "payload": {
+            "type": "UnsubscribeEventResponse",
+            "version": "v1",
+            "msgId": "alarm-unsubscribe-1",
+            "data": "",
+            "code": 0,
+            "message": "success"
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "code",
+          "message",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "UnsubscribeEventResponse"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": ""
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "处理结果码，0 表示成功，非 0 表示失败。"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "处理结果描述。"
+          }
+        }
+      }
+    },
+    "AlarmEvent": {
+      "name": "AlarmEvent",
+      "title": "原始告警推送",
+      "description": "仅投递给显式订阅 ALARM 的会话，SubscribeAllRequest 和对象事件订阅不隐式开启。告警独立于 App 通知栏推送；不只限于 OFF_NORMAL，按告警源实际发布的 sourceState 消费。仅实时推送，不补发历史；断线后须重新订阅。msgId 仅供追踪，不是全局唯一事件 ID。",
+      "examples": [
+        {
+          "name": "alarmTriggered",
+          "payload": {
+            "version": "v1",
+            "msgId": "alarm-notify-alarm-1",
+            "type": "AlarmEvent",
+            "data": {
+              "uuid": "alarm-1",
+              "deviceName": "Smoke sensor",
+              "deviceId": "device-1",
+              "devicePointName": "烟雾浓度",
+              "alarmClass": "Critical",
+              "alarmRuleName": "Smoke rule",
+              "alarmText": "检测到烟雾",
+              "alarmValue": "开启",
+              "sourceState": "OFF_NORMAL",
+              "alarmTime": 1793577600000,
+              "localized": {
+                "zh-CN": {
+                  "devicePointName": "烟雾浓度",
+                  "alarmText": "检测到烟雾",
+                  "alarmValue": "开启",
+                  "sourceStateText": "触发"
+                },
+                "en-US": {
+                  "devicePointName": "Smoke concentration",
+                  "alarmText": "Smoke detected",
+                  "alarmValue": "On",
+                  "sourceStateText": "Triggered"
+                }
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        }
+      ],
+      "payloadSchema": {
+        "description": "WebSocket 与 HTTP 共用的原始告警推送正文。WebSocket 显式订阅 ALARM 后接收，HTTP 按配置启用告警；不使用 App 通知栏 payload。",
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data",
+          "code",
+          "message"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "AlarmEvent"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "object",
+            "required": [
+              "uuid",
+              "deviceName",
+              "deviceId",
+              "devicePointName",
+              "alarmClass",
+              "alarmRuleName",
+              "alarmText",
+              "alarmValue",
+              "sourceState",
+              "alarmTime",
+              "localized"
+            ],
+            "properties": {
+              "uuid": {
+                "type": "string",
+                "description": "告警记录 ID；同一告警记录的后续事件可能复用，不是每次状态变化的唯一事件 ID。"
+              },
+              "deviceName": {
+                "type": "string",
+                "description": "设备展示名称。"
+              },
+              "deviceId": {
+                "type": "string",
+                "description": "设备 ID；无法解析到设备时可能为空字符串。"
+              },
+              "devicePointName": {
+                "type": "string",
+                "description": "告警点位展示名称。"
+              },
+              "alarmClass": {
+                "type": "string",
+                "description": "告警分类展示名称。"
+              },
+              "alarmRuleName": {
+                "type": "string",
+                "description": "告警规则展示名称，可能使用点位名称回退。"
+              },
+              "alarmText": {
+                "type": "string",
+                "description": "告警展示文本。"
+              },
+              "alarmValue": {
+                "type": "string",
+                "description": "格式化后的告警值，类型为字符串。"
+              },
+              "sourceState": {
+                "type": "string",
+                "description": "告警源的标准状态值，NORMAL（正常）、OFF_NORMAL（触发）、FAULT（故障）、ALERT（提醒）。按实际告警事件提供，不表示每种状态或确认操作都一定产生独立推送；接收端应兼容后续新增值。"
+              },
+              "alarmTime": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Unix 毫秒时间戳。"
+              },
+              "localized": {
+                "type": "object",
+                "minProperties": 1,
+                "description": "按语言标签提供文本；部分语言构建失败时可缺失，顶层文本使用系统默认语言或可用回退语言。",
+                "additionalProperties": {
+                  "type": "object",
+                  "required": [
+                    "devicePointName",
+                    "alarmText",
+                    "alarmValue",
+                    "sourceStateText"
+                  ],
+                  "properties": {
+                    "devicePointName": {
+                      "type": "string",
+                      "description": "告警点位展示名称。"
+                    },
+                    "alarmText": {
+                      "type": "string",
+                      "description": "告警展示文本。"
+                    },
+                    "alarmValue": {
+                      "type": "string",
+                      "description": "告警值。"
+                    },
+                    "sourceStateText": {
+                      "type": "string",
+                      "description": "告警源状态展示文本。"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "处理结果码，0 表示成功，非 0 表示失败。"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "处理结果描述。"
+          }
+        }
+      }
+    },
     "SubscribeObjectEventRequest": {
       "name": "SubscribeObjectEventRequest",
       "title": "订阅空间、设备空间关系和自动化对象事件",
@@ -1324,8 +1757,8 @@ const aqaraLifeWebSocketSpecZh = {
     "ObjectEvent": {
       "name": "objectEvent",
       "title": "对象事件推送",
-      "summary": "设备增删默认推送；空间、自动化和空间关联变化按精确对象订阅投递。",
-      "description": "DEVICE_ADDED、DEVICE_REMOVED 在认证连接建立后默认推送。\n\nSPACE_*、AUTOMATION_*、DEVICE_SPACE_UPDATED 仅投递给命中 eventType、objectId 和当前权限的 SubscribeObjectEventRequest 会话。\n\nDEVICE_ENDPOINT_*、DEVICE_TRAIT_PARAMETER_UPDATE 继续跟随现有设备数据订阅。\n\n独立场景通过 /scenes 管理，变化通知沿用 AUTOMATION_* 事件族；对象分类以 /automations 和 /scenes 查询结果为准。数量变化不提供独立事件。\n\n场景是自动化内部的 manualTriggers，不提供独立场景事件；数量变化不提供独立事件。\n\n协议不提供全局唯一的事件 ID；推送 msgId 只用于链路追踪，调用端应按对象状态幂等处理，不应仅按 objectId、eventType、time 去重。\n",
+      "summary": "设备增删默认推送；空间、自动化和空间关联变化按精确对象订阅投递。当前 13 类对象事件均提供示例。",
+      "description": "DEVICE_ADDED、DEVICE_REMOVED 在认证连接建立后默认推送。\n\nSPACE_*、AUTOMATION_*、DEVICE_SPACE_UPDATED 仅投递给命中 eventType、objectId 和当前权限的 SubscribeObjectEventRequest 会话。\n\nDEVICE_ENDPOINT_*、DEVICE_TRAIT_PARAMETER_UPDATE 继续跟随现有设备数据订阅。\n\n独立场景通过 /scenes 管理，变化通知沿用 AUTOMATION_* 事件族；对象分类以 /automations 和 /scenes 查询结果为准。数量变化不提供独立事件。新增、删除自动化只发送对应生命周期快照，不额外发送空间关系事件；已有对象仅空间关系变化时发送 AUTOMATION_SPACE_UPDATED，内容与关系同时变化时两类事件都可能收到。\n\n自动化快照的 manualTriggers 包含 triggerNodeId 和 triggerName；手动触发入口添加、删除或重命名通过 AUTOMATION_UPDATED 返回完整列表。按完整列表替换缓存，空数组清空旧入口；无需新增事件订阅类型。\n\n协议不提供全局唯一的事件 ID；推送 msgId 只用于链路追踪，调用端应按对象状态幂等处理，不应仅按 objectId、eventType、time 去重。\n",
       "examples": [
         {
           "name": "deviceAdded",
@@ -1392,10 +1825,16 @@ const aqaraLifeWebSocketSpecZh = {
               "time": 1789113600000,
               "data": {
                 "automationId": "automation-1",
-                "definitionType": "WHEN_IF_THEN",
+                "definitionType": "SCRIPT_JSON",
                 "name": "回家模式",
                 "enabled": true,
-                "createTime": 1789000000000
+                "createTime": 1789000000000,
+                "manualTriggers": [
+                  {
+                    "triggerNodeId": "trigger-1",
+                    "triggerName": "手动回家"
+                  }
+                ]
               }
             },
             "code": 0,
@@ -1414,6 +1853,281 @@ const aqaraLifeWebSocketSpecZh = {
               "time": 1789113600000,
               "data": {
                 "automationId": "automation-1",
+                "oldSpaceId": "space-2",
+                "space": null
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "device_removed",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-device_removed",
+            "data": {
+              "eventType": "DEVICE_REMOVED",
+              "objectId": "device-1",
+              "time": 1793577600000,
+              "data": {
+                "deviceId": "device-1",
+                "name": "客厅灯",
+                "deviceTypesList": [
+                  "Light"
+                ],
+                "endpointIds": [
+                  0,
+                  2
+                ],
+                "time": 1793577600000
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "device_endpoint_added",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-device_endpoint_added",
+            "data": {
+              "eventType": "DEVICE_ENDPOINT_ADDED",
+              "objectId": "device-1",
+              "time": 1793577600000,
+              "data": {
+                "deviceId": "device-1",
+                "name": "客厅灯",
+                "deviceTypesList": [
+                  "Light"
+                ],
+                "endpointIds": [
+                  0,
+                  2,
+                  3
+                ],
+                "time": 1793577600000
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "device_endpoint_removed",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-device_endpoint_removed",
+            "data": {
+              "eventType": "DEVICE_ENDPOINT_REMOVED",
+              "objectId": "device-1",
+              "time": 1793577600000,
+              "data": {
+                "deviceId": "device-1",
+                "name": "客厅灯",
+                "deviceTypesList": [
+                  "Light"
+                ],
+                "endpointIds": [
+                  0,
+                  2
+                ],
+                "time": 1793577600000
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "device_trait_parameter_update",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-device_trait_parameter_update",
+            "data": {
+              "eventType": "DEVICE_TRAIT_PARAMETER_UPDATE",
+              "objectId": "device-1",
+              "time": 1793577600000,
+              "data": {
+                "deviceId": "device-1",
+                "endpointId": 2,
+                "functionCode": "LevelControl",
+                "traitCode": "CurrentLevel",
+                "oldValue": {
+                  "endpointId": 2,
+                  "functionCode": "LevelControl",
+                  "traitCode": "CurrentLevel",
+                  "min": 1,
+                  "max": 100,
+                  "step": 1,
+                  "unit": "%"
+                },
+                "newValue": {
+                  "endpointId": 2,
+                  "functionCode": "LevelControl",
+                  "traitCode": "CurrentLevel",
+                  "min": 1,
+                  "max": 100,
+                  "step": 2,
+                  "unit": "%"
+                }
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "space_added",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-space_added",
+            "data": {
+              "eventType": "SPACE_ADDED",
+              "objectId": "space-2",
+              "time": 1793577600000,
+              "data": {
+                "spaceId": "space-2",
+                "name": "卧室",
+                "spatialMarking": "room",
+                "parentSpaceId": "home-1"
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "space_removed",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-space_removed",
+            "data": {
+              "eventType": "SPACE_REMOVED",
+              "objectId": "space-2",
+              "time": 1793577600000,
+              "data": {
+                "spaceId": "space-2",
+                "name": "卧室",
+                "spatialMarking": "room",
+                "parentSpaceId": "home-1"
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "space_updated",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-space_updated",
+            "data": {
+              "eventType": "SPACE_UPDATED",
+              "objectId": "space-2",
+              "time": 1793577600000,
+              "data": {
+                "spaceId": "space-2",
+                "name": "主卧",
+                "spatialMarking": "room",
+                "parentSpaceId": "home-1"
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "automation_added",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-automation_added",
+            "data": {
+              "eventType": "AUTOMATION_ADDED",
+              "objectId": "automation-1",
+              "time": 1793577600000,
+              "data": {
+                "automationId": "automation-1",
+                "definitionType": "WHEN_IF_THEN",
+                "name": "回家模式",
+                "enabled": true,
+                "createTime": 1793491200000,
+                "manualTriggers": []
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "automation_removed",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-automation_removed",
+            "data": {
+              "eventType": "AUTOMATION_REMOVED",
+              "objectId": "automation-1",
+              "time": 1793577600000,
+              "data": {
+                "automationId": "automation-1",
+                "definitionType": "WHEN_IF_THEN",
+                "name": "回家模式",
+                "enabled": true,
+                "createTime": 1793491200000,
+                "manualTriggers": []
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "automationSpaceAssigned",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-automation_space_updated",
+            "data": {
+              "eventType": "AUTOMATION_SPACE_UPDATED",
+              "objectId": "automation-1",
+              "time": 1793577600000,
+              "data": {
+                "automationId": "automation-1",
+                "oldSpaceId": null,
+                "space": {
+                  "spaceId": "space-2",
+                  "name": "卧室",
+                  "spatialMarking": "room",
+                  "parentSpaceId": "home-1"
+                }
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "deviceSpaceUnassigned",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-device_space_updated",
+            "data": {
+              "eventType": "DEVICE_SPACE_UPDATED",
+              "objectId": "device-1",
+              "time": 1793577600000,
+              "data": {
+                "deviceId": "device-1",
                 "oldSpaceId": "space-2",
                 "space": null
               }
@@ -1974,7 +2688,7 @@ const aqaraLifeWebSocketSpecZh = {
                   },
                   {
                     "type": "object",
-                    "description": "自动化和独立场景变化通知沿用的轻量快照，不包含完整 config。事件字段 automationId 对于已知场景是 sceneId；按查询列表识别分类，分别通过 GET /automations/{automationI 或 GET /scenes/{sceneId} 查询详情。场景列表不使用快照中的 enabled 和 definitionType。",
+                    "description": "自动化和独立场景变化通知沿用的轻量快照，不包含完整 config。事件字段 automationId 对于已知场景是 sceneId；按查询列表识别分类，分别通过 GET /automations/{automationI 或 GET /scenes/{sceneId} 查询详情。场景列表不使用快照中的 enabled 和 definitionType。manualTriggers 为自动化内手动触发入口的完整列表，其变化也触发 AUTOMATION_UPDATED。",
                     "required": [
                       "automationId",
                       "definitionType",
@@ -2003,13 +2717,36 @@ const aqaraLifeWebSocketSpecZh = {
                         "type": "integer",
                         "format": "int64",
                         "description": "创建时间戳，单位毫秒。"
+                      },
+                      "manualTriggers": {
+                        "type": "array",
+                        "default": [],
+                        "description": "自动化内手动触发入口的完整列表；添加、删除或重命名入口时通过 AUTOMATION_UPDATED 推送变化后的完整快照。接收端应整体替换缓存，空数组表示清空；缺失字段可按空数组兼容。新增使用新增后列表，删除使用删除前列表。此列表不代表独立的 /scenes 对象。",
+                        "items": {
+                          "type": "object",
+                          "description": "自动化内单个手动触发入口的摘要。",
+                          "required": [
+                            "triggerNodeId",
+                            "triggerName"
+                          ],
+                          "properties": {
+                            "triggerNodeId": {
+                              "type": "string",
+                              "description": "手动触发节点 ID，与所属 automationId 一起定位入口。"
+                            },
+                            "triggerName": {
+                              "type": "string",
+                              "description": "手动触发入口的展示名称。"
+                            }
+                          }
+                        }
                       }
                     },
                     "title": "AUTOMATION_ADDED"
                   },
                   {
                     "type": "object",
-                    "description": "自动化和独立场景变化通知沿用的轻量快照，不包含完整 config。事件字段 automationId 对于已知场景是 sceneId；按查询列表识别分类，分别通过 GET /automations/{automationI 或 GET /scenes/{sceneId} 查询详情。场景列表不使用快照中的 enabled 和 definitionType。",
+                    "description": "自动化和独立场景变化通知沿用的轻量快照，不包含完整 config。事件字段 automationId 对于已知场景是 sceneId；按查询列表识别分类，分别通过 GET /automations/{automationI 或 GET /scenes/{sceneId} 查询详情。场景列表不使用快照中的 enabled 和 definitionType。manualTriggers 为自动化内手动触发入口的完整列表，其变化也触发 AUTOMATION_UPDATED。",
                     "required": [
                       "automationId",
                       "definitionType",
@@ -2038,13 +2775,36 @@ const aqaraLifeWebSocketSpecZh = {
                         "type": "integer",
                         "format": "int64",
                         "description": "创建时间戳，单位毫秒。"
+                      },
+                      "manualTriggers": {
+                        "type": "array",
+                        "default": [],
+                        "description": "自动化内手动触发入口的完整列表；添加、删除或重命名入口时通过 AUTOMATION_UPDATED 推送变化后的完整快照。接收端应整体替换缓存，空数组表示清空；缺失字段可按空数组兼容。新增使用新增后列表，删除使用删除前列表。此列表不代表独立的 /scenes 对象。",
+                        "items": {
+                          "type": "object",
+                          "description": "自动化内单个手动触发入口的摘要。",
+                          "required": [
+                            "triggerNodeId",
+                            "triggerName"
+                          ],
+                          "properties": {
+                            "triggerNodeId": {
+                              "type": "string",
+                              "description": "手动触发节点 ID，与所属 automationId 一起定位入口。"
+                            },
+                            "triggerName": {
+                              "type": "string",
+                              "description": "手动触发入口的展示名称。"
+                            }
+                          }
+                        }
                       }
                     },
                     "title": "AUTOMATION_REMOVED"
                   },
                   {
                     "type": "object",
-                    "description": "自动化和独立场景变化通知沿用的轻量快照，不包含完整 config。事件字段 automationId 对于已知场景是 sceneId；按查询列表识别分类，分别通过 GET /automations/{automationI 或 GET /scenes/{sceneId} 查询详情。场景列表不使用快照中的 enabled 和 definitionType。",
+                    "description": "自动化和独立场景变化通知沿用的轻量快照，不包含完整 config。事件字段 automationId 对于已知场景是 sceneId；按查询列表识别分类，分别通过 GET /automations/{automationI 或 GET /scenes/{sceneId} 查询详情。场景列表不使用快照中的 enabled 和 definitionType。manualTriggers 为自动化内手动触发入口的完整列表，其变化也触发 AUTOMATION_UPDATED。",
                     "required": [
                       "automationId",
                       "definitionType",
@@ -2073,6 +2833,29 @@ const aqaraLifeWebSocketSpecZh = {
                         "type": "integer",
                         "format": "int64",
                         "description": "创建时间戳，单位毫秒。"
+                      },
+                      "manualTriggers": {
+                        "type": "array",
+                        "default": [],
+                        "description": "自动化内手动触发入口的完整列表；添加、删除或重命名入口时通过 AUTOMATION_UPDATED 推送变化后的完整快照。接收端应整体替换缓存，空数组表示清空；缺失字段可按空数组兼容。新增使用新增后列表，删除使用删除前列表。此列表不代表独立的 /scenes 对象。",
+                        "items": {
+                          "type": "object",
+                          "description": "自动化内单个手动触发入口的摘要。",
+                          "required": [
+                            "triggerNodeId",
+                            "triggerName"
+                          ],
+                          "properties": {
+                            "triggerNodeId": {
+                              "type": "string",
+                              "description": "手动触发节点 ID，与所属 automationId 一起定位入口。"
+                            },
+                            "triggerName": {
+                              "type": "string",
+                              "description": "手动触发入口的展示名称。"
+                            }
+                          }
+                        }
                       }
                     },
                     "title": "AUTOMATION_UPDATED"

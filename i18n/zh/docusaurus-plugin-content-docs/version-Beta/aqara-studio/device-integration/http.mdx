@@ -7,13 +7,20 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "HTTP 设备接入"]
 
 本文将指导您如何通过编写 JS 脚本，将 HTTP 协议设备接入 Aqara Studio 以及将设备功能点按照 **Aqara 物模型规范** 完成映射，实现设备的发现、添加及功能点控制等操作。
 
+## 支持的 HTTP 设备
+
+以下列出经 Aqara 测试可正常接入 Aqara Studio 的 HTTP 设备：
+- 朗润加环境监测类设备
+
 ## 前提条件
 
 在开始之前，请确保待接入的 HTTP 设备与 Aqara Studio 处于同一局域网。
 
 ## 学习并编写 JavaScript 脚本
 
-请参考 [JavaScript 脚本（适用于 HTTP）](./../javascript-for-http-integration.mdx) 的编写方法，编写符合 **Aqara 物模型规范** 的 JavaScript 脚本。此脚本将用于指导 Aqara Studio 如何发现设备、添加与控制功能点等。
+脚本结构与配置流程，参见 [第三方设备脚本接入指南](../ai-agent-device-onboarding.mdx)。
+
+请参考 [JavaScript 脚本（适用于 HTTP）](./../unified-protocol-script.mdx#http) 的编写方法，编写符合 **Aqara 物模型规范** 的 JavaScript 脚本。此脚本将用于指导 Aqara Studio 如何发现设备、添加与控制功能点等。
 
 ## 安装插件
 

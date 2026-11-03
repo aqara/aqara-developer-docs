@@ -5,7 +5,7 @@ import type { PlaygroundSpec } from "./types";
 const aqaraLifeWebSocketSpecEn = {
   "title": "Studio WebSocket API",
   "version": "v1",
-  "description": "This document describes the asynchronous messages exchanged between the client and the Studio WebSocket service:\n- The client sends authentication, heartbeat, subscribe, and unsubscribe requests.\n- Studio returns responses to requests and proactively pushes messages when subscriptions match or device events occur.\n- This contract covers device, Trait, and object-event subscriptions, but does not cover standalone alarm-event subscriptions such as SubscribeEventRequest and UnsubscribeEventRequest.\n- For the Studio self-domain endpoint and LAN Studio environments, if the token is not included during the handshake, `AuthRequest` may be sent as the first message after the connection is established.\n\nPerspective note: this AsyncAPI describes the integration behavior that client applications need to implement; `send` means the client sends to Studio, and `receive` means the client receives from Studio.\n",
+  "description": "This document describes the asynchronous messages exchanged between the client and the Studio WebSocket service:\n- The client sends authentication, heartbeat, subscribe, and unsubscribe requests.\n- Studio returns responses to requests and proactively pushes messages when subscriptions match or device events occur.\n- This contract covers device, Trait, object-event, and standalone alarm-event subscriptions, unsubscriptions, and pushes. Alarm is subscribed explicitly through SubscribeEventRequest.\n- For the Studio self-domain endpoint and LAN Studio environments, if the token is not included during the handshake, `AuthRequest` may be sent as the first message after the connection is established.\n\nPerspective note: this AsyncAPI describes the integration behavior that client applications need to implement; `send` means the client sends to Studio, and `receive` means the client receives from Studio.\n",
   "servers": [
     {
       "id": "lanStudio",
@@ -55,6 +55,8 @@ const aqaraLifeWebSocketSpecEn = {
         "UnsubscribeAllRequest",
         "SubscribeTraitValueRequest",
         "UnsubscribeTraitValueRequest",
+        "SubscribeEventRequest",
+        "UnsubscribeEventRequest",
         "SubscribeObjectEventRequest",
         "UnsubscribeObjectEventRequest"
       ]
@@ -67,6 +69,8 @@ const aqaraLifeWebSocketSpecEn = {
         "UnsubscribeAllResponse",
         "SubscribeTraitValueResponse",
         "UnsubscribeTraitValueResponse",
+        "SubscribeEventResponse",
+        "UnsubscribeEventResponse",
         "SubscribeObjectEventResponse",
         "UnsubscribeObjectEventResponse",
         "ErrorMessage"
@@ -77,6 +81,7 @@ const aqaraLifeWebSocketSpecEn = {
       "action": "receive",
       "messages": [
         "TraitValueUpdate",
+        "AlarmEvent",
         "ObjectEvent",
         "ErrorMessage"
       ]
@@ -832,6 +837,434 @@ const aqaraLifeWebSocketSpecEn = {
         }
       }
     },
+    "SubscribeEventRequest": {
+      "name": "SubscribeEventRequest",
+      "title": "Subscribe Alarm Request",
+      "description": "Send after authentication. `data` must be a non-empty array of event types. Ordinary clients use `ALARM`. The subscription applies to the current session only, and repeated requests are idempotent. This does not affect device, Trait, or object event subscriptions.",
+      "examples": [
+        {
+          "name": "subscribeAlarmRequest",
+          "payload": {
+            "type": "SubscribeEventRequest",
+            "version": "v1",
+            "msgId": "alarm-subscribe-1",
+            "data": [
+              "ALARM"
+            ]
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "SubscribeEventRequest"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": [
+                "ALARM"
+              ]
+            },
+            "description": "Use ALARM for alarms; do not accept empty arrays, wildcards, or object ID filters."
+          }
+        }
+      }
+    },
+    "SubscribeEventResponse": {
+      "name": "SubscribeEventResponse",
+      "title": "Subscribe Alarm Response",
+      "examples": [
+        {
+          "name": "subscribeAlarmResponse",
+          "payload": {
+            "type": "SubscribeEventResponse",
+            "version": "v1",
+            "msgId": "alarm-subscribe-1",
+            "data": "",
+            "code": 0,
+            "message": "success"
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "code",
+          "message",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "SubscribeEventResponse"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": ""
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Processing result code. 0 indicates success, and any non-zero value indicates failure."
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Processing result message."
+          }
+        }
+      }
+    },
+    "UnsubscribeEventRequest": {
+      "name": "UnsubscribeEventRequest",
+      "title": "Unsubscribe Alarm Request",
+      "description": "Send after authentication. `data` must be a non-empty array of event types. Ordinary clients use `ALARM`. The subscription applies to the current session only, and repeated requests are idempotent. This does not affect device, Trait, or object event subscriptions.",
+      "examples": [
+        {
+          "name": "unsubscribeAlarmRequest",
+          "payload": {
+            "type": "UnsubscribeEventRequest",
+            "version": "v1",
+            "msgId": "alarm-unsubscribe-1",
+            "data": [
+              "ALARM"
+            ]
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "UnsubscribeEventRequest"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": [
+                "ALARM"
+              ]
+            },
+            "description": "Use ALARM for alarms; do not accept empty arrays, wildcards, or object ID filters."
+          }
+        }
+      }
+    },
+    "UnsubscribeEventResponse": {
+      "name": "UnsubscribeEventResponse",
+      "title": "Unsubscribe Alarm Response",
+      "examples": [
+        {
+          "name": "unsubscribeAlarmResponse",
+          "payload": {
+            "type": "UnsubscribeEventResponse",
+            "version": "v1",
+            "msgId": "alarm-unsubscribe-1",
+            "data": "",
+            "code": 0,
+            "message": "success"
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "code",
+          "message",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "UnsubscribeEventResponse"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": ""
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Processing result code. 0 indicates success, and any non-zero value indicates failure."
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Processing result message."
+          }
+        }
+      }
+    },
+    "AlarmEvent": {
+      "name": "AlarmEvent",
+      "title": "Raw Alarm Push",
+      "description": "Delivered only to sessions that explicitly subscribe to `ALARM`. `SubscribeAllRequest` and object event subscriptions do not enable this implicitly. Alarms are independent of App notification-bar pushes. Delivery is not limited to `OFF_NORMAL`; consume the `sourceState` actually published by the alarm source. Only real-time pushes are supported, and historical alarms are not redelivered. Re-subscribe after disconnection. `msgId` is for tracing only and is not a globally unique event ID.",
+      "examples": [
+        {
+          "name": "alarmTriggered",
+          "payload": {
+            "version": "v1",
+            "msgId": "alarm-notify-alarm-1",
+            "type": "AlarmEvent",
+            "data": {
+              "uuid": "alarm-1",
+              "deviceName": "Smoke sensor",
+              "deviceId": "device-1",
+              "devicePointName": "Smoke concentration",
+              "alarmClass": "Critical",
+              "alarmRuleName": "Smoke rule",
+              "alarmText": "Smoke detected",
+              "alarmValue": "On",
+              "sourceState": "OFF_NORMAL",
+              "alarmTime": 1793577600000,
+              "localized": {
+                "zh-CN": {
+                  "devicePointName": "烟雾浓度",
+                  "alarmText": "检测到烟雾",
+                  "alarmValue": "开启",
+                  "sourceStateText": "触发"
+                },
+                "en-US": {
+                  "devicePointName": "Smoke concentration",
+                  "alarmText": "Smoke detected",
+                  "alarmValue": "On",
+                  "sourceStateText": "Triggered"
+                }
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        }
+      ],
+      "payloadSchema": {
+        "description": "WebSocket and HTTP shared raw alarm-push payload. WebSocket explicitly subscribes to `ALARM` to receive, and HTTP enables alarms according to configuration; does not use the app notification payload.",
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data",
+          "code",
+          "message"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "AlarmEvent"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "object",
+            "required": [
+              "uuid",
+              "deviceName",
+              "deviceId",
+              "devicePointName",
+              "alarmClass",
+              "alarmRuleName",
+              "alarmText",
+              "alarmValue",
+              "sourceState",
+              "alarmTime",
+              "localized"
+            ],
+            "properties": {
+              "uuid": {
+                "type": "string",
+                "description": "Alarm record ID. Subsequent events for the same alarm record may reuse this value; it is not a unique event ID for each state change."
+              },
+              "deviceName": {
+                "type": "string",
+                "description": "Display name of the device."
+              },
+              "deviceId": {
+                "type": "string",
+                "description": "Device ID. May be an empty string when the device cannot be resolved."
+              },
+              "devicePointName": {
+                "type": "string",
+                "description": "Display name of the alarm point."
+              },
+              "alarmClass": {
+                "type": "string",
+                "description": "Display name of the alarm class."
+              },
+              "alarmRuleName": {
+                "type": "string",
+                "description": "Display name of the alarm rule. May fall back to the point name."
+              },
+              "alarmText": {
+                "type": "string",
+                "description": "Alarm display text."
+              },
+              "alarmValue": {
+                "type": "string",
+                "description": "Formatted alarm value as a string."
+              },
+              "sourceState": {
+                "type": "string",
+                "description": "Standard status of the alarm source, including NORMAL (normal), OFF_NORMAL (triggered), FAULT (fault), and ALERT (alert). Values are provided based on the actual alarm event and do not imply that every status or acknowledgment action produces a separate push. Receivers should remain compatible with future added values."
+              },
+              "alarmTime": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Unix millisecond timestamp."
+              },
+              "localized": {
+                "type": "object",
+                "minProperties": 1,
+                "description": "Provides text by language tag. Some languages may be absent when localized text generation fails; in that case, the top-level text uses the system default language or an available fallback language.",
+                "additionalProperties": {
+                  "type": "object",
+                  "required": [
+                    "devicePointName",
+                    "alarmText",
+                    "alarmValue",
+                    "sourceStateText"
+                  ],
+                  "properties": {
+                    "devicePointName": {
+                      "type": "string",
+                      "description": "Display name of the alarm point."
+                    },
+                    "alarmText": {
+                      "type": "string",
+                      "description": "Alarm display text."
+                    },
+                    "alarmValue": {
+                      "type": "string",
+                      "description": "Alarm value."
+                    },
+                    "sourceStateText": {
+                      "type": "string",
+                      "description": "Alarm source state display text."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Processing result code. 0 indicates success, and any non-zero value indicates failure."
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Processing result message."
+          }
+        }
+      }
+    },
     "SubscribeObjectEventRequest": {
       "name": "SubscribeObjectEventRequest",
       "title": "Subscribe to space, device-space relationship, and automation object events",
@@ -1324,8 +1757,8 @@ const aqaraLifeWebSocketSpecEn = {
     "ObjectEvent": {
       "name": "objectEvent",
       "title": "Object event push",
-      "summary": "Device add/remove events are pushed by default; changes to spaces, automations, and space relationships are delivered according to precise object subscriptions.",
-      "description": "DEVICE_ADDED and DEVICE_REMOVED are pushed by default after an authenticated connection is established.\n\nSPACE_*, AUTOMATION_*, and DEVICE_SPACE_UPDATED are delivered only to SubscribeObjectEventRequest sessions that match the eventType, objectId, and current permissions.\n\nDEVICE_ENDPOINT_* and DEVICE_TRAIT_PARAMETER_UPDATE continue to follow the existing device-data subscriptions.\n\nStandalone scenes are managed via /scenes, and change notifications continue to use the AUTOMATION_* event family; object classification should follow the query results of /automations and /scenes. No standalone events are provided for changes in count.\n\nScenes are represented by the `manualTriggers` inside an automation; no standalone scene event is provided, and changes in count do not produce separate events.\nThe protocol does not provide a globally unique event ID; the push `msgId` is only for link tracing. Callers should process events idempotently according to object state rather than deduplicating only by `objectId`, `eventType`, and `time`.\n",
+      "summary": "Device add/remove events are pushed by default; changes to spaces, automations, and space relationships are delivered according to precise object subscriptions. Current 13 object event types are provided with examples.",
+      "description": "DEVICE_ADDED and DEVICE_REMOVED are pushed by default after an authenticated connection is established.\n\nSPACE_*, AUTOMATION_*, and DEVICE_SPACE_UPDATED are delivered only to SubscribeObjectEventRequest sessions that match the eventType, objectId, and current permissions.\n\nDEVICE_ENDPOINT_* and DEVICE_TRAIT_PARAMETER_UPDATE continue to follow the existing device-data subscriptions.\n\nIndependent scenes are managed through `/scenes`, and change notifications reuse the `AUTOMATION_*` event family. Object classification is based on the query results from `/automations` and `/scenes`. No separate event is provided for count changes. Creating or deleting an automation sends only the corresponding lifecycle snapshot and does not additionally send a space-relationship event. For an existing object, `AUTOMATION_SPACE_UPDATED` is sent only when its space relationship changes. If both the content and the relationship change at the same time, both types of events may be received.\n\nThe `manualTriggers` field in an automation snapshot contains `triggerNodeId` and `triggerName`. Adding, deleting, or renaming a manual trigger entry returns the full list through `AUTOMATION_UPDATED`. Replace the cache with the full list, and clear previous entries when the array is empty. No additional event subscription type is required.\n\nThe protocol does not provide a globally unique event ID; the push `msgId` is only for link tracing. Callers should process events idempotently according to object state rather than deduplicating only by `objectId`, `eventType`, and `time`.\n",
       "examples": [
         {
           "name": "deviceAdded",
@@ -1392,10 +1825,16 @@ const aqaraLifeWebSocketSpecEn = {
               "time": 1789113600000,
               "data": {
                 "automationId": "automation-1",
-                "definitionType": "WHEN_IF_THEN",
+                "definitionType": "SCRIPT_JSON",
                 "name": "Home Mode",
                 "enabled": true,
-                "createTime": 1789000000000
+                "createTime": 1789000000000,
+                "manualTriggers": [
+                  {
+                    "triggerNodeId": "trigger-1",
+                    "triggerName": "Enable Home Mode"
+                  }
+                ]
               }
             },
             "code": 0,
@@ -1414,6 +1853,281 @@ const aqaraLifeWebSocketSpecEn = {
               "time": 1789113600000,
               "data": {
                 "automationId": "automation-1",
+                "oldSpaceId": "space-2",
+                "space": null
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "device_removed",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-device_removed",
+            "data": {
+              "eventType": "DEVICE_REMOVED",
+              "objectId": "device-1",
+              "time": 1793577600000,
+              "data": {
+                "deviceId": "device-1",
+                "name": "Living Room Light",
+                "deviceTypesList": [
+                  "Light"
+                ],
+                "endpointIds": [
+                  0,
+                  2
+                ],
+                "time": 1793577600000
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "device_endpoint_added",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-device_endpoint_added",
+            "data": {
+              "eventType": "DEVICE_ENDPOINT_ADDED",
+              "objectId": "device-1",
+              "time": 1793577600000,
+              "data": {
+                "deviceId": "device-1",
+                "name": "Living Room Light",
+                "deviceTypesList": [
+                  "Light"
+                ],
+                "endpointIds": [
+                  0,
+                  2,
+                  3
+                ],
+                "time": 1793577600000
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "device_endpoint_removed",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-device_endpoint_removed",
+            "data": {
+              "eventType": "DEVICE_ENDPOINT_REMOVED",
+              "objectId": "device-1",
+              "time": 1793577600000,
+              "data": {
+                "deviceId": "device-1",
+                "name": "Living Room Light",
+                "deviceTypesList": [
+                  "Light"
+                ],
+                "endpointIds": [
+                  0,
+                  2
+                ],
+                "time": 1793577600000
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "device_trait_parameter_update",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-device_trait_parameter_update",
+            "data": {
+              "eventType": "DEVICE_TRAIT_PARAMETER_UPDATE",
+              "objectId": "device-1",
+              "time": 1793577600000,
+              "data": {
+                "deviceId": "device-1",
+                "endpointId": 2,
+                "functionCode": "LevelControl",
+                "traitCode": "CurrentLevel",
+                "oldValue": {
+                  "endpointId": 2,
+                  "functionCode": "LevelControl",
+                  "traitCode": "CurrentLevel",
+                  "min": 1,
+                  "max": 100,
+                  "step": 1,
+                  "unit": "%"
+                },
+                "newValue": {
+                  "endpointId": 2,
+                  "functionCode": "LevelControl",
+                  "traitCode": "CurrentLevel",
+                  "min": 1,
+                  "max": 100,
+                  "step": 2,
+                  "unit": "%"
+                }
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "space_added",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-space_added",
+            "data": {
+              "eventType": "SPACE_ADDED",
+              "objectId": "space-2",
+              "time": 1793577600000,
+              "data": {
+                "spaceId": "space-2",
+                "name": "Bedroom",
+                "spatialMarking": "room",
+                "parentSpaceId": "home-1"
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "space_removed",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-space_removed",
+            "data": {
+              "eventType": "SPACE_REMOVED",
+              "objectId": "space-2",
+              "time": 1793577600000,
+              "data": {
+                "spaceId": "space-2",
+                "name": "Bedroom",
+                "spatialMarking": "room",
+                "parentSpaceId": "home-1"
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "space_updated",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-space_updated",
+            "data": {
+              "eventType": "SPACE_UPDATED",
+              "objectId": "space-2",
+              "time": 1793577600000,
+              "data": {
+                "spaceId": "space-2",
+                "name": "Master Bedroom",
+                "spatialMarking": "room",
+                "parentSpaceId": "home-1"
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "automation_added",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-automation_added",
+            "data": {
+              "eventType": "AUTOMATION_ADDED",
+              "objectId": "automation-1",
+              "time": 1793577600000,
+              "data": {
+                "automationId": "automation-1",
+                "definitionType": "WHEN_IF_THEN",
+                "name": "Home Mode",
+                "enabled": true,
+                "createTime": 1793491200000,
+                "manualTriggers": []
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "automation_removed",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-automation_removed",
+            "data": {
+              "eventType": "AUTOMATION_REMOVED",
+              "objectId": "automation-1",
+              "time": 1793577600000,
+              "data": {
+                "automationId": "automation-1",
+                "definitionType": "WHEN_IF_THEN",
+                "name": "Home Mode",
+                "enabled": true,
+                "createTime": 1793491200000,
+                "manualTriggers": []
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "automationSpaceAssigned",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-automation_space_updated",
+            "data": {
+              "eventType": "AUTOMATION_SPACE_UPDATED",
+              "objectId": "automation-1",
+              "time": 1793577600000,
+              "data": {
+                "automationId": "automation-1",
+                "oldSpaceId": null,
+                "space": {
+                  "spaceId": "space-2",
+                  "name": "Bedroom",
+                  "spatialMarking": "room",
+                  "parentSpaceId": "home-1"
+                }
+              }
+            },
+            "code": 0,
+            "message": "success"
+          }
+        },
+        {
+          "name": "deviceSpaceUnassigned",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "example-device_space_updated",
+            "data": {
+              "eventType": "DEVICE_SPACE_UPDATED",
+              "objectId": "device-1",
+              "time": 1793577600000,
+              "data": {
+                "deviceId": "device-1",
                 "oldSpaceId": "space-2",
                 "space": null
               }
@@ -1974,7 +2688,7 @@ const aqaraLifeWebSocketSpecEn = {
                   },
                   {
                     "type": "object",
-                    "description": "Lightweight snapshot used for automation and standalone scene change notifications; does not include the full config. For known scenes, the `automationId` event field is the sceneId; distinguish the type according to the query list, and query details via GET /automations/{automationId} or GET /scenes/{sceneId} respectively. The scene list does not use `enabled` or `definitionType` in the snapshot.",
+                    "description": "Lightweight snapshot used for automation and standalone scene change notifications; does not include the full config. For known scenes, the `automationId` event field is the sceneId; distinguish the type according to the query list, and query details via GET /automations/{automationId} or GET /scenes/{sceneId} respectively. The scene list does not use `enabled` or `definitionType` in the snapshot. manualtriggers are the complete list of manual trigger entries inside the automation, and changes to them also trigger `AUTOMATION_UPDATED`.",
                     "required": [
                       "automationId",
                       "definitionType",
@@ -2003,13 +2717,36 @@ const aqaraLifeWebSocketSpecEn = {
                         "type": "integer",
                         "format": "int64",
                         "description": "Creation timestamp in milliseconds."
+                      },
+                      "manualTriggers": {
+                        "type": "array",
+                        "default": [],
+                        "description": "Complete list of manual trigger entries in the automation. When an entry is added, deleted, or renamed, `AUTOMATION_UPDATED` pushes the full snapshot after the change. The receiver should replace the cache as a whole. An empty array clears the cache, and a missing field may be treated as an empty array for compatibility. For additions, the list after the addition is used; for deletions, the list before the deletion is used. This list does not represent an independent `/scenes` object.",
+                        "items": {
+                          "type": "object",
+                          "description": "Summary of a single manual trigger entry in an automation.",
+                          "required": [
+                            "triggerNodeId",
+                            "triggerName"
+                          ],
+                          "properties": {
+                            "triggerNodeId": {
+                              "type": "string",
+                              "description": "Manual trigger node ID. Used together with the parent `automationId` to locate the entry."
+                            },
+                            "triggerName": {
+                              "type": "string",
+                              "description": "Display name of the manual trigger entry."
+                            }
+                          }
+                        }
                       }
                     },
                     "title": "AUTOMATION_ADDED"
                   },
                   {
                     "type": "object",
-                    "description": "Lightweight snapshot used for automation and standalone scene change notifications; does not include the full config. For known scenes, the `automationId` event field is the sceneId; distinguish the type according to the query list, and query details via GET /automations/{automationId} or GET /scenes/{sceneId} respectively. The scene list does not use `enabled` or `definitionType` in the snapshot.",
+                    "description": "Lightweight snapshot used for automation and standalone scene change notifications; does not include the full config. For known scenes, the `automationId` event field is the sceneId; distinguish the type according to the query list, and query details via GET /automations/{automationId} or GET /scenes/{sceneId} respectively. The scene list does not use `enabled` or `definitionType` in the snapshot. manualtriggers are the complete list of manual trigger entries inside the automation, and changes to them also trigger `AUTOMATION_UPDATED`.",
                     "required": [
                       "automationId",
                       "definitionType",
@@ -2038,13 +2775,36 @@ const aqaraLifeWebSocketSpecEn = {
                         "type": "integer",
                         "format": "int64",
                         "description": "Creation timestamp in milliseconds."
+                      },
+                      "manualTriggers": {
+                        "type": "array",
+                        "default": [],
+                        "description": "Complete list of manual trigger entries in the automation. When an entry is added, deleted, or renamed, `AUTOMATION_UPDATED` pushes the full snapshot after the change. The receiver should replace the cache as a whole. An empty array clears the cache, and a missing field may be treated as an empty array for compatibility. For additions, the list after the addition is used; for deletions, the list before the deletion is used. This list does not represent an independent `/scenes` object.",
+                        "items": {
+                          "type": "object",
+                          "description": "Summary of a single manual trigger entry in an automation.",
+                          "required": [
+                            "triggerNodeId",
+                            "triggerName"
+                          ],
+                          "properties": {
+                            "triggerNodeId": {
+                              "type": "string",
+                              "description": "Manual trigger node ID. Used together with the parent `automationId` to locate the entry."
+                            },
+                            "triggerName": {
+                              "type": "string",
+                              "description": "Display name of the manual trigger entry."
+                            }
+                          }
+                        }
                       }
                     },
                     "title": "AUTOMATION_REMOVED"
                   },
                   {
                     "type": "object",
-                    "description": "Lightweight snapshot used for automation and standalone scene change notifications; does not include the full config. For known scenes, the `automationId` event field is the sceneId; distinguish the type according to the query list, and query details via GET /automations/{automationId} or GET /scenes/{sceneId} respectively. The scene list does not use `enabled` or `definitionType` in the snapshot.",
+                    "description": "Lightweight snapshot used for automation and standalone scene change notifications; does not include the full config. For known scenes, the `automationId` event field is the sceneId; distinguish the type according to the query list, and query details via GET /automations/{automationId} or GET /scenes/{sceneId} respectively. The scene list does not use `enabled` or `definitionType` in the snapshot. manualtriggers are the complete list of manual trigger entries inside the automation, and changes to them also trigger `AUTOMATION_UPDATED`.",
                     "required": [
                       "automationId",
                       "definitionType",
@@ -2073,6 +2833,29 @@ const aqaraLifeWebSocketSpecEn = {
                         "type": "integer",
                         "format": "int64",
                         "description": "Creation timestamp in milliseconds."
+                      },
+                      "manualTriggers": {
+                        "type": "array",
+                        "default": [],
+                        "description": "Complete list of manual trigger entries in the automation. When an entry is added, deleted, or renamed, `AUTOMATION_UPDATED` pushes the full snapshot after the change. The receiver should replace the cache as a whole. An empty array clears the cache, and a missing field may be treated as an empty array for compatibility. For additions, the list after the addition is used; for deletions, the list before the deletion is used. This list does not represent an independent `/scenes` object.",
+                        "items": {
+                          "type": "object",
+                          "description": "Summary of a single manual trigger entry in an automation.",
+                          "required": [
+                            "triggerNodeId",
+                            "triggerName"
+                          ],
+                          "properties": {
+                            "triggerNodeId": {
+                              "type": "string",
+                              "description": "Manual trigger node ID. Used together with the parent `automationId` to locate the entry."
+                            },
+                            "triggerName": {
+                              "type": "string",
+                              "description": "Display name of the manual trigger entry."
+                            }
+                          }
+                        }
                       }
                     },
                     "title": "AUTOMATION_UPDATED"

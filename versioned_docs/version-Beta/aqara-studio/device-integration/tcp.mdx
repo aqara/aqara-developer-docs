@@ -7,9 +7,18 @@ keywords: ["Aqara Docs", "Aqara Studio", "Device Integration", "TCP"]
 
 This guide will show you how to integrate TCP protocol devices into Aqara Studio by writing JS scripts, and how to map device function points according to the **Aqara Data Model Specification**, enabling device discovery, addition, and control of function points.
 
+## Tested TCP Devices
+
+The following TCP devices have been tested by Aqara and can be integrated with Aqara Studio:
+- HOPE speakers
+- JBL speakers
+- Kudi players
+
 ## Learn and Write JavaScript Scripts
 
-Please refer to the [JavaScript script (for UDP and TCP)](./../javascript-for-udp-tcp-integration.mdx) guide to write a JavaScript script that complies with the **Aqara Data Model Specification**. This script instructs Aqara Studio how to discover devices, and add and control function points.
+For the shared script structure and configuration workflow, see the [third-party device script integration guide](../ai-agent-device-onboarding.mdx).
+
+Please refer to the [JavaScript script (for UDP and TCP)](./../unified-protocol-script.mdx#tcp-udp) guide to write a JavaScript script that complies with the **Aqara Data Model Specification**. This script instructs Aqara Studio how to discover devices, and add and control function points.
 
 ## Install the Plugin
 
@@ -56,17 +65,17 @@ Please refer to the [Plugin Market](./../plugin-center.mdx) instruction, and go 
     If your TCP device is discovered via the TCP protocol, select the **TCP** option; if your TCP device is discovered via the UDP protocol, select the **UDP** option.
 
     :::tip
-    If you do not use the following configuration, it is recommended to directly specify the target TCP device's IP address and port number in the return value of [parseDiscoveryResponse](./../javascript-for-udp-tcp-integration.mdx#parsediscoveryresponse) in the [JS script](#learn-and-write-javascript-scripts) to achieve precise device discovery and integration.
+    Supply a fixed target in [describe().discovery](../unified-protocol-script.mdx#tcp-udp-discovery) or editable dialog settings. encode(discoverDevices) builds the request and decode returns actual device candidates/addresses. A static address list alone is not completed discovery; use published manual creation when no discovery protocol exists.
     :::
 
     - **TCP**:   
-        Enter the target TCP IP address and port number in the popup. This information will be used by the [buildDiscoveryRequest](./../javascript-for-udp-tcp-integration.mdx#builddiscoveryrequest) interface in the [JS script](#learn-and-write-javascript-scripts) to instruct Aqara Studio to automatically discover all TCP devices at the specified address.   
+        Enter the TCP target IP/port or use script discovery settings. [encode(discoverDevices)](../unified-protocol-script.mdx#tcp-udp-discovery) builds/sends a request; decode parses the real response into candidates.
         <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/TCP-TCPIPConfiguration.png" alt="Configure server IP address and Port" style={{width: '50%'}} />
 
     - **UDP**:   
         Set `Discovery Type` to `UDP`.   
         <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/TCP-DiscoveryType.png" alt="Configure discovery type" style={{width: '50%'}} />   
-        Enter the UDP server IP address and port number in the popup. This information will be used by the [buildDiscoveryRequest](./../javascript-for-udp-tcp-integration.mdx#builddiscoveryrequest) interface in the [JS script](#learn-and-write-javascript-scripts) to instruct Aqara Studio to automatically discover all TCP devices at the specified address.    
+        Configure the actual UDP broadcast/multicast target or describe().discovery. [encode(discoverDevices)](../unified-protocol-script.mdx#tcp-udp-discovery) sends and decode obtains identity/TCP address from replies. Configure responseIp/responsePort separately when a fixed reply port is required.
         <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/TCP-IPConfiguration.png" alt="Configure server IP address and Port" style={{width: '50%'}} />
 
 10. Click the **Discover Devices** button.
@@ -97,10 +106,9 @@ Please refer to the [Plugin Market](./../plugin-center.mdx) instruction, and go 
 2. Click the **Discover Points** button.
 
     :::tip
-    - If the device function points are **dynamic**, implement the [buildDiscoverPointsRequest](./../javascript-for-udp-tcp-integration.mdx#builddiscoverpointsrequest) and [parseDiscoverPointsResponse](./../javascript-for-udp-tcp-integration.mdx#parsediscoverpointsresponse) interfaces in the [JS script](#learn-and-write-javascript-scripts).   
-    In this case, when you click the **Add Point** button, Aqara Studio calls [buildDiscoverPointsRequest](./../javascript-for-udp-tcp-integration.mdx#builddiscoverpointsrequest) to dynamically discover device function points, and uses the return value of that interface as the input of [parseDiscoverPointsResponse](./../javascript-for-udp-tcp-integration.mdx#parsediscoverpointsresponse).
-    - If the device function points are **static**, implement the [parseDiscoverPointsResponse](./../javascript-for-udp-tcp-integration.mdx#parsediscoverpointsresponse) interface in the [JS script](#learn-and-write-javascript-scripts), and **directly provide the target device's function-point list** in the return value.   
-    In this case, when you click the **Add Point** button, Aqara Studio will discover these function points directly.
+    - Remote point lists: encode(discoverPoints) sends bytes; decode returns [pointDefinitions](../unified-protocol-script.mdx#point-definitions) from the actual response.
+    - Static point lists: encode(discoverPoints) returns null; decode receives bytes=null and returns pointDefinitions without a request.
+    Both require selecting/importing points. Runtime option changes use [dynamic enums](../unified-protocol-script.mdx#dynamic-enums), not repeated point creation.
     :::
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/TCP-DiscoverPoints.png" alt="Discover Points" /> 

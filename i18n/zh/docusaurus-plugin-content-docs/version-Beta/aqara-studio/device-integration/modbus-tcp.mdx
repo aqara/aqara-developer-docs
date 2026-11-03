@@ -7,6 +7,33 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "Modbus TCP 设备接
 
 本文说明如何将 Modbus TCP 设备接入 Aqara Studio。
 
+## 支持的 Modbus TCP 点位数据类型
+
+在将您的 Modbus TCP 设备接入 Aqara Studio 时，请确保其点类型在 Aqara Studio 支持的范围内（如下表所列）：
+
+| 类型 | 范围 | 寄存器数 |
+|----|----|----| 
+| UInt16 | 0～65,535 | 1 |
+| Int16 | −32,768～32,767 | 1 |
+| Int32 | −2,147,483,648～2,147,483,647 | 2 |
+| UInt32 | 0～4,294,967,295 | 2 |
+| Float32 | IEEE 754 单精度 | 2 |
+| Boolean | 线圈、离散输入 | 1 bit |
+| RegisterBit | 单寄存器的 bit0～15 | 单寄存器内 |
+| NumericBits / EnumBits | 单寄存器内的无符号位段 | 单寄存器内 |
+| 普通 String | 保持寄存器字节按 UTF-8 解码，当前只读 | 按长度 |
+
+## 经测试的 Modbus TCP 设备
+
+以下列出经 Aqara 测试可正常接入 Aqara Studio 的 Modbus TCP 设备：
+
+| 品牌 | 型号 |
+|----|----|
+| Siemens | LOGO |
+| Siemens | S7-200 SMART CPU SR20 |
+| 浙江正泰电器 | CHNT DDSU6665(80) |
+| 杭州塔石物联 | TAS-LAN-464 |
+| 埃美柯 | LXLY-50 |
 
 ## 前提条件
 
@@ -33,7 +60,7 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "Modbus TCP 设备接
     | --- | --- |
     |启用/禁用该设备 | 注意：禁用后该设备将不可用。|
     |浮点数字节序 | 32 位浮点数的读写顺序，支持如下：<ul><li>Order BADC</li><li>Order ABCD（默认）</li><li>Order CDAB</li><li>Order DCBA</li></ul>|
-    |长整型字节序 | 64 位长整型字节顺序，支持如下：<ul><li>Order BADC</li><li>Order ABCD（默认）</li><li>Order CDAB</li><li>Order DCBA</li></ul>|
+    |长整型字节序 | 32 位 Int32/UInt32，占两个连续寄存器，支持如下：<ul><li>Order BADC</li><li>Order ABCD（默认）</li><li>Order CDAB</li><li>Order DCBA</li></ul>|
 
 4. 单击**添加设备**按钮，进入添加流程。
 
@@ -58,7 +85,7 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "Modbus TCP 设备接
     | 是否启用批量写入线圈指令 | ✔ | 是否使用 "Force Multiple Coils" 指令写多个线圈（对应 Modbus 协议中的功能码 15）。 |
     | 是否启用批量写入寄存器指令 | ✔ | 是否使用 "Preset Multiple Registers" 指令写多个保持寄存器（对应 Modbus 协议中的功能码 16）。 |
     | 浮点数字节序 | ✔ | 32 位浮点数的读写顺序，支持如下：<ul><li>Order BADC</li><li>Order ABCD（默认）</li><li>Order CDAB</li><li>Order DCBA</li></ul> |
-    | 长整型字节序 | ✔ | 64 位长整型字节顺序，支持如下：<ul><li>Order BADC</li><li>Order ABCD（默认）</li><li>Order CDAB</li><li>Order DCBA</li></ul> |
+    | 长整型字节序 | ✔ |  32 位 Int32/UInt32，占两个连续寄存器，支持如下：<ul><li>Order BADC</li><li>Order ABCD（默认）</li><li>Order CDAB</li><li>Order DCBA</li></ul> |
     | 是否覆盖网络配置 | ✔ | 不开启则使用 network 的字节序配置，当前字节序配置无效。 |
     | rxProcessMode | ✔ | 接收数据处理模式，支持以下值：<ul><li>Byte</li><li>Packet</li></ul> |
 
@@ -78,13 +105,13 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备接入", "Modbus TCP 设备接
         | 轮询频率 | ✘ | 用于控制该点位的轮询频率。支持以下选项：<ul><li><strong>快速</strong>：为 1 秒，高频轮询（适用于关键控制）</li><li><strong>正常</strong>：为 5 秒，常规频率</li><li><strong>慢速</strong>：为 30 秒，低频轮询（适用于非实时状态）。</li></ul>此配置主要在点位独立读取时生效；如果启用了设备级轮询，实际刷新频率可能会以设备轮询组配置为准。| 正常 |
         | 寄存器类型 | ✔ | 支持以下：<ul><li><strong>保持寄存器</strong></li><li><strong>输入寄存器</strong></li><li><strong>离散线圈</strong></li><li><strong>离散输入</strong></li></ul> | 保持寄存器 |
         | 访问类型 | ✘ | 支持以下：<ul><li><strong>只读</strong></li><li><strong>读写</strong></li></ul> | 读写 |
-        | 寄存器地址格式 | ✔ | 地址格式类型，支持以下：<ul><li><strong>十六进制</strong>：如 0x0013。</li><li><strong>十进制</strong>：如 19。</li><li><strong>标准 Modbus 地址</strong>：如 00001、10001、30001、40001。</li></ul> | 十进制 |
+        | 寄存器地址格式 | ✔ | 地址格式类型，支持以下：<ul><li><strong>十六进制</strong>：如 0013。</li><li><strong>十进制</strong>：如 19。</li><li><strong>标准 Modbus 地址</strong>：如 00001、10001、30001、40001。</li></ul> | 十进制 |
         | 寄存器地址 | ✔ | 根据“寄存器地址格式”填写。hex 示例：000A；decimal 示例：10；modbus 示例：00001、10001、30001、40001。 | 10 |
         | 数据类型 | 数值型点必填 | 数据类型 当寄存器类型为 **保存寄存器** 或 **输入寄存器** 时必填，支持以下：<ul><li>UInt16</li><li>Int16</li><li>UInt32</li><li>Int32</li><li>Float32</li></ul> | Int16 |
         | 单位 | 数值型点必填 | 您可以自定义适合此功能点的单位。 | - |
         | 位编号 | 数值型点必填 | 用于从一个 16 位保持寄存器或输入寄存器中读取指定单个位。位编号从 0 开始，范围为 0-15，0 表示最低位。-1 标识不使用该配置。 | -1 |
         | 起始位 | 数值型点必填 | 当一个 16 位寄存器中的连续几位代表一个数值或状态枚举时，填写这段数据的起始位。位编号从 0 开始，范围为 0-15，0 表示最低位。 | 0 |
-        | 位数 | 数值型点必填 | 当一个 16 位寄存器中的连续几位代表一个数值或状态枚举时，填写从起始位开始占用的连续位数。范围为 1-16，且起始位 + 位数不能超过 16。当前只支持从单个 16 位寄存器中取连续位段。| 1 |
+        | 位数 | 数值型点必填 | 当一个 16 位寄存器中的连续几位代表一个数值或状态枚举时，填写从起始位开始占用的连续位数。范围为 1-16，且起始位 + 位数不能超过 16。当前只支持从单个 16 位寄存器中取连续位段。| 0 |
     - **类型设置**：
         - 当寄存器类型为 **保持寄存器** 或 **输入寄存器** 时：
             
