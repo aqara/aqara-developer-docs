@@ -8111,7 +8111,7 @@ Indicates the firmware version of the thermostat base. The version number consis
 
 #### HardInfo Trait {#ref_HardInfo}
 
-Should provide a read-only string encoding the version and identity information of the door lock device and its back cover module. This string should be UTF-8 encoded, with a maximum length of 256 bytes.
+Should provide a read-only list of LabelStruct encoding the hardware or firmware identity information of the door lock device and its back cover module. Each list item uses Label to specify the information name and Value to provide the corresponding value; for example, the main version, hardware version, back cover version, BLE MAC address, or back cover serial number.
 
 <table>
   <thead>
@@ -99603,7 +99603,7 @@ Should indicate the current voice firmware OTA upgrade status.
 
 #### OTAProgress Trait {#ref_OTAProgress}
 
-Should indicate the current OTA firmware progress, reporting the upgrade completion percentage in the range 1 to 100.
+Should indicate the current OTA firmware progress, reporting the upgrade completion percentage in the range 0.0 to 100.0.
 
 <table>
   <thead>
