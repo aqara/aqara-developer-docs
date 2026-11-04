@@ -82,6 +82,9 @@
 - Edge Hub M300: https://docs.aqara.com/docs/aqara-studio/product-knowledge/gateways/edge-hub-m300
 - DIN Rail Hub AX100M: https://docs.aqara.com/docs/aqara-studio/product-knowledge/gateways/din-rail-hub-ax100m
 - Hub AX200M: https://docs.aqara.com/docs/aqara-studio/product-knowledge/gateways/hub-ax200m
+- Hub M3 Pro: https://docs.aqara.com/docs/aqara-studio/product-knowledge/gateways/hub-m3-pro
+- Hub M100 Pro: https://docs.aqara.com/docs/aqara-studio/product-knowledge/gateways/hub-m100-pro
+- Edge Box GX500M: https://docs.aqara.com/docs/aqara-studio/product-knowledge/gateways/edge-box-gx500m
 - Presence Sensor PR330P: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/presence-sensor-pr330p
 - Spatial Multi-Sensor FP400: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/spatial-multi-sensor-fp400
 - Spatial Multi-Sensor FP400 Pro: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/spatial-multi-sensor-fp400-pro
