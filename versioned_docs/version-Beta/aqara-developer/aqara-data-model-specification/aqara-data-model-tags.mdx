@@ -8146,7 +8146,7 @@ Should provide a read-only string encoding the version and identity information 
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td>characterString</td>
+      <td>list[<a href="#ref_LabelStruct">LabelStruct</a>]</td>
       <td></td>
       <td></td>
       <td>RV</td>
@@ -40628,7 +40628,7 @@ This structure defines the Present Value field layout of the LockErrorLogReport 
     <tr>
       <td>0</td>
       <td>LockErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>External or internal exception; value is defined by the LockErrorCodeEnum Type.</td>
     </tr>
@@ -48173,7 +48173,7 @@ This Trait is used to carry the user record list returned by `GetAqaraUserRespon
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td><a href="#ref_GetAqaraUserResponseTraitPresentValueStructure">GetAqaraUserResponseTraitPresentValueStructure</a></td>
+      <td>list[<a href="#ref_AqaraUserRecordStruct">AqaraUserRecordStruct</a>]</td>
       <td></td>
       <td></td>
       <td>RV</td>
@@ -50094,7 +50094,7 @@ This command is used to respond to `SetTravelCalibration`, reporting the executi
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>Travel calibration result; 0x00 means success, non-zero values indicate failure reasons.</td>
     </tr>
@@ -50119,7 +50119,7 @@ This command is used to respond to `AddAqaraUser`, reporting the user creation r
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>User creation result.</td>
     </tr>
@@ -50151,7 +50151,7 @@ This command is used to respond to `ModifyAqaraUser`, reporting the user modific
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>User modification result.</td>
     </tr>
@@ -50183,7 +50183,7 @@ This command is used to respond to `DeleteAqaraUser`, reporting the user deletio
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>User deletion result.</td>
     </tr>
@@ -50240,7 +50240,7 @@ This command is used to respond to `AddAqaraCredential`, reporting the credentia
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>Credential addition result.</td>
     </tr>
@@ -50279,7 +50279,7 @@ This command is used to respond to `ModifyAqaraCredential`, reporting the creden
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>Credential modification result.</td>
     </tr>
@@ -50311,7 +50311,7 @@ This command is used to respond to `DeleteAqaraCredential`, reporting the creden
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>Credential deletion result.</td>
     </tr>
@@ -50343,7 +50343,7 @@ This command is used to respond to `GetAqaraCredential`, returning the credentia
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>Credential query result.</td>
     </tr>
@@ -50382,7 +50382,7 @@ This command is used to respond to `ExitAddAqaraCredential`, reporting the resul
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>Exit session result.</td>
     </tr>
@@ -99638,36 +99638,36 @@ Should indicate the current OTA firmware progress, reporting the upgrade complet
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td>uint8</td>
+      <td>float</td>
       <td></td>
-      <td>1</td>
+      <td>0.0</td>
       <td>RV</td>
       <td>O</td>
     </tr>
     <tr>
       <td>0x0002</td>
       <td>Maximum Value</td>
-      <td>uint8</td>
+      <td>float</td>
       <td></td>
-      <td>100</td>
+      <td>100.0</td>
       <td>R</td>
       <td>O</td>
     </tr>
     <tr>
       <td>0x0003</td>
       <td>Minimum Value</td>
-      <td>uint8</td>
+      <td>float</td>
       <td></td>
-      <td>1</td>
+      <td>0.0</td>
       <td>R</td>
       <td>O</td>
     </tr>
     <tr>
       <td>0x0005</td>
       <td>Step Value</td>
-      <td>uint32</td>
+      <td>float</td>
       <td></td>
-      <td>1</td>
+      <td>0.1</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -126245,7 +126245,7 @@ If the device does not support the above dynamic modes, or supports the modes bu
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td>list</td>
+      <td>list[<a href="#ref_DynamicEffectIdEnum8">DynamicEffectIdEnum8</a>]</td>
       <td></td>
       <td></td>
       <td>RV</td>
