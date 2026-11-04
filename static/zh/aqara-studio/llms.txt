@@ -82,6 +82,9 @@
 - 智慧边端 M300: https://docs.aqara.com/zh/docs/aqara-studio/product-knowledge/gateways/edge-hub-m300
 - 配电箱网关 AX100M: https://docs.aqara.com/zh/docs/aqara-studio/product-knowledge/gateways/din-rail-hub-ax100m
 - 智慧网关 AX200M: https://docs.aqara.com/zh/docs/aqara-studio/product-knowledge/gateways/hub-ax200m
+- 方舟智慧中枢 M3 Pro: https://docs.aqara.com/zh/docs/aqara-studio/product-knowledge/gateways/hub-m3-pro
+- 网关 M100 Pro: https://docs.aqara.com/zh/docs/aqara-studio/product-knowledge/gateways/hub-m100-pro
+- 边端盒子 GX500M: https://docs.aqara.com/zh/docs/aqara-studio/product-knowledge/gateways/edge-box-gx500m
 - 人在传感器 PR330P: https://docs.aqara.com/zh/docs/aqara-studio/product-knowledge/sensors/presence-sensor-pr330p
 - AI 空间传感器 FP400: https://docs.aqara.com/zh/docs/aqara-studio/product-knowledge/sensors/spatial-multi-sensor-fp400
 - AI 空间传感器 FP400 Pro: https://docs.aqara.com/zh/docs/aqara-studio/product-knowledge/sensors/spatial-multi-sensor-fp400-pro
