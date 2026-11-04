@@ -6019,6 +6019,12 @@ BooleanState描述如何在设备的上下文中使用布尔值（可能在智�
   </thead>
   <tbody>
     <tr>
+      <td>0x505D</td>
+      <td><a href="#ref_HardInfo">HardInfo</a></td>
+      <td>硬件信息</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x8116</td>
       <td><a href="#ref_HardwareVersionString">HardwareVersionString</a></td>
       <td>硬件版本号</td>
@@ -6245,6 +6251,38 @@ BooleanState描述如何在设备的上下文中使用布尔值（可能在智�
   </tbody>
 </table>
 
+##### LabelStruct Type {#ref_LabelStruct}
+
+该结构体定义用户自定义的名称-值字符串对，用于标识一项硬件或固件信息。Label 示例包括 `MainVersion`、`HardwareVersion`、`BackVersion`、`BleMacAddress` 和 `BackSN`；Value 为对应信息值。
+
+<table>
+  <thead>
+    <tr>
+      <th>成员 ID</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Label</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>信息项名称，UTF-8 字符串，最大 32 字节，默认空字符串。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Value</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>信息项的值，UTF-8 字符串，最大 32 字节，默认空字符串。</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### HubConnectionStatusEnum8 Type {#ref_HubConnectionStatusEnum8}
 
 该枚举定义 HubConnectionStatus Trait 的 Present Value 有效取值。
@@ -6282,6 +6320,11 @@ BooleanState描述如何在设备的上下文中使用布尔值（可能在智�
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td>0x505D</td>
+      <td><a href="#ref_HardInfo">HardInfo</a></td>
+      <td>O</td>
+    </tr>
     <tr>
       <td>0x8116</td>
       <td><a href="#ref_HardwareVersionString">HardwareVersionString</a></td>
@@ -8058,6 +8101,52 @@ AIOT 模型值，例如 lumi.gateway.cn01
       <td>0x0001</td>
       <td>Present Value</td>
       <td>characterString</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### HardInfo Trait（硬件信息） {#ref_HardInfo}
+
+应提供只读的 LabelStruct 列表，编码门锁设备及其后盖模块的硬件或固件标识信息。每个列表项以 Label 指明信息名称，并以 Value 提供对应值；例如主版本、硬件版本、背板版本、BLE MAC 地址或背板序列号。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x505D</td>
+      <td>HardInfo</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_LabelStruct">LabelStruct</a>]</td>
       <td></td>
       <td></td>
       <td>RV</td>
@@ -39697,27 +39786,9 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>O</td>
     </tr>
     <tr>
-      <td>0x50A8</td>
-      <td><a href="#ref_FirmwareDowngradeEnabled">FirmwareDowngradeEnabled</a></td>
-      <td>开启固件降级</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x50A7</td>
-      <td><a href="#ref_VoiceOTAStatus">VoiceOTAStatus</a></td>
-      <td>语音固件升级</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x50A6</td>
       <td><a href="#ref_OTASilentUpgrade">OTASilentUpgrade</a></td>
       <td>OTA静默升级</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x50A5</td>
-      <td><a href="#ref_OTAProgress">OTAProgress</a></td>
-      <td>OTA进度</td>
       <td>O</td>
     </tr>
     <tr>
@@ -39787,12 +39858,6 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>O</td>
     </tr>
     <tr>
-      <td>0x5095</td>
-      <td><a href="#ref_DoorbellLightEnabled">DoorbellLightEnabled</a></td>
-      <td>开启门铃灯</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5094</td>
       <td><a href="#ref_DeviceOrientation">DeviceOrientation</a></td>
       <td>门方向</td>
@@ -39847,21 +39912,9 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>O</td>
     </tr>
     <tr>
-      <td>0x505F</td>
-      <td><a href="#ref_DoorLockAlarmStatus">DoorLockAlarmStatus</a></td>
-      <td>门锁告警状态</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x505E</td>
       <td><a href="#ref_TamperAlarmEnabled">TamperAlarmEnabled</a></td>
       <td>撬锁报警开关设置</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x505D</td>
-      <td><a href="#ref_HardInfo">HardInfo</a></td>
-      <td>硬件信息</td>
       <td>O</td>
     </tr>
     <tr>
@@ -39901,27 +39954,9 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>O</td>
     </tr>
     <tr>
-      <td>0x5056</td>
-      <td><a href="#ref_DemoVoiceVolume">DemoVoiceVolume</a></td>
-      <td>演示固件语料音量</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5055</td>
       <td><a href="#ref_AbnormalVibrationAlarmVolume">AbnormalVibrationAlarmVolume</a></td>
       <td>异常震动告警音量</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5054</td>
-      <td><a href="#ref_VoiceVolume">VoiceVolume</a></td>
-      <td>语音音量</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5053</td>
-      <td><a href="#ref_DoorbellVolume">DoorbellVolume</a></td>
-      <td>门铃音量</td>
       <td>O</td>
     </tr>
     <tr>
@@ -39961,24 +39996,6 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>O</td>
     </tr>
     <tr>
-      <td>0x4EF3</td>
-      <td><a href="#ref_VoiceLanguage">VoiceLanguage</a></td>
-      <td>语音播报语言</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x4F09</td>
-      <td><a href="#ref_OTAState">OTAState</a></td>
-      <td>OTA状态</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5080</td>
-      <td><a href="#ref_ChildLock">ChildLock</a></td>
-      <td>童锁</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5169</td>
       <td><a href="#ref_ButtonLockUnlockEnabled">ButtonLockUnlockEnabled</a></td>
       <td>单击按键上解锁使能</td>
@@ -40000,18 +40017,6 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>0x514F</td>
       <td><a href="#ref_SpeedFollowEnabled">SpeedFollowEnabled</a></td>
       <td>速度跟随使能</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5149</td>
-      <td><a href="#ref_DoorbellEnabled">DoorbellEnabled</a></td>
-      <td>门铃使能</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x514A</td>
-      <td><a href="#ref_DoorbellSensitivity">DoorbellSensitivity</a></td>
-      <td>门铃感应灵敏度</td>
       <td>O</td>
     </tr>
     <tr>
@@ -40099,12 +40104,6 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>O</td>
     </tr>
     <tr>
-      <td>0x80C9</td>
-      <td><a href="#ref_StateOfLowBat">StateOfLowBat</a></td>
-      <td>低电状态</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x4E71</td>
       <td><a href="#ref_GetCredentialStatusResponse">GetCredentialStatusResponse</a></td>
       <td>获取凭证状态回复</td>
@@ -40168,12 +40167,6 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>0x4E66</td>
       <td><a href="#ref_NumberOfTotalUsersSupported">NumberOfTotalUsersSupported</a></td>
       <td>门锁总用户量</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x4E2A</td>
-      <td><a href="#ref_NetworkInterfaces">NetworkInterfaces</a></td>
-      <td>网络接口信息</td>
       <td>O</td>
     </tr>
     <tr>
@@ -40635,9 +40628,9 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
     <tr>
       <td>0</td>
       <td>LockErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
-      <td>外部或内部异常，取值见 LockErrorCodeEnum Type。</td>
+      <td>外部或内部异常。</td>
     </tr>
     <tr>
       <td>1</td>
@@ -40873,6 +40866,232 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
   </tbody>
 </table>
 
+##### DoorLockErrorCodeEnum Type {#ref_DoorLockErrorCodeEnum}
+
+该枚举表示门锁命令或事件的处理结果。`0x00 Success` 表示操作成功；未列出的值为保留值，客户端应按 `0xFE Unknown` 处理。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Success</td>
+      <td>操作成功</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>CrcCheckFailed</td>
+      <td>接收帧的 CRC 校验失败</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>InvalidData</td>
+      <td>命令载荷格式错误或无效</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>InvalidDataLength</td>
+      <td>命令载荷长度与预期不符</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>DecryptionFailed</td>
+      <td>设备无法解密接收的数据</td>
+    </tr>
+    <tr>
+      <td>0x05</td>
+      <td>LocalUpgradeInProgress</td>
+      <td>设备正在本地升级，暂时无法处理请求</td>
+    </tr>
+    <tr>
+      <td>0x07</td>
+      <td>InvalidParameter</td>
+      <td>一个或多个命令参数超出范围或无效</td>
+    </tr>
+    <tr>
+      <td>0x10</td>
+      <td>PasswordExists</td>
+      <td>相同内容的密码凭证已存在</td>
+    </tr>
+    <tr>
+      <td>0x11</td>
+      <td>FingerprintExists</td>
+      <td>相同内容的指纹凭证已存在</td>
+    </tr>
+    <tr>
+      <td>0x12</td>
+      <td>NFCExists</td>
+      <td>相同内容的 NFC 凭证已存在</td>
+    </tr>
+    <tr>
+      <td>0x13</td>
+      <td>TemporaryPasswordExists</td>
+      <td>相同内容的一次性或临时密码已存在</td>
+    </tr>
+    <tr>
+      <td>0x14</td>
+      <td>PasswordUsersFull</td>
+      <td>设备级密码凭证容量已满</td>
+    </tr>
+    <tr>
+      <td>0x15</td>
+      <td>FingerprintUsersFull</td>
+      <td>设备级指纹凭证容量已满</td>
+    </tr>
+    <tr>
+      <td>0x16</td>
+      <td>NFCUsersFull</td>
+      <td>设备级 NFC 凭证容量已满</td>
+    </tr>
+    <tr>
+      <td>0x17</td>
+      <td>TemporaryPasswordsFull</td>
+      <td>设备级一次性或临时密码容量已满</td>
+    </tr>
+    <tr>
+      <td>0x18</td>
+      <td>AddUserTimeout</td>
+      <td>凭证录入会话超时</td>
+    </tr>
+    <tr>
+      <td>0x19</td>
+      <td>InvalidPasswordLength</td>
+      <td>密码长度超出支持范围</td>
+    </tr>
+    <tr>
+      <td>0x1A</td>
+      <td>UnsupportedCardType</td>
+      <td>设备不支持该 NFC 卡类型</td>
+    </tr>
+    <tr>
+      <td>0x1B</td>
+      <td>AbnormalExit</td>
+      <td>录入会话异常终止，例如取消或中断</td>
+    </tr>
+    <tr>
+      <td>0x1C</td>
+      <td>UserPasswordsFull</td>
+      <td>用户级密码凭证容量已满</td>
+    </tr>
+    <tr>
+      <td>0x1D</td>
+      <td>UserFingerprintsFull</td>
+      <td>用户级指纹凭证容量已满</td>
+    </tr>
+    <tr>
+      <td>0x1E</td>
+      <td>UserCountFull</td>
+      <td>设备级用户容量已满</td>
+    </tr>
+    <tr>
+      <td>0x20</td>
+      <td>PasswordNotFound</td>
+      <td>找不到指定密码凭证</td>
+    </tr>
+    <tr>
+      <td>0x21</td>
+      <td>FingerprintNotFound</td>
+      <td>找不到指定指纹凭证</td>
+    </tr>
+    <tr>
+      <td>0x22</td>
+      <td>NFCNotFound</td>
+      <td>找不到指定 NFC 凭证</td>
+    </tr>
+    <tr>
+      <td>0x23</td>
+      <td>TemporaryPasswordNotFound</td>
+      <td>找不到指定一次性或临时密码</td>
+    </tr>
+    <tr>
+      <td>0x24</td>
+      <td>UserGroupNotFound</td>
+      <td>找不到指定用户组</td>
+    </tr>
+    <tr>
+      <td>0x25</td>
+      <td>UserNotFound</td>
+      <td>找不到指定用户</td>
+    </tr>
+    <tr>
+      <td>0x30</td>
+      <td>WifiConfigurationFailed</td>
+      <td>无法保存 Wi-Fi 配置信息</td>
+    </tr>
+    <tr>
+      <td>0x31</td>
+      <td>NoDoorLockRecord</td>
+      <td>找不到匹配的门锁记录</td>
+    </tr>
+    <tr>
+      <td>0x32</td>
+      <td>SettingsStorageFailed</td>
+      <td>无法保存设备设置</td>
+    </tr>
+    <tr>
+      <td>0x33</td>
+      <td>FingerprintEnrollCountFailed</td>
+      <td>无法配置指纹录入尝试次数</td>
+    </tr>
+    <tr>
+      <td>0x34</td>
+      <td>LithiumBatteryLow</td>
+      <td>锂电池电量过低，操作被阻止</td>
+    </tr>
+    <tr>
+      <td>0x35</td>
+      <td>WifiNotConfigured</td>
+      <td>尚未配置 Wi-Fi，操作被阻止</td>
+    </tr>
+    <tr>
+      <td>0x36</td>
+      <td>DryBatteryLow</td>
+      <td>干电池电量过低，操作被阻止</td>
+    </tr>
+    <tr>
+      <td>0x37</td>
+      <td>LithiumBatteryTempAbnormal</td>
+      <td>锂电池温度超出安全范围，操作被阻止</td>
+    </tr>
+    <tr>
+      <td>0x38</td>
+      <td>Busy</td>
+      <td>设备正忙于处理其他请求</td>
+    </tr>
+    <tr>
+      <td>0x45</td>
+      <td>FaceDuplicate</td>
+      <td>相同内容的人脸凭证已存在</td>
+    </tr>
+    <tr>
+      <td>0x46</td>
+      <td>AjarAngleError</td>
+      <td>虚掩角度超出允许范围</td>
+    </tr>
+    <tr>
+      <td>0x47</td>
+      <td>CloseDoorAngleError</td>
+      <td>关门角度超出允许范围</td>
+    </tr>
+    <tr>
+      <td>0x48</td>
+      <td>PasswordVerifyFailed</td>
+      <td>密码验证失败</td>
+    </tr>
+    <tr>
+      <td>0xFE</td>
+      <td>Unknown</td>
+      <td>未知或未分类的错误</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### AqaraUserErrorTraitPresentValueStructure Type {#ref_AqaraUserErrorTraitPresentValueStructure}
 
 该结构体定义 AqaraUserError Trait 的 Present Value 字段布局。
@@ -40890,20 +41109,27 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
   <tbody>
     <tr>
       <td>1</td>
+      <td>ErrorCode</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
+      <td>M</td>
+      <td>用户或凭证管理失败原因。</td>
+    </tr>
+    <tr>
+      <td>2</td>
       <td>UserId</td>
       <td>uint16</td>
       <td>M</td>
       <td>用户 ID。</td>
     </tr>
     <tr>
-      <td>2</td>
+      <td>3</td>
       <td>CredentialAttribute</td>
       <td>uint8</td>
       <td>M</td>
       <td>凭证属性。</td>
     </tr>
     <tr>
-      <td>3</td>
+      <td>4</td>
       <td>CredentialType</td>
       <td>uint8</td>
       <td>M</td>
@@ -40914,7 +41140,7 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
 
 ##### AqaraUserChangeTraitPresentValueStructure Type {#ref_AqaraUserChangeTraitPresentValueStructure}
 
-该结构体定义 AqaraUserChange Trait 的 Present Value 字段布局。该 Trait 仅在用户或凭证数据库成功变更后上报相关状态；凭证变更时，Credential 可携带完整的 AqaraCredentialItemStruct（包括凭证类型及其内容）。Extension 事件中的 CheckNumber 仅供网关内部使用，不属于 Trait，不得上报至 App 或云端。
+该结构体定义 AqaraUserChange Trait 的 Present Value 字段布局。该 Trait 仅在用户或凭证数据库成功变更后上报相关状态；凭证变更时，Credential 可携带 AqaraCredentialItemStruct 中定义的凭证元数据。Extension 事件中的 CheckNumber 仅供网关内部使用，不属于 Trait，不得上报至 App 或云端。
 
 <table>
   <thead>
@@ -40967,7 +41193,7 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>Credential</td>
       <td><a href="#ref_AqaraCredentialItemStruct">AqaraCredentialItemStruct</a></td>
       <td>O</td>
-      <td>变更涉及的完整凭证信息，包含凭证属性、类型、ID、索引、名称、有效期及类型对应的凭证内容；无相关凭证、删除凭证或设备未提供敏感凭证内容时可省略或为 null。</td>
+      <td>变更涉及的凭证元数据，包含凭证属性、类型、ID、索引、名称及有效期；无相关凭证或删除凭证时可省略或为 null。</td>
     </tr>
   </tbody>
 </table>
@@ -41086,38 +41312,6 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>0x06</td>
       <td>PowerOff</td>
       <td>掉电状态</td>
-    </tr>
-  </tbody>
-</table>
-
-##### VoiceOTAStatusTraitPresentValueStructure Type {#ref_VoiceOTAStatusTraitPresentValueStructure}
-
-该结构体定义 VoiceOTAStatus Trait 的 Present Value 字段布局。
-
-<table>
-  <thead>
-    <tr>
-      <th>结构体成员序号</th>
-      <th>字段名</th>
-      <th>类型</th>
-      <th>必须</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Status</td>
-      <td>enum8</td>
-      <td>M</td>
-      <td>语音固件 OTA 升级状态。</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>Progress</td>
-      <td>uint8</td>
-      <td>O</td>
-      <td>升级进度百分比，范围 1 至 100。</td>
     </tr>
   </tbody>
 </table>
@@ -41474,59 +41668,6 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
   </tbody>
 </table>
 
-##### DoorLockAlarmStatusTraitPresentValueStructure Type {#ref_DoorLockAlarmStatusTraitPresentValueStructure}
-
-该结构体定义 DoorLockAlarmStatus Trait 的 Present Value 字段布局。
-
-<table>
-  <thead>
-    <tr>
-      <th>结构体成员序号</th>
-      <th>字段名</th>
-      <th>类型</th>
-      <th>必须</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>LockState</td>
-      <td>enum8</td>
-      <td>M</td>
-      <td>锁状态快照。</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>DoorState</td>
-      <td>enum8</td>
-      <td>M</td>
-      <td>门状态快照。</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>TamperActive</td>
-      <td>boolean</td>
-      <td>M</td>
-      <td>防拆告警是否激活。</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>AwayModeArmed</td>
-      <td>boolean</td>
-      <td>M</td>
-      <td>离家模式是否布防。</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>LowBattery</td>
-      <td>boolean</td>
-      <td>M</td>
-      <td>是否处于低电量状态。</td>
-    </tr>
-  </tbody>
-</table>
-
 ##### DoorAjarConfigTraitPresentValueStructure Type {#ref_DoorAjarConfigTraitPresentValueStructure}
 
 该结构体定义 DoorAjarConfig Trait 的 Present Value 字段布局。
@@ -41773,117 +41914,9 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
   </tbody>
 </table>
 
-##### DemoVoiceVolumeEnum8 Type {#ref_DemoVoiceVolumeEnum8}
-
-该枚举定义 DemoVoiceVolume Trait 的 Present Value 有效取值。
-
-<table>
-  <thead>
-    <tr>
-      <th>Value</th>
-      <th>Name</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x00</td>
-      <td>High</td>
-      <td>高</td>
-    </tr>
-    <tr>
-      <td>0x01</td>
-      <td>Medium</td>
-      <td>中</td>
-    </tr>
-    <tr>
-      <td>0x02</td>
-      <td>Low</td>
-      <td>低</td>
-    </tr>
-    <tr>
-      <td>0x03</td>
-      <td>Mute</td>
-      <td>静音</td>
-    </tr>
-  </tbody>
-</table>
-
 ##### AbnormalVibrationAlarmVolumeEnum8 Type {#ref_AbnormalVibrationAlarmVolumeEnum8}
 
 该枚举定义 AbnormalVibrationAlarmVolume Trait 的 Present Value 有效取值。
-
-<table>
-  <thead>
-    <tr>
-      <th>Value</th>
-      <th>Name</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x00</td>
-      <td>High</td>
-      <td>高</td>
-    </tr>
-    <tr>
-      <td>0x01</td>
-      <td>Medium</td>
-      <td>中</td>
-    </tr>
-    <tr>
-      <td>0x02</td>
-      <td>Low</td>
-      <td>低</td>
-    </tr>
-    <tr>
-      <td>0x03</td>
-      <td>Mute</td>
-      <td>静音</td>
-    </tr>
-  </tbody>
-</table>
-
-##### VoiceVolumeEnum8 Type {#ref_VoiceVolumeEnum8}
-
-该枚举定义 VoiceVolume Trait 的 Present Value 有效取值。
-
-<table>
-  <thead>
-    <tr>
-      <th>Value</th>
-      <th>Name</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x00</td>
-      <td>High</td>
-      <td>高</td>
-    </tr>
-    <tr>
-      <td>0x01</td>
-      <td>Medium</td>
-      <td>中</td>
-    </tr>
-    <tr>
-      <td>0x02</td>
-      <td>Low</td>
-      <td>低</td>
-    </tr>
-    <tr>
-      <td>0x03</td>
-      <td>Mute</td>
-      <td>静音</td>
-    </tr>
-  </tbody>
-</table>
-
-##### DoorbellVolumeEnum8 Type {#ref_DoorbellVolumeEnum8}
-
-该枚举定义 DoorbellVolume Trait 的 Present Value 有效取值。
 
 <table>
   <thead>
@@ -41975,37 +42008,6 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>0x01</td>
       <td>DisableElectronicLockoutMode</td>
       <td>关闭电子反锁</td>
-    </tr>
-  </tbody>
-</table>
-
-##### StateOfLowBatEnum8 Type {#ref_StateOfLowBatEnum8}
-
-该枚举定义 StateOfLowBat Trait 的 Present Value 有效取值。
-
-<table>
-  <thead>
-    <tr>
-      <th>Value</th>
-      <th>Name</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x00</td>
-      <td>False</td>
-      <td>电量充足</td>
-    </tr>
-    <tr>
-      <td>0x01</td>
-      <td>True</td>
-      <td>低电量</td>
-    </tr>
-    <tr>
-      <td>0x02</td>
-      <td>Critical</td>
-      <td>电量耗尽</td>
     </tr>
   </tbody>
 </table>
@@ -42478,19 +42480,12 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>O</td>
       <td>凭证有效期计划。</td>
     </tr>
-    <tr>
-      <td>6</td>
-      <td>CredentialContent</td>
-      <td><a href="#ref_AqaraCredentialContentStruct">AqaraCredentialContentStruct</a></td>
-      <td>O</td>
-      <td>由 CredentialType 决定的凭证内容。</td>
-    </tr>
   </tbody>
 </table>
 
 ##### AqaraUserRecordStruct Type {#ref_AqaraUserRecordStruct}
 
-该结构体定义 GetAqaraUserResponse 的 Users 列表中的单条用户记录，包含用户标识、用户类型、凭证及可选用户名。
+该结构体定义 GetAqaraUserResponse Present Value 列表中的单条用户记录，包含用户标识、用户类型、凭证及可选用户名。
 
 <table>
   <thead>
@@ -42530,38 +42525,6 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>characterString</td>
       <td>O</td>
       <td>用户显示名称，UTF-8 编码，最大 20 字节；未设置时为 null。</td>
-    </tr>
-  </tbody>
-</table>
-
-##### GetAqaraUserResponseTraitPresentValueStructure Type {#ref_GetAqaraUserResponseTraitPresentValueStructure}
-
-该结构体定义 GetAqaraUserResponse Trait 的 Present Value。`Users` 是用户记录结构体列表；`NextUserId` 为可空分页游标。
-
-<table>
-  <thead>
-    <tr>
-      <th>成员 ID</th>
-      <th>字段名</th>
-      <th>类型</th>
-      <th>必须</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Users</td>
-      <td>list[<a href="#ref_AqaraUserRecordStruct">AqaraUserRecordStruct</a>]</td>
-      <td>O</td>
-      <td>用户记录列表，最多返回请求中的 Number 条记录，并按 UserId 升序排列；空数据库时为空列表。</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>NextUserId</td>
-      <td>uint16</td>
-      <td>M</td>
-      <td>后续分页查询的起始用户 ID；null 表示遍历完成。</td>
     </tr>
   </tbody>
 </table>
@@ -42777,80 +42740,6 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>uint32</td>
       <td>M</td>
       <td>本地结束时间，Epoch Time in Seconds；应大于 LocalStartTime。</td>
-    </tr>
-  </tbody>
-</table>
-
-##### NetworkInterfacesTraitPresentValueStructure Type {#ref_NetworkInterfacesTraitPresentValueStructure}
-
-该结构体定义 NetworkInterfaces Trait 的 Present Value 字段布局。
-
-<table>
-  <thead>
-    <tr>
-      <th>结构体成员序号</th>
-      <th>字段名</th>
-      <th>类型</th>
-      <th>必须</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Name</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>网络接口名称，最大长度 32 字节。</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>IsOperational</td>
-      <td>boolean</td>
-      <td>M</td>
-      <td>接口是否处于运行状态。</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>OffPremiseServicesReachableIPv4</td>
-      <td>boolean</td>
-      <td>O</td>
-      <td>是否可通过 IPv4 访问网外服务；为空表示未知。</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>OffPremiseServicesReachableIPv6</td>
-      <td>boolean</td>
-      <td>O</td>
-      <td>是否可通过 IPv6 访问网外服务；为空表示未知。</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>HardwareAddress</td>
-      <td>octetString</td>
-      <td>M</td>
-      <td>硬件 MAC 地址。</td>
-    </tr>
-    <tr>
-      <td>5</td>
-      <td>IPv4Addresses</td>
-      <td>list[octetString]</td>
-      <td>M</td>
-      <td>IPv4 地址列表。</td>
-    </tr>
-    <tr>
-      <td>6</td>
-      <td>IPv6Addresses</td>
-      <td>list[octetString]</td>
-      <td>M</td>
-      <td>IPv6 地址列表。</td>
-    </tr>
-    <tr>
-      <td>7</td>
-      <td>Type</td>
-      <td>enum8</td>
-      <td>M</td>
-      <td>接口类型（InterfaceTypeEnum）。</td>
     </tr>
   </tbody>
 </table>
@@ -44179,23 +44068,8 @@ SetTravelCalibration Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
-      <td>0x50A8</td>
-      <td><a href="#ref_FirmwareDowngradeEnabled">FirmwareDowngradeEnabled</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x50A7</td>
-      <td><a href="#ref_VoiceOTAStatus">VoiceOTAStatus</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x50A6</td>
       <td><a href="#ref_OTASilentUpgrade">OTASilentUpgrade</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x50A5</td>
-      <td><a href="#ref_OTAProgress">OTAProgress</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -44254,11 +44128,6 @@ SetTravelCalibration Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
-      <td>0x5095</td>
-      <td><a href="#ref_DoorbellLightEnabled">DoorbellLightEnabled</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5094</td>
       <td><a href="#ref_DeviceOrientation">DeviceOrientation</a></td>
       <td>O</td>
@@ -44304,18 +44173,8 @@ SetTravelCalibration Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
-      <td>0x505F</td>
-      <td><a href="#ref_DoorLockAlarmStatus">DoorLockAlarmStatus</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x505E</td>
       <td><a href="#ref_TamperAlarmEnabled">TamperAlarmEnabled</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x505D</td>
-      <td><a href="#ref_HardInfo">HardInfo</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -44349,23 +44208,8 @@ SetTravelCalibration Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
-      <td>0x5056</td>
-      <td><a href="#ref_DemoVoiceVolume">DemoVoiceVolume</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5055</td>
       <td><a href="#ref_AbnormalVibrationAlarmVolume">AbnormalVibrationAlarmVolume</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5054</td>
-      <td><a href="#ref_VoiceVolume">VoiceVolume</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5053</td>
-      <td><a href="#ref_DoorbellVolume">DoorbellVolume</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -44399,21 +44243,6 @@ SetTravelCalibration Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
-      <td>0x4EF3</td>
-      <td><a href="#ref_VoiceLanguage">VoiceLanguage</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x4F09</td>
-      <td><a href="#ref_OTAState">OTAState</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5080</td>
-      <td><a href="#ref_ChildLock">ChildLock</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5169</td>
       <td><a href="#ref_ButtonLockUnlockEnabled">ButtonLockUnlockEnabled</a></td>
       <td>O</td>
@@ -44431,16 +44260,6 @@ SetTravelCalibration Command 的参数结构体。
     <tr>
       <td>0x514F</td>
       <td><a href="#ref_SpeedFollowEnabled">SpeedFollowEnabled</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5149</td>
-      <td><a href="#ref_DoorbellEnabled">DoorbellEnabled</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x514A</td>
-      <td><a href="#ref_DoorbellSensitivity">DoorbellSensitivity</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -44514,11 +44333,6 @@ SetTravelCalibration Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
-      <td>0x80C9</td>
-      <td><a href="#ref_StateOfLowBat">StateOfLowBat</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x4E71</td>
       <td><a href="#ref_GetCredentialStatusResponse">GetCredentialStatusResponse</a></td>
       <td>O</td>
@@ -44571,11 +44385,6 @@ SetTravelCalibration Command 的参数结构体。
     <tr>
       <td>0x4E66</td>
       <td><a href="#ref_NumberOfTotalUsersSupported">NumberOfTotalUsersSupported</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x4E2A</td>
-      <td><a href="#ref_NetworkInterfaces">NetworkInterfaces</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -45201,107 +45010,6 @@ SetTravelCalibration Command 的参数结构体。
   </tbody>
 </table>
 
-#### FirmwareDowngradeEnabled Trait（开启固件降级） {#ref_FirmwareDowngradeEnabled}
-
-应控制是否允许设备固件版本降级。false（0）应禁止降级；true（1）应允许降级。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x50A8</td>
-      <td>FirmwareDowngradeEnabled</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td>0</td>
-      <td>W</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### VoiceOTAStatus Trait（语音固件升级） {#ref_VoiceOTAStatus}
-
-应指示当前语音固件 OTA 升级状态。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x50A7</td>
-      <td>VoiceOTAStatus</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td><a href="#ref_VoiceOTAStatusTraitPresentValueStructure">VoiceOTAStatusTraitPresentValueStructure</a></td>
-      <td></td>
-      <td></td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
 #### OTASilentUpgrade Trait（OTA静默升级） {#ref_OTASilentUpgrade}
 
 应配置静默 OTA 固件升级功能。
@@ -45343,79 +45051,6 @@ SetTravelCalibration Command 的参数结构体。
       <td></td>
       <td></td>
       <td>RVW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### OTAProgress Trait（OTA进度） {#ref_OTAProgress}
-
-应指示当前 OTA 固件进度，上报 1 至 100 范围内的升级完成百分比
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x50A5</td>
-      <td>OTAProgress</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td>1</td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0002</td>
-      <td>Maximum Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td>100</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0003</td>
-      <td>Minimum Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td>1</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0005</td>
-      <td>Step Value</td>
-      <td>uint32</td>
-      <td></td>
-      <td>1</td>
-      <td>R</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -45998,116 +45633,6 @@ SetTravelCalibration Command 的参数结构体。
   </tbody>
 </table>
 
-#### VoiceLanguage Trait（语音播报语言） {#ref_VoiceLanguage}
-
-该 Trait 指示当前语音播报语言。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x4EF3</td>
-      <td>VoiceLanguage</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td></td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0006</td>
-      <td>Supported Value</td>
-      <td>list[uint8]</td>
-      <td></td>
-      <td></td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td>1</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### OTAState Trait（OTA状态） {#ref_OTAState}
-
-该 Trait 指示设备当前 OTA 固件升级状态。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x4F09</td>
-      <td>OTAState</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td>1</td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
 #### ButtonLockUnlockEnabled Trait（单击按键上解锁使能） {#ref_ButtonLockUnlockEnabled}
 
 该 Trait 用于启用或禁用单击按键上锁/解锁功能。值为 `true` 时，用户可通过单击按键上锁或解锁；值为 `false` 时禁用该功能。
@@ -46322,116 +45847,6 @@ SetTravelCalibration Command 的参数结构体。
       <td>boolean</td>
       <td></td>
       <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### DoorbellEnabled Trait（门铃使能） {#ref_DoorbellEnabled}
-
-该 Trait 用于启用或禁用门铃功能。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5149</td>
-      <td>DoorbellEnabled</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td>0</td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### DoorbellSensitivity Trait（门铃感应灵敏度） {#ref_DoorbellSensitivity}
-
-该 Trait 指示门铃感应灵敏度等级。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x514A</td>
-      <td>DoorbellSensitivity</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td>1</td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td>1</td>
       <td>RW</td>
       <td>O</td>
     </tr>
@@ -47372,61 +46787,6 @@ SetTravelCalibration Command 的参数结构体。
   </tbody>
 </table>
 
-#### DoorbellLightEnabled Trait（开启门铃灯） {#ref_DoorbellLightEnabled}
-
-应启用或禁用门铃指示灯。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5095</td>
-      <td>DoorbellLightEnabled</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td>0</td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
 #### DeviceOrientation Trait（门方向） {#ref_DeviceOrientation}
 
 应配置门锁物理朝向。DoorOpenDirection 使用 DoorOpenDirectionEnum Type 指定门向外开或向内开。
@@ -47905,52 +47265,6 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
   </tbody>
 </table>
 
-#### DoorLockAlarmStatus Trait（门锁告警状态） {#ref_DoorLockAlarmStatus}
-
-应上报门锁设备当前组合状态作为只读快照。设备尚未上报状态时，该属性应为 null。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x505F</td>
-      <td>DoorLockAlarmStatus</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td><a href="#ref_DoorLockAlarmStatusTraitPresentValueStructure">DoorLockAlarmStatusTraitPresentValueStructure</a></td>
-      <td></td>
-      <td></td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
 #### TamperAlarmEnabled Trait（撬锁报警开关设置） {#ref_TamperAlarmEnabled}
 
 应启用或禁用防拆报警。设为 true 时，检测到篡改事件门锁应触发报警。
@@ -48001,52 +47315,6 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
       <td></td>
       <td>0</td>
       <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### HardInfo Trait（硬件信息） {#ref_HardInfo}
-
-应提供只读字符串，编码门锁设备及其后盖模块的版本和身份信息。该字符串应为 UTF-8 编码，最大长度 256 字节。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x505D</td>
-      <td>HardInfo</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>characterString</td>
-      <td></td>
-      <td></td>
-      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -48382,70 +47650,6 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
   </tbody>
 </table>
 
-#### DemoVoiceVolume Trait（演示固件语料音量） {#ref_DemoVoiceVolume}
-
-应配置演示固件语音音量等级，用于展厅演示。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5056</td>
-      <td>DemoVoiceVolume</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td><a href="#ref_DemoVoiceVolumeEnum8">DemoVoiceVolumeEnum8</a></td>
-      <td></td>
-      <td>0</td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0006</td>
-      <td>Supported Value</td>
-      <td>list[<a href="#ref_DemoVoiceVolumeEnum8">DemoVoiceVolumeEnum8</a>]</td>
-      <td></td>
-      <td></td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td><a href="#ref_DemoVoiceVolumeEnum8">DemoVoiceVolumeEnum8</a></td>
-      <td></td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
 #### AbnormalVibrationAlarmVolume Trait（异常震动告警音量） {#ref_AbnormalVibrationAlarmVolume}
 
 应配置异常振动报警音量等级，用于保险箱功能。
@@ -48502,134 +47706,6 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
       <td>0x0007</td>
       <td>Default Value</td>
       <td><a href="#ref_AbnormalVibrationAlarmVolumeEnum8">AbnormalVibrationAlarmVolumeEnum8</a></td>
-      <td></td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### VoiceVolume Trait（语音音量） {#ref_VoiceVolume}
-
-应配置语音提示音量等级。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5054</td>
-      <td>VoiceVolume</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td><a href="#ref_VoiceVolumeEnum8">VoiceVolumeEnum8</a></td>
-      <td></td>
-      <td>0</td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0006</td>
-      <td>Supported Value</td>
-      <td>list[<a href="#ref_VoiceVolumeEnum8">VoiceVolumeEnum8</a>]</td>
-      <td></td>
-      <td></td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td><a href="#ref_VoiceVolumeEnum8">VoiceVolumeEnum8</a></td>
-      <td></td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### DoorbellVolume Trait（门铃音量） {#ref_DoorbellVolume}
-
-应配置门铃音量等级。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5053</td>
-      <td>DoorbellVolume</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td><a href="#ref_DoorbellVolumeEnum8">DoorbellVolumeEnum8</a></td>
-      <td></td>
-      <td>0</td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0006</td>
-      <td>Supported Value</td>
-      <td>list[<a href="#ref_DoorbellVolumeEnum8">DoorbellVolumeEnum8</a>]</td>
-      <td></td>
-      <td></td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td><a href="#ref_DoorbellVolumeEnum8">DoorbellVolumeEnum8</a></td>
       <td></td>
       <td>0</td>
       <td>RW</td>
@@ -48922,61 +47998,6 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
   </tbody>
 </table>
 
-#### StateOfLowBat Trait（低电状态） {#ref_StateOfLowBat}
-
-指示电池是否处于低电量状态。0：正常，1：低电量，2：严重不足。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x80C9</td>
-      <td>StateOfLowBat</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td><a href="#ref_StateOfLowBatEnum8">StateOfLowBatEnum8</a></td>
-      <td></td>
-      <td>0</td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0006</td>
-      <td>Supported Value</td>
-      <td>list[<a href="#ref_StateOfLowBatEnum8">StateOfLowBatEnum8</a>]</td>
-      <td></td>
-      <td></td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
 #### GetCredentialStatusResponse Trait（获取凭证状态回复） {#ref_GetCredentialStatusResponse}
 
 该 Trait 用于「获取凭证状态回复」相关数据的访问与上报。
@@ -49152,7 +48173,7 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td><a href="#ref_GetAqaraUserResponseTraitPresentValueStructure">GetAqaraUserResponseTraitPresentValueStructure</a></td>
+      <td>list[<a href="#ref_AqaraUserRecordStruct">AqaraUserRecordStruct</a>]</td>
       <td></td>
       <td></td>
       <td>RV</td>
@@ -49686,52 +48707,6 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
       <td></td>
       <td>0</td>
       <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### NetworkInterfaces Trait（网络接口信息） {#ref_NetworkInterfaces}
-
-该特征描述设备支持的网络接口。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x4E2A</td>
-      <td>NetworkInterfaces</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>list[<a href="#ref_NetworkInterfacesTraitPresentValueStructure">NetworkInterfacesTraitPresentValueStructure</a>]</td>
-      <td></td>
-      <td></td>
-      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -51119,9 +50094,9 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
-      <td>行程校准结果；0x00 表示成功，非零值表示失败原因。</td>
+      <td>行程校准结果。</td>
     </tr>
   </tbody>
 </table>
@@ -51144,7 +50119,7 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>用户创建结果。</td>
     </tr>
@@ -51176,7 +50151,7 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>用户修改结果。</td>
     </tr>
@@ -51208,7 +50183,7 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>用户删除结果。</td>
     </tr>
@@ -51224,7 +50199,7 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
 
 #### GetAqaraUserResponse 响应数据格式 {#ref_GetAqaraUserResponseResponseFormat}
 
-设备以该响应返回用户记录及分页游标。下表仅列出 Aqara Spec 用户数据模型使用的字段；Trait 仅保存 `Users`，不包含 `ErrorCode`。字段 ID 沿用 Extension 定义。
+设备以该响应返回用户记录；Extension 响应中的 `SourceId` 不进入 Trait。
 
 <table>
   <thead>
@@ -51238,18 +50213,11 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
   </thead>
   <tbody>
     <tr>
-      <td>2</td>
+      <td>0</td>
       <td>Users</td>
       <td>list[<a href="#ref_AqaraUserRecordStruct">AqaraUserRecordStruct</a>]</td>
       <td>O</td>
       <td>用户记录列表，最多返回请求中的 Number 条记录，并按 UserId 升序排列；空数据库时为空列表。</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>NextUserId</td>
-      <td>uint16</td>
-      <td>M</td>
-      <td>后续分页查询的起始用户 ID；null 表示遍历完成。</td>
     </tr>
   </tbody>
 </table>
@@ -51272,7 +50240,7 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>凭证添加结果。</td>
     </tr>
@@ -51311,7 +50279,7 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>凭证修改结果。</td>
     </tr>
@@ -51343,7 +50311,7 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>凭证删除结果。</td>
     </tr>
@@ -51375,7 +50343,7 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>凭证查询结果。</td>
     </tr>
@@ -51414,7 +50382,7 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
     <tr>
       <td>0</td>
       <td>ErrorCode</td>
-      <td>enum8</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
       <td>退出会话结果。</td>
     </tr>
@@ -51758,7 +50726,7 @@ ClearUser（清除用户）
 #### ModifyAqaraCredential Command {#ref_ModifyAqaraCredential}
 
 该命令应更新 CredentialId 标识凭证的一个或多个属性。
-每个可更新字段均可独立省略：字段省略时，设备上凭证的现有值应保持不变。至少应提供 CredentialAttribute、CredentialType、CredentialContent、Validity 或 CredentialName 之一；若五项均省略，设备应以 DoorLockErrorCodeEnum 类型 InvalidParameter（0x07）响应且不得修改任何凭证数据。
+每个可更新字段均可独立省略：字段省略时，设备上凭证的现有值应保持不变。至少应提供 CredentialAttribute、CredentialType、CredentialContent、Validity 或 CredentialName 之一；若五项均省略，设备应以 [DoorLockErrorCodeEnum](#ref_DoorLockErrorCodeEnum) 类型 InvalidParameter（0x07）响应且不得修改任何凭证数据。
 
 ##### 参数
 
@@ -51774,7 +50742,7 @@ ClearUser（清除用户）
 
 #### GetAqaraUser Command {#ref_GetAqaraUser}
 
-该命令应请求门锁返回一条或多条用户记录（每条携带用户属性及关联凭证）。设备应以 GetAqaraUserResponse 响应，从 UserId 起最多返回 Number 条记录。该命令也是遍历完整用户数据库的基本操作--客户端通过链式连续调用并消费每次响应的 NextUserId 字段直至其为 null 来遍历数据库。
+该命令应请求门锁返回一条或多条用户记录（每条携带用户属性及关联凭证）。设备应以 GetAqaraUserResponse 响应，从 UserId 起最多返回 Number 条记录；需要继续查询时，客户端可根据已返回的用户 ID 发起后续请求。
 
 ##### 参数
 
@@ -51790,7 +50758,7 @@ ClearUser（清除用户）
 
 #### ModifyAqaraUser Command {#ref_ModifyAqaraUser}
 
-该命令应更新门锁设备上 UserId 标识用户的一个或多个属性。每个可更新字段均可独立省略：字段为 null 或省略时，设备上用户的现有值应保持不变。UserType 或 UserName 至少一项应提供非 null 值；若两项均为 null 或省略，设备应以 DoorLockErrorCodeEnum 类型 InvalidParameter（0x07）响应且不得修改任何用户数据。
+该命令应更新门锁设备上 UserId 标识用户的一个或多个属性。每个可更新字段均可独立省略：字段为 null 或省略时，设备上用户的现有值应保持不变。UserType 或 UserName 至少一项应提供非 null 值；若两项均为 null 或省略，设备应以 [DoorLockErrorCodeEnum](#ref_DoorLockErrorCodeEnum) 类型 InvalidParameter（0x07）响应且不得修改任何用户数据。
 
 ##### 参数
 
@@ -62112,6 +61080,30 @@ bit 9 至 31：保留
       <td>室外门铃音量</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5053</td>
+      <td><a href="#ref_DoorbellVolume">DoorbellVolume</a></td>
+      <td>门铃音量</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5095</td>
+      <td><a href="#ref_DoorbellLightEnabled">DoorbellLightEnabled</a></td>
+      <td>开启门铃灯</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5149</td>
+      <td><a href="#ref_DoorbellEnabled">DoorbellEnabled</a></td>
+      <td>门铃使能</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x514A</td>
+      <td><a href="#ref_DoorbellSensitivity">DoorbellSensitivity</a></td>
+      <td>门铃感应灵敏度</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -62226,6 +61218,42 @@ bit 9 至 31：保留
   </tbody>
 </table>
 
+##### DoorbellVolumeEnum8 Type {#ref_DoorbellVolumeEnum8}
+
+该枚举定义 DoorbellVolume Trait 的 Present Value 有效取值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>High</td>
+      <td>高</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Medium</td>
+      <td>中</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Low</td>
+      <td>低</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Mute</td>
+      <td>静音</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### TriggerDoorbellWake Command Structure Type {#ref_TriggerDoorbellWakeCommandStructure}
 
 TriggerDoorbellWake Command 的参数结构体。
@@ -62290,6 +61318,26 @@ TriggerDoorbellWake Command 的参数结构体。
     <tr>
       <td>0x518C</td>
       <td><a href="#ref_OutdoorBellVolume">OutdoorBellVolume</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5053</td>
+      <td><a href="#ref_DoorbellVolume">DoorbellVolume</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5095</td>
+      <td><a href="#ref_DoorbellLightEnabled">DoorbellLightEnabled</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5149</td>
+      <td><a href="#ref_DoorbellEnabled">DoorbellEnabled</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x514A</td>
+      <td><a href="#ref_DoorbellSensitivity">DoorbellSensitivity</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -62709,6 +61757,235 @@ TriggerDoorbellWake Command 的参数结构体。
       <td>float</td>
       <td></td>
       <td>50</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DoorbellEnabled Trait（门铃使能） {#ref_DoorbellEnabled}
+
+该 Trait 用于启用或禁用门铃功能。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5149</td>
+      <td>DoorbellEnabled</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DoorbellSensitivity Trait（门铃感应灵敏度） {#ref_DoorbellSensitivity}
+
+该 Trait 指示门铃感应灵敏度等级。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x514A</td>
+      <td>DoorbellSensitivity</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>1</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>1</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DoorbellLightEnabled Trait（开启门铃灯） {#ref_DoorbellLightEnabled}
+
+应启用或禁用门铃指示灯。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5095</td>
+      <td>DoorbellLightEnabled</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DoorbellVolume Trait（门铃音量） {#ref_DoorbellVolume}
+
+应配置门铃音量等级。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5053</td>
+      <td>DoorbellVolume</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_DoorbellVolumeEnum8">DoorbellVolumeEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_DoorbellVolumeEnum8">DoorbellVolumeEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_DoorbellVolumeEnum8">DoorbellVolumeEnum8</a></td>
+      <td></td>
+      <td>0</td>
       <td>RW</td>
       <td>O</td>
     </tr>
@@ -68627,6 +67904,18 @@ OpenMatterCommissioningWindow Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5056</td>
+      <td><a href="#ref_DemoVoiceVolume">DemoVoiceVolume</a></td>
+      <td>演示语音音量</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5054</td>
+      <td><a href="#ref_VoiceVolume">VoiceVolume</a></td>
+      <td>语音音量</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4E85</td>
       <td><a href="#ref_OutputInterlockFlag">OutputInterlockFlag</a></td>
       <td>开关互锁使能配置标记</td>
@@ -69686,6 +68975,78 @@ WakeupDevice Command 的参数结构体。Server 下发该 Command，用于将�
   </tbody>
 </table>
 
+#### DemoVoiceVolumeEnum8 Type {#ref_DemoVoiceVolumeEnum8}
+
+该枚举定义 DemoVoiceVolume Trait 的 Present Value 有效取值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>High</td>
+      <td>高</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Medium</td>
+      <td>中</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Low</td>
+      <td>低</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Mute</td>
+      <td>静音</td>
+    </tr>
+  </tbody>
+</table>
+
+#### VoiceVolumeEnum8 Type {#ref_VoiceVolumeEnum8}
+
+该枚举定义 VoiceVolume Trait 的 Present Value 有效取值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>High</td>
+      <td>高</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Medium</td>
+      <td>中</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Low</td>
+      <td>低</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Mute</td>
+      <td>静音</td>
+    </tr>
+  </tbody>
+</table>
+
 #### ResetModeEnum8 Type {#ref_ResetModeEnum8}
 
 该枚举定义 ResetMode Trait 的 Present Value 有效取值。
@@ -69957,6 +69318,16 @@ WakeupDevice Command 的参数结构体。Server 下发该 Command，用于将�
     <tr>
       <td>0x4EF3</td>
       <td><a href="#ref_VoiceLanguage">VoiceLanguage</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5056</td>
+      <td><a href="#ref_DemoVoiceVolume">DemoVoiceVolume</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5054</td>
+      <td><a href="#ref_VoiceVolume">VoiceVolume</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -71068,6 +70439,134 @@ State0 至 State63 是通用状态名称，具体业务状态含义应在设备�
       <td>1</td>
       <td>RW</td>
       <td></td>
+    </tr>
+  </tbody>
+</table>
+
+#### DemoVoiceVolume Trait（演示语音音量） {#ref_DemoVoiceVolume}
+
+应配置演示固件语音音量等级，用于展厅演示。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5056</td>
+      <td>DemoVoiceVolume</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_DemoVoiceVolumeEnum8">DemoVoiceVolumeEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_DemoVoiceVolumeEnum8">DemoVoiceVolumeEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_DemoVoiceVolumeEnum8">DemoVoiceVolumeEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### VoiceVolume Trait（语音音量） {#ref_VoiceVolume}
+
+应配置语音提示音量等级。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5054</td>
+      <td>VoiceVolume</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_VoiceVolumeEnum8">VoiceVolumeEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_VoiceVolumeEnum8">VoiceVolumeEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_VoiceVolumeEnum8">VoiceVolumeEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
     </tr>
   </tbody>
 </table>
@@ -99797,6 +99296,18 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x50A7</td>
+      <td><a href="#ref_VoiceOTAStatus">VoiceOTAStatus</a></td>
+      <td>语音固件升级</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x50A5</td>
+      <td><a href="#ref_OTAProgress">OTAProgress</a></td>
+      <td>OTA进度</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4EE1</td>
       <td><a href="#ref_UpgradeTypeSetting">UpgradeTypeSetting</a></td>
       <td>升级类型设置</td>
@@ -99909,6 +99420,38 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
   </tbody>
 </table>
 
+##### VoiceOTAStatusTraitPresentValueStructure Type {#ref_VoiceOTAStatusTraitPresentValueStructure}
+
+该结构体定义 VoiceOTAStatus Trait 的 Present Value 字段布局。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td>enum8</td>
+      <td>M</td>
+      <td>语音固件 OTA 升级状态。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Progress</td>
+      <td>uint8</td>
+      <td>O</td>
+      <td>升级进度百分比，范围 1 至 100。</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait 定义
 
 <table>
@@ -99923,6 +99466,16 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
     <tr>
       <td>0x4F09</td>
       <td><a href="#ref_OTAState">OTAState</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x50A7</td>
+      <td><a href="#ref_VoiceOTAStatus">VoiceOTAStatus</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x50A5</td>
+      <td><a href="#ref_OTAProgress">OTAProgress</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -99997,6 +99550,125 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
       <td></td>
       <td>1</td>
       <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### VoiceOTAStatus Trait（语音固件升级） {#ref_VoiceOTAStatus}
+
+应指示当前语音固件 OTA 升级状态。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x50A7</td>
+      <td>VoiceOTAStatus</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_VoiceOTAStatusTraitPresentValueStructure">VoiceOTAStatusTraitPresentValueStructure</a></td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### OTAProgress Trait（OTA进度） {#ref_OTAProgress}
+
+应指示当前 OTA 固件进度，上报 0.0 至 100.0 范围内的升级完成百分比。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x50A5</td>
+      <td>OTAProgress</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>float</td>
+      <td></td>
+      <td>0.0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>float</td>
+      <td></td>
+      <td>100.0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>float</td>
+      <td></td>
+      <td>0.0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>Step Value</td>
+      <td>float</td>
+      <td></td>
+      <td>0.1</td>
+      <td>R</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -124511,6 +124183,122 @@ WashDryCombinationCommand Command 的参数结构体。
   </tbody>
 </table>
 
+##### DynamicEffectIdEnum8 Type {#ref_DynamicEffectIdEnum8}
+
+该枚举定义 DynamicEffect 和 SegmentDynamicEffect 使用的动态效果引擎 ID，并由 SupportedDynamicEffectIds Trait 用于声明设备支持的动态效果。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Undefined</td>
+      <td>未定义</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Breathe</td>
+      <td>呼吸</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Candle</td>
+      <td>烛光</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Colorful</td>
+      <td>幻彩</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>Blink</td>
+      <td>闪烁</td>
+    </tr>
+    <tr>
+      <td>0x05</td>
+      <td>Gradient</td>
+      <td>渐变</td>
+    </tr>
+    <tr>
+      <td>0x06</td>
+      <td>AlternateBreath</td>
+      <td>交替呼吸</td>
+    </tr>
+    <tr>
+      <td>0x07</td>
+      <td>ForwardFlow</td>
+      <td>正向流动</td>
+    </tr>
+    <tr>
+      <td>0x08</td>
+      <td>ReverseFlow</td>
+      <td>反向流动</td>
+    </tr>
+    <tr>
+      <td>0x09</td>
+      <td>Jump</td>
+      <td>跳变</td>
+    </tr>
+    <tr>
+      <td>0x0A</td>
+      <td>Celebration</td>
+      <td>庆典</td>
+    </tr>
+    <tr>
+      <td>0x0B</td>
+      <td>BidirectionalCelebration</td>
+      <td>双向庆典</td>
+    </tr>
+    <tr>
+      <td>0x0C</td>
+      <td>Chase</td>
+      <td>追逐</td>
+    </tr>
+    <tr>
+      <td>0x0D</td>
+      <td>ReverseChase</td>
+      <td>反向追逐</td>
+    </tr>
+    <tr>
+      <td>0x0E</td>
+      <td>Firefly</td>
+      <td>萤光</td>
+    </tr>
+    <tr>
+      <td>0x0F</td>
+      <td>Starry</td>
+      <td>星空</td>
+    </tr>
+    <tr>
+      <td>0x10</td>
+      <td>Bounce</td>
+      <td>反弹</td>
+    </tr>
+    <tr>
+      <td>0x11</td>
+      <td>Meteor</td>
+      <td>流星</td>
+    </tr>
+    <tr>
+      <td>0x12</td>
+      <td>ReverseMeteor</td>
+      <td>反向流星</td>
+    </tr>
+    <tr>
+      <td>0x13</td>
+      <td>Stack</td>
+      <td>堆积</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### NaturalEffectIdEnum8 Type {#ref_NaturalEffectIdEnum8}
 
 该枚举定义 ActionType 为 NaturalAtmosphereEffect 时使用的自然氛围效果 ID。
@@ -126457,7 +126245,7 @@ Present Value 使用字符串承载该掩码；字符串编码应与设备采用
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td>list</td>
+      <td>list[<a href="#ref_DynamicEffectIdEnum8">DynamicEffectIdEnum8</a>]</td>
       <td></td>
       <td></td>
       <td>RV</td>
