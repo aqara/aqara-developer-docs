@@ -68525,6 +68525,12 @@ Provides general device configuration items, such as sensitivity, delay, default
   </thead>
   <tbody>
     <tr>
+      <td>0x524A</td>
+      <td><a href="#ref_MultiStateSetting">MultiStateSetting</a></td>
+      <td>Multi-state setting</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5080</td>
       <td><a href="#ref_ChildLock">ChildLock</a></td>
       <td>Child lock</td>
@@ -68753,6 +68759,342 @@ Provides general device configuration items, such as sensitivity, delay, default
 </table>
 
 ### Data Types
+
+#### MultiStateSettingEnum16 Type {#ref_MultiStateSettingEnum16}
+
+This enumeration defines the valid values of the Present Value of the MultiStateSetting Trait. The underlying data type is uint16. The valid enumeration values range from 0 to 63; each value corresponds to a discrete state identifier and is not interpreted as a continuous numeric value.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0000</td>
+      <td>State0</td>
+      <td>State 0</td>
+    </tr>
+    <tr>
+      <td>0x0001</td>
+      <td>State1</td>
+      <td>State 1</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>State2</td>
+      <td>State 2</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>State3</td>
+      <td>State 3</td>
+    </tr>
+    <tr>
+      <td>0x0004</td>
+      <td>State4</td>
+      <td>State 4</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>State5</td>
+      <td>State 5</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>State6</td>
+      <td>State 6</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>State7</td>
+      <td>State 7</td>
+    </tr>
+    <tr>
+      <td>0x0008</td>
+      <td>State8</td>
+      <td>State 8</td>
+    </tr>
+    <tr>
+      <td>0x0009</td>
+      <td>State9</td>
+      <td>State 9</td>
+    </tr>
+    <tr>
+      <td>0x000A</td>
+      <td>State10</td>
+      <td>State 10</td>
+    </tr>
+    <tr>
+      <td>0x000B</td>
+      <td>State11</td>
+      <td>State 11</td>
+    </tr>
+    <tr>
+      <td>0x000C</td>
+      <td>State12</td>
+      <td>State 12</td>
+    </tr>
+    <tr>
+      <td>0x000D</td>
+      <td>State13</td>
+      <td>State 13</td>
+    </tr>
+    <tr>
+      <td>0x000E</td>
+      <td>State14</td>
+      <td>State 14</td>
+    </tr>
+    <tr>
+      <td>0x000F</td>
+      <td>State15</td>
+      <td>State 15</td>
+    </tr>
+    <tr>
+      <td>0x0010</td>
+      <td>State16</td>
+      <td>State 16</td>
+    </tr>
+    <tr>
+      <td>0x0011</td>
+      <td>State17</td>
+      <td>State 17</td>
+    </tr>
+    <tr>
+      <td>0x0012</td>
+      <td>State18</td>
+      <td>State 18</td>
+    </tr>
+    <tr>
+      <td>0x0013</td>
+      <td>State19</td>
+      <td>State 19</td>
+    </tr>
+    <tr>
+      <td>0x0014</td>
+      <td>State20</td>
+      <td>State 20</td>
+    </tr>
+    <tr>
+      <td>0x0015</td>
+      <td>State21</td>
+      <td>State 21</td>
+    </tr>
+    <tr>
+      <td>0x0016</td>
+      <td>State22</td>
+      <td>State 22</td>
+    </tr>
+    <tr>
+      <td>0x0017</td>
+      <td>State23</td>
+      <td>State 23</td>
+    </tr>
+    <tr>
+      <td>0x0018</td>
+      <td>State24</td>
+      <td>State 24</td>
+    </tr>
+    <tr>
+      <td>0x0019</td>
+      <td>State25</td>
+      <td>State 25</td>
+    </tr>
+    <tr>
+      <td>0x001A</td>
+      <td>State26</td>
+      <td>State 26</td>
+    </tr>
+    <tr>
+      <td>0x001B</td>
+      <td>State27</td>
+      <td>State 27</td>
+    </tr>
+    <tr>
+      <td>0x001C</td>
+      <td>State28</td>
+      <td>State 28</td>
+    </tr>
+    <tr>
+      <td>0x001D</td>
+      <td>State29</td>
+      <td>State 29</td>
+    </tr>
+    <tr>
+      <td>0x001E</td>
+      <td>State30</td>
+      <td>State 30</td>
+    </tr>
+    <tr>
+      <td>0x001F</td>
+      <td>State31</td>
+      <td>State 31</td>
+    </tr>
+    <tr>
+      <td>0x0020</td>
+      <td>State32</td>
+      <td>State 32</td>
+    </tr>
+    <tr>
+      <td>0x0021</td>
+      <td>State33</td>
+      <td>State 33</td>
+    </tr>
+    <tr>
+      <td>0x0022</td>
+      <td>State34</td>
+      <td>State 34</td>
+    </tr>
+    <tr>
+      <td>0x0023</td>
+      <td>State35</td>
+      <td>State 35</td>
+    </tr>
+    <tr>
+      <td>0x0024</td>
+      <td>State36</td>
+      <td>State 36</td>
+    </tr>
+    <tr>
+      <td>0x0025</td>
+      <td>State37</td>
+      <td>State 37</td>
+    </tr>
+    <tr>
+      <td>0x0026</td>
+      <td>State38</td>
+      <td>State 38</td>
+    </tr>
+    <tr>
+      <td>0x0027</td>
+      <td>State39</td>
+      <td>State 39</td>
+    </tr>
+    <tr>
+      <td>0x0028</td>
+      <td>State40</td>
+      <td>State 40</td>
+    </tr>
+    <tr>
+      <td>0x0029</td>
+      <td>State41</td>
+      <td>State 41</td>
+    </tr>
+    <tr>
+      <td>0x002A</td>
+      <td>State42</td>
+      <td>State 42</td>
+    </tr>
+    <tr>
+      <td>0x002B</td>
+      <td>State43</td>
+      <td>State 43</td>
+    </tr>
+    <tr>
+      <td>0x002C</td>
+      <td>State44</td>
+      <td>State 44</td>
+    </tr>
+    <tr>
+      <td>0x002D</td>
+      <td>State45</td>
+      <td>State 45</td>
+    </tr>
+    <tr>
+      <td>0x002E</td>
+      <td>State46</td>
+      <td>State 46</td>
+    </tr>
+    <tr>
+      <td>0x002F</td>
+      <td>State47</td>
+      <td>State 47</td>
+    </tr>
+    <tr>
+      <td>0x0030</td>
+      <td>State48</td>
+      <td>State 48</td>
+    </tr>
+    <tr>
+      <td>0x0031</td>
+      <td>State49</td>
+      <td>State 49</td>
+    </tr>
+    <tr>
+      <td>0x0032</td>
+      <td>State50</td>
+      <td>State 50</td>
+    </tr>
+    <tr>
+      <td>0x0033</td>
+      <td>State51</td>
+      <td>State 51</td>
+    </tr>
+    <tr>
+      <td>0x0034</td>
+      <td>State52</td>
+      <td>State 52</td>
+    </tr>
+    <tr>
+      <td>0x0035</td>
+      <td>State53</td>
+      <td>State 53</td>
+    </tr>
+    <tr>
+      <td>0x0036</td>
+      <td>State54</td>
+      <td>State 54</td>
+    </tr>
+    <tr>
+      <td>0x0037</td>
+      <td>State55</td>
+      <td>State 55</td>
+    </tr>
+    <tr>
+      <td>0x0038</td>
+      <td>State56</td>
+      <td>State 56</td>
+    </tr>
+    <tr>
+      <td>0x0039</td>
+      <td>State57</td>
+      <td>State 57</td>
+    </tr>
+    <tr>
+      <td>0x003A</td>
+      <td>State58</td>
+      <td>State 58</td>
+    </tr>
+    <tr>
+      <td>0x003B</td>
+      <td>State59</td>
+      <td>State 59</td>
+    </tr>
+    <tr>
+      <td>0x003C</td>
+      <td>State60</td>
+      <td>State 60</td>
+    </tr>
+    <tr>
+      <td>0x003D</td>
+      <td>State61</td>
+      <td>State 61</td>
+    </tr>
+    <tr>
+      <td>0x003E</td>
+      <td>State62</td>
+      <td>State 62</td>
+    </tr>
+    <tr>
+      <td>0x003F</td>
+      <td>State63</td>
+      <td>State 63</td>
+    </tr>
+  </tbody>
+</table>
 
 #### P2PCaptureIntervalEnum8 Type {#ref_P2PCaptureIntervalEnum8}
 
@@ -69533,6 +69875,11 @@ This enumeration defines the valid values of the Present Value of the PublicCapO
   </thead>
   <tbody>
     <tr>
+      <td>0x524A</td>
+      <td><a href="#ref_MultiStateSetting">MultiStateSetting</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5080</td>
       <td><a href="#ref_ChildLock">ChildLock</a></td>
       <td>O</td>
@@ -69700,6 +70047,83 @@ This enumeration defines the valid values of the Present Value of the PublicCapO
     <tr>
       <td>0x51ED</td>
       <td><a href="#ref_VibrationIntensity">VibrationIntensity</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### MultiStateSetting Trait (Multi-State Setting) {#ref_MultiStateSetting}
+
+Multi-state setting, used to place the device into one of several discrete states. The value of this Trait is a named enumeration constant: each enumeration value is itself a state identifier with business meaning, where the value and the state meaning are unified and no external mapping table is required. It applies to multi-state control scenarios such as mode selection, level selection and operating scenario switching, for example "Auto", "Cooling", "Heating" and "Fan".
+
+Compared with a boolean switch, this Trait can express more than two discrete states; compared with a continuous numeric setting, it allows only a limited set of valid enumeration values, avoiding illegal intermediate values. The underlying data type is uint16, and the enumeration values range from 0 to 63, corresponding to State0 to State63 (state 0 to state 63). It supports read, write and report.
+
+State0 to State63 are generic state names; the specific business meaning of each state should be defined in the Trait definition of the device. This generic definition does not fix any State as a business state such as "Auto" or "Cooling". If the device supports only some of these states, the set of supported enumeration values should be declared through Supported Value. The written value must be a valid state supported by the device; interpolation by continuous numeric value is not allowed, and values outside the range of 0 to 63 must not be accepted.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x524A</td>
+      <td>MultiStateSetting</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_MultiStateSettingEnum16">MultiStateSettingEnum16</a></td>
+      <td>0..63; must be an enumeration value supported by the device</td>
+      <td></td>
+      <td>RVW</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>63</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_MultiStateSettingEnum16">MultiStateSettingEnum16</a>]</td>
+      <td>Each element must be a valid enumeration value supported by the device</td>
+      <td></td>
+      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -134356,6 +134780,16 @@ Manages the device's voice interaction capabilities, including wake words, voice
       <td>O</td>
     </tr>
     <tr>
+      <td>0x524B</td>
+      <td><a href="#ref_WakeWordEnable">WakeWordEnable</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x524C</td>
+      <td><a href="#ref_MateWakeupAssistantEnable">MateWakeupAssistantEnable</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5101</td>
       <td><a href="#ref_ControlScopeSetting">ControlScopeSetting</a></td>
       <td>O</td>
@@ -134606,6 +135040,16 @@ Parameter structure of the TriggerVoiceAssistantWake Command.
       <td>O</td>
     </tr>
     <tr>
+      <td>0x524B</td>
+      <td><a href="#ref_WakeWordEnable">WakeWordEnable</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x524C</td>
+      <td><a href="#ref_MateWakeupAssistantEnable">MateWakeupAssistantEnable</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5101</td>
       <td><a href="#ref_ControlScopeSetting">ControlScopeSetting</a></td>
       <td>O</td>
@@ -134693,6 +135137,120 @@ Determines whether the device responds to voice commands; when enabled (default)
       <td>O</td>
       <td>1</td>
       <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### WakeWordEnable Trait {#ref_WakeWordEnable}
+
+Wake word wake-up enable, used to turn the wake word wake-up function of the voice assistant on or off. When enabled, users can wake the voice assistant with a wake word; when disabled, wake words no longer take effect. The data type of this Trait is boolean, where `0` means off and `1` means on. The default value is `1` (on), and it is readable, writable and reportable.
+
+This Trait only controls the wake word wake-up function and does not replace [VoiceAssistantEnabled](#ref_VoiceAssistantEnabled), the master switch of voice functions; when the master switch is off, wake words are not responded to even if WakeWordEnable is on.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x524B</td>
+      <td>WakeWordEnable</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>1</td>
+      <td>RVW</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>1</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### MateWakeupAssistantEnable Trait {#ref_MateWakeupAssistantEnable}
+
+Voice companion wake-up enable, used to turn the "wake the voice assistant through a voice companion" function on or off. A voice companion is a smart device with voice pickup capability; when enabled, users can wake the voice assistant through voice picked up by the voice companion; when disabled, this wake-up method no longer takes effect. The data type of this Trait is boolean, where `0` means off and `1` means on. The default value is `1` (on), and it is readable, writable and reportable.
+
+This Trait only controls the wake-up method through a voice companion and does not replace [VoiceAssistantEnabled](#ref_VoiceAssistantEnabled), the master switch of voice functions; when the master switch is off, the voice assistant is not woken through a voice companion even if MateWakeupAssistantEnable is on.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x524C</td>
+      <td>MateWakeupAssistantEnable</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>1</td>
+      <td>RVW</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>1</td>
+      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
