@@ -5091,8 +5091,8 @@ Indicates the list of Function capabilities that this controller endpoint can bi
   </tbody>
 </table>
 
-
 ### Command Definitions
+
 This Function does not contain Commands.
 
 ## CO (Carbon Monoxide) {#ref_Aqara_Spec_CO}
@@ -5467,8 +5467,8 @@ Indicates the carbon monoxide concentration in the air, used to monitor toxic ga
   </tbody>
 </table>
 
-
 ### Command Definitions
+
 <table>
   <thead>
     <tr>
@@ -6019,6 +6019,12 @@ Provides basic device information, including vendor, product model, firmware ver
   </thead>
   <tbody>
     <tr>
+      <td>0x505D</td>
+      <td><a href="#ref_HardInfo">HardInfo</a></td>
+      <td>Hardware information</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x8116</td>
       <td><a href="#ref_HardwareVersionString">HardwareVersionString</a></td>
       <td>Hardware version string</td>
@@ -6245,6 +6251,38 @@ This structure defines the Present Value field layout of the ConfigurationVersio
   </tbody>
 </table>
 
+##### LabelStruct Type {#ref_LabelStruct}
+
+This structure defines a user-defined name-value string pair that labels a hardware or firmware information item. Examples of Label include `MainVersion`, `HardwareVersion`, `BackVersion`, `BleMacAddress`, and `BackSN`; Value is the corresponding information value.
+
+<table>
+  <thead>
+    <tr>
+      <th>Member ID</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Label</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Name of the information item, a UTF-8 string of up to 32 bytes, empty string by default.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Value</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Value of the information item, a UTF-8 string of up to 32 bytes, empty string by default.</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### HubConnectionStatusEnum8 Type {#ref_HubConnectionStatusEnum8}
 
 This enumeration defines the valid values of the Present Value of the HubConnectionStatus Trait.
@@ -6282,6 +6320,11 @@ This enumeration defines the valid values of the Present Value of the HubConnect
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td>0x505D</td>
+      <td><a href="#ref_HardInfo">HardInfo</a></td>
+      <td>O</td>
+    </tr>
     <tr>
       <td>0x8116</td>
       <td><a href="#ref_HardwareVersionString">HardwareVersionString</a></td>
@@ -8035,6 +8078,52 @@ Indicates the firmware version of the thermostat base. The version number consis
     <tr>
       <td>0x515E</td>
       <td>ThermostatBaseFWVersion</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>characterString</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### HardInfo Trait {#ref_HardInfo}
+
+Should provide a read-only string encoding the version and identity information of the door lock device and its back cover module. This string should be UTF-8 encoded, with a maximum length of 256 bytes.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x505D</td>
+      <td>HardInfo</td>
     </tr>
   </tbody>
 </table>
@@ -39697,27 +39786,9 @@ Provides core smart door lock capabilities, including lock state, user/credentia
       <td>O</td>
     </tr>
     <tr>
-      <td>0x50A8</td>
-      <td><a href="#ref_FirmwareDowngradeEnabled">FirmwareDowngradeEnabled</a></td>
-      <td>Enable firmware downgrade</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x50A7</td>
-      <td><a href="#ref_VoiceOTAStatus">VoiceOTAStatus</a></td>
-      <td>Voice firmware upgrade</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x50A6</td>
       <td><a href="#ref_OTASilentUpgrade">OTASilentUpgrade</a></td>
       <td>OTA silent upgrade</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x50A5</td>
-      <td><a href="#ref_OTAProgress">OTAProgress</a></td>
-      <td>OTA progress</td>
       <td>O</td>
     </tr>
     <tr>
@@ -39787,12 +39858,6 @@ Provides core smart door lock capabilities, including lock state, user/credentia
       <td>O</td>
     </tr>
     <tr>
-      <td>0x5095</td>
-      <td><a href="#ref_DoorbellLightEnabled">DoorbellLightEnabled</a></td>
-      <td>Enable doorbell light</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5094</td>
       <td><a href="#ref_DeviceOrientation">DeviceOrientation</a></td>
       <td>Door orientation</td>
@@ -39847,21 +39912,9 @@ Provides core smart door lock capabilities, including lock state, user/credentia
       <td>O</td>
     </tr>
     <tr>
-      <td>0x505F</td>
-      <td><a href="#ref_DoorLockAlarmStatus">DoorLockAlarmStatus</a></td>
-      <td>Door lock alarm status</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x505E</td>
       <td><a href="#ref_TamperAlarmEnabled">TamperAlarmEnabled</a></td>
       <td>Prying alarm switch setting</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x505D</td>
-      <td><a href="#ref_HardInfo">HardInfo</a></td>
-      <td>Hardware info</td>
       <td>O</td>
     </tr>
     <tr>
@@ -39901,27 +39954,9 @@ Provides core smart door lock capabilities, including lock state, user/credentia
       <td>O</td>
     </tr>
     <tr>
-      <td>0x5056</td>
-      <td><a href="#ref_DemoVoiceVolume">DemoVoiceVolume</a></td>
-      <td>Demo firmware speech volume</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5055</td>
       <td><a href="#ref_AbnormalVibrationAlarmVolume">AbnormalVibrationAlarmVolume</a></td>
       <td>Abnormal vibration alarm volume</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5054</td>
-      <td><a href="#ref_VoiceVolume">VoiceVolume</a></td>
-      <td>Voice volume</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5053</td>
-      <td><a href="#ref_DoorbellVolume">DoorbellVolume</a></td>
-      <td>Doorbell volume</td>
       <td>O</td>
     </tr>
     <tr>
@@ -39961,24 +39996,6 @@ Provides core smart door lock capabilities, including lock state, user/credentia
       <td>O</td>
     </tr>
     <tr>
-      <td>0x4EF3</td>
-      <td><a href="#ref_VoiceLanguage">VoiceLanguage</a></td>
-      <td>Voice broadcast language</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x4F09</td>
-      <td><a href="#ref_OTAState">OTAState</a></td>
-      <td>OTA status</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5080</td>
-      <td><a href="#ref_ChildLock">ChildLock</a></td>
-      <td>Child lock</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5169</td>
       <td><a href="#ref_ButtonLockUnlockEnabled">ButtonLockUnlockEnabled</a></td>
       <td>Single press unlock enable</td>
@@ -40000,18 +40017,6 @@ Provides core smart door lock capabilities, including lock state, user/credentia
       <td>0x514F</td>
       <td><a href="#ref_SpeedFollowEnabled">SpeedFollowEnabled</a></td>
       <td>Speed follow enable</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5149</td>
-      <td><a href="#ref_DoorbellEnabled">DoorbellEnabled</a></td>
-      <td>Doorbell enable</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x514A</td>
-      <td><a href="#ref_DoorbellSensitivity">DoorbellSensitivity</a></td>
-      <td>Doorbell sensitivity</td>
       <td>O</td>
     </tr>
     <tr>
@@ -40099,12 +40104,6 @@ Provides core smart door lock capabilities, including lock state, user/credentia
       <td>O</td>
     </tr>
     <tr>
-      <td>0x80C9</td>
-      <td><a href="#ref_StateOfLowBat">StateOfLowBat</a></td>
-      <td>Low battery state</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x4E71</td>
       <td><a href="#ref_GetCredentialStatusResponse">GetCredentialStatusResponse</a></td>
       <td>Get credential status reply</td>
@@ -40168,12 +40167,6 @@ Provides core smart door lock capabilities, including lock state, user/credentia
       <td>0x4E66</td>
       <td><a href="#ref_NumberOfTotalUsersSupported">NumberOfTotalUsersSupported</a></td>
       <td>Total door lock user count</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x4E2A</td>
-      <td><a href="#ref_NetworkInterfaces">NetworkInterfaces</a></td>
-      <td>Network interface info</td>
       <td>O</td>
     </tr>
     <tr>
@@ -40873,6 +40866,232 @@ This enumeration identifies the operation type performed by the AqaraUserChange 
   </tbody>
 </table>
 
+##### DoorLockErrorCodeEnum Type {#ref_DoorLockErrorCodeEnum}
+
+This enumeration represents the processing result of a door lock command or event. `0x00 Success` indicates that the operation succeeded; values not listed are reserved and clients should treat them as `0xFE Unknown`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Success</td>
+      <td>The operation succeeded</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>CrcCheckFailed</td>
+      <td>CRC check of the received frame failed</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>InvalidData</td>
+      <td>The command payload is malformed or invalid</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>InvalidDataLength</td>
+      <td>The command payload length does not match the expected length</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>DecryptionFailed</td>
+      <td>The device cannot decrypt the received data</td>
+    </tr>
+    <tr>
+      <td>0x05</td>
+      <td>LocalUpgradeInProgress</td>
+      <td>The device is performing a local upgrade and cannot process the request at the moment</td>
+    </tr>
+    <tr>
+      <td>0x07</td>
+      <td>InvalidParameter</td>
+      <td>One or more command parameters are out of range or invalid</td>
+    </tr>
+    <tr>
+      <td>0x10</td>
+      <td>PasswordExists</td>
+      <td>A password credential with the same content already exists</td>
+    </tr>
+    <tr>
+      <td>0x11</td>
+      <td>FingerprintExists</td>
+      <td>A fingerprint credential with the same content already exists</td>
+    </tr>
+    <tr>
+      <td>0x12</td>
+      <td>NFCExists</td>
+      <td>An NFC credential with the same content already exists</td>
+    </tr>
+    <tr>
+      <td>0x13</td>
+      <td>TemporaryPasswordExists</td>
+      <td>A one-time or temporary password with the same content already exists</td>
+    </tr>
+    <tr>
+      <td>0x14</td>
+      <td>PasswordUsersFull</td>
+      <td>The device-level password credential capacity is full</td>
+    </tr>
+    <tr>
+      <td>0x15</td>
+      <td>FingerprintUsersFull</td>
+      <td>The device-level fingerprint credential capacity is full</td>
+    </tr>
+    <tr>
+      <td>0x16</td>
+      <td>NFCUsersFull</td>
+      <td>The device-level NFC credential capacity is full</td>
+    </tr>
+    <tr>
+      <td>0x17</td>
+      <td>TemporaryPasswordsFull</td>
+      <td>The device-level one-time or temporary password capacity is full</td>
+    </tr>
+    <tr>
+      <td>0x18</td>
+      <td>AddUserTimeout</td>
+      <td>The credential enrollment session timed out</td>
+    </tr>
+    <tr>
+      <td>0x19</td>
+      <td>InvalidPasswordLength</td>
+      <td>The password length is outside the supported range</td>
+    </tr>
+    <tr>
+      <td>0x1A</td>
+      <td>UnsupportedCardType</td>
+      <td>The device does not support this NFC card type</td>
+    </tr>
+    <tr>
+      <td>0x1B</td>
+      <td>AbnormalExit</td>
+      <td>The enrollment session ended abnormally, for example by cancellation or interruption</td>
+    </tr>
+    <tr>
+      <td>0x1C</td>
+      <td>UserPasswordsFull</td>
+      <td>The user-level password credential capacity is full</td>
+    </tr>
+    <tr>
+      <td>0x1D</td>
+      <td>UserFingerprintsFull</td>
+      <td>The user-level fingerprint credential capacity is full</td>
+    </tr>
+    <tr>
+      <td>0x1E</td>
+      <td>UserCountFull</td>
+      <td>The device-level user capacity is full</td>
+    </tr>
+    <tr>
+      <td>0x20</td>
+      <td>PasswordNotFound</td>
+      <td>The specified password credential was not found</td>
+    </tr>
+    <tr>
+      <td>0x21</td>
+      <td>FingerprintNotFound</td>
+      <td>The specified fingerprint credential was not found</td>
+    </tr>
+    <tr>
+      <td>0x22</td>
+      <td>NFCNotFound</td>
+      <td>The specified NFC credential was not found</td>
+    </tr>
+    <tr>
+      <td>0x23</td>
+      <td>TemporaryPasswordNotFound</td>
+      <td>The specified one-time or temporary password was not found</td>
+    </tr>
+    <tr>
+      <td>0x24</td>
+      <td>UserGroupNotFound</td>
+      <td>The specified user group was not found</td>
+    </tr>
+    <tr>
+      <td>0x25</td>
+      <td>UserNotFound</td>
+      <td>The specified user was not found</td>
+    </tr>
+    <tr>
+      <td>0x30</td>
+      <td>WifiConfigurationFailed</td>
+      <td>The Wi-Fi configuration cannot be saved</td>
+    </tr>
+    <tr>
+      <td>0x31</td>
+      <td>NoDoorLockRecord</td>
+      <td>No matching door lock record was found</td>
+    </tr>
+    <tr>
+      <td>0x32</td>
+      <td>SettingsStorageFailed</td>
+      <td>The device settings cannot be saved</td>
+    </tr>
+    <tr>
+      <td>0x33</td>
+      <td>FingerprintEnrollCountFailed</td>
+      <td>The number of fingerprint enrollment attempts cannot be configured</td>
+    </tr>
+    <tr>
+      <td>0x34</td>
+      <td>LithiumBatteryLow</td>
+      <td>The lithium battery level is too low and the operation is blocked</td>
+    </tr>
+    <tr>
+      <td>0x35</td>
+      <td>WifiNotConfigured</td>
+      <td>Wi-Fi has not been configured and the operation is blocked</td>
+    </tr>
+    <tr>
+      <td>0x36</td>
+      <td>DryBatteryLow</td>
+      <td>The dry battery level is too low and the operation is blocked</td>
+    </tr>
+    <tr>
+      <td>0x37</td>
+      <td>LithiumBatteryTempAbnormal</td>
+      <td>The lithium battery temperature is outside the safe range and the operation is blocked</td>
+    </tr>
+    <tr>
+      <td>0x38</td>
+      <td>Busy</td>
+      <td>The device is busy processing another request</td>
+    </tr>
+    <tr>
+      <td>0x45</td>
+      <td>FaceDuplicate</td>
+      <td>A face credential with the same content already exists</td>
+    </tr>
+    <tr>
+      <td>0x46</td>
+      <td>AjarAngleError</td>
+      <td>The ajar angle is outside the allowed range</td>
+    </tr>
+    <tr>
+      <td>0x47</td>
+      <td>CloseDoorAngleError</td>
+      <td>The door closing angle is outside the allowed range</td>
+    </tr>
+    <tr>
+      <td>0x48</td>
+      <td>PasswordVerifyFailed</td>
+      <td>Password verification failed</td>
+    </tr>
+    <tr>
+      <td>0xFE</td>
+      <td>Unknown</td>
+      <td>Unknown or unclassified error</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### AqaraUserErrorTraitPresentValueStructure Type {#ref_AqaraUserErrorTraitPresentValueStructure}
 
 This structure defines the Present Value field layout of the AqaraUserError Trait.
@@ -40890,20 +41109,27 @@ This structure defines the Present Value field layout of the AqaraUserError Trai
   <tbody>
     <tr>
       <td>1</td>
+      <td>ErrorCode</td>
+      <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
+      <td>M</td>
+      <td>Reason for the failure of user or credential management.</td>
+    </tr>
+    <tr>
+      <td>2</td>
       <td>UserId</td>
       <td>uint16</td>
       <td>M</td>
       <td>User ID.</td>
     </tr>
     <tr>
-      <td>2</td>
+      <td>3</td>
       <td>CredentialAttribute</td>
       <td>uint8</td>
       <td>M</td>
       <td>Credential properties.</td>
     </tr>
     <tr>
-      <td>3</td>
+      <td>4</td>
       <td>CredentialType</td>
       <td>uint8</td>
       <td>M</td>
@@ -41086,38 +41312,6 @@ This enumeration defines the valid values of the Present Value of the WiFiStatus
       <td>0x06</td>
       <td>PowerOff</td>
       <td>Power-off state</td>
-    </tr>
-  </tbody>
-</table>
-
-##### VoiceOTAStatusTraitPresentValueStructure Type {#ref_VoiceOTAStatusTraitPresentValueStructure}
-
-This structure defines the Present Value field layout of the VoiceOTAStatus Trait.
-
-<table>
-  <thead>
-    <tr>
-      <th>Struct Member No.</th>
-      <th>Field Name</th>
-      <th>Type</th>
-      <th>Mandatory</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Status</td>
-      <td>enum8</td>
-      <td>M</td>
-      <td>Voice firmware OTA upgrade status.</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>Progress</td>
-      <td>uint8</td>
-      <td>O</td>
-      <td>Upgrade progress percentage, ranging from 1 to 100.</td>
     </tr>
   </tbody>
 </table>
@@ -41474,59 +41668,6 @@ This enumeration defines the valid values of the Present Value of the LockWorkMo
   </tbody>
 </table>
 
-##### DoorLockAlarmStatusTraitPresentValueStructure Type {#ref_DoorLockAlarmStatusTraitPresentValueStructure}
-
-This structure defines the Present Value field layout of the DoorLockAlarmStatus Trait.
-
-<table>
-  <thead>
-    <tr>
-      <th>Struct Member No.</th>
-      <th>Field Name</th>
-      <th>Type</th>
-      <th>Mandatory</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>LockState</td>
-      <td>enum8</td>
-      <td>M</td>
-      <td>Lock state snapshot.</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>DoorState</td>
-      <td>enum8</td>
-      <td>M</td>
-      <td>Door state snapshot.</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>TamperActive</td>
-      <td>boolean</td>
-      <td>M</td>
-      <td>Whether tamper alarm is active.</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>AwayModeArmed</td>
-      <td>boolean</td>
-      <td>M</td>
-      <td>Whether away mode is armed.</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>LowBattery</td>
-      <td>boolean</td>
-      <td>M</td>
-      <td>Whether in low battery state.</td>
-    </tr>
-  </tbody>
-</table>
-
 ##### DoorAjarConfigTraitPresentValueStructure Type {#ref_DoorAjarConfigTraitPresentValueStructure}
 
 This structure defines the Present Value field layout of the DoorAjarConfig Trait.
@@ -41773,117 +41914,9 @@ This enumeration defines the valid values of the Present Value of the AwayModePr
   </tbody>
 </table>
 
-##### DemoVoiceVolumeEnum8 Type {#ref_DemoVoiceVolumeEnum8}
-
-This enumeration defines the valid values of the Present Value of the DemoVoiceVolume Trait.
-
-<table>
-  <thead>
-    <tr>
-      <th>Value</th>
-      <th>Name</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x00</td>
-      <td>High</td>
-      <td>High</td>
-    </tr>
-    <tr>
-      <td>0x01</td>
-      <td>Medium</td>
-      <td>Medium</td>
-    </tr>
-    <tr>
-      <td>0x02</td>
-      <td>Low</td>
-      <td>Low</td>
-    </tr>
-    <tr>
-      <td>0x03</td>
-      <td>Mute</td>
-      <td>Mute</td>
-    </tr>
-  </tbody>
-</table>
-
 ##### AbnormalVibrationAlarmVolumeEnum8 Type {#ref_AbnormalVibrationAlarmVolumeEnum8}
 
 This enumeration defines the valid values of the Present Value of the AbnormalVibrationAlarmVolume Trait.
-
-<table>
-  <thead>
-    <tr>
-      <th>Value</th>
-      <th>Name</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x00</td>
-      <td>High</td>
-      <td>High</td>
-    </tr>
-    <tr>
-      <td>0x01</td>
-      <td>Medium</td>
-      <td>Medium</td>
-    </tr>
-    <tr>
-      <td>0x02</td>
-      <td>Low</td>
-      <td>Low</td>
-    </tr>
-    <tr>
-      <td>0x03</td>
-      <td>Mute</td>
-      <td>Mute</td>
-    </tr>
-  </tbody>
-</table>
-
-##### VoiceVolumeEnum8 Type {#ref_VoiceVolumeEnum8}
-
-This enumeration defines the valid values of the Present Value of the VoiceVolume Trait.
-
-<table>
-  <thead>
-    <tr>
-      <th>Value</th>
-      <th>Name</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x00</td>
-      <td>High</td>
-      <td>High</td>
-    </tr>
-    <tr>
-      <td>0x01</td>
-      <td>Medium</td>
-      <td>Medium</td>
-    </tr>
-    <tr>
-      <td>0x02</td>
-      <td>Low</td>
-      <td>Low</td>
-    </tr>
-    <tr>
-      <td>0x03</td>
-      <td>Mute</td>
-      <td>Mute</td>
-    </tr>
-  </tbody>
-</table>
-
-##### DoorbellVolumeEnum8 Type {#ref_DoorbellVolumeEnum8}
-
-This enumeration defines the valid values of the Present Value of the DoorbellVolume Trait.
 
 <table>
   <thead>
@@ -41975,37 +42008,6 @@ This enumeration defines the valid values of the Present Value of the ConfigOper
       <td>0x01</td>
       <td>DisableElectronicLockoutMode</td>
       <td>Disable electronic deadbolt</td>
-    </tr>
-  </tbody>
-</table>
-
-##### StateOfLowBatEnum8 Type {#ref_StateOfLowBatEnum8}
-
-This enumeration defines the valid values of the Present Value of the StateOfLowBat Trait.
-
-<table>
-  <thead>
-    <tr>
-      <th>Value</th>
-      <th>Name</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x00</td>
-      <td>False</td>
-      <td>Sufficient charge</td>
-    </tr>
-    <tr>
-      <td>0x01</td>
-      <td>True</td>
-      <td>Low battery</td>
-    </tr>
-    <tr>
-      <td>0x02</td>
-      <td>Critical</td>
-      <td>Battery exhausted</td>
     </tr>
   </tbody>
 </table>
@@ -42478,13 +42480,6 @@ This structure defines a single credential in the user record of GetAqaraUserRes
       <td>O</td>
       <td>Credential validity schedule.</td>
     </tr>
-    <tr>
-      <td>6</td>
-      <td>CredentialContent</td>
-      <td><a href="#ref_AqaraCredentialContentStruct">AqaraCredentialContentStruct</a></td>
-      <td>O</td>
-      <td>Credential content determined by CredentialType.</td>
-    </tr>
   </tbody>
 </table>
 
@@ -42530,38 +42525,6 @@ This structure defines a single user record in the Users list of GetAqaraUserRes
       <td>characterString</td>
       <td>O</td>
       <td>User display name, UTF-8 encoded, up to 20 bytes; null when not set.</td>
-    </tr>
-  </tbody>
-</table>
-
-##### GetAqaraUserResponseTraitPresentValueStructure Type {#ref_GetAqaraUserResponseTraitPresentValueStructure}
-
-This structure defines the Present Value of the GetAqaraUserResponse Trait. `Users` is a list of user record structures; `NextUserId` is a nullable pagination cursor.
-
-<table>
-  <thead>
-    <tr>
-      <th>Member ID</th>
-      <th>Field Name</th>
-      <th>Type</th>
-      <th>Mandatory</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Users</td>
-      <td>list[<a href="#ref_AqaraUserRecordStruct">AqaraUserRecordStruct</a>]</td>
-      <td>O</td>
-      <td>User record list, returning at most the Number of records requested, sorted by UserId in ascending order; an empty list when the database is empty.</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>NextUserId</td>
-      <td>uint16</td>
-      <td>M</td>
-      <td>Starting user ID for the next pagination query; null indicates the traversal is complete.</td>
     </tr>
   </tbody>
 </table>
@@ -42777,80 +42740,6 @@ This structure defines the Present Value field layout of the GetYearDayScheduleR
       <td>uint32</td>
       <td>M</td>
       <td>Local end time, in Epoch Time in Seconds; should be greater than LocalStartTime.</td>
-    </tr>
-  </tbody>
-</table>
-
-##### NetworkInterfacesTraitPresentValueStructure Type {#ref_NetworkInterfacesTraitPresentValueStructure}
-
-This structure defines the Present Value field layout of the NetworkInterfaces Trait.
-
-<table>
-  <thead>
-    <tr>
-      <th>Struct Member No.</th>
-      <th>Field Name</th>
-      <th>Type</th>
-      <th>Mandatory</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Name</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>Network interface name, max length 32 bytes.</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>IsOperational</td>
-      <td>boolean</td>
-      <td>M</td>
-      <td>Whether the interface is in the running state.</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>OffPremiseServicesReachableIPv4</td>
-      <td>boolean</td>
-      <td>O</td>
-      <td>Whether external network services can be accessed via IPv4; empty means unknown.</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>OffPremiseServicesReachableIPv6</td>
-      <td>boolean</td>
-      <td>O</td>
-      <td>Whether external network services can be accessed via IPv6; empty means unknown.</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>HardwareAddress</td>
-      <td>octetString</td>
-      <td>M</td>
-      <td>Hardware MAC address.</td>
-    </tr>
-    <tr>
-      <td>5</td>
-      <td>IPv4Addresses</td>
-      <td>list[octetString]</td>
-      <td>M</td>
-      <td>IPv4 address list.</td>
-    </tr>
-    <tr>
-      <td>6</td>
-      <td>IPv6Addresses</td>
-      <td>list[octetString]</td>
-      <td>M</td>
-      <td>IPv6 address list.</td>
-    </tr>
-    <tr>
-      <td>7</td>
-      <td>Type</td>
-      <td>enum8</td>
-      <td>M</td>
-      <td>Interface type (InterfaceTypeEnum).</td>
     </tr>
   </tbody>
 </table>
@@ -44179,23 +44068,8 @@ Parameter structure of the SetTravelCalibration Command.
       <td>O</td>
     </tr>
     <tr>
-      <td>0x50A8</td>
-      <td><a href="#ref_FirmwareDowngradeEnabled">FirmwareDowngradeEnabled</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x50A7</td>
-      <td><a href="#ref_VoiceOTAStatus">VoiceOTAStatus</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x50A6</td>
       <td><a href="#ref_OTASilentUpgrade">OTASilentUpgrade</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x50A5</td>
-      <td><a href="#ref_OTAProgress">OTAProgress</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -44254,11 +44128,6 @@ Parameter structure of the SetTravelCalibration Command.
       <td>O</td>
     </tr>
     <tr>
-      <td>0x5095</td>
-      <td><a href="#ref_DoorbellLightEnabled">DoorbellLightEnabled</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5094</td>
       <td><a href="#ref_DeviceOrientation">DeviceOrientation</a></td>
       <td>O</td>
@@ -44304,18 +44173,8 @@ Parameter structure of the SetTravelCalibration Command.
       <td>O</td>
     </tr>
     <tr>
-      <td>0x505F</td>
-      <td><a href="#ref_DoorLockAlarmStatus">DoorLockAlarmStatus</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x505E</td>
       <td><a href="#ref_TamperAlarmEnabled">TamperAlarmEnabled</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x505D</td>
-      <td><a href="#ref_HardInfo">HardInfo</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -44349,23 +44208,8 @@ Parameter structure of the SetTravelCalibration Command.
       <td>O</td>
     </tr>
     <tr>
-      <td>0x5056</td>
-      <td><a href="#ref_DemoVoiceVolume">DemoVoiceVolume</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5055</td>
       <td><a href="#ref_AbnormalVibrationAlarmVolume">AbnormalVibrationAlarmVolume</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5054</td>
-      <td><a href="#ref_VoiceVolume">VoiceVolume</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5053</td>
-      <td><a href="#ref_DoorbellVolume">DoorbellVolume</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -44399,21 +44243,6 @@ Parameter structure of the SetTravelCalibration Command.
       <td>O</td>
     </tr>
     <tr>
-      <td>0x4EF3</td>
-      <td><a href="#ref_VoiceLanguage">VoiceLanguage</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x4F09</td>
-      <td><a href="#ref_OTAState">OTAState</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5080</td>
-      <td><a href="#ref_ChildLock">ChildLock</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5169</td>
       <td><a href="#ref_ButtonLockUnlockEnabled">ButtonLockUnlockEnabled</a></td>
       <td>O</td>
@@ -44431,16 +44260,6 @@ Parameter structure of the SetTravelCalibration Command.
     <tr>
       <td>0x514F</td>
       <td><a href="#ref_SpeedFollowEnabled">SpeedFollowEnabled</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5149</td>
-      <td><a href="#ref_DoorbellEnabled">DoorbellEnabled</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x514A</td>
-      <td><a href="#ref_DoorbellSensitivity">DoorbellSensitivity</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -44514,11 +44333,6 @@ Parameter structure of the SetTravelCalibration Command.
       <td>O</td>
     </tr>
     <tr>
-      <td>0x80C9</td>
-      <td><a href="#ref_StateOfLowBat">StateOfLowBat</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x4E71</td>
       <td><a href="#ref_GetCredentialStatusResponse">GetCredentialStatusResponse</a></td>
       <td>O</td>
@@ -44571,11 +44385,6 @@ Parameter structure of the SetTravelCalibration Command.
     <tr>
       <td>0x4E66</td>
       <td><a href="#ref_NumberOfTotalUsersSupported">NumberOfTotalUsersSupported</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x4E2A</td>
-      <td><a href="#ref_NetworkInterfaces">NetworkInterfaces</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -45201,107 +45010,6 @@ Should indicate the current Wi-Fi connection status of the device, encoded as th
   </tbody>
 </table>
 
-#### FirmwareDowngradeEnabled Trait {#ref_FirmwareDowngradeEnabled}
-
-Should control whether the device firmware version can be downgraded. false (0) should prohibit downgrade; true (1) should allow downgrade.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x50A8</td>
-      <td>FirmwareDowngradeEnabled</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td>0</td>
-      <td>W</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### VoiceOTAStatus Trait {#ref_VoiceOTAStatus}
-
-Should indicate the current voice firmware OTA upgrade status.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x50A7</td>
-      <td>VoiceOTAStatus</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td><a href="#ref_VoiceOTAStatusTraitPresentValueStructure">VoiceOTAStatusTraitPresentValueStructure</a></td>
-      <td></td>
-      <td></td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
 #### OTASilentUpgrade Trait {#ref_OTASilentUpgrade}
 
 Should configure the silent OTA firmware upgrade function.
@@ -45343,79 +45051,6 @@ Should configure the silent OTA firmware upgrade function.
       <td></td>
       <td></td>
       <td>RVW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### OTAProgress Trait {#ref_OTAProgress}
-
-Should indicate the current OTA firmware progress, reporting the upgrade completion percentage in the range 1 to 100.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x50A5</td>
-      <td>OTAProgress</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td>1</td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0002</td>
-      <td>Maximum Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td>100</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0003</td>
-      <td>Minimum Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td>1</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0005</td>
-      <td>Step Value</td>
-      <td>uint32</td>
-      <td></td>
-      <td>1</td>
-      <td>R</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -45998,116 +45633,6 @@ This Trait indicates the timestamp of the most recent change of the reported doo
   </tbody>
 </table>
 
-#### VoiceLanguage Trait {#ref_VoiceLanguage}
-
-This Trait indicates the current voice broadcast language.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x4EF3</td>
-      <td>VoiceLanguage</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td></td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0006</td>
-      <td>Supported Value</td>
-      <td>list[uint8]</td>
-      <td></td>
-      <td></td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td>1</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### OTAState Trait {#ref_OTAState}
-
-This Trait indicates the current OTA firmware upgrade state of the device.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x4F09</td>
-      <td>OTAState</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td>1</td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
 #### ButtonLockUnlockEnabled Trait {#ref_ButtonLockUnlockEnabled}
 
 This Trait is used to enable or disable the single-press button lock/unlock function. When the value is `true`, the user can lock or unlock by a single press of the button; when the value is `false`, this function is disabled.
@@ -46322,116 +45847,6 @@ This Trait is used to control whether the speed follow function of the door lock
       <td>boolean</td>
       <td></td>
       <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### DoorbellEnabled Trait {#ref_DoorbellEnabled}
-
-This Trait is used to enable or disable the doorbell function.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5149</td>
-      <td>DoorbellEnabled</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td>0</td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### DoorbellSensitivity Trait {#ref_DoorbellSensitivity}
-
-This Trait indicates the doorbell sensing sensitivity level.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x514A</td>
-      <td>DoorbellSensitivity</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td>1</td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>uint8</td>
-      <td></td>
-      <td>1</td>
       <td>RW</td>
       <td>O</td>
     </tr>
@@ -47372,61 +46787,6 @@ Should configure the motor speed level used in normal (daily) operating mode, i.
   </tbody>
 </table>
 
-#### DoorbellLightEnabled Trait {#ref_DoorbellLightEnabled}
-
-Should enable or disable the doorbell indicator light.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5095</td>
-      <td>DoorbellLightEnabled</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td>0</td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
 #### DeviceOrientation Trait {#ref_DeviceOrientation}
 
 Should configure the physical orientation of the door lock. DoorOpenDirection uses the DoorOpenDirectionEnum Type to specify whether the door opens outward or inward.
@@ -47905,52 +47265,6 @@ Should configure the authentication method allowed to enter the device local men
   </tbody>
 </table>
 
-#### DoorLockAlarmStatus Trait {#ref_DoorLockAlarmStatus}
-
-Should report the current combined state of the door lock device as a read-only snapshot. This attribute should be null when the device has not yet reported its state.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x505F</td>
-      <td>DoorLockAlarmStatus</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td><a href="#ref_DoorLockAlarmStatusTraitPresentValueStructure">DoorLockAlarmStatusTraitPresentValueStructure</a></td>
-      <td></td>
-      <td></td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
 #### TamperAlarmEnabled Trait {#ref_TamperAlarmEnabled}
 
 Should enable or disable the tamper alarm. When set to true, the door lock should trigger an alarm when a tamper event is detected.
@@ -48001,52 +47315,6 @@ Should enable or disable the tamper alarm. When set to true, the door lock shoul
       <td></td>
       <td>0</td>
       <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### HardInfo Trait {#ref_HardInfo}
-
-Should provide a read-only string encoding the version and identity information of the door lock device and its back cover module. This string should be UTF-8 encoded, with a maximum length of 256 bytes.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x505D</td>
-      <td>HardInfo</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>characterString</td>
-      <td></td>
-      <td></td>
-      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -48382,70 +47650,6 @@ Should configure the volume level of the away mode arm/disarm prompts.
   </tbody>
 </table>
 
-#### DemoVoiceVolume Trait {#ref_DemoVoiceVolume}
-
-Should configure the demo firmware voice volume level, used for showroom demonstration.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5056</td>
-      <td>DemoVoiceVolume</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td><a href="#ref_DemoVoiceVolumeEnum8">DemoVoiceVolumeEnum8</a></td>
-      <td></td>
-      <td>0</td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0006</td>
-      <td>Supported Value</td>
-      <td>list[<a href="#ref_DemoVoiceVolumeEnum8">DemoVoiceVolumeEnum8</a>]</td>
-      <td></td>
-      <td></td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td><a href="#ref_DemoVoiceVolumeEnum8">DemoVoiceVolumeEnum8</a></td>
-      <td></td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
 #### AbnormalVibrationAlarmVolume Trait {#ref_AbnormalVibrationAlarmVolume}
 
 Should configure the abnormal vibration alarm volume level, used for the safe box function.
@@ -48502,134 +47706,6 @@ Should configure the abnormal vibration alarm volume level, used for the safe bo
       <td>0x0007</td>
       <td>Default Value</td>
       <td><a href="#ref_AbnormalVibrationAlarmVolumeEnum8">AbnormalVibrationAlarmVolumeEnum8</a></td>
-      <td></td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### VoiceVolume Trait {#ref_VoiceVolume}
-
-Should configure the voice prompt volume level.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5054</td>
-      <td>VoiceVolume</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td><a href="#ref_VoiceVolumeEnum8">VoiceVolumeEnum8</a></td>
-      <td></td>
-      <td>0</td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0006</td>
-      <td>Supported Value</td>
-      <td>list[<a href="#ref_VoiceVolumeEnum8">VoiceVolumeEnum8</a>]</td>
-      <td></td>
-      <td></td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td><a href="#ref_VoiceVolumeEnum8">VoiceVolumeEnum8</a></td>
-      <td></td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### DoorbellVolume Trait {#ref_DoorbellVolume}
-
-Should configure the doorbell volume level.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5053</td>
-      <td>DoorbellVolume</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td><a href="#ref_DoorbellVolumeEnum8">DoorbellVolumeEnum8</a></td>
-      <td></td>
-      <td>0</td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0006</td>
-      <td>Supported Value</td>
-      <td>list[<a href="#ref_DoorbellVolumeEnum8">DoorbellVolumeEnum8</a>]</td>
-      <td></td>
-      <td></td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td><a href="#ref_DoorbellVolumeEnum8">DoorbellVolumeEnum8</a></td>
       <td></td>
       <td>0</td>
       <td>RW</td>
@@ -48914,61 +47990,6 @@ This Trait is used for access to and reporting of "door lock configuration opera
       <td>0x0006</td>
       <td>Supported Value</td>
       <td>list[<a href="#ref_ConfigOperationEnum8">ConfigOperationEnum8</a>]</td>
-      <td></td>
-      <td></td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### StateOfLowBat Trait {#ref_StateOfLowBat}
-
-Indicates whether the battery is in a low battery state. 0: Normal, 1: Low battery, 2: Critically low.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x80C9</td>
-      <td>StateOfLowBat</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td><a href="#ref_StateOfLowBatEnum8">StateOfLowBatEnum8</a></td>
-      <td></td>
-      <td>0</td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0006</td>
-      <td>Supported Value</td>
-      <td>list[<a href="#ref_StateOfLowBatEnum8">StateOfLowBatEnum8</a>]</td>
       <td></td>
       <td></td>
       <td>R</td>
@@ -49686,52 +48707,6 @@ This Trait is used for access to and reporting of "total door lock user count" d
       <td></td>
       <td>0</td>
       <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### NetworkInterfaces Trait {#ref_NetworkInterfaces}
-
-This feature describes the network interfaces supported by the device.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x4E2A</td>
-      <td>NetworkInterfaces</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>list[<a href="#ref_NetworkInterfacesTraitPresentValueStructure">NetworkInterfacesTraitPresentValueStructure</a>]</td>
-      <td></td>
-      <td></td>
-      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -51224,7 +50199,7 @@ This command is used to respond to `DeleteAqaraUser`, reporting the user deletio
 
 #### GetAqaraUserResponse Response Data Format {#ref_GetAqaraUserResponseResponseFormat}
 
-The device returns user records and a pagination cursor in this response. The table below only lists the fields used by the Aqara Spec user data model; the Trait only stores `Users`, not including `ErrorCode`. Field IDs follow the Extension definitions.
+The device returns user records in this response; the `SourceId` in the Extension response does not enter the Trait.; the Trait only stores `Users`, not including `ErrorCode`. Field IDs follow the Extension definitions.
 
 <table>
   <thead>
@@ -51238,18 +50213,11 @@ The device returns user records and a pagination cursor in this response. The ta
   </thead>
   <tbody>
     <tr>
-      <td>2</td>
+      <td>0</td>
       <td>Users</td>
       <td>list[<a href="#ref_AqaraUserRecordStruct">AqaraUserRecordStruct</a>]</td>
       <td>O</td>
       <td>User record list, returning at most the Number of records requested, sorted by UserId in ascending order; an empty list when the database is empty.</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>NextUserId</td>
-      <td>uint16</td>
-      <td>M</td>
-      <td>Starting user ID for the next pagination query; null indicates the traversal is complete.</td>
     </tr>
   </tbody>
 </table>
@@ -62112,6 +61080,30 @@ Provides doorbell-related capabilities, including call event reporting and linka
       <td>Outdoor doorbell volume</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5053</td>
+      <td><a href="#ref_DoorbellVolume">DoorbellVolume</a></td>
+      <td>Doorbell volume</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5095</td>
+      <td><a href="#ref_DoorbellLightEnabled">DoorbellLightEnabled</a></td>
+      <td>Doorbell light enabled</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5149</td>
+      <td><a href="#ref_DoorbellEnabled">DoorbellEnabled</a></td>
+      <td>Doorbell enabled</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x514A</td>
+      <td><a href="#ref_DoorbellSensitivity">DoorbellSensitivity</a></td>
+      <td>Doorbell sensitivity</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -62226,6 +61218,42 @@ This enumeration defines the valid values of the Present Value of the DoorbellRi
   </tbody>
 </table>
 
+##### DoorbellVolumeEnum8 Type {#ref_DoorbellVolumeEnum8}
+
+This enumeration defines the valid values of the Present Value of the DoorbellVolume Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>High</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Medium</td>
+      <td>Medium</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Low</td>
+      <td>Low</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Mute</td>
+      <td>Mute</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### TriggerDoorbellWake Command Structure Type {#ref_TriggerDoorbellWakeCommandStructure}
 
 Parameter structure of the TriggerDoorbellWake Command.
@@ -62290,6 +61318,26 @@ Parameter structure of the TriggerDoorbellWake Command.
     <tr>
       <td>0x518C</td>
       <td><a href="#ref_OutdoorBellVolume">OutdoorBellVolume</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5053</td>
+      <td><a href="#ref_DoorbellVolume">DoorbellVolume</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5095</td>
+      <td><a href="#ref_DoorbellLightEnabled">DoorbellLightEnabled</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5149</td>
+      <td><a href="#ref_DoorbellEnabled">DoorbellEnabled</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x514A</td>
+      <td><a href="#ref_DoorbellSensitivity">DoorbellSensitivity</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -62709,6 +61757,235 @@ Outdoor doorbell volume. Represents the volume level of the outdoor doorbell, ra
       <td>float</td>
       <td></td>
       <td>50</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DoorbellEnabled Trait {#ref_DoorbellEnabled}
+
+This Trait is used to enable or disable the doorbell function.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5149</td>
+      <td>DoorbellEnabled</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DoorbellSensitivity Trait {#ref_DoorbellSensitivity}
+
+This Trait indicates the doorbell sensing sensitivity level.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x514A</td>
+      <td>DoorbellSensitivity</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>1</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>1</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DoorbellLightEnabled Trait {#ref_DoorbellLightEnabled}
+
+Should enable or disable the doorbell indicator light.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5095</td>
+      <td>DoorbellLightEnabled</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DoorbellVolume Trait {#ref_DoorbellVolume}
+
+Should configure the doorbell volume level.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5053</td>
+      <td>DoorbellVolume</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_DoorbellVolumeEnum8">DoorbellVolumeEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_DoorbellVolumeEnum8">DoorbellVolumeEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_DoorbellVolumeEnum8">DoorbellVolumeEnum8</a></td>
+      <td></td>
+      <td>0</td>
       <td>RW</td>
       <td>O</td>
     </tr>
@@ -68627,6 +67904,18 @@ Provides general device configuration items, such as sensitivity, delay, default
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5056</td>
+      <td><a href="#ref_DemoVoiceVolume">DemoVoiceVolume</a></td>
+      <td>Demo voice volume</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5054</td>
+      <td><a href="#ref_VoiceVolume">VoiceVolume</a></td>
+      <td>Voice volume</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4E85</td>
       <td><a href="#ref_OutputInterlockFlag">OutputInterlockFlag</a></td>
       <td>Switch interlock enable configuration flag</td>
@@ -69686,6 +68975,78 @@ This enumeration defines the valid values of the Present Value of the VoiceLangu
   </tbody>
 </table>
 
+#### DemoVoiceVolumeEnum8 Type {#ref_DemoVoiceVolumeEnum8}
+
+This enumeration defines the valid values of the Present Value of the DemoVoiceVolume Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>High</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Medium</td>
+      <td>Medium</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Low</td>
+      <td>Low</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Mute</td>
+      <td>Mute</td>
+    </tr>
+  </tbody>
+</table>
+
+#### VoiceVolumeEnum8 Type {#ref_VoiceVolumeEnum8}
+
+This enumeration defines the valid values of the Present Value of the VoiceVolume Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>High</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Medium</td>
+      <td>Medium</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Low</td>
+      <td>Low</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Mute</td>
+      <td>Mute</td>
+    </tr>
+  </tbody>
+</table>
+
 #### ResetModeEnum8 Type {#ref_ResetModeEnum8}
 
 This enumeration defines the valid values of the Present Value of the ResetMode Trait.
@@ -69957,6 +69318,16 @@ This enumeration defines the valid values of the Present Value of the PublicCapO
     <tr>
       <td>0x4EF3</td>
       <td><a href="#ref_VoiceLanguage">VoiceLanguage</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5056</td>
+      <td><a href="#ref_DemoVoiceVolume">DemoVoiceVolume</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5054</td>
+      <td><a href="#ref_VoiceVolume">VoiceVolume</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -71068,6 +70439,134 @@ The language used for voice prompts and voice feedback.
       <td>1</td>
       <td>RW</td>
       <td></td>
+    </tr>
+  </tbody>
+</table>
+
+#### DemoVoiceVolume Trait {#ref_DemoVoiceVolume}
+
+Should configure the demo firmware voice volume level, used for showroom demonstration.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5056</td>
+      <td>DemoVoiceVolume</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_DemoVoiceVolumeEnum8">DemoVoiceVolumeEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_DemoVoiceVolumeEnum8">DemoVoiceVolumeEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_DemoVoiceVolumeEnum8">DemoVoiceVolumeEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### VoiceVolume Trait {#ref_VoiceVolume}
+
+Should configure the voice prompt volume level.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5054</td>
+      <td>VoiceVolume</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_VoiceVolumeEnum8">VoiceVolumeEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_VoiceVolumeEnum8">VoiceVolumeEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_VoiceVolumeEnum8">VoiceVolumeEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
     </tr>
   </tbody>
 </table>
@@ -99797,6 +99296,18 @@ Manages the device firmware upgrade process, including download, installation sc
       <td>O</td>
     </tr>
     <tr>
+      <td>0x50A7</td>
+      <td><a href="#ref_VoiceOTAStatus">VoiceOTAStatus</a></td>
+      <td>Voice firmware upgrade</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x50A5</td>
+      <td><a href="#ref_OTAProgress">OTAProgress</a></td>
+      <td>OTA progress</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4EE1</td>
       <td><a href="#ref_UpgradeTypeSetting">UpgradeTypeSetting</a></td>
       <td>Upgrade type setting</td>
@@ -99909,6 +99420,38 @@ This enumeration defines the valid values of the Present Value of the UpgradeTyp
   </tbody>
 </table>
 
+##### VoiceOTAStatusTraitPresentValueStructure Type {#ref_VoiceOTAStatusTraitPresentValueStructure}
+
+This structure defines the Present Value field layout of the VoiceOTAStatus Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td>enum8</td>
+      <td>M</td>
+      <td>Voice firmware OTA upgrade status.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Progress</td>
+      <td>uint8</td>
+      <td>O</td>
+      <td>Upgrade progress percentage, ranging from 1 to 100.</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait Definitions
 
 <table>
@@ -99923,6 +99466,16 @@ This enumeration defines the valid values of the Present Value of the UpgradeTyp
     <tr>
       <td>0x4F09</td>
       <td><a href="#ref_OTAState">OTAState</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x50A7</td>
+      <td><a href="#ref_VoiceOTAStatus">VoiceOTAStatus</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x50A5</td>
+      <td><a href="#ref_OTAProgress">OTAProgress</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -99997,6 +99550,125 @@ An enumerated value that provides real-time visibility into the overall progress
       <td></td>
       <td>1</td>
       <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### VoiceOTAStatus Trait {#ref_VoiceOTAStatus}
+
+Should indicate the current voice firmware OTA upgrade status.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x50A7</td>
+      <td>VoiceOTAStatus</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_VoiceOTAStatusTraitPresentValueStructure">VoiceOTAStatusTraitPresentValueStructure</a></td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### OTAProgress Trait {#ref_OTAProgress}
+
+Should indicate the current OTA firmware progress, reporting the upgrade completion percentage in the range 1 to 100.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x50A5</td>
+      <td>OTAProgress</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>1</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>100</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>Step Value</td>
+      <td>uint32</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -124507,6 +124179,122 @@ This enumeration defines the valid values of the ActionType field in EffectData,
       <td>0x05</td>
       <td>NaturalAtmosphereEffect</td>
       <td>Natural atmosphere scene using NaturalEffectId</td>
+    </tr>
+  </tbody>
+</table>
+
+##### DynamicEffectIdEnum8 Type {#ref_DynamicEffectIdEnum8}
+
+This enumeration defines the dynamic effect engine ID used by DynamicEffect and SegmentDynamicEffect, and is used by the SupportedDynamicEffectIds Trait to declare the dynamic effects supported by the device.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Undefined</td>
+      <td>Undefined</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Breathe</td>
+      <td>Breathe</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Candle</td>
+      <td>Candle</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Colorful</td>
+      <td>Colorful</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>Blink</td>
+      <td>Blink</td>
+    </tr>
+    <tr>
+      <td>0x05</td>
+      <td>Gradient</td>
+      <td>Gradient</td>
+    </tr>
+    <tr>
+      <td>0x06</td>
+      <td>AlternateBreath</td>
+      <td>Alternate breathing</td>
+    </tr>
+    <tr>
+      <td>0x07</td>
+      <td>ForwardFlow</td>
+      <td>Forward flow</td>
+    </tr>
+    <tr>
+      <td>0x08</td>
+      <td>ReverseFlow</td>
+      <td>Reverse flow</td>
+    </tr>
+    <tr>
+      <td>0x09</td>
+      <td>Jump</td>
+      <td>Jump</td>
+    </tr>
+    <tr>
+      <td>0x0A</td>
+      <td>Celebration</td>
+      <td>Celebration</td>
+    </tr>
+    <tr>
+      <td>0x0B</td>
+      <td>BidirectionalCelebration</td>
+      <td>Bidirectional celebration</td>
+    </tr>
+    <tr>
+      <td>0x0C</td>
+      <td>Chase</td>
+      <td>Chase</td>
+    </tr>
+    <tr>
+      <td>0x0D</td>
+      <td>ReverseChase</td>
+      <td>Reverse chase</td>
+    </tr>
+    <tr>
+      <td>0x0E</td>
+      <td>Firefly</td>
+      <td>Firefly</td>
+    </tr>
+    <tr>
+      <td>0x0F</td>
+      <td>Starry</td>
+      <td>Starry</td>
+    </tr>
+    <tr>
+      <td>0x10</td>
+      <td>Bounce</td>
+      <td>Bounce</td>
+    </tr>
+    <tr>
+      <td>0x11</td>
+      <td>Meteor</td>
+      <td>Meteor</td>
+    </tr>
+    <tr>
+      <td>0x12</td>
+      <td>ReverseMeteor</td>
+      <td>Reverse meteor</td>
+    </tr>
+    <tr>
+      <td>0x13</td>
+      <td>Stack</td>
+      <td>Stack</td>
     </tr>
   </tbody>
 </table>
