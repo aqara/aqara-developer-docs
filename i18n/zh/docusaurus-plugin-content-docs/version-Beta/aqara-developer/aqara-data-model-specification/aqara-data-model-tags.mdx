@@ -38175,6 +38175,11 @@ MediaPlaybackCommand表示媒体播放命令，适用于多种类型的媒体（
       <td><a href="#ref_PlayTTS">PlayTTS</a></td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x9DBB</td>
+      <td><a href="#ref_LoadHomeTheaterPlayback">LoadHomeTheaterPlayback</a></td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -38469,6 +38474,11 @@ PlayTTS Command 的参数结构体。
       <td><a href="#ref_PlayTTS">PlayTTS</a></td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x9DBB</td>
+      <td><a href="#ref_LoadHomeTheaterPlayback">LoadHomeTheaterPlayback</a></td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -38479,6 +38489,14 @@ PlayTTS Command 的参数结构体。
 ##### 参数
 
 [PlayTTS Command Structure](#ref_PlayTTSCommandStructure)
+
+#### LoadHomeTheaterPlayback Command {#ref_LoadHomeTheaterPlayback}
+
+音箱加载家庭影院播放。
+
+Loads home theater playback on the speaker.
+
+该 Command 无参数。
 
 ## PowerSource（电源） {#ref_Aqara_Spec_PowerSource}
 
@@ -39763,8 +39781,8 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
     </tr>
     <tr>
       <td>0x51F1</td>
-      <td><a href="#ref_GetAqaraUserResponse">GetAqaraUserResponse</a></td>
-      <td>获取Aqara用户响应</td>
+      <td><a href="#ref_AqaraUserList">AqaraUserList</a></td>
+      <td>Aqara用户列表</td>
       <td>O</td>
     </tr>
     <tr>
@@ -42425,7 +42443,7 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
 
 ##### AqaraCredentialItemStruct Type {#ref_AqaraCredentialItemStruct}
 
-该结构体定义 GetAqaraUserResponse 用户记录中的单条凭证。
+该结构体定义 AqaraUserList 中用户记录的单条凭证。
 
 <table>
   <thead>
@@ -42485,7 +42503,7 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
 
 ##### AqaraUserRecordStruct Type {#ref_AqaraUserRecordStruct}
 
-该结构体定义 GetAqaraUserResponse Present Value 列表中的单条用户记录，包含用户标识、用户类型、凭证及可选用户名。
+该结构体定义 AqaraUserList Present Value 列表中的单条用户记录，包含用户标识、用户类型、凭证及可选用户名。
 
 <table>
   <thead>
@@ -43944,38 +43962,6 @@ AddAqaraUser Command 的参数结构体。
   </tbody>
 </table>
 
-##### GetAqaraUser Command Structure Type {#ref_GetAqaraUserCommandStructure}
-
-GetAqaraUser Command 的参数结构体。
-
-<table>
-  <thead>
-    <tr>
-      <th>结构体成员序号</th>
-      <th>字段名</th>
-      <th>类型</th>
-      <th>必须</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>1</td>
-      <td>UserId</td>
-      <td>uint16</td>
-      <td>M</td>
-      <td>要查询的起始用户ID；用户ID从 1 开始。</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>Number</td>
-      <td>uint8</td>
-      <td>M</td>
-      <td>单次请求返回的最大用户记录数，最小值为 1。</td>
-    </tr>
-  </tbody>
-</table>
-
 ##### SetTravelCalibration Command Structure Type {#ref_SetTravelCalibrationCommandStructure}
 
 SetTravelCalibration Command 的参数结构体。
@@ -44049,7 +44035,7 @@ SetTravelCalibration Command 的参数结构体。
     </tr>
     <tr>
       <td>0x51F1</td>
-      <td><a href="#ref_GetAqaraUserResponse">GetAqaraUserResponse</a></td>
+      <td><a href="#ref_AqaraUserList">AqaraUserList</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -48136,9 +48122,9 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
   </tbody>
 </table>
 
-#### GetAqaraUserResponse Trait（获取Aqara用户响应） {#ref_GetAqaraUserResponse}
+#### AqaraUserList Trait（Aqara用户列表） {#ref_AqaraUserList}
 
-该 Trait 用于承载 `GetAqaraUserResponse` 返回的用户记录列表。
+维护全部 Aqara 用户列表。
 
 <table>
   <thead>
@@ -48150,7 +48136,7 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
   <tbody>
     <tr>
       <td>0x51F1</td>
-      <td>GetAqaraUserResponse</td>
+      <td>AqaraUserList</td>
     </tr>
   </tbody>
 </table>
@@ -50197,7 +50183,7 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
   </tbody>
 </table>
 
-#### GetAqaraUserResponse 响应数据格式 {#ref_GetAqaraUserResponseResponseFormat}
+#### AqaraUserList 响应数据格式 {#ref_AqaraUserListResponseFormat}
 
 设备以该响应返回用户记录；Extension 响应中的 `SourceId` 不进入 Trait。
 
@@ -50217,7 +50203,7 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
       <td>Users</td>
       <td>list[<a href="#ref_AqaraUserRecordStruct">AqaraUserRecordStruct</a>]</td>
       <td>O</td>
-      <td>用户记录列表，最多返回请求中的 Number 条记录，并按 UserId 升序排列；空数据库时为空列表。</td>
+      <td>用户记录列表，按 UserId 升序排列；空数据库时为空列表。</td>
     </tr>
   </tbody>
 </table>
@@ -50742,11 +50728,9 @@ ClearUser（清除用户）
 
 #### GetAqaraUser Command {#ref_GetAqaraUser}
 
-该命令应请求门锁返回一条或多条用户记录（每条携带用户属性及关联凭证）。设备应以 GetAqaraUserResponse 响应，从 UserId 起最多返回 Number 条记录；需要继续查询时，客户端可根据已返回的用户 ID 发起后续请求。
+该命令应请求门锁上报用户数据库中的全部用户记录。设备应将用户记录列表写入 AqaraUserList Trait 的 Present Value。
 
-##### 参数
-
-[GetAqaraUser Command Structure](#ref_GetAqaraUserCommandStructure)
+该 Command 无参数。
 
 #### DeleteAqaraUser Command {#ref_DeleteAqaraUser}
 
@@ -71984,6 +71968,12 @@ Server 下发该命令，用于将设备从睡眠或待机模式唤醒。该命�
       <td>链路检测</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x524D</td>
+      <td><a href="#ref_AIOTBindState">AIOTBindState</a></td>
+      <td>AIOT绑定状态</td>
+      <td>M</td>
+    </tr>
   </tbody>
 </table>
 
@@ -72323,6 +72313,32 @@ Server 下发该命令，用于将设备从睡眠或待机模式唤醒。该命�
       <td>0xFF</td>
       <td>Unspecified</td>
       <td>未指定或未知</td>
+    </tr>
+  </tbody>
+</table>
+
+##### AIOTBindStateEnum8 Type {#ref_AIOTBindStateEnum8}
+
+该枚举定义 AIOTBindState Trait 的 Present Value 有效取值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Unbound</td>
+      <td>未绑定</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Bound</td>
+      <td>已绑定</td>
     </tr>
   </tbody>
 </table>
@@ -72744,6 +72760,57 @@ Reboot Command 的参数结构体。
       <td>0x5106</td>
       <td><a href="#ref_CommLinkDetection">CommLinkDetection</a></td>
       <td>O</td>
+    </tr>
+    <tr>
+      <td>0x524D</td>
+      <td><a href="#ref_AIOTBindState">AIOTBindState</a></td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### AIOTBindState Trait（AIOT绑定状态） {#ref_AIOTBindState}
+
+SHALL indicate the state of AIOT Unbound or Bound.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x524D</td>
+      <td>AIOTBindState</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_AIOTBindStateEnum8">AIOTBindStateEnum8</a></td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>M</td>
     </tr>
   </tbody>
 </table>
@@ -123868,6 +123935,11 @@ WashDryCombinationCommand Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x524F</td>
+      <td><a href="#ref_LedLayoutPositions">LedLayoutPositions</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5034</td>
       <td><a href="#ref_FlowMode">FlowMode</a></td>
       <td>O</td>
@@ -124000,6 +124072,38 @@ WashDryCombinationCommand Command 的参数结构体。
 </table>
 
 ### 数据类型
+
+##### LedLayoutPointStruct Type {#ref_LedLayoutPointStruct}
+
+该结构体描述单个 LED 网格单元在产品平面坐标系中的相对位置。坐标用于视觉布局，不表示毫米等绝对物理单位或实际比例。
+
+<table>
+  <thead>
+    <tr>
+      <th>成员 ID</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>约束</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>X</td>
+      <td>uint8</td>
+      <td>0-255</td>
+      <td>X 坐标；向右递增。坐标原点由产品定义，通常为设备外框左上角。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Y</td>
+      <td>uint8</td>
+      <td>0-255</td>
+      <td>Y 坐标；向下递增。坐标原点由产品定义，通常为设备外框左上角。</td>
+    </tr>
+  </tbody>
+</table>
 
 ##### EffectInfoTraitPresentValueStructure Type {#ref_EffectInfoTraitPresentValueStructure}
 
@@ -124878,6 +124982,11 @@ RemoveUserDefinedEffects Command 的参数结构体。
     <tr>
       <td>0x5242</td>
       <td><a href="#ref_SupportedLedGridMask">SupportedLedGridMask</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x524F</td>
+      <td><a href="#ref_LedLayoutPositions">LedLayoutPositions</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -125913,11 +126022,77 @@ Present Value 使用字符串承载该掩码；字符串编码应与设备采用
   </tbody>
 </table>
 
+#### LedLayoutPositions Trait {#ref_LedLayoutPositions}
+
+该 Trait 在设备支持 LedLayout（LL）Feature 时提供 LED 网格单元在产品平面坐标系中的相对位置有序列表，客户端可结合列表顺序渲染产品外观。
+
+列表索引 `i` 表示第 `i` 个 LED 网格单元的电气连接顺序，并应与 [LedGridMask](#ref_LedGridMask) 及 [Lighting EffectData Encoding](#ref_Lighting_EffectData_Encoding) 中的 `LedGridCount` 所使用的 LED 网格单元索引一致；数据中不单独编码索引字段。
+
+Present Value 为 `null` 时表示布局数据暂不可用，例如设备正在初始化或尚未准备好布局数据。布局数据可用后，服务端必须提供非 null、非空列表，元素数为 1-256。该值可在设备生命周期内变化。
+
+若设备同时支持 LedGridConfiguration（LGC）Feature，列表元素数量应与 [SupportedLedGridMask](#ref_SupportedLedGridMask) 所描述的 LED 网格单元集合一致。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x524F</td>
+      <td>LedLayoutPositions</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_LedLayoutPointStruct">LedLayoutPointStruct</a>]</td>
+      <td>允许 null；非 null 时为 1-256 个元素</td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+image::../images/aqara_lighting_cluster/led_layout_positions.svg[LedLayoutPositions 编码示例,820]
+
+上图展示了 8 个 LED 网格单元在产品自定义坐标系中的位置，箭头表示电气连接顺序。对应的有序属性值为：
+
+`[{X=0,Y=150}, {X=70,Y=60}, {X=150,Y=0}, {X=230,Y=70}, {X=255,Y=150}, {X=230,Y=240}, {X=70,Y=240}, {X=150,Y=150}]`
+
+image::../images/aqara_lighting_cluster/led_layout_positions_compact.svg[LedLayoutPositions 紧凑布局示例,900]
+
+紧凑示例展示了从上报坐标重建应用交互示意图的过程：每个坐标对应一个可绘制单元格，列表索引即电气连接顺序。下行颜色数据按列表索引寻址，不包含平面坐标。对应的 `LedLayoutPositions` 值为：
+
+`[{X=0,Y=1}, {X=1,Y=0}, {X=1,Y=1}, {X=2,Y=1}, {X=2,Y=0}, {X=3,Y=1}, {X=3,Y=2}, {X=2,Y=3}, {X=2,Y=2}, {X=1,Y=2}, {X=1,Y=3}, {X=0,Y=2}]`
+
 #### FlowMode Trait {#ref_FlowMode}
 
 该 Trait 指示当前配置的 Flow Mode 效果引擎。
 
 客户端可结合 Supported Value 选择当前设备支持的律动效果类型。
+
+**LedLayoutPositions 紧凑布局示例**
 
 <table>
   <thead>
