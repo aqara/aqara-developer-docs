@@ -38175,6 +38175,11 @@ Describes the speaker output capability of the device, including audio output fu
       <td><a href="#ref_PlayTTS">PlayTTS</a></td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x9DBB</td>
+      <td><a href="#ref_LoadHomeTheaterPlayback">LoadHomeTheaterPlayback</a></td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -38469,6 +38474,11 @@ Indicates or sets the step increment (e.g., volume adjustment). In this speaker 
       <td><a href="#ref_PlayTTS">PlayTTS</a></td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x9DBB</td>
+      <td><a href="#ref_LoadHomeTheaterPlayback">LoadHomeTheaterPlayback</a></td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -38479,6 +38489,12 @@ Controls the device to convert the specified text into speech and play it throug
 ##### Parameters
 
 [PlayTTS Command Structure](#ref_PlayTTSCommandStructure)
+
+#### LoadHomeTheaterPlayback Command {#ref_LoadHomeTheaterPlayback}
+
+Loads home theater playback on the speaker.
+
+This Command has no parameters.
 
 ## PowerSource {#ref_Aqara_Spec_PowerSource}
 
@@ -39763,8 +39779,8 @@ Provides core smart door lock capabilities, including lock state, user/credentia
     </tr>
     <tr>
       <td>0x51F1</td>
-      <td><a href="#ref_GetAqaraUserResponse">GetAqaraUserResponse</a></td>
-      <td>Get Aqara user response</td>
+      <td><a href="#ref_AqaraUserList">AqaraUserList</a></td>
+      <td>Aqara user list</td>
       <td>O</td>
     </tr>
     <tr>
@@ -42425,7 +42441,7 @@ This structure carries the credential-type-specific content. The valid field is 
 
 ##### AqaraCredentialItemStruct Type {#ref_AqaraCredentialItemStruct}
 
-This structure defines a single credential in the user record of GetAqaraUserResponse.
+This structure defines a single credential in the user record of AqaraUserList.
 
 <table>
   <thead>
@@ -42485,7 +42501,7 @@ This structure defines a single credential in the user record of GetAqaraUserRes
 
 ##### AqaraUserRecordStruct Type {#ref_AqaraUserRecordStruct}
 
-This structure defines a single user record in the Users list of GetAqaraUserResponse, including user identifier, user type, credentials and optional username.
+This structure defines a single user record in the Users list of AqaraUserList, including user identifier, user type, credentials and optional username.
 
 <table>
   <thead>
@@ -43944,38 +43960,6 @@ Parameter structure of the AddAqaraUser Command.
   </tbody>
 </table>
 
-##### GetAqaraUser Command Structure Type {#ref_GetAqaraUserCommandStructure}
-
-Parameter structure of the GetAqaraUser Command.
-
-<table>
-  <thead>
-    <tr>
-      <th>Struct Member No.</th>
-      <th>Field Name</th>
-      <th>Type</th>
-      <th>Mandatory</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>1</td>
-      <td>UserId</td>
-      <td>uint16</td>
-      <td>M</td>
-      <td>Starting user ID to query; user IDs start from 1.</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>Number</td>
-      <td>uint8</td>
-      <td>M</td>
-      <td>Maximum number of user records returned per request, minimum value is 1.</td>
-    </tr>
-  </tbody>
-</table>
-
 ##### SetTravelCalibration Command Structure Type {#ref_SetTravelCalibrationCommandStructure}
 
 Parameter structure of the SetTravelCalibration Command.
@@ -44049,7 +44033,7 @@ Parameter structure of the SetTravelCalibration Command.
     </tr>
     <tr>
       <td>0x51F1</td>
-      <td><a href="#ref_GetAqaraUserResponse">GetAqaraUserResponse</a></td>
+      <td><a href="#ref_AqaraUserList">AqaraUserList</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -48136,9 +48120,9 @@ This Trait is used for access to and reporting of "get user reply" data.
   </tbody>
 </table>
 
-#### GetAqaraUserResponse Trait {#ref_GetAqaraUserResponse}
+#### AqaraUserList Trait {#ref_AqaraUserList}
 
-This Trait is used to carry the user record list returned by `GetAqaraUserResponse`.
+Maintains the list of all Aqara users.
 
 <table>
   <thead>
@@ -48150,7 +48134,7 @@ This Trait is used to carry the user record list returned by `GetAqaraUserRespon
   <tbody>
     <tr>
       <td>0x51F1</td>
-      <td>GetAqaraUserResponse</td>
+      <td>AqaraUserList</td>
     </tr>
   </tbody>
 </table>
@@ -50197,7 +50181,7 @@ This command is used to respond to `DeleteAqaraUser`, reporting the user deletio
   </tbody>
 </table>
 
-#### GetAqaraUserResponse Response Data Format {#ref_GetAqaraUserResponseResponseFormat}
+#### AqaraUserList Response Data Format {#ref_AqaraUserListResponseFormat}
 
 The device returns user records in this response; the `SourceId` in the Extension response does not enter the Trait.; the Trait only stores `Users`, not including `ErrorCode`. Field IDs follow the Extension definitions.
 
@@ -50217,7 +50201,7 @@ The device returns user records in this response; the `SourceId` in the Extensio
       <td>Users</td>
       <td>list[<a href="#ref_AqaraUserRecordStruct">AqaraUserRecordStruct</a>]</td>
       <td>O</td>
-      <td>User record list, returning at most the Number of records requested, sorted by UserId in ascending order; an empty list when the database is empty.</td>
+      <td>User record list, sorted by UserId in ascending order; an empty list when the database is empty.</td>
     </tr>
   </tbody>
 </table>
@@ -50742,11 +50726,9 @@ This command should add a new credential and associate it with the existing user
 
 #### GetAqaraUser Command {#ref_GetAqaraUser}
 
-This command should request the door lock to return one or more user records (each carrying user attributes and associated credentials). The device should respond with GetAqaraUserResponse, returning at most Number records starting from UserId. This command is also the basic operation for traversing the complete user database--the client traverses the database by making chained consecutive calls and consuming the NextUserId field of each response until it is null.
+This command should request the door lock to report all user records in the user database. The device should write the user record list into the Present Value of the AqaraUserList Trait.
 
-##### Parameters
-
-[GetAqaraUser Command Structure](#ref_GetAqaraUserCommandStructure)
+This Command has no parameters.
 
 #### DeleteAqaraUser Command {#ref_DeleteAqaraUser}
 
@@ -71984,6 +71966,12 @@ Provides general diagnostic information, including uptime, reboot count, network
       <td>Link detection</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x524D</td>
+      <td><a href="#ref_AIOTBindState">AIOTBindState</a></td>
+      <td>AIOT binding state</td>
+      <td>M</td>
+    </tr>
   </tbody>
 </table>
 
@@ -72323,6 +72311,32 @@ This enumeration defines the valid values of the `AddressingMode` field in the N
       <td>0xFF</td>
       <td>Unspecified</td>
       <td>Unspecified or unknown</td>
+    </tr>
+  </tbody>
+</table>
+
+##### AIOTBindStateEnum8 Type {#ref_AIOTBindStateEnum8}
+
+This enumeration defines the valid values of the Present Value of the AIOTBindState Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Unbound</td>
+      <td>Unbound.</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Bound</td>
+      <td>Bound.</td>
     </tr>
   </tbody>
 </table>
@@ -72744,6 +72758,57 @@ Parameter structure of the Reboot Command.
       <td>0x5106</td>
       <td><a href="#ref_CommLinkDetection">CommLinkDetection</a></td>
       <td>O</td>
+    </tr>
+    <tr>
+      <td>0x524D</td>
+      <td><a href="#ref_AIOTBindState">AIOTBindState</a></td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### AIOTBindState Trait {#ref_AIOTBindState}
+
+SHALL indicate the state of AIOT Unbound or Bound.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x524D</td>
+      <td>AIOTBindState</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_AIOTBindStateEnum8">AIOTBindStateEnum8</a></td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>M</td>
     </tr>
   </tbody>
 </table>
@@ -123868,6 +123933,11 @@ The specific implementation of effects falls within the vendor's custom scope. D
       <td>O</td>
     </tr>
     <tr>
+      <td>0x524F</td>
+      <td><a href="#ref_LedLayoutPositions">LedLayoutPositions</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5034</td>
       <td><a href="#ref_FlowMode">FlowMode</a></td>
       <td>O</td>
@@ -124000,6 +124070,38 @@ The specific implementation of effects falls within the vendor's custom scope. D
 </table>
 
 ### Data Types
+
+##### LedLayoutPointStruct Type {#ref_LedLayoutPointStruct}
+
+This structure describes the relative position of a single LED grid cell in the product plane coordinate system. The coordinates are used for visual layout and do not represent absolute physical units such as millimeters or the actual scale.
+
+<table>
+  <thead>
+    <tr>
+      <th>Member ID</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>X</td>
+      <td>uint8</td>
+      <td>0-255</td>
+      <td>X coordinate; increases to the right. The coordinate origin is defined by the product, usually the top-left corner of the device outer frame.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Y</td>
+      <td>uint8</td>
+      <td>0-255</td>
+      <td>Y coordinate; increases downward. The coordinate origin is defined by the product, usually the top-left corner of the device outer frame.</td>
+    </tr>
+  </tbody>
+</table>
 
 ##### EffectInfoTraitPresentValueStructure Type {#ref_EffectInfoTraitPresentValueStructure}
 
@@ -124878,6 +124980,11 @@ Parameter structure of the RemoveUserDefinedEffects Command.
     <tr>
       <td>0x5242</td>
       <td><a href="#ref_SupportedLedGridMask">SupportedLedGridMask</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x524F</td>
+      <td><a href="#ref_LedLayoutPositions">LedLayoutPositions</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -125913,11 +126020,77 @@ The Present Value carries the mask as a string; the string encoding SHALL be con
   </tbody>
 </table>
 
+#### LedLayoutPositions Trait {#ref_LedLayoutPositions}
+
+When the device supports the LedLayout (LL) Feature, this Trait provides an ordered list of the relative positions of the LED grid cells in the product plane coordinate system; the client can render the product appearance in combination with the order of the list.
+
+List index `i` indicates the electrical connection order of the i-th LED grid cell and should be consistent with the LED grid cell index used by [LedGridMask](#ref_LedGridMask) and by `LedGridCount` in [Lighting EffectData Encoding](#ref_Lighting_EffectData_Encoding); the index field is not separately encoded in the data.
+
+A Present Value of `null` indicates that the layout data is temporarily unavailable, for example when the device is initializing or the layout data is not yet ready. Once the layout data becomes available, the server must provide a non-null, non-empty list with 1-256 elements. This value may change during the device lifecycle.
+
+If the device also supports the LedGridConfiguration (LGC) Feature, the number of list elements should be consistent with the set of LED grid cells described by [SupportedLedGridMask](#ref_SupportedLedGridMask).
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x524F</td>
+      <td>LedLayoutPositions</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_LedLayoutPointStruct">LedLayoutPointStruct</a>]</td>
+      <td>Null allowed; 1-256 elements when not null</td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+image::../images/aqara_lighting_cluster/led_layout_positions.svg[LedLayoutPositions encoding example,820]
+
+The figure above shows the positions of 8 LED grid cells in the product-defined coordinate system, with arrows indicating the electrical connection order. The corresponding ordered attribute value is:
+
+`[{X=0,Y=150}, {X=70,Y=60}, {X=150,Y=0}, {X=230,Y=70}, {X=255,Y=150}, {X=230,Y=240}, {X=70,Y=240}, {X=150,Y=150}]`
+
+image::../images/aqara_lighting_cluster/led_layout_positions_compact.svg[LedLayoutPositions compact layout example,900]
+
+The compact example shows the process of reconstructing the application interaction diagram from the reported coordinates: each coordinate corresponds to one drawable cell, and the list index is the electrical connection order. The downlink color data is addressed by list index and does not contain plane coordinates. The corresponding `LedLayoutPositions` value is:
+
+`[{X=0,Y=1}, {X=1,Y=0}, {X=1,Y=1}, {X=2,Y=1}, {X=2,Y=0}, {X=3,Y=1}, {X=3,Y=2}, {X=2,Y=3}, {X=2,Y=2}, {X=1,Y=2}, {X=1,Y=3}, {X=0,Y=2}]`
+
 #### FlowMode Trait {#ref_FlowMode}
 
 This Trait indicates the currently configured Flow Mode effect engine.
 
 Clients can select the rhythmic effect type supported by the current device in combination with the Supported Value.
+
+**LedLayoutPositions Compact Layout Example**
 
 <table>
   <thead>
