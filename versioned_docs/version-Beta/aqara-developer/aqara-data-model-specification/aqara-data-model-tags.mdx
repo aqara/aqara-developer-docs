@@ -11636,6 +11636,12 @@ This Function does not handle brightness control; brightness is provided by the 
       <td>O</td>
     </tr>
     <tr>
+      <td>0x524E</td>
+      <td><a href="#ref_XYToRGBMatrix">XYToRGBMatrix</a></td>
+      <td>XY to RGB matrix coefficients</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4EE0</td>
       <td><a href="#ref_ColorXY">ColorXY</a></td>
       <td>Color value XY</td>
@@ -12008,6 +12014,87 @@ This structure defines the Present Value field layout of WhitePointXY.
       <td>uint16</td>
       <td>M</td>
       <td>This parameter represents the normalized chromaticity value y of the device's current white point defined in the CIE xyY color space. y and the WhitePointY attribute satisfy: y = WhitePointY / 65536 (WhitePointY value range is 0 to 65279, inclusive).</td>
+    </tr>
+  </tbody>
+</table>
+
+##### XYToRGBMatrixPresentValueStructure Type {#ref_XYToRGBMatrixPresentValueStructure}
+
+This structure defines the Present Value field layout of XYToRGBMatrix. The coefficients are single-precision floating-point numbers and may be negative. The conversion relationship is: `Z = 1 - X - Y`, `R = RedA * X + RedB * Y + RedC * Z`, `G = GreenA * X + GreenB * Y + GreenC * Z`, `B = BlueA * X + BlueB * Y + BlueC * Z`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>RedA</td>
+      <td>float</td>
+      <td>M</td>
+      <td>Coefficient of the R channel with respect to the X tristimulus value of CIE XYZ.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>RedB</td>
+      <td>float</td>
+      <td>M</td>
+      <td>Coefficient of the R channel with respect to the Y tristimulus value of CIE XYZ.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>RedC</td>
+      <td>float</td>
+      <td>M</td>
+      <td>Coefficient of the R channel with respect to the Z tristimulus value of CIE XYZ.</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>GreenA</td>
+      <td>float</td>
+      <td>M</td>
+      <td>Coefficient of the G channel with respect to the X tristimulus value of CIE XYZ.</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>GreenB</td>
+      <td>float</td>
+      <td>M</td>
+      <td>Coefficient of the G channel with respect to the Y tristimulus value of CIE XYZ.</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>GreenC</td>
+      <td>float</td>
+      <td>M</td>
+      <td>Coefficient of the G channel with respect to the Z tristimulus value of CIE XYZ.</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>BlueA</td>
+      <td>float</td>
+      <td>M</td>
+      <td>Coefficient of the B channel with respect to the X tristimulus value of CIE XYZ.</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>BlueB</td>
+      <td>float</td>
+      <td>M</td>
+      <td>Coefficient of the B channel with respect to the Y tristimulus value of CIE XYZ.</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>BlueC</td>
+      <td>float</td>
+      <td>M</td>
+      <td>Coefficient of the B channel with respect to the Z tristimulus value of CIE XYZ.</td>
     </tr>
   </tbody>
 </table>
@@ -13198,6 +13285,11 @@ Parameter structure of the MoveToSaturation Command.
       <td>O</td>
     </tr>
     <tr>
+      <td>0x524E</td>
+      <td><a href="#ref_XYToRGBMatrix">XYToRGBMatrix</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4EE0</td>
       <td><a href="#ref_ColorXY">ColorXY</a></td>
       <td>O</td>
@@ -13459,6 +13551,63 @@ Defines the X and Y coordinates of the white point in the CIE 1931 chromaticity 
       <td>0x0001</td>
       <td>Present Value</td>
       <td><a href="#ref_WhitePointXYPresentValueStructure">WhitePointXYPresentValueStructure</a></td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### XYToRGBMatrix Trait {#ref_XYToRGBMatrix}
+
+XYToRGBMatrix is used to represent the 3&times;3 matrix coefficients that convert the CIE 1931 tristimulus values X, Y, and Z into RGB, for use when converting XY colors to RGB.
+
+Color shift occurs when ColorXY is sent to the RS-485 light film, and it has been corrected with a calibration algorithm. Studio images and videos do not use this algorithm and instead send RGB directly in sRGB. The color gamut of the light film differs from sRGB, so the same RGB values appear with a color deviation on the light film, and this path still has color shift. Studio needs to use the conversion formula of this Trait to re-calibrate and correct the RGB values it sends. The matrix coefficients used for calibration vary with the R/G/B/W gamut boundaries and the luminous flux of the LED beads, and therefore must not be hard-coded in Studio. The conversion flow only needs to be implemented once in Studio; the device reports its own coefficients through this Trait, and Studio reads them and recomputes the RGB with the same algorithm before sending.
+
+The conversion relationship is:
+
+* `Z = 1 - X - Y`
+* `R = RedA * X + RedB * Y + RedC * Z`
+* `G = GreenA * X + GreenB * Y + GreenC * Z`
+* `B = BlueA * X + BlueB * Y + BlueC * Z`
+
+The coefficients are single-precision floating-point numbers and may be negative. This Trait supports read and active reporting, but not write.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x524E</td>
+      <td>XYToRGBMatrix</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_XYToRGBMatrixPresentValueStructure">XYToRGBMatrixPresentValueStructure</a></td>
       <td></td>
       <td></td>
       <td>RV</td>
