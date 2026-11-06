@@ -11636,6 +11636,12 @@ StepBrightness Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x524E</td>
+      <td><a href="#ref_XYToRGBMatrix">XYToRGBMatrix</a></td>
+      <td>XY转RGB矩阵系数</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4EE0</td>
       <td><a href="#ref_ColorXY">ColorXY</a></td>
       <td>颜色值XY</td>
@@ -12008,6 +12014,87 @@ StepBrightness Command 的参数结构体。
       <td>uint16</td>
       <td>M</td>
       <td>该参数表示设备当前白点在 CIE xyY 色彩空间中定义的归一化色度值 y。y 与 WhitePointY 属性满足关系：y = WhitePointY / 65536（WhitePointY 取值范围为 0 至 65279，含边界）。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### XYToRGBMatrixPresentValueStructure Type {#ref_XYToRGBMatrixPresentValueStructure}
+
+该结构体定义 XYToRGBMatrix 的 Present Value 字段布局。系数为单精度浮点数，允许为负。转换关系为：`Z = 1 - X - Y`，`R = RedA * X + RedB * Y + RedC * Z`，`G = GreenA * X + GreenB * Y + GreenC * Z`，`B = BlueA * X + BlueB * Y + BlueC * Z`。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>RedA</td>
+      <td>float</td>
+      <td>M</td>
+      <td>R 通道对 CIE XYZ 三刺激值 X 的系数。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>RedB</td>
+      <td>float</td>
+      <td>M</td>
+      <td>R 通道对 CIE XYZ 三刺激值 Y 的系数。</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>RedC</td>
+      <td>float</td>
+      <td>M</td>
+      <td>R 通道对 CIE XYZ 三刺激值 Z 的系数。</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>GreenA</td>
+      <td>float</td>
+      <td>M</td>
+      <td>G 通道对 CIE XYZ 三刺激值 X 的系数。</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>GreenB</td>
+      <td>float</td>
+      <td>M</td>
+      <td>G 通道对 CIE XYZ 三刺激值 Y 的系数。</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>GreenC</td>
+      <td>float</td>
+      <td>M</td>
+      <td>G 通道对 CIE XYZ 三刺激值 Z 的系数。</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>BlueA</td>
+      <td>float</td>
+      <td>M</td>
+      <td>B 通道对 CIE XYZ 三刺激值 X 的系数。</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>BlueB</td>
+      <td>float</td>
+      <td>M</td>
+      <td>B 通道对 CIE XYZ 三刺激值 Y 的系数。</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>BlueC</td>
+      <td>float</td>
+      <td>M</td>
+      <td>B 通道对 CIE XYZ 三刺激值 Z 的系数。</td>
     </tr>
   </tbody>
 </table>
@@ -13198,6 +13285,11 @@ MoveToSaturation Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x524E</td>
+      <td><a href="#ref_XYToRGBMatrix">XYToRGBMatrix</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4EE0</td>
       <td><a href="#ref_ColorXY">ColorXY</a></td>
       <td>O</td>
@@ -13459,6 +13551,63 @@ ColorMode trait 用于表示照明设备当前所工作的颜色空间，即设�
       <td>0x0001</td>
       <td>Present Value</td>
       <td><a href="#ref_WhitePointXYPresentValueStructure">WhitePointXYPresentValueStructure</a></td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### XYToRGBMatrix Trait（XY转RGB矩阵系数） {#ref_XYToRGBMatrix}
+
+XYToRGBMatrix 用于表达将 CIE 1931 三刺激值 X、Y、Z 转换为 RGB 的 3&times;3 矩阵系数，供 XY 颜色转换到 RGB 时使用。
+
+RS-485 灯膜下发 ColorXY 时出现偏色，已用标定算法修正。Studio 的图片和视频不走该算法，而是按 sRGB 直接下发 RGB。灯膜色域与 sRGB 不同，同一组 RGB 数值在灯膜上的颜色就会偏离，因此这条路径仍然偏色。Studio 需要用本 Trait 的转换公式对下发的 RGB 重新标定并修正。标定所用的矩阵系数随灯珠 R/G/B/W 色域边界及光通量变化，不能在 Studio 中写死。转换流程在 Studio 实现一次即可；设备通过本 Trait 上报本机系数，Studio 读取后按同一套算法重算 RGB 再下发。
+
+转换关系为：
+
+* `Z = 1 - X - Y`
+* `R = RedA * X + RedB * Y + RedC * Z`
+* `G = GreenA * X + GreenB * Y + GreenC * Z`
+* `B = BlueA * X + BlueB * Y + BlueC * Z`
+
+系数为单精度浮点数，允许为负。该 Trait 支持读和上报，不支持写。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x524E</td>
+      <td>XYToRGBMatrix</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_XYToRGBMatrixPresentValueStructure">XYToRGBMatrixPresentValueStructure</a></td>
       <td></td>
       <td></td>
       <td>RV</td>
