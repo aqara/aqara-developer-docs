@@ -175,9 +175,12 @@ export const DocIconAuto = ({ title }) => {
     <tr>
       <th colspan="2">Comparison Item</th>
       <th><a href="./din-rail-hub-ax100m">AX100M</a></th>
-      <th><a href="./hub-ax200m">AX200M</a></th>
+      <th><a href="./hub-ax200m">M200 Pro</a></th>
+      <th><a href="./hub-m100-pro">M100 Pro</a></th>
+      <th><a href="./hub-m3-pro">M3 Pro</a></th>
       <th><a href="./edge-hub-m300">M300</a></th>
       <th>GX300M</th>
+      <th><a href="./edge-box-gx500m">GX500M</a></th>
     </tr>
   </thead>
   <tbody>
@@ -185,51 +188,72 @@ export const DocIconAuto = ({ title }) => {
       <td colspan="2">Product Type</td>
       <td>Aqara Studio<br />Sub-hub</td>
       <td>Aqara Studio<br />Sub-hub</td>
+      <td>Aqara Studio<br />Sub-hub</td>
+      <td>Aqara Studio<br />Sub-hub (Smart Hub)</td>
       <td>Aqara Studio<br />Primary Hub</td>
       <td>Aqara Studio<br />Primary Hub</td>
+      <td>Aqara Studio<br />Primary Hub (Edge Box)</td>
     </tr>
     <tr>
       <td rowspan="8">Hardware Specs</td>
       <td>2.4G/5G Dual-band Wi-Fi</td>
-      <td>√</td>
-      <td>√</td>
-      <td>√</td>
-      <td>√</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>× (2.4G Wi-Fi 6 only)</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
     </tr>
     <tr>
       <td>DDR</td>
       <td>128MB</td>
       <td>128MB</td>
+      <td>128MB</td>
+      <td>128MB</td>
       <td>1GB</td>
       <td>1GB</td>
+      <td>8GB LPDDR4X</td>
     </tr>
     <tr>
       <td>Nand Flash / EMMC</td>
       <td>256MB Nand Flash</td>
       <td>256MB Nand Flash</td>
+      <td>256MB Nand Flash</td>
+      <td>8GB EMMC</td>
       <td>64GB EMMC</td>
       <td>64GB EMMC</td>
+      <td>32GB EMMC</td>
     </tr>
     <tr>
-      <td>Expandable Storage</td>
+      <td>Expansion Storage</td>
+      <td>×</td>
+      <td>×</td>
       <td>×</td>
       <td>×</td>
       <td>Micro SD (up to 512GB)</td>
       <td>Micro SD (up to 512GB)</td>
+      <td>M.2 NVMe SSD + TF card</td>
     </tr>
     <tr>
       <td>RJ45</td>
       <td>1</td>
-      <td>1 (PoE Supported)</td>
-      <td>1 (PoE Supported)</td>
-      <td>1 (PoE Supported)</td>
+      <td>1 (PoE support)</td>
+      <td>× (no Ethernet port)</td>
+      <td>1 (PoE support)</td>
+      <td>1 (PoE support)</td>
+      <td>1 (PoE support)</td>
+      <td>2 (Gigabit)</td>
     </tr>
     <tr>
       <td>USB</td>
       <td>USB-A</td>
       <td>1×USB-A<br />1×USB-C</td>
+      <td>USB-A (power)</td>
       <td>1×USB-C</td>
       <td>1×USB-C</td>
+      <td>1×USB-C</td>
+      <td>4×USB 3.0</td>
     </tr>
     <tr>
       <td>RS485</td>
@@ -237,39 +261,57 @@ export const DocIconAuto = ({ title }) => {
       <td>×</td>
       <td>×</td>
       <td>×</td>
+      <td>×</td>
+      <td>×</td>
+      <td>4 (DB9)</td>
     </tr>
     <tr>
       <td>Recommended Mounting</td>
       <td>DIN Rail</td>
       <td>Flat/Wall/Ceiling</td>
+      <td>Flat (USB-A power)</td>
       <td>Flat/Wall/Ceiling</td>
       <td>Flat/Wall/Ceiling</td>
+      <td>Flat/Wall/Ceiling</td>
+      <td>Desktop/Wall/DIN Rail/VESA</td>
     </tr>
     <tr>
       <td rowspan="10">Software Features</td>
-      <td><a href="/docs/aqara-studio/device-integration/matter">Matter Controller, Thread Border Router</a></td>
-      <td>√</td>
-      <td>√</td>
-      <td>√</td>
-      <td>√</td>
+      <td><a href="/docs/aqara-studio/device-integration/matter">Matter Controller,<br />Thread Border Router</a></td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>×</td>
     </tr>
     <tr>
       <td><a href="/docs/aqara-studio/device-integration/zigbee">Zigbee hub</a></td>
-      <td>√</td>
-      <td>√</td>
-      <td>√</td>
-      <td>√</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>×</td>
     </tr>
     <tr>
-      <td><a href="/docs/aqara-studio/device-integration/zigbee">Matter Bridge for Aqara Zigbee Devices</a></td>
+      <td><a href="/docs/aqara-studio/device-integration/zigbee">Matter Bridge for<br />Aqara Zigbee Devices</a></td>
       <td>×</td>
       <td>×</td>
-      <td>√</td>
-      <td>√</td>
+      <td>×</td>
+      <td>×</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
     </tr>
     <tr>
       <td><a href="/docs/aqara-studio/device-integration/aqara-rs-485">AqaraModbus hub,<br />RS485 Bus Connection</a></td>
-      <td>√</td>
+      <td>✓</td>
+      <td>×</td>
+      <td>×</td>
+      <td>×</td>
       <td>×</td>
       <td>×</td>
       <td>×</td>
@@ -277,49 +319,68 @@ export const DocIconAuto = ({ title }) => {
     <tr>
       <td><a href="/docs/aqara-studio/device-integration/virtual/infrared-equipment">Universal IR Remote</a></td>
       <td>×</td>
-      <td>√</td>
-      <td>√</td>
-      <td>√</td>
+      <td>✓</td>
+      <td>×</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>×</td>
     </tr>
     <tr>
       <td><a href="/docs/aqara-studio/overview/compatible-aqara-devices">Connect B-end exclusive<br />Sub-devices</a></td>
-      <td>√</td>
-      <td>√</td>
+      <td>✓</td>
+      <td>✓</td>
       <td>×</td>
-      <td>√</td>
+      <td>×</td>
+      <td>×</td>
+      <td>✓</td>
+      <td>✓</td>
     </tr>
     <tr>
       <td>Set Static IP<DocIconAuto title="During project delivery, if a static IP needs to be set for the hub before networking, a dedicated tool is required. Please contact Aqara technical support." /></td>
-      <td>√</td>
-      <td>√</td>
-      <td>√</td>
-      <td>√</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
     </tr>
     <tr>
       <td><a href="/docs/aqara-studio/automation">Local Automation</a><DocIconAuto title="If all devices involved are connected to the same sub-gateway (including Zigbee/Thread/Aqara RS-485/IR), the automation is offloaded to that sub-gateway. Even if the connection between the sub-gateway and Studio is unstable, the automation will reliably run locally." /></td>
       <td>Supports automation offloading to sub-hub</td>
       <td>Supports automation offloading to sub-hub</td>
+      <td>Supports automation offloading to sub-hub</td>
+      <td>Supports automation offloading to sub-hub</td>
+      <td>Supports creating local automation</td>
       <td>Supports creating local automation</td>
       <td>Supports creating local automation</td>
     </tr>
     <tr>
       <td>Automation<br />Capabilities</td>
-      <td>Trigger:<br />Anti-mis-deletion<br />notification trigger<br />Action:<br />-</td>
+      <td>Trigger:<br />Anti-mis-deletion<br />notification trigger</td>
+      <td>Trigger:<br />Anti-mis-deletion<br />notification trigger<br />Action:<br />Voice playback<br />IR remote control</td>
+      <td>Trigger:<br />Anti-mis-deletion<br />notification trigger</td>
       <td>Trigger:<br />Anti-mis-deletion<br />notification trigger<br />Action:<br />Voice playback<br />IR remote control</td>
       <td>Trigger:<br />Anti-mis-deletion<br />notification trigger<br />Action:<br />Voice playback<br />IR remote control</td>
       <td>Trigger:<br />Anti-mis-deletion<br />notification trigger<br />Action:<br />Voice playback<br />IR remote control</td>
+      <td>Trigger:<br />Anti-mis-deletion<br />notification trigger<br />Action:<br />Restart/Delay/Scene/Ringtone/Volume</td>
     </tr>
     <tr>
       <td>Recommended<br />Connected<br />Sub-devices</td>
-      <td>40 Aqara Zigbee<br />+ 40 Thread<br />+ 32 Aqara RS-485</td>
+      <td>40 Aqara Zigbee<br />+ 40 Thread<br />+ 32 Aqara Modbus</td>
       <td>40 Aqara Zigbee<br />+ 40 Thread</td>
+      <td>Up to 40 Aqara Zigbee + Thread</td>
+      <td>128 Aqara Zigbee<br />+ 128 Thread</td>
       <td>Up to 300</td>
       <td>Up to 300</td>
+      <td>Up to 2000</td>
     </tr>
   </tbody>
 </table>
 
 # Selection Recommendations
 
-- **M300 / GX300M:** As Aqara Studio official standard hosts, pre-installed with Aqara Studio OS and built-in Hub, delivering out-of-the-box local deployment and operation. With stable edge computing capabilities, they are perfectly suited for smart home and small commercial project needs.
-- **AX100M / AX200M:** As Aqara Studio sub-hubs, they need to connect to M300/GX300M or other official standard hosts running Aqara Studio. Primarily used to expand Zigbee and Thread wireless network coverage and device access capacity. Suitable for scenarios requiring distributed deployment, multi-area signal extension, or protocol bridging (e.g., infrared control).
+- **M300** / **GX300M**: As Aqara Studio official standard hosts, pre-installed with Aqara Studio OS and built-in Hub, delivering out-of-the-box local deployment and operation. With stable edge computing capabilities, they are perfectly suited for smart home and small commercial project needs.
+- **GX500M**: As an Aqara Studio high-compute edge host (industrial RK3588J fanless, 8GB memory, multiple serial ports / dual Gigabit Ethernet), designed for large buildings, commercial buildings, and smart factories for multi-protocol access and centralized management; it does not directly connect Zigbee/Thread/Matter/IR and needs sub-hubs for expansion.
+- **AX100M** / **AX200M** / **M100 Pro** / **M3 Pro**: As Aqara Studio sub-hubs, they need to connect to M300/GX300M/GX500M or other hosts running Aqara Studio. Primarily used to expand Zigbee and Thread wireless network coverage and device access capacity. Suitable for scenarios requiring distributed deployment, multi-area signal extension, or protocol bridging (e.g., infrared control).
