@@ -177,8 +177,11 @@ export const DocIconAuto = ({ title }) => {
       <th colspan="2">对比项</th>
       <th><a href="./din-rail-hub-ax100m">AX100M</a></th>
       <th><a href="./hub-ax200m">AX200M</a></th>
+      <th><a href="./hub-m100-pro">M100 Pro</a></th>
+      <th><a href="./hub-m3-pro">M3 Pro</a></th>
       <th><a href="./edge-hub-m300">M300</a></th>
       <th>GX300M</th>
+      <th><a href="./edge-box-gx500m">GX500M</a></th>
     </tr>
   </thead>
   <tbody>
@@ -186,12 +189,18 @@ export const DocIconAuto = ({ title }) => {
       <td colspan="2">产品类型</td>
       <td>Aqara Studio 子网关</td>
       <td>Aqara Studio 子网关</td>
+      <td>Aqara Studio 子网关</td>
+      <td>Aqara Studio 子网关（智慧中枢）</td>
       <td>Aqara Studio 官方标准主机</td>
       <td>Aqara Studio 官方标准主机</td>
+      <td>Aqara Studio 官方标准主机（边缘盒子）</td>
     </tr>
     <tr>
       <td rowspan="8">硬件规格</td>
       <td>2.4G/5G 双频Wi-Fi</td>
+      <td>√</td>
+      <td>√</td>
+      <td>×（仅 2.4G Wi-Fi 6）</td>
       <td>√</td>
       <td>√</td>
       <td>√</td>
@@ -201,36 +210,51 @@ export const DocIconAuto = ({ title }) => {
       <td>DDR</td>
       <td>128MB</td>
       <td>128MB</td>
+      <td>128MB</td>
+      <td>128MB</td>
       <td>1GB</td>
       <td>1GB</td>
+      <td>8GB LPDDR4X</td>
     </tr>
     <tr>
       <td>Nand Flash / EMMC</td>
       <td>256MB Nand Flash</td>
       <td>256MB Nand Flash</td>
+      <td>256MB Nand Flash</td>
+      <td>8GB EMMC</td>
       <td>64GB EMMC</td>
       <td>64GB EMMC</td>
+      <td>32GB EMMC</td>
     </tr>
     <tr>
       <td>扩展存储</td>
       <td>×</td>
       <td>×</td>
+      <td>×</td>
+      <td>×</td>
       <td>Mirco SD(最多512GB)</td>
       <td>Mirco SD(最多512GB)</td>
+      <td>M.2 NVMe SSD + TF 卡</td>
     </tr>
     <tr>
       <td>RJ45</td>
       <td>1个</td>
       <td>1个(支持POE)</td>
+      <td>×（无网口）</td>
       <td>1个(支持POE)</td>
       <td>1个(支持POE)</td>
+      <td>1个(支持POE)</td>
+      <td>2个(千兆)</td>
     </tr>
     <tr>
       <td>USB</td>
       <td>USB-A</td>
-      <td>USB-A</td>
-      <td>USB-C</td>
-      <td>USB-C</td>
+      <td>1个USB-A<br />1个USB-C</td>
+      <td>USB-A（供电）</td>
+      <td>1个USB-C</td>
+      <td>1个USB-C</td>
+      <td>1个USB-C</td>
+      <td>4个USB 3.0</td>
     </tr>
     <tr>
       <td>RS485</td>
@@ -238,13 +262,19 @@ export const DocIconAuto = ({ title }) => {
       <td>×</td>
       <td>×</td>
       <td>×</td>
+      <td>×</td>
+      <td>×</td>
+      <td>4个(DB9)</td>
     </tr>
     <tr>
       <td>推荐安装方式</td>
       <td>DIN导轨</td>
       <td>平放/壁挂/吊装</td>
+      <td>平放（USB-A 供电）</td>
+      <td>平放/壁挂/吸顶</td>
       <td>平放/壁挂/吊装</td>
       <td>平放/壁挂/吊装</td>
+      <td>桌面/壁挂/DIN导轨/VESA</td>
     </tr>
     <tr>
       <td rowspan="10">软件功能</td>
@@ -253,6 +283,9 @@ export const DocIconAuto = ({ title }) => {
       <td>√</td>
       <td>√</td>
       <td>√</td>
+      <td>√</td>
+      <td>√</td>
+      <td>×</td>
     </tr>
     <tr>
       <td><a href="/zh/docs/aqara-studio/device-integration/zigbee">Zigbee 网关</a></td>
@@ -260,17 +293,26 @@ export const DocIconAuto = ({ title }) => {
       <td>√</td>
       <td>√</td>
       <td>√</td>
+      <td>√</td>
+      <td>√</td>
+      <td>×</td>
     </tr>
     <tr>
       <td><a href="/zh/docs/aqara-studio/device-integration/zigbee">Aqara Zigbee 设备的 Matter 桥接器</a></td>
       <td>×</td>
       <td>×</td>
+      <td>×</td>
+      <td>×</td>
+      <td>√</td>
       <td>√</td>
       <td>√</td>
     </tr>
     <tr>
-      <td><a href="/zh/docs/aqara-studio/device-integration/aqara-rs-485">Aqara RS-485 网关，RS-485 总线连接</a></td>
+      <td><a href="/zh/docs/aqara-studio/device-integration/aqara-rs-485">AqaraModbus 网关，RS485 总线连接</a></td>
       <td>√</td>
+      <td>×</td>
+      <td>×</td>
+      <td>×</td>
       <td>×</td>
       <td>×</td>
       <td>×</td>
@@ -279,14 +321,20 @@ export const DocIconAuto = ({ title }) => {
       <td><a href="/zh/docs/aqara-studio/device-integration/virtual/infrared-equipment">万能红外遥控器</a></td>
       <td>×</td>
       <td>√</td>
+      <td>×</td>
       <td>√</td>
       <td>√</td>
+      <td>√</td>
+      <td>×</td>
     </tr>
     <tr>
       <td><a href="/zh/docs/aqara-studio/overview/compatible-aqara-devices">连接渠道专供子设备</a></td>
       <td>√</td>
       <td>√</td>
       <td>×</td>
+      <td>×</td>
+      <td>×</td>
+      <td>√</td>
       <td>√</td>
     </tr>
     <tr>
@@ -295,11 +343,17 @@ export const DocIconAuto = ({ title }) => {
       <td>√</td>
       <td>√</td>
       <td>√</td>
+      <td>√</td>
+      <td>√</td>
+      <td>√</td>
     </tr>
     <tr>
       <td><a href="/zh/docs/aqara-studio/automation">本地自动化</a><DocIconAuto title="当该条自动化涉及的所有子设备均连接到同一个子网关（包括Zigbee/Thread/Aqara RS-485/红外遥控），则完成创建后将下沉到该子网关，当子网关与 Studio 之间网络连接不稳定，仍能够稳定执行该自动化。" /></td>
-      <td>支持本地自动化创建后下沉到此子网关</td>
-      <td>支持本地自动化创建后下沉到此子网关</td>
+      <td>支持本地自动化创建后下沉到子网关</td>
+      <td>支持本地自动化创建后下沉到子网关</td>
+      <td>支持本地自动化创建后下沉到子网关</td>
+      <td>支持本地自动化创建后下沉到子网关</td>
+      <td>支持创建本地自动化</td>
       <td>支持创建本地自动化</td>
       <td>支持创建本地自动化</td>
     </tr>
@@ -307,19 +361,27 @@ export const DocIconAuto = ({ title }) => {
       <td>自动化能力</td>
       <td>触发：防误删通知触发</td>
       <td>触发：防误删通知触发<br />执行：<ul><li>语音播放</li><li>红外遥控</li></ul></td>
+      <td>触发：防误删通知触发</td>
       <td>触发：防误删通知触发<br />执行：<ul><li>语音播放</li><li>红外遥控</li></ul></td>
       <td>触发：防误删通知触发<br />执行：<ul><li>语音播放</li><li>红外遥控</li></ul></td>
+      <td>触发：防误删通知触发<br />执行：<ul><li>语音播放</li><li>红外遥控</li></ul></td>
+      <td>触发：防误删通知触发<br />执行：<ul><li>重启/延时/场景/铃声/音量</li></ul></td>
     </tr>
     <tr>
       <td>推荐连接子设备数量</td>
-      <td>40 Aqara Zigbee<br />+ 40 Thread<br />+ 32 Aqara RS-485</td>
+      <td>40 Aqara Zigbee<br />+ 40 Thread<br />+ 32 Aqara Modbus</td>
       <td>40 Aqara Zigbee<br />+ 40 Thread</td>
-      <td>最多 300 个</td>
-      <td>最多 300 个</td>
+      <td>最多连接 40 个 Aqara Zigbee + Thread</td>
+      <td>128 Aqara Zigbee<br />+ 128 Thread</td>
+      <td>推荐最多连接 300 个子设备</td>
+      <td>推荐最多连接 300 个子设备</td>
+      <td>推荐最多连接 2000 个子设备</td>
     </tr>
   </tbody>
 </table>
 
+
 选型建议：
-- M300 / GX300M：作为 Aqara Studio 官方标准主机，预装 Aqara Studio OS 并内置中枢 Hub，实现开箱即用的本地化部署与运行；凭借稳定的边缘计算能力，完美适配住宅及小型商业项目的智能化需求。
-- AX100M / AX200M：作为 Aqara Studio 子网关，需接入 M300 / GX300M 等搭载 Aqara Studio 的官方标准主机，主要用于扩展 Zigbee 与 Thread 无线网络的覆盖范围和设备接入容量；适用于需分布式部署、多区域信号延伸或协议桥接（如红外控制）的场景。
+- **M300** / **GX300M**：作为 Aqara Studio 官方标准主机，预装 Aqara Studio OS 并内置中枢 Hub，实现开箱即用的本地化部署与运行；凭借稳定的边缘计算能力，完美适配住宅及小型商业项目的智能化需求。
+- **GX500M**：作为 Aqara Studio 大算力边缘主机（工规 RK3588J 无风扇、8GB 内存、多路串口/双千兆网口），面向大型楼宇、商业建筑、智慧工厂等中大型项目的多协议接入与集中管理；本机不直接接入 Zigbee/Thread/Matter/红外，需通过子网关扩展。
+- **AX100M** / **AX200M** / **M100 Pro** / **M3 Pro**：作为 Aqara Studio 子网关，需接入 M300 / GX300M / GX500M 等搭载 Aqara Studio 的主机，用于扩展 Zigbee 与 Thread 无线网络的覆盖范围和设备接入容量；适用于分布式部署、多区域信号延伸或协议桥接（如红外控制）的场景。
