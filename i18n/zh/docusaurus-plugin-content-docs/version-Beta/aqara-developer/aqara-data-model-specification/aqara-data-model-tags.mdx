@@ -94,10 +94,12 @@ Device: "<Device ID>"
 │         │    ├── EdgeRegionBitmask (Trait ID: 0x4F1D)
 │         │    ├── EnableHumanCountDetection (Trait ID: 0x4F1F)
 │         │    ├── EnableAIHighPrecisionRecognition (Trait ID: 0x4F23)
+│         │    ├── EnableAIEntryExitRegionRecognition (Trait ID: 0x4F26)
 │         │    ├── EnableAIInterferenceSourceRecognition (Trait ID: 0x4F27)
 │         │    ├── EnableAIAdaptiveSensitivity (Trait ID: 0x4F28)
 │         │    ├── CoordinateReverseSetting (Trait ID: 0x4F29)
 │         │    ├── DetectionDirectionSetting (Trait ID: 0x4F2A)
+│         │    ├── PIRDetectionTime (Trait ID: 0x5119)
 │         │    ├── AutoInterferenceSourceRecognition (Trait ID: 0x4F30)
 │         │    ├── AutoEdgeRecognition (Trait ID: 0x4F31)
 │         │    ├── AIEntryExitRegionRecognition (Trait ID: 0x4F32)
@@ -40731,6 +40733,72 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
   </tbody>
 </table>
 
+##### FingerprintEnrollResultEnum8 Type {#ref_FingerprintEnrollResultEnum8}
+
+该枚举定义单次指纹录入尝试的结果。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>GeneralSuccess</td>
+      <td>指纹录入成功，未发生错误</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>GeneralFailure</td>
+      <td>指纹录入发生一般错误</td>
+    </tr>
+    <tr>
+      <td>0x20</td>
+      <td>SuccessEnd</td>
+      <td>本次指纹录入尝试成功</td>
+    </tr>
+    <tr>
+      <td>0x22</td>
+      <td>Timeout</td>
+      <td>未在规定时间内放置手指，录入超时</td>
+    </tr>
+    <tr>
+      <td>0x23</td>
+      <td>LowQuality</td>
+      <td>指纹质量过低</td>
+    </tr>
+    <tr>
+      <td>0x24</td>
+      <td>InsufficientArea</td>
+      <td>指纹覆盖面积不足</td>
+    </tr>
+    <tr>
+      <td>0x25</td>
+      <td>FingerTooDry</td>
+      <td>手指过干</td>
+    </tr>
+    <tr>
+      <td>0x26</td>
+      <td>FingerTooWet</td>
+      <td>手指过湿</td>
+    </tr>
+    <tr>
+      <td>0x27</td>
+      <td>FingerprintAlreadyExists</td>
+      <td>指纹已存在于数据库中</td>
+    </tr>
+    <tr>
+      <td>0x28</td>
+      <td>AreaOverlap</td>
+      <td>与此前录入指纹的覆盖区域重叠过大</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### FingerprintEnrollProgressTraitPresentValueStructure Type {#ref_FingerprintEnrollProgressTraitPresentValueStructure}
 
 该结构体定义 FingerprintEnrollProgress Trait 的 Present Value 字段布局。
@@ -40748,31 +40816,52 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
   <tbody>
     <tr>
       <td>0</td>
-      <td>CurrentAttempt</td>
-      <td>uint8</td>
+      <td>Result</td>
+      <td><a href="#ref_FingerprintEnrollResultEnum8">FingerprintEnrollResultEnum8</a></td>
       <td>M</td>
-      <td>当前录入尝试序号，从 1 开始。</td>
+      <td>本次指纹录入尝试的结果。</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>TotalAttempts</td>
-      <td>uint8</td>
+      <td>FingerId</td>
+      <td>uint16</td>
       <td>M</td>
-      <td>完整注册会话所需尝试次数（当前为 8）。</td>
+      <td>正在录入的指纹凭证 ID。</td>
     </tr>
     <tr>
       <td>2</td>
-      <td>EnrollmentProgress</td>
+      <td>Index</td>
       <td>uint8</td>
       <td>M</td>
-      <td>录入进度百分比，范围 0 至 100。</td>
+      <td>当前录入尝试在完整注册会话中的序号，从 1 开始。</td>
     </tr>
     <tr>
       <td>3</td>
-      <td>EnrollmentStatus</td>
-      <td>enum8</td>
+      <td>Quality</td>
+      <td>uint8</td>
       <td>M</td>
-      <td>本次尝试的录入状态。</td>
+      <td>本次采集指纹图像的质量分数。</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Area</td>
+      <td>uint8</td>
+      <td>M</td>
+      <td>本次采集指纹的覆盖面积。</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>DryWet</td>
+      <td>uint8</td>
+      <td>M</td>
+      <td>本次采集指纹的干湿状态。</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>TotalTimes</td>
+      <td>uint8</td>
+      <td>M</td>
+      <td>完成注册会话所需的录入尝试总次数。</td>
     </tr>
   </tbody>
 </table>
@@ -108211,6 +108300,12 @@ ResetPresence 命令用于重置设备或空间的当前存在检测状态。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x4F26</td>
+      <td><a href="#ref_EnableAIEntryExitRegionRecognition">EnableAIEntryExitRegionRecognition</a></td>
+      <td>使能AI进出口区域识别</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4F25</td>
       <td><a href="#ref_EnableAverageOccupancyDurationDetection">EnableAverageOccupancyDurationDetection</a></td>
       <td>使能平均存在时长检测</td>
@@ -108358,6 +108453,12 @@ ResetPresence 命令用于重置设备或空间的当前存在检测状态。
       <td>0x5118</td>
       <td><a href="#ref_SensingMode">SensingMode</a></td>
       <td>传感器模式</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5119</td>
+      <td><a href="#ref_PIRDetectionTime">PIRDetectionTime</a></td>
+      <td>PIR检测时间</td>
       <td>O</td>
     </tr>
     <tr>
@@ -109049,6 +109150,11 @@ SubscribeAutoEdgeRecognitionData Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x4F26</td>
+      <td><a href="#ref_EnableAIEntryExitRegionRecognition">EnableAIEntryExitRegionRecognition</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4F25</td>
       <td><a href="#ref_EnableAverageOccupancyDurationDetection">EnableAverageOccupancyDurationDetection</a></td>
       <td>O</td>
@@ -109171,6 +109277,11 @@ SubscribeAutoEdgeRecognitionData Command 的参数结构体。
     <tr>
       <td>0x5118</td>
       <td><a href="#ref_SensingMode">SensingMode</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5119</td>
+      <td><a href="#ref_PIRDetectionTime">PIRDetectionTime</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -110084,6 +110195,61 @@ SubscribeAutoEdgeRecognitionData Command 的参数结构体。
     <tr>
       <td>0x4F27</td>
       <td>EnableAIInterferenceSourceRecognition</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### EnableAIEntryExitRegionRecognition Trait（使能AI进出口区域识别） {#ref_EnableAIEntryExitRegionRecognition}
+
+该 Trait 用于「使能AI进出口区域识别」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4F26</td>
+      <td>EnableAIEntryExitRegionRecognition</td>
     </tr>
   </tbody>
 </table>
@@ -111603,6 +111769,70 @@ image::../images/aqara_Ambient_configuration_cluster/detection_range_bitmask.svg
       <td></td>
       <td>0</td>
       <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### PIRDetectionTime Trait（PIR检测时间） {#ref_PIRDetectionTime}
+
+该 Trait 用于设置 PIR 检测时间参数，以控制 PIR 感应判定窗口。单位：秒。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5119</td>
+      <td>PIRDetectionTime</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>60</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
       <td>O</td>
     </tr>
   </tbody>
