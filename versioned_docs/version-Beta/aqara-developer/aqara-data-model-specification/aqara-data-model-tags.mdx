@@ -94,10 +94,12 @@ Device: "<Device ID>"
 │         │    ├── EdgeRegionBitmask (Trait ID: 0x4F1D)
 │         │    ├── EnableHumanCountDetection (Trait ID: 0x4F1F)
 │         │    ├── EnableAIHighPrecisionRecognition (Trait ID: 0x4F23)
+│         │    ├── EnableAIEntryExitRegionRecognition (Trait ID: 0x4F26)
 │         │    ├── EnableAIInterferenceSourceRecognition (Trait ID: 0x4F27)
 │         │    ├── EnableAIAdaptiveSensitivity (Trait ID: 0x4F28)
 │         │    ├── CoordinateReverseSetting (Trait ID: 0x4F29)
 │         │    ├── DetectionDirectionSetting (Trait ID: 0x4F2A)
+│         │    ├── PIRDetectionTime (Trait ID: 0x5119)
 │         │    ├── AutoInterferenceSourceRecognition (Trait ID: 0x4F30)
 │         │    ├── AutoEdgeRecognition (Trait ID: 0x4F31)
 │         │    ├── AIEntryExitRegionRecognition (Trait ID: 0x4F32)
@@ -40731,6 +40733,72 @@ This enumeration defines the valid values of the Present Value of the LockState 
   </tbody>
 </table>
 
+##### FingerprintEnrollResultEnum8 Type {#ref_FingerprintEnrollResultEnum8}
+
+This enumeration defines the result of a single fingerprint enrollment attempt.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>GeneralSuccess</td>
+      <td>Fingerprint enrollment succeeded with no error.</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>GeneralFailure</td>
+      <td>A general error occurred during fingerprint enrollment.</td>
+    </tr>
+    <tr>
+      <td>0x20</td>
+      <td>SuccessEnd</td>
+      <td>This fingerprint enrollment attempt succeeded.</td>
+    </tr>
+    <tr>
+      <td>0x22</td>
+      <td>Timeout</td>
+      <td>The finger was not placed in time and the enrollment timed out.</td>
+    </tr>
+    <tr>
+      <td>0x23</td>
+      <td>LowQuality</td>
+      <td>The fingerprint quality is too low.</td>
+    </tr>
+    <tr>
+      <td>0x24</td>
+      <td>InsufficientArea</td>
+      <td>The fingerprint coverage area is insufficient.</td>
+    </tr>
+    <tr>
+      <td>0x25</td>
+      <td>FingerTooDry</td>
+      <td>The finger is too dry.</td>
+    </tr>
+    <tr>
+      <td>0x26</td>
+      <td>FingerTooWet</td>
+      <td>The finger is too wet.</td>
+    </tr>
+    <tr>
+      <td>0x27</td>
+      <td>FingerprintAlreadyExists</td>
+      <td>The fingerprint already exists in the database.</td>
+    </tr>
+    <tr>
+      <td>0x28</td>
+      <td>AreaOverlap</td>
+      <td>The coverage area overlaps too much with previously enrolled fingerprints.</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### FingerprintEnrollProgressTraitPresentValueStructure Type {#ref_FingerprintEnrollProgressTraitPresentValueStructure}
 
 This structure defines the Present Value field layout of the FingerprintEnrollProgress Trait.
@@ -40748,31 +40816,52 @@ This structure defines the Present Value field layout of the FingerprintEnrollPr
   <tbody>
     <tr>
       <td>0</td>
-      <td>CurrentAttempt</td>
-      <td>uint8</td>
+      <td>Result</td>
+      <td><a href="#ref_FingerprintEnrollResultEnum8">FingerprintEnrollResultEnum8</a></td>
       <td>M</td>
-      <td>Current enrollment attempt sequence number, starting from 1.</td>
+      <td>The result of this fingerprint enrollment attempt.</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>TotalAttempts</td>
-      <td>uint8</td>
+      <td>FingerId</td>
+      <td>uint16</td>
       <td>M</td>
-      <td>Number of attempts required for a complete registration session (currently 8).</td>
+      <td>ID of the fingerprint credential being enrolled.</td>
     </tr>
     <tr>
       <td>2</td>
-      <td>EnrollmentProgress</td>
+      <td>Index</td>
       <td>uint8</td>
       <td>M</td>
-      <td>Enrollment progress percentage, ranging from 0 to 100.</td>
+      <td>Sequence number of the current enrollment attempt within the complete registration session, starting from 1.</td>
     </tr>
     <tr>
       <td>3</td>
-      <td>EnrollmentStatus</td>
-      <td>enum8</td>
+      <td>Quality</td>
+      <td>uint8</td>
       <td>M</td>
-      <td>Enrollment status of this attempt.</td>
+      <td>Quality score of the fingerprint image captured in this attempt.</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Area</td>
+      <td>uint8</td>
+      <td>M</td>
+      <td>Coverage area of the fingerprint captured in this attempt.</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>DryWet</td>
+      <td>uint8</td>
+      <td>M</td>
+      <td>Dry/wet state of the fingerprint captured in this attempt.</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>TotalTimes</td>
+      <td>uint8</td>
+      <td>M</td>
+      <td>Total number of enrollment attempts required to complete the registration session.</td>
     </tr>
   </tbody>
 </table>
@@ -108211,6 +108300,12 @@ Provides Aqara ambient sensing configuration capabilities, covering zone managem
       <td>O</td>
     </tr>
     <tr>
+      <td>0x4F26</td>
+      <td><a href="#ref_EnableAIEntryExitRegionRecognition">EnableAIEntryExitRegionRecognition</a></td>
+      <td>Enable AI entry/exit region recognition</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4F25</td>
       <td><a href="#ref_EnableAverageOccupancyDurationDetection">EnableAverageOccupancyDurationDetection</a></td>
       <td>Enable average occupancy duration detection</td>
@@ -108358,6 +108453,12 @@ Provides Aqara ambient sensing configuration capabilities, covering zone managem
       <td>0x5118</td>
       <td><a href="#ref_SensingMode">SensingMode</a></td>
       <td>Sensor mode</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5119</td>
+      <td><a href="#ref_PIRDetectionTime">PIRDetectionTime</a></td>
+      <td>PIR detection time</td>
       <td>O</td>
     </tr>
     <tr>
@@ -109049,6 +109150,11 @@ The parameter structure of the SubscribeAutoEdgeRecognitionData Command.
       <td>O</td>
     </tr>
     <tr>
+      <td>0x4F26</td>
+      <td><a href="#ref_EnableAIEntryExitRegionRecognition">EnableAIEntryExitRegionRecognition</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4F25</td>
       <td><a href="#ref_EnableAverageOccupancyDurationDetection">EnableAverageOccupancyDurationDetection</a></td>
       <td>O</td>
@@ -109171,6 +109277,11 @@ The parameter structure of the SubscribeAutoEdgeRecognitionData Command.
     <tr>
       <td>0x5118</td>
       <td><a href="#ref_SensingMode">SensingMode</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5119</td>
+      <td><a href="#ref_PIRDetectionTime">PIRDetectionTime</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -110084,6 +110195,61 @@ This Trait is used for access to and reporting of "enable AI interference source
     <tr>
       <td>0x4F27</td>
       <td>EnableAIInterferenceSourceRecognition</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### EnableAIEntryExitRegionRecognition Trait {#ref_EnableAIEntryExitRegionRecognition}
+
+This Trait is used for access to and reporting of "enable AI entry/exit region recognition" data.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4F26</td>
+      <td>EnableAIEntryExitRegionRecognition</td>
     </tr>
   </tbody>
 </table>
@@ -111603,6 +111769,70 @@ This Trait is used to configure the sensing working mode of PIR and Radar, such 
       <td></td>
       <td>0</td>
       <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### PIRDetectionTime Trait {#ref_PIRDetectionTime}
+
+This Trait is used to set the PIR detection time parameter in order to control the PIR sensing decision window. Unit: seconds.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5119</td>
+      <td>PIRDetectionTime</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>60</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
       <td>O</td>
     </tr>
   </tbody>
