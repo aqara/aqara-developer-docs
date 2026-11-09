@@ -2160,6 +2160,8 @@ Special types: Root, Public. They correspond to the Root Endpoint and Public End
   </tbody>
 </table>
 
+SingleSetpointAC supports only the following Functions: the mandatory `Output` and `HeaterCooler`, plus the optional `IRControl`, `FanControl` and `FreshAirControl`; no other Functions are supported.
+
 AirConditioner and SingleSetpointAC both implement `Output` and `HeaterCooler`; they differ in target-temperature and mode-control models:
 
 * `AirConditioner` (Device Type ID `0x000D`, decimal 13) is a dual-setpoint air conditioner for devices that can maintain cooling and heating targets at the same time and automatically switch between cooling and heating based on room temperature. Its `CoolingTemperature` and `HeatingTemperature` are two independent targets that are both effective concurrently; `SetTemperature` MUST NOT be used as an alias or substitute for these two targets. The difference between the two targets MUST be no less than the Present Value of `MinHeatCoolDeadBand`. The device MUST support and report `Auto` in `HeaterCoolerMode/Supported Value`. In Auto mode, cool when room temperature is above the cooling target, and heat when below the heating target; while in the deadband between the two targets, do not simultaneously request both cooling and heating because of this automatic temperature-control logic. In Auto mode, clients SHOULD display and allow independent adjustment of both targets; when switching to Cool or Heat, use the corresponding cooling or heating target, while the other target remains independently effective. The device SHOULD validate the relationship whenever either target or the minimum deadband is updated; writes that violate the minimum deadband MUST be rejected, and MUST NOT be applied partially.
@@ -68024,6 +68026,12 @@ Provides general device configuration items, such as sensitivity, delay, default
   </thead>
   <tbody>
     <tr>
+      <td>0x5250</td>
+      <td><a href="#ref_SpecialHandlingPoints">SpecialHandlingPoints</a></td>
+      <td>Special handling data point list</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x524A</td>
       <td><a href="#ref_MultiStateSetting">MultiStateSetting</a></td>
       <td>Multi-state setting</td>
@@ -68270,6 +68278,59 @@ Provides general device configuration items, such as sensitivity, delay, default
 </table>
 
 ### Data Types
+
+#### SpecialHandlingTypeEnum8 Type {#ref_SpecialHandlingTypeEnum8}
+
+This enumeration defines the valid values of the special handling type field in the SpecialHandlingPoints Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x01</td>
+      <td>CameraLegacyCompat</td>
+      <td>Legacy compatibility handling for cameras</td>
+    </tr>
+  </tbody>
+</table>
+
+#### SpecialHandlingPointsTraitPresentValueStructure Type {#ref_SpecialHandlingPointsTraitPresentValueStructure}
+
+This structure defines the Present Value field layout of the SpecialHandlingPoints Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Type</td>
+      <td><a href="#ref_SpecialHandlingTypeEnum8">SpecialHandlingTypeEnum8</a></td>
+      <td>M</td>
+      <td>Special handling type, indicating the additional handling convention that the data point or command SHALL follow.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>DataPointIds</td>
+      <td>list[characterString]</td>
+      <td>M</td>
+      <td>List of addressing IDs of the data points or commands that require special handling. The Trait/Parameter format is <code>&#123;Endpoint ID&#125;.&#123;Function ID&#125;.&#123;Trait ID&#125;.&#123;Parameter ID&#125;</code>, for example <code>2.132.32920.1</code>; the Command format is <code>&#123;Endpoint ID&#125;.&#123;Function ID&#125;.&#123;Command ID&#125;.0</code>, for example <code>2.132.32930.0</code>.</td>
+    </tr>
+  </tbody>
+</table>
 
 #### MultiStateSettingEnum16 Type {#ref_MultiStateSettingEnum16}
 
@@ -69458,6 +69519,11 @@ This enumeration defines the valid values of the Present Value of the PublicCapO
   </thead>
   <tbody>
     <tr>
+      <td>0x5250</td>
+      <td><a href="#ref_SpecialHandlingPoints">SpecialHandlingPoints</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x524A</td>
       <td><a href="#ref_MultiStateSetting">MultiStateSetting</a></td>
       <td>O</td>
@@ -69640,6 +69706,54 @@ This enumeration defines the valid values of the Present Value of the PublicCapO
     <tr>
       <td>0x51ED</td>
       <td><a href="#ref_VibrationIntensity">VibrationIntensity</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### SpecialHandlingPoints Trait (Special Handling Data Point List) {#ref_SpecialHandlingPoints}
+
+Special handling data point list, used to identify the set of data points or commands that require additional special handling and to indicate their special handling type. When a client or the cloud parses the data points in the list or executes the commands, in addition to the normal logic it SHALL perform the additional handling according to the corresponding type convention. For example, `CameraLegacyCompat` means legacy compatibility handling for cameras; the specific conversion, display or alarm judgement rules are defined by the convention of that compatibility type.
+
+The addressing ID format of a Trait/Parameter is `{Endpoint ID}.{Function ID}.{Trait ID}.{Parameter ID}`; the addressing ID format of a Command is `{Endpoint ID}.{Function ID}.{Command ID}.0`, where the last segment is always `0`. The IDs in `DataPointIds` SHOULD point to Endpoints, Functions, Traits/Parameters or Commands that actually exist.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5250</td>
+      <td>SpecialHandlingPoints</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_SpecialHandlingPointsTraitPresentValueStructure">SpecialHandlingPointsTraitPresentValueStructure</a></td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -103288,13 +103402,54 @@ Acquires facial features and compares them with the local library, reporting fac
       <td>Region dimension</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5251</td>
+      <td><a href="#ref_FaceList">FaceList</a></td>
+      <td>Face list</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5252</td>
+      <td><a href="#ref_FaceCountLimit">FaceCountLimit</a></td>
+      <td>Face count limit</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
 ### Command
 
-This Function does not contain Commands.
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Code</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9DBC</td>
+      <td><a href="#ref_AddFace">AddFace</a></td>
+      <td>Add face</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DBD</td>
+      <td><a href="#ref_DeleteFace">DeleteFace</a></td>
+      <td>Delete face</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DBE</td>
+      <td><a href="#ref_ModifyFace">ModifyFace</a></td>
+      <td>Modify face</td>
+      <td>O</td>
+    </tr>
+  </tbody>
 
+</table>
 ### Data Types
 
 ##### TimePeriodSettingTraitPresentValueStructure Type {#ref_TimePeriodSettingTraitPresentValueStructure}
@@ -103479,6 +103634,292 @@ This structure defines the Present Value field layout of the RegionDimension Tra
   </tbody>
 </table>
 
+##### FaceManagementStatusEnum8 Type {#ref_FaceManagementStatusEnum8}
+
+This enumeration defines the response status codes of the AddFace, DeleteFace and ModifyFace Commands.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>SUCCESS</td>
+      <td>Operation succeeded</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>RESOURCE_EXHAUSTED</td>
+      <td>The face library has reached its limit</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>CONSTRAINT_ERROR</td>
+      <td>A parameter is invalid or the auxiliary validation does not match</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>BUSY</td>
+      <td>The device is busy and cannot process the request at the moment</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>NOT_FOUND</td>
+      <td>The specified FaceId does not exist</td>
+    </tr>
+  </tbody>
+</table>
+
+##### FaceItemStructure Type {#ref_FaceItemStructure}
+
+A single face record in FaceList. At least one of `ImageData` and `ImageUrl` SHALL be provided; when both are provided, `ImageData` is the image data and `ImageUrl` is the access address of that image.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>FaceId</td>
+      <td>uint64</td>
+      <td>M</td>
+      <td>Unique face identifier assigned by the device.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Name</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Face name, up to 64 characters.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>ImageData</td>
+      <td>octetString</td>
+      <td>O</td>
+      <td>Binary face image data, Base64-encoded in JSON. At least one of ImageData and ImageUrl SHALL be provided; maximum 512 KiB.</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>ImageUrl</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>Access address of the face image. At least one of ImageUrl and ImageData SHALL be provided.</td>
+    </tr>
+  </tbody>
+</table>
+
+##### AddFace Command Structure Type {#ref_AddFaceCommandStructure}
+
+Request parameter structure of the AddFace Command.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Name</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Face name, which MUST NOT be empty, up to 64 characters.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>ImageData</td>
+      <td>octetString</td>
+      <td>M</td>
+      <td>Binary face image data, Base64-encoded in JSON. The image SHOULD be no larger than 512 KiB; JPG or PNG is recommended, and a resolution of at least 200 &times; 200 is recommended.</td>
+    </tr>
+  </tbody>
+</table>
+
+##### AddFace Response Structure Type {#ref_AddFaceResponseStructure}
+
+Response structure of the AddFace Command. On success it returns the FaceId assigned by the device; `Success` SHALL be consistent with `Status`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td><a href="#ref_FaceManagementStatusEnum8">FaceManagementStatusEnum8</a></td>
+      <td>M</td>
+      <td>Status of the command execution.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>FaceId</td>
+      <td>uint64</td>
+      <td>C</td>
+      <td>Unique face identifier assigned and returned by the device when the addition succeeds; omitted on failure.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Success</td>
+      <td>boolean</td>
+      <td>M</td>
+      <td>Whether the operation succeeded; it MUST be true when Status is SUCCESS and MUST be false otherwise.</td>
+    </tr>
+  </tbody>
+</table>
+
+##### DeleteFace Command Structure Type {#ref_DeleteFaceCommandStructure}
+
+Request parameter structure of the DeleteFace Command.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>FaceId</td>
+      <td>uint64</td>
+      <td>M</td>
+      <td>Unique identifier of the face to delete; it MUST be a valid ID already assigned by the device.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Name</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>Face name used as auxiliary validation, up to 64 characters; if it does not match the record of FaceId, CONSTRAINT_ERROR is returned.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>ImageData</td>
+      <td>octetString</td>
+      <td>O</td>
+      <td>Face image used as auxiliary validation, Base64-encoded in JSON, maximum 512 KiB; if it does not match the record of FaceId, CONSTRAINT_ERROR is returned.</td>
+    </tr>
+  </tbody>
+</table>
+
+##### DeleteFace Response Structure Type {#ref_DeleteFaceResponseStructure}
+
+Response structure of the DeleteFace Command.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td><a href="#ref_FaceManagementStatusEnum8">FaceManagementStatusEnum8</a></td>
+      <td>M</td>
+      <td>Status of the command execution.</td>
+    </tr>
+  </tbody>
+</table>
+
+##### ModifyFace Command Structure Type {#ref_ModifyFaceCommandStructure}
+
+Request parameter structure of the ModifyFace Command. At least one of Name or ImageData SHALL be provided; fields not provided keep their original values.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>FaceId</td>
+      <td>uint64</td>
+      <td>M</td>
+      <td>Unique identifier of the face to modify; it MUST be a valid ID already assigned by the device.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Name</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>New face name, up to 64 characters; keeps the original value when not provided.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>ImageData</td>
+      <td>octetString</td>
+      <td>O</td>
+      <td>Binary data of the new face image, Base64-encoded in JSON, maximum 512 KiB; keeps the original value when not provided.</td>
+    </tr>
+  </tbody>
+</table>
+
+##### ModifyFace Response Structure Type {#ref_ModifyFaceResponseStructure}
+
+Response structure of the ModifyFace Command.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td><a href="#ref_FaceManagementStatusEnum8">FaceManagementStatusEnum8</a></td>
+      <td>M</td>
+      <td>Status of the command execution.</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait Definitions
 
 <table>
@@ -103543,6 +103984,16 @@ This structure defines the Present Value field layout of the RegionDimension Tra
     <tr>
       <td>0x502D</td>
       <td><a href="#ref_RegionDimension">RegionDimension</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5251</td>
+      <td><a href="#ref_FaceList">FaceList</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5252</td>
+      <td><a href="#ref_FaceCountLimit">FaceCountLimit</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -104237,9 +104688,270 @@ height (uint32): the total height of the region in the specified unit.
   </tbody>
 </table>
 
+#### FaceList Trait (Face List) {#ref_FaceList}
+
+Represents the list of face information in the device local face library. Each item contains the FaceId assigned by the device, the name, and either the image data or the image access address. This Trait is read-only and reportable, and is used by clients to obtain the face information stored locally on the device.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5251</td>
+      <td>FaceList</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_FaceItemStructure">FaceItemStructure</a>]</td>
+      <td>Each item provides at least ImageData or ImageUrl</td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### FaceCountLimit Trait (Face Count Limit) {#ref_FaceCountLimit}
+
+Represents the maximum number of faces that the device local face library can hold. The device reports this value according to its own capability. The default value is 50.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5252</td>
+      <td>FaceCountLimit</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td>1..65535</td>
+      <td>50</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>65535</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>Step Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Command Definitions
 
-This Function does not contain Commands.
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9DBC</td>
+      <td><a href="#ref_AddFace">AddFace</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DBD</td>
+      <td><a href="#ref_DeleteFace">DeleteFace</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DBE</td>
+      <td><a href="#ref_ModifyFace">ModifyFace</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### AddFace Command {#ref_AddFace}
+
+Adds a face record and synchronizes it to the device local face library. On success the device SHALL assign a unique 64-bit unsigned FaceId and return it in the response. When the face library has reached FaceCountLimit, RESOURCE_EXHAUSTED is returned.
+
+##### Parameters
+
+[AddFace Command Structure](#ref_AddFaceCommandStructure)
+
+##### Response
+
+[AddFace Response Structure](#ref_AddFaceResponseStructure), with `Status` values:
+
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SUCCESS</td>
+      <td>Addition succeeded, FaceId is returned and Success is true</td>
+    </tr>
+    <tr>
+      <td>RESOURCE_EXHAUSTED</td>
+      <td>The face library has reached FaceCountLimit</td>
+    </tr>
+    <tr>
+      <td>CONSTRAINT_ERROR</td>
+      <td>A parameter is invalid, for example the name is empty, the image format is unsupported, or the image exceeds the size limit</td>
+    </tr>
+    <tr>
+      <td>BUSY</td>
+      <td>The device is busy and cannot process the request at the moment</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DeleteFace Command {#ref_DeleteFace}
+
+Deletes the specified face record and synchronizes it to the device local face library. FaceId is the only primary key; Name and ImageData MAY be used as auxiliary validation. When FaceId does not exist, NOT_FOUND is returned.
+
+##### Parameters
+
+[DeleteFace Command Structure](#ref_DeleteFaceCommandStructure)
+
+##### Response
+
+[DeleteFace Response Structure](#ref_DeleteFaceResponseStructure), with `Status` values:
+
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SUCCESS</td>
+      <td>Deletion succeeded</td>
+    </tr>
+    <tr>
+      <td>NOT_FOUND</td>
+      <td>The specified FaceId does not exist</td>
+    </tr>
+    <tr>
+      <td>CONSTRAINT_ERROR</td>
+      <td>Auxiliary validation does not match, for example Name does not match the record of FaceId</td>
+    </tr>
+    <tr>
+      <td>BUSY</td>
+      <td>The device is busy and cannot process the request at the moment</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ModifyFace Command {#ref_ModifyFace}
+
+Modifies the specified face record and synchronizes it to the device local face library. The record is located by FaceId, and the name and/or image MAY be updated; fields not provided keep their original values. When FaceId does not exist, NOT_FOUND is returned.
+
+##### Parameters
+
+[ModifyFace Command Structure](#ref_ModifyFaceCommandStructure)
+
+##### Response
+
+[ModifyFace Response Structure](#ref_ModifyFaceResponseStructure), with `Status` values:
+
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SUCCESS</td>
+      <td>Modification succeeded</td>
+    </tr>
+    <tr>
+      <td>NOT_FOUND</td>
+      <td>The specified FaceId does not exist</td>
+    </tr>
+    <tr>
+      <td>CONSTRAINT_ERROR</td>
+      <td>A parameter is invalid, for example no field to modify is provided or the image format is unsupported</td>
+    </tr>
+    <tr>
+      <td>BUSY</td>
+      <td>The device is busy and cannot process the request at the moment</td>
+    </tr>
+  </tbody>
+</table>
 
 ## GestureRecognition {#ref_Aqara_Spec_GestureRecognition}
 
