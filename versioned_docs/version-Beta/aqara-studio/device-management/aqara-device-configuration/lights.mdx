@@ -5,10 +5,12 @@ keywords: ["Aqara Docs", "Aqara Studio", "Device Management", "Lights"]
 ---
 # Lights
 
-Aqara lights support three scene control modes to flexibly meet diverse lighting needs:
+Aqara lights support five scene control modes to flexibly meet diverse lighting needs:
 - [Static Scene](#static-scene): Set and display a single color and brightness.
 - [Dynamic Scene](#dynamic-scene): Create a vivid atmosphere with dynamic transitions in color and brightness.
 - [Sequence Scene](#sequence-scene): Customize the duration and order of transitions between colors for gradient or choreography effects.
+- [Segmented Static Scene](#segmented-static-scene): Divide the light strip into multiple segments, and set a static lighting effect for each segment.
+- [Segmented Dynamic Scene](#segmented-dynamic-scene): Divide the light strip into multiple segments, and configure a dynamic lighting effect, switching speed, and color combination for each segment.
 
 You can either [use Aqara's preset scene modes](#use-default-scenes), [create custom scenes](#custom-scenes) according to your needs, or [copy your custom scenes to other devices](#copy-custom-scenes-to-other-devices).
 
@@ -18,13 +20,13 @@ The scene modes and available presets vary by Aqara light model. Please refer to
 
 ## Use Default Scenes
 
-1. On the **Devices** page, in the left-side **Protocols & Devices** tree, select your target light device and click **Device details**.
+1. On the **Devices** page, in the left-side **Protocols & Devices** tree, select your target light device and click **More settings**.
 
-    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Light-SelectADeviceAndCheckDetails.png" alt="View device details" />
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Light-MoreSettings.png" alt="View more settings" />
 
-2. On the **Device details** page, find the **Scene Control** area. Under the **Default** tab, hover over a scene and click the **Execute Scene** button. After execution, the light will display the defined color and brightness of that scene.
+2. On the **More settings** page, find the **Scene Control** area. Under the **Default** tab, hover over a scene and click the **Execute Scene** button. After execution, the light will display the defined color and brightness of that scene.
 
-    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Light-ExecuteDefaultScene.png" alt="Execute default scene" style={{width: '60%'}} />
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Light-ExecuteDefaultSceneOnMoreSettings.png" alt="执行默认情景" style={{width: '60%'}} />
 
 ## Custom Scenes
 
@@ -32,9 +34,18 @@ In addition to Aqara's default scenes, you can also create your own scenes.
 
 ### Create a Custom Scene
 
-In the **Scene Control** area, click the **New Scene** button. From the dropdown menu, select the type of scene you want to create ([Static Scene](#static-scene), [Dynamic Scene](#dynamic-scene), or [Sequence Scene](#sequence-scene)).
+In the **Scene Control** area, click the **Create** button.
 
-<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Light-NewScene.png" alt="Create new scene" style={{width: '80%'}} />
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Light-CreateScenes.png" alt="Create A New Scene" style={{width: '80%'}} />
+
+In the **New Scene** drawer, you can select the scene type to create:
+- [Static Scene](#static-scene)
+- [Dynamic Scene](#dynamic-scene)
+- [Sequence Scene](#sequence-scene)
+- [Segmented Static Scene](#segmented-static-scene)
+- [Segmented Dynamic Scene](#segmented-dynamic-scene)
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Light-NewSceneSettings.png" alt="Select a scene type" style={{width: '60%'}} />
 
 ### Configure the Custom Scene
 
@@ -42,7 +53,7 @@ Configure parameters based on the type of scene.
 
 #### Static Scene
 
-On the **New Static Scene** page:
+On the **New Scene** page:
 1. Set a scene name and choose a color and brightness.
 2. (Optional) Click the **Preview** button to view the effect and confirm if it meets your expectations.
 3. Click the **Save** button to complete creation.
@@ -51,7 +62,7 @@ On the **New Static Scene** page:
 
 #### Dynamic Scene
 
-On the **New Dynamic Scene** page:
+On the **New Scene** page:
 1. Set a scene name, select multiple colors, choose a dynamic effect for global color switching, and set the switching speed.
 2. (Optional) Click the **Preview** button to view the effect and confirm if it meets your expectations.
 3. Click the **Save** button to complete creation.
@@ -60,7 +71,7 @@ On the **New Dynamic Scene** page:
 
 #### Sequence Scene
 
-On the **New Sequence Scene** page:
+On the **New Scene** page:
 1. Configure the scene name and loop mode.
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Light-ConfigureSequenceSceneNameAndLoop.png" alt="" style={{width: '60%'}} />
@@ -81,9 +92,30 @@ On the **New Sequence Scene** page:
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Light-PreviewAndSaveSequenceScene.png" alt="" style={{width: '60%'}} />
 
+#### Segmented Static Scene
+
+On the **New Scene** page:
+1. Set a scene name, and select a mode under the scene type.
+2. Based on the mode you select, the **Scene Settings** area displays the corresponding configuration options.
+3. (Optional) Click the **Preview** button to view the effect and confirm if it meets your expectations.
+4. Click the **Save** button to complete creation.
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Light-SetSegementedStaticScene.png" alt="New segmented static scene" style={{width: '60%'}} />
+
+
+#### Segmented Dynamic Scene
+
+On the **New Scene** page:
+1. Set a scene name. In **Scene Settings**, click **Segment Settings** to configure the number of segments.
+2. Select each segment in the list, and configure the dynamic effect, color sequence, and color switching speed for that segment.
+3. (Optional) Click the **Preview** button to view the effect and confirm if it meets your expectations.
+4. Click the **Save** button to complete creation.
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Light-SetSegementedDynamicScene.png" alt="New segmented dynamic scene" style={{width: '60%'}} />
+
 ### Reference Existing Scenes
 
-If you've already created other scenes and wish to use one in your current scene, click the **Reference Existing Scene** button. Select the scene you want to reference from the dropdown list to complete the reference.
+If you've already created other scenes and wish to use one in your new scenes, click the **Reference Existing Scene** button. Select the scene you want to reference from the dropdown list to complete the reference.
 
 <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Light-ReferenceAnExisitingScene.png" alt="Reference existing scene" style={{width: '80%'}} />
 
@@ -96,7 +128,7 @@ In the **Scene Control** area, switch to the **Custom** tab. Hover over a scene 
 ## Copy Custom Scenes to Other Devices
 
 If you'd like to [copy your custom scenes](#custom-scenes) to other devices, follow these steps:
-1. In the **Scene Control** area, click the **Copy** button.
+1. In the **Scene Control** area, click the **... > Copy Scenes to Other Devices** button.
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Light-ClickCopyButton.png" alt="Click copy button" style={{width: '80%'}} />
 

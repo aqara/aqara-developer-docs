@@ -5,10 +5,12 @@ keywords: ["Aqara 文档", "Aqara Studio", "设备管理", "灯", "lights"]
 ---
 # 灯
 
-Aqara 灯具支持三种情景控制模式，可灵活适配多样化照明需求：
+Aqara 灯具支持五种情景控制模式，可灵活适配多样化照明需求：
 - [静态情景](#静态情景)：设定并呈现单一色彩和亮度；
 - [动态情景](#动态情景)：通过色彩和亮度的动态切换，营造富有变化的灯光氛围；
-- [序列情景](#序列情景)：自定义各色彩的过渡时长与顺序，展现渐变或编排效果。
+- [序列情景](#序列情景)：自定义各色彩的过渡时长与顺序，展现渐变或编排效果；
+- [分段静态](#分段静态)：将灯带划分为多个区段，并为各区段分别设定静态灯光效果；
+- [分段动态](#分段动态)：将灯带划分为多个区段，并为各区段分别配置动态灯光效果、切换速率与颜色组合。
 
 您可以直接 [应用 Aqara 预设的情景模式](#使用默认情景) 或根据实际需求 [自定义专属情景](#自定义情景)，还可以将您创建的自定义情景 [复制到其他设备](#复制自定义情景到其他设备)。
 
@@ -18,23 +20,32 @@ Aqara 灯具支持三种情景控制模式，可灵活适配多样化照明需�
 
 ## 使用默认情景
 
-1. 在 **设备管理** 页面左侧的 **协议和设备** 树中，选择目标灯设备，单击 **设备详情**。
+1. 在 **设备管理** 页面左侧的 **协议和设备** 树中，选择目标灯设备，单击 **更多设置**。
 
-    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Light-CheckDetails.png" alt="查看设备详情" />
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Light-MoreSettings.png" alt="查看更多设置" />
 
-2. 在 **设备详情** 页面找到 **情景控制** 区域，在 **默认** 标签页下将鼠标悬停至一个情景上，点击 **执行场景** 按钮。待执行完成后，灯将展示该情景规定的颜色和亮度。
+2. 在 **更多设置** 页面找到 **情景控制** 区域，在 **默认** 标签页下将鼠标悬停至一个情景上，点击 **执行情景** 按钮。待执行完成后，灯将展示该情景规定的颜色和亮度。
 
-    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Light-ExecuteDefaultScene.png" alt="执行默认情景" style={{width: '60%'}} />
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Light-ExecuteDefaultSceneOnMoreSettings.png" alt="执行默认情景" style={{width: '60%'}} />
 
 ## 自定义情景
 
 除了使用 Aqara 为您提供的默认情景之外，您还可以自行创建情景。
 
-### 新建自定义场景
+### 新建自定义情景
 
-在**情景控制** 区域点击 **新建场景**按钮，从下拉列表中选择要创建的情景类型（[静态场景](#静态情景)、[动态场景](#动态情景)、[序列场景](#序列情景)）。
+在**情景控制** 区域点击 **新建** 按钮。
 
-<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Light-NewScene.png" alt="新建情景" style={{width: '80%'}} />
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Light-CreateScenes.png" alt="新建情景" style={{width: '80%'}} />
+
+在 **新建情景** 抽屉中，您可以选择要创建的情景类型：
+- [静态情景](#静态情景)
+- [动态情景](#动态情景)
+- [序列情景](#序列情景)
+- [分段静态](#分段静态)
+- [分段动态](#分段动态)
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Light-NewSceneSettings.png" alt="新建情景" style={{width: '60%'}} />
 
 ### 配置自定义情景
 
@@ -42,7 +53,7 @@ Aqara 灯具支持三种情景控制模式，可灵活适配多样化照明需�
 
 #### 静态情景
 
-在 **新建静态情景** 页面：
+在 **新建情景** 页面：
 1. 配置情景名称，并设置一个颜色和亮度。
 2. （如需）点击 **预览** 按钮，观察灯的效果，确认是否符合预期。
 3. 点击 **保存** 按钮完成创建。
@@ -51,7 +62,7 @@ Aqara 灯具支持三种情景控制模式，可灵活适配多样化照明需�
 
 #### 动态情景
 
-在 **新建动态情景** 页面：
+在 **新建情景** 页面：
 1. 配置情景名称，选择多个颜色，选择一个动态效果作为全局颜色切换的效果，以及颜色切换的速率。
 2. （如需）点击 **预览** 按钮，观察灯的效果，确认是否符合预期。
 3. 点击 **保存** 按钮完成创建。
@@ -60,7 +71,7 @@ Aqara 灯具支持三种情景控制模式，可灵活适配多样化照明需�
 
 #### 序列情景
 
-在 **新建序列情景** 页面：
+在 **新建情景** 页面：
 1. 配置情景名称和循环方式。
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Light-ConfigureSequenceSceneNameAndLoop.png" alt="" style={{width: '60%'}} />
@@ -81,23 +92,43 @@ Aqara 灯具支持三种情景控制模式，可灵活适配多样化照明需�
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Light-PreviewAndSaveSequenceScene.png" alt="" style={{width: '60%'}} />
 
+#### 分段静态
+
+在 **新建情景** 页面：
+1. 配置情景名称，在情景类型下选择一个模式。
+2. 根据你选择的模式，**情景设置** 区域会出现不同的配置项供您选择。
+2. （如需）点击 **预览** 按钮，观察灯的效果，确认是否符合预期。
+3. 点击 **保存** 按钮完成创建。
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Light-SetSegementedStaticScene.png" alt="新建静态情景" style={{width: '60%'}} />
+
+
+#### 分段动态
+
+在 **新建情景** 页面：
+1. 配置情景名称。在 **情景设置** 中单击 **分段设置**，用于配置分段的数量。
+2. 分别选择列表中的分段，配置适用于此分段的动态效果、彩光顺序和颜色切换速率。
+2. （如需）点击 **预览** 按钮，观察灯的效果，确认是否符合预期。
+3. 点击 **保存** 按钮完成创建。
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Light-SetSegementedDynamicScene.png" alt="新建静态情景" style={{width: '60%'}} />
 
 ### 引用现有情景
 
-如果您已经创建了其他情景，并且希望在当前情景中使用，可以点击 **引用现有情景** 按钮，在下拉列表中选择要引用的情景，即可完成引用。
+如果您已经创建了其他情景，并且希望在新建情景中使用，可以点击 **引用现有情景** 按钮，在下拉列表中选择要引用的情景，即可完成引用。
 
 <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Light-ReferenceAnExisitingScene.png" alt="引用现有情景" style={{width: '80%'}} />
 
 ### 执行自定义情景
 
-在 **情景控制** 区域，切换至 **自定义** 标签页，将鼠标悬停至一个情景上，点击 **执行场景** 按钮。待执行完成后，灯将展示该情景规定的颜色和亮度。
+在 **情景控制** 区域，切换至 **自定义** 标签页，将鼠标悬停至一个情景上，点击 **执行情景** 按钮。待执行完成后，灯将展示该情景规定的颜色和亮度。
 
 <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Light-ExecuteCustomScene.png" alt="执行自定义情景" style={{width: '80%'}} />
 
 ## 复制自定义情景到其他设备
 
 如果您希望将 [自定义的情景](#自定义情景) 复制到其他设备，可以按照以下步骤操作：
-1. 在 **情景控制** 区域，单击 **复制** 按钮。
+1. 在 **情景控制** 区域，单击 **... > 复制情景到其他设备** 按钮。
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Light-ClickCopyButton.png" alt="点击复制按钮" style={{width: '80%'}} />
 
