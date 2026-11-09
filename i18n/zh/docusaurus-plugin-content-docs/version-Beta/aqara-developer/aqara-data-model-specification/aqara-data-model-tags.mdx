@@ -1999,6 +1999,13 @@ Device Type 用于描述 Endpoint 的设备类型，一个 Device 可以由一�
     <tr>
       <td>0x0087</td>
       <td>SingleSetpointAC（单设定点空调）</td>
+      <td>IRControl</td>
+      <td>O</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>0x0087</td>
+      <td>SingleSetpointAC（单设定点空调）</td>
       <td>FanControl</td>
       <td>O</td>
       <td></td>
@@ -2009,13 +2016,6 @@ Device Type 用于描述 Endpoint 的设备类型，一个 Device 可以由一�
       <td>FreshAirControl</td>
       <td>O</td>
       <td></td>
-    </tr>
-    <tr>
-      <td>0x0087</td>
-      <td>SingleSetpointAC（单设定点空调）</td>
-      <td>Temperature</td>
-      <td>O</td>
-      <td>室外温度使用 <code>OutdoorTemperature</code>；室内温度复用 HeaterCooler 的 <code>CurrentTemperature</code>。</td>
     </tr>
     <tr>
       <td>0x0062</td>
@@ -2159,6 +2159,8 @@ Device Type 用于描述 Endpoint 的设备类型，一个 Device 可以由一�
     </tr>
   </tbody>
 </table>
+
+SingleSetpointAC 支持的 Function 仅限于：必选的 `Output`、`HeaterCooler`，以及可选的 `IRControl`、`FanControl`、`FreshAirControl`，不支持其他 Function。
 
 AirConditioner 与 SingleSetpointAC 都实现 `Output` 和 `HeaterCooler`，区别在于目标温度和模式控制模型：
 
@@ -68024,6 +68026,12 @@ OpenMatterCommissioningWindow Command 的参数结构体。
   </thead>
   <tbody>
     <tr>
+      <td>0x5250</td>
+      <td><a href="#ref_SpecialHandlingPoints">SpecialHandlingPoints</a></td>
+      <td>特殊处理数据点列表</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x524A</td>
       <td><a href="#ref_MultiStateSetting">MultiStateSetting</a></td>
       <td>多状态设置</td>
@@ -68270,6 +68278,59 @@ OpenMatterCommissioningWindow Command 的参数结构体。
 </table>
 
 ### 数据类型
+
+#### SpecialHandlingTypeEnum8 Type {#ref_SpecialHandlingTypeEnum8}
+
+该枚举定义 SpecialHandlingPoints Trait 中特殊处理类型字段的有效取值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x01</td>
+      <td>CameraLegacyCompat</td>
+      <td>摄像头旧版兼容处理</td>
+    </tr>
+  </tbody>
+</table>
+
+#### SpecialHandlingPointsTraitPresentValueStructure Type {#ref_SpecialHandlingPointsTraitPresentValueStructure}
+
+该结构体定义 SpecialHandlingPoints Trait 的 Present Value 字段布局。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Type</td>
+      <td><a href="#ref_SpecialHandlingTypeEnum8">SpecialHandlingTypeEnum8</a></td>
+      <td>M</td>
+      <td>特殊处理类型，指明数据点或命令需遵循的额外处理约定。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>DataPointIds</td>
+      <td>list[characterString]</td>
+      <td>M</td>
+      <td>需要特殊处理的数据点或命令的寻址 ID 列表。Trait/Parameter 格式为 <code>&#123;Endpoint ID&#125;.&#123;Function ID&#125;.&#123;Trait ID&#125;.&#123;Parameter ID&#125;</code>，例如 <code>2.132.32920.1</code>；Command 格式为 <code>&#123;Endpoint ID&#125;.&#123;Function ID&#125;.&#123;Command ID&#125;.0</code>，例如 <code>2.132.32930.0</code>。</td>
+    </tr>
+  </tbody>
+</table>
 
 #### MultiStateSettingEnum16 Type {#ref_MultiStateSettingEnum16}
 
@@ -69458,6 +69519,11 @@ WakeupDevice Command 的参数结构体。Server 下发该 Command，用于将�
   </thead>
   <tbody>
     <tr>
+      <td>0x5250</td>
+      <td><a href="#ref_SpecialHandlingPoints">SpecialHandlingPoints</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x524A</td>
       <td><a href="#ref_MultiStateSetting">MultiStateSetting</a></td>
       <td>O</td>
@@ -69640,6 +69706,54 @@ WakeupDevice Command 的参数结构体。Server 下发该 Command，用于将�
     <tr>
       <td>0x51ED</td>
       <td><a href="#ref_VibrationIntensity">VibrationIntensity</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### SpecialHandlingPoints Trait（特殊处理数据点列表） {#ref_SpecialHandlingPoints}
+
+特殊处理数据点列表，用于标识需要额外特殊处理的数据点或命令集合，并指明其特殊处理类型。客户端或云端解析列表中的数据点或执行命令时，除常规逻辑外，SHALL 按对应类型约定执行额外处理。例如，`CameraLegacyCompat` 表示摄像头旧版兼容处理，具体转换、展示或告警判断规则由该兼容类型的约定定义。
+
+Trait/Parameter 的寻址 ID 格式为 `{Endpoint ID}.{Function ID}.{Trait ID}.{Parameter ID}`；Command 的寻址 ID 格式为 `{Endpoint ID}.{Function ID}.{Command ID}.0`，最后一段固定为 `0`。`DataPointIds` 中的 ID 应指向实际存在的 Endpoint、Function、Trait/Parameter 或 Command。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5250</td>
+      <td>SpecialHandlingPoints</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_SpecialHandlingPointsTraitPresentValueStructure">SpecialHandlingPointsTraitPresentValueStructure</a></td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -103288,12 +103402,53 @@ height（uint32）：指定单位下的区域总高度。
       <td>区域尺寸</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5251</td>
+      <td><a href="#ref_FaceList">FaceList</a></td>
+      <td>人脸列表</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5252</td>
+      <td><a href="#ref_FaceCountLimit">FaceCountLimit</a></td>
+      <td>人脸数上限</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
 ### Command
 
-本 Function 不包含 Command。
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Code</th>
+      <th>名称</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9DBC</td>
+      <td><a href="#ref_AddFace">AddFace</a></td>
+      <td>新增人脸</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DBD</td>
+      <td><a href="#ref_DeleteFace">DeleteFace</a></td>
+      <td>删除人脸</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DBE</td>
+      <td><a href="#ref_ModifyFace">ModifyFace</a></td>
+      <td>修改人脸</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
 
 ### 数据类型
 
@@ -103479,6 +103634,292 @@ height（uint32）：指定单位下的区域总高度。
   </tbody>
 </table>
 
+##### FaceManagementStatusEnum8 Type {#ref_FaceManagementStatusEnum8}
+
+该枚举定义 AddFace、DeleteFace 和 ModifyFace Command 的响应状态码。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>SUCCESS</td>
+      <td>操作成功</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>RESOURCE_EXHAUSTED</td>
+      <td>人脸库已达上限</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>CONSTRAINT_ERROR</td>
+      <td>参数无效或辅助校验不一致</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>BUSY</td>
+      <td>设备正忙，暂时无法处理</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>NOT_FOUND</td>
+      <td>指定的 FaceId 不存在</td>
+    </tr>
+  </tbody>
+</table>
+
+##### FaceItemStructure Type {#ref_FaceItemStructure}
+
+FaceList 中的单条人脸记录。`ImageData` 与 `ImageUrl` 至少提供一项；同时提供时，`ImageData` 为图片数据，`ImageUrl` 为该图片的访问地址。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>FaceId</td>
+      <td>uint64</td>
+      <td>M</td>
+      <td>设备分配的人脸唯一标识。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Name</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>人脸名称，最长 64 个字符。</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>ImageData</td>
+      <td>octetString</td>
+      <td>O</td>
+      <td>人脸图片二进制数据，JSON 编码使用 Base64。与 ImageUrl 至少提供一项，最大 512 KiB。</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>ImageUrl</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>人脸图片访问地址。与 ImageData 至少提供一项。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### AddFace Command Structure Type {#ref_AddFaceCommandStructure}
+
+AddFace Command 的请求参数结构体。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Name</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>人脸名称，不能为空，最长 64 个字符。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>ImageData</td>
+      <td>octetString</td>
+      <td>M</td>
+      <td>人脸图片二进制数据，JSON 编码使用 Base64。图片最大 512 KiB（建议）；建议 JPG 或 PNG，建议分辨率不低于 200 &times; 200。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### AddFace Response Structure Type {#ref_AddFaceResponseStructure}
+
+AddFace Command 的响应结构体。成功时返回设备分配的 FaceId；`Success` SHALL 与 `Status` 一致。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td><a href="#ref_FaceManagementStatusEnum8">FaceManagementStatusEnum8</a></td>
+      <td>M</td>
+      <td>命令执行结果状态。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>FaceId</td>
+      <td>uint64</td>
+      <td>C</td>
+      <td>新增成功时由设备分配并返回的人脸唯一标识；失败时省略。</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Success</td>
+      <td>boolean</td>
+      <td>M</td>
+      <td>操作是否成功；Status 为 SUCCESS 时必须为 true，否则必须为 false。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### DeleteFace Command Structure Type {#ref_DeleteFaceCommandStructure}
+
+DeleteFace Command 的请求参数结构体。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>FaceId</td>
+      <td>uint64</td>
+      <td>M</td>
+      <td>要删除的人脸唯一标识，必须是设备已分配的有效 ID。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Name</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>人脸名称辅助校验，最长 64 个字符；与 FaceId 对应记录不一致时返回 CONSTRAINT_ERROR。</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>ImageData</td>
+      <td>octetString</td>
+      <td>O</td>
+      <td>人脸图片辅助校验，JSON 编码使用 Base64，最大 512 KiB；与 FaceId 对应记录不一致时返回 CONSTRAINT_ERROR。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### DeleteFace Response Structure Type {#ref_DeleteFaceResponseStructure}
+
+DeleteFace Command 的响应结构体。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td><a href="#ref_FaceManagementStatusEnum8">FaceManagementStatusEnum8</a></td>
+      <td>M</td>
+      <td>命令执行结果状态。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### ModifyFace Command Structure Type {#ref_ModifyFaceCommandStructure}
+
+ModifyFace Command 的请求参数结构体。至少提供 Name 或 ImageData 之一；未提供的字段保持原值不变。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>FaceId</td>
+      <td>uint64</td>
+      <td>M</td>
+      <td>要修改的人脸唯一标识，必须是设备已分配的有效 ID。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Name</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>新人脸名称，最长 64 个字符；未提供时保持原值。</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>ImageData</td>
+      <td>octetString</td>
+      <td>O</td>
+      <td>新人脸图片二进制数据，JSON 编码使用 Base64，最大 512 KiB；未提供时保持原值。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### ModifyFace Response Structure Type {#ref_ModifyFaceResponseStructure}
+
+ModifyFace Command 的响应结构体。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Status</td>
+      <td><a href="#ref_FaceManagementStatusEnum8">FaceManagementStatusEnum8</a></td>
+      <td>M</td>
+      <td>命令执行结果状态。</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait 定义
 
 <table>
@@ -103543,6 +103984,16 @@ height（uint32）：指定单位下的区域总高度。
     <tr>
       <td>0x502D</td>
       <td><a href="#ref_RegionDimension">RegionDimension</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5251</td>
+      <td><a href="#ref_FaceList">FaceList</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5252</td>
+      <td><a href="#ref_FaceCountLimit">FaceCountLimit</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -104237,9 +104688,270 @@ height（uint32）：指定单位下的区域总高度。
   </tbody>
 </table>
 
+#### FaceList Trait（人脸列表） {#ref_FaceList}
+
+表示设备本地人脸库中的人脸信息列表。每项包含设备分配的 FaceId、名称，以及图片数据或图片访问地址。该 Trait 只读、可上报，用于客户端获取设备本地人脸信息。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5251</td>
+      <td>FaceList</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_FaceItemStructure">FaceItemStructure</a>]</td>
+      <td>每项至少提供 ImageData 或 ImageUrl</td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### FaceCountLimit Trait（人脸数上限） {#ref_FaceCountLimit}
+
+表示设备本地人脸库可容纳的人脸数量上限。该值由设备根据自身能力上报。默认值为 50。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5252</td>
+      <td>FaceCountLimit</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td>1..65535</td>
+      <td>50</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>65535</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>Step Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Command 定义
 
-本 Function 不包含 Command。
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9DBC</td>
+      <td><a href="#ref_AddFace">AddFace</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DBD</td>
+      <td><a href="#ref_DeleteFace">DeleteFace</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DBE</td>
+      <td><a href="#ref_ModifyFace">ModifyFace</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### AddFace Command {#ref_AddFace}
+
+新增一条人脸信息并同步到设备本地人脸库。设备在成功时 SHALL 分配唯一的 64 位无符号 FaceId，并在响应中返回。当人脸库已达到 FaceCountLimit 时返回 RESOURCE_EXHAUSTED。
+
+##### 参数
+
+[AddFace Command Structure](#ref_AddFaceCommandStructure)
+
+##### 响应
+
+[AddFace Response Structure](#ref_AddFaceResponseStructure)。Status 取值：
+
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SUCCESS</td>
+      <td>新增成功，返回 FaceId，Success 为 true</td>
+    </tr>
+    <tr>
+      <td>RESOURCE_EXHAUSTED</td>
+      <td>人脸库已达 FaceCountLimit</td>
+    </tr>
+    <tr>
+      <td>CONSTRAINT_ERROR</td>
+      <td>参数无效，例如名称为空、图片格式不支持或图片超过大小限制</td>
+    </tr>
+    <tr>
+      <td>BUSY</td>
+      <td>设备正忙，暂时无法处理</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DeleteFace Command {#ref_DeleteFace}
+
+删除指定人脸信息并同步到设备本地人脸库。以 FaceId 为唯一主定位依据，Name 和 ImageData 可作为辅助校验。FaceId 不存在时返回 NOT_FOUND。
+
+##### 参数
+
+[DeleteFace Command Structure](#ref_DeleteFaceCommandStructure)
+
+##### 响应
+
+[DeleteFace Response Structure](#ref_DeleteFaceResponseStructure)。Status 取值：
+
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SUCCESS</td>
+      <td>删除成功</td>
+    </tr>
+    <tr>
+      <td>NOT_FOUND</td>
+      <td>指定的 FaceId 不存在</td>
+    </tr>
+    <tr>
+      <td>CONSTRAINT_ERROR</td>
+      <td>辅助校验不一致，例如 Name 与 FaceId 对应记录不符</td>
+    </tr>
+    <tr>
+      <td>BUSY</td>
+      <td>设备正忙，暂时无法处理</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ModifyFace Command {#ref_ModifyFace}
+
+修改指定人脸信息并同步到设备本地人脸库。以 FaceId 定位记录，可更新名称和/或图片；未提供的字段保持原值不变。FaceId 不存在时返回 NOT_FOUND。
+
+##### 参数
+
+[ModifyFace Command Structure](#ref_ModifyFaceCommandStructure)
+
+##### 响应
+
+[ModifyFace Response Structure](#ref_ModifyFaceResponseStructure)。Status 取值：
+
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SUCCESS</td>
+      <td>修改成功</td>
+    </tr>
+    <tr>
+      <td>NOT_FOUND</td>
+      <td>指定的 FaceId 不存在</td>
+    </tr>
+    <tr>
+      <td>CONSTRAINT_ERROR</td>
+      <td>参数无效，例如未提供任何待修改字段或图片格式不支持</td>
+    </tr>
+    <tr>
+      <td>BUSY</td>
+      <td>设备正忙，暂时无法处理</td>
+    </tr>
+  </tbody>
+</table>
 
 ## GestureRecognition（手势识别） {#ref_Aqara_Spec_GestureRecognition}
 
