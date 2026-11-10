@@ -113,7 +113,9 @@
                           "aqara-studio/flow/condition",
                           "aqara-studio/flow/action"
                       ]
-                    }
+                    },
+                    "aqara-studio/automation/scenes",
+                    "aqara-studio/automation/templates"
                 ]
               },
               {

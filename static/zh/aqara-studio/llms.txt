@@ -46,6 +46,8 @@
 - 触发: https://docs.aqara.com/zh/docs/aqara-studio/flow/trigger
 - 判断: https://docs.aqara.com/zh/docs/aqara-studio/flow/condition
 - 执行: https://docs.aqara.com/zh/docs/aqara-studio/flow/action
+- 场景: https://docs.aqara.com/zh/docs/aqara-studio/automation/scenes
+- 模板: https://docs.aqara.com/zh/docs/aqara-studio/automation/templates
 - 可视化大屏: https://docs.aqara.com/zh/docs/aqara-studio/graph/graph-introduction
 - 组件库: https://docs.aqara.com/zh/docs/aqara-studio/graph/components
 - 组件类型: https://docs.aqara.com/zh/docs/aqara-studio/graph/component-categories
