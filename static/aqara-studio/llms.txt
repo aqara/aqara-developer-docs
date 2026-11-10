@@ -46,6 +46,8 @@
 - Trigger: https://docs.aqara.com/docs/aqara-studio/flow/trigger
 - Condition: https://docs.aqara.com/docs/aqara-studio/flow/condition
 - Action: https://docs.aqara.com/docs/aqara-studio/flow/action
+- Scenes: https://docs.aqara.com/docs/aqara-studio/automation/scenes
+- Templates: https://docs.aqara.com/docs/aqara-studio/automation/templates
 - Graph Web: https://docs.aqara.com/docs/aqara-studio/graph/graph-introduction
 - Components: https://docs.aqara.com/docs/aqara-studio/graph/components
 - Component Categories: https://docs.aqara.com/docs/aqara-studio/graph/component-categories
