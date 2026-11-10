@@ -97015,7 +97015,7 @@ Inside `AqaraSpecTree` (key `3`), Map Keys no longer use this fixed table, but d
       <td>1</td>
       <td>DeviceType</td>
       <td>unsigned int</td>
-      <td></td>
+      <td>Aqara Spec device type ID; <code>0xFFFF</code> (supports all device types)</td>
       <td>Device type ID defined by Aqara Spec, located in each Devices entry.</td>
     </tr>
     <tr>
@@ -97041,7 +97041,7 @@ This field is a CBOR Array; each Map in the array describes the subscription cap
 
 ###### DeviceType Field (inside Devices entries)
 
-This field is used to indicate the device type corresponding to the capability entry, whose value is the unsigned integer device type ID defined by Aqara Spec. The same `DeviceType` may only appear once in a single Payload.
+This field is used to indicate the device type corresponding to the capability entry, whose value is the unsigned integer device type ID defined by Aqara Spec. The same `DeviceType` may only appear once in a single Payload. When the value of `DeviceType` is `0xFFFF`, the capability entry applies to all device types.
 
 ###### MaxEndpointNum Field (inside Devices entries)
 
