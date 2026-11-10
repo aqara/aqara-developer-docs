@@ -97015,7 +97015,7 @@ Map Key 使用**无符号整数**（CBOR major type 0）；`0-23` 可编码为�
       <td>1</td>
       <td>DeviceType</td>
       <td>unsigned int</td>
-      <td></td>
+      <td>Aqara Spec 设备类型 ID；<code>0xFFFF</code>（支持所有设备类型）</td>
       <td>Aqara Spec 定义的设备类型 ID，位于每个 Devices 条目中。</td>
     </tr>
     <tr>
@@ -97041,7 +97041,7 @@ Map Key 使用**无符号整数**（CBOR major type 0）；`0-23` 可编码为�
 
 ###### DeviceType 字段（位于 Devices 条目内）
 
-该字段用于指示能力条目所对应的设备类型，其值为 Aqara Spec 定义的无符号整数设备类型 ID。单个 Payload 内同一 `DeviceType` 只能出现一次。
+该字段用于指示能力条目所对应的设备类型，其值为 Aqara Spec 定义的无符号整数设备类型 ID。单个 Payload 内同一 `DeviceType` 只能出现一次。当 `DeviceType` 取值为 `0xFFFF` 时，表示该能力条目适用于所有设备类型。
 
 ###### MaxEndpointNum 字段（位于 Devices 条目内）
 
