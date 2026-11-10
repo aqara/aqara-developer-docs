@@ -1999,6 +1999,13 @@ Special types: Root, Public. They correspond to the Root Endpoint and Public End
     <tr>
       <td>0x0087</td>
       <td>SingleSetpointAC (Single-setpoint Air Conditioner)</td>
+      <td>IRControl</td>
+      <td>O</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>0x0087</td>
+      <td>SingleSetpointAC (Single-setpoint Air Conditioner)</td>
       <td>FanControl</td>
       <td>O</td>
       <td></td>
@@ -2009,13 +2016,6 @@ Special types: Root, Public. They correspond to the Root Endpoint and Public End
       <td>FreshAirControl</td>
       <td>O</td>
       <td></td>
-    </tr>
-    <tr>
-      <td>0x0087</td>
-      <td>SingleSetpointAC (Single-setpoint Air Conditioner)</td>
-      <td>Temperature</td>
-      <td>O</td>
-      <td>Outdoor temperature uses <code>OutdoorTemperature</code>; indoor temperature reuses HeaterCooler's <code>CurrentTemperature</code>.</td>
     </tr>
     <tr>
       <td>0x0062</td>
@@ -40888,7 +40888,7 @@ This structure defines the Present Value field layout of the LockErrorLogReport 
       <td>LockErrorCode</td>
       <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
-      <td>External or internal exception; value is defined by the LockErrorCodeEnum Type.</td>
+      <td>External or internal exception.</td>
     </tr>
     <tr>
       <td>1</td>
@@ -41398,7 +41398,7 @@ This structure defines the Present Value field layout of the AqaraUserError Trai
 
 ##### AqaraUserChangeTraitPresentValueStructure Type {#ref_AqaraUserChangeTraitPresentValueStructure}
 
-This structure defines the Present Value field layout of the AqaraUserChange Trait. This Trait reports the relevant status only after a successful change to the user or credential database; when a credential changes, Credential may carry the complete AqaraCredentialItemStruct (including the credential type and its content). The CheckNumber in Extension events is for gateway-internal use only, does not belong to the Trait, and MUST NOT be reported to the App or the cloud.
+This structure defines the Present Value field layout of the AqaraUserChange Trait. This Trait reports the relevant status only after a successful change to the user or credential database; when a credential changes, Credential may carry the credential metadata defined in AqaraCredentialItemStruct. The CheckNumber in Extension events is for gateway-internal use only, does not belong to the Trait, and MUST NOT be reported to the App or the cloud.
 
 <table>
   <thead>
@@ -41451,7 +41451,7 @@ This structure defines the Present Value field layout of the AqaraUserChange Tra
       <td>Credential</td>
       <td><a href="#ref_AqaraCredentialItemStruct">AqaraCredentialItemStruct</a></td>
       <td>O</td>
-      <td>Complete credential information involved in the change, including credential attributes, type, ID, index, name, validity period, and credential content corresponding to the type; may be omitted or null when there is no related credential, when a credential is deleted, or when the device does not provide sensitive credential content.</td>
+      <td>Credential metadata involved in the change, including credential attributes, type, ID, index, name, and validity period; may be omitted or null when there is no related credential or when a credential is deleted.</td>
     </tr>
   </tbody>
 </table>
@@ -50322,7 +50322,7 @@ This command is used to respond to `SetTravelCalibration`, reporting the executi
       <td>ErrorCode</td>
       <td><a href="#ref_DoorLockErrorCodeEnum">DoorLockErrorCodeEnum</a></td>
       <td>M</td>
-      <td>Travel calibration result; 0x00 means success, non-zero values indicate failure reasons.</td>
+      <td>Travel calibration result.</td>
     </tr>
   </tbody>
 </table>
@@ -149775,7 +149775,7 @@ This enumeration defines the valid values of the signaling event types in the We
     <tr>
       <td>0x03</td>
       <td>End</td>
-      <td>Camera ends the session</td>
+      <td>Server ends the session</td>
     </tr>
   </tbody>
 </table>
@@ -149821,7 +149821,7 @@ This enumeration defines the valid values of the WebRTC session end reasons.
     <tr>
       <td>0x05</td>
       <td>NoUserMedia</td>
-      <td>No local media device</td>
+      <td>No local media Server</td>
     </tr>
     <tr>
       <td>0x06</td>
@@ -149831,7 +149831,7 @@ This enumeration defines the valid values of the WebRTC session end reasons.
     <tr>
       <td>0x07</td>
       <td>AnsweredElsewhere</td>
-      <td>Answered by another device</td>
+      <td>Answered by another Server</td>
     </tr>
     <tr>
       <td>0x08</td>
@@ -150005,7 +150005,7 @@ This structure defines the field layout of the ICE candidate.
 
 ##### ExtensionOptionsStructure Type {#ref_ExtensionOptionsStructure}
 
-Extension options for configuring the timeout values of each WebRTC connection establishment phase and other extension parameters. The Struct as a whole and each field are optional; when a field is not carried, the gateway SHALL use implementation defaults. Options not supported by the downstream Matter WebRTC protocol are interpreted and executed by the gateway on the Aqara Spec side.
+Extension options for configuring the timeout values of each WebRTC connection establishment phase and other extension parameters. The Struct as a whole and each field are optional; when a field is not carried, the Server SHALL use implementation defaults. The extension options are interpreted and executed by the Server.
 
 <table>
   <thead>
@@ -150171,7 +150171,7 @@ This structure defines the field layout of the signaling event.
 
 ##### SessionStatusStructure Type {#ref_SessionStatusStructure}
 
-Session status report structure. The gateway **Reports** based on the route selection result of the WebRTC media stack and the session lifecycle; when the downstream Matter protocol has no corresponding capability, the gateway aggregates and reports it.
+Session status report structure. The Server **Reports** based on the route selection result of the WebRTC media stack and the session lifecycle.
 
 <table>
   <thead>
@@ -150743,7 +150743,7 @@ The request structure of `WebRTCSetResolution`.
 
 ##### WebRTCSetResolutionResponse Command Structure Type {#ref_WebRTCSetResolutionResponseCommandStructure}
 
-The response structure of `WebRTCSetResolution`.
+The response structure of `WebRTCSetResolution`. This command has no other response parameters.
 
 <table>
   <thead>
@@ -150878,7 +150878,7 @@ List of currently active WebRTC sessions.
 
 #### WebRTCSignalingEvent Trait {#ref_WebRTCSignalingEvent}
 
-Signaling events generated by the camera.
+Signaling events generated by the Server.
 
 <table>
   <thead>
