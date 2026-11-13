@@ -321,6 +321,11 @@
                       "type": "doc",
                       "id": "aqara-developer/data-export-api/update-space-name",
                       "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/delete-space",
+                      "className": "api-method post"
                     }
                   ]
                 },
@@ -383,6 +388,21 @@
                     },
                     {
                       "type": "doc",
+                      "id": "aqara-developer/data-export-api/get-device-filter-options",
+                      "className": "api-method get"
+                    },                    
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/get-matched-device-capabilities",
+                      "className": "api-method get"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/batch-device-capabilities",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
                       "id": "aqara-developer/data-export-api/execute-device-trait",
                       "className": "api-method post"
                     },
@@ -403,12 +423,37 @@
                     },
                     {
                       "type": "doc",
+                      "id": "aqara-developer/data-export-api/query-device-point-info",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/update-device-name",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/update-device-point-name",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
                       "id": "aqara-developer/data-export-api/delete-device-point",
                       "className": "api-method post"
                     },
                     {
                       "type": "doc",
                       "id": "aqara-developer/data-export-api/add-virtual-device",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/bind-virtual-device-points",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/unbind-virtual-device-points",
                       "className": "api-method post"
                     },
                     {
@@ -466,20 +511,69 @@
                       "type": "doc",
                       "id": "aqara-developer/data-export-api/delete-automations",
                       "className": "api-method post"
-                    },
+                    }
+                  ]
+                },
+                {
+                  "type": "category",
+                  "label": "Event",
+                  "link": {
+                    "type": "doc",
+                    "id": "aqara-developer/data-export-api/event"
+                  },
+                  "collapsed": false,
+                  "items": [
                     {
                       "type": "doc",
-                      "id": "aqara-developer/data-export-api/query-automation-manual-trigger-list",
-                      "className": "api-method get"
-                    },
+                      "id": "aqara-developer/data-export-api/report-external-event",
+                      "className": "api-method post"
+                    }
+                  ]
+                }, 
+                {
+                  "type": "category",
+                  "label": "Firmware",
+                  "link": {
+                    "type": "doc",
+                    "id": "aqara-developer/data-export-api/firmware"
+                  },
+                  "collapsed": false,
+                  "items": [
                     {
                       "type": "doc",
-                      "id": "aqara-developer/data-export-api/execute-automation-manual-trigger",
+                      "id": "aqara-developer/data-export-api/search-upgradable-devices-firmware-by-device-ids",
                       "className": "api-method post"
                     },
                     {
                       "type": "doc",
-                      "id": "aqara-developer/data-export-api/reference/json-automation-script"
+                      "id": "aqara-developer/data-export-api/upgrade-firmware",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/search-firmware-upgrade-status",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/cancel-upgrade-firmware",
+                      "className": "api-method post"
+                    }
+                  ]
+                },
+                {
+                  "type": "category",
+                  "label": "History",
+                  "link": {
+                    "type": "doc",
+                    "id": "aqara-developer/data-export-api/history"
+                  },
+                  "collapsed": false,
+                  "items": [
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/query-device-point-history",
+                      "className": "api-method post"
                     }
                   ]
                 },
@@ -496,6 +590,93 @@
                       "type": "doc",
                       "id": "aqara-developer/data-export-api/get-studio-statistics",
                       "className": "api-method get"
+                    }
+                  ]
+                },
+                {
+                  "type": "category",
+                  "label": "Scene",
+                  "link": {
+                    "type": "doc",
+                    "id": "aqara-developer/data-export-api/scene"
+                  },
+                  "collapsed": false,
+                  "items": [
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/create-scene",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/execute-scene",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/update-scene",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/update-scene-space",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/query-scene-details",
+                      "className": "api-method get"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/query-scene-list",
+                      "className": "api-method get"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/delete-scenes",
+                      "className": "api-method post"
+                    }
+                  ]
+                },                
+                {
+                  "type": "category",
+                  "label": "EMS",
+                  "link": {
+                    "type": "doc",
+                    "id": "aqara-developer/data-export-api/ems"
+                  },
+                  "collapsed": false,
+                  "items": [
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/get-ems-trend-device",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/get-ems-trend-space",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/get-ems-total-device",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/get-ems-total-space",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/get-ems-summary-space",
+                      "className": "api-method post"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "aqara-developer/data-export-api/get-ems-summary-devices",
+                      "className": "api-method post"
                     }
                   ]
                 }

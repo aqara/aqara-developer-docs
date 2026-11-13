@@ -1,0 +1,71 @@
+---
+id: query-device-point-info
+title: "批量查询设备点位信息"
+description: "按 deviceId、endpointId、functionCode 和 traitCode/commandCode 查询点位所属空间、设备名称、点位名称等信息。"
+sidebar_label: "批量查询设备点位信息"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "post api-method"
+info_path: i18n/zh/docusaurus-plugin-content-docs/version-Beta/aqara-developer/data-export-api/data-export-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"批量查询设备点位信息"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/devices/points/info"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+按 deviceId、endpointId、functionCode 和 traitCode/commandCode 查询点位所属空间、设备名称、点位名称等信息。
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"Lang","in":"header","required":false,"schema":{"type":"string","example":"{{Lang}}"},"description":"语言。使用 `zh-CN` 表示中文，使用 `en-US` 表示英文。"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["data"],"properties":{"data":{"type":"array","description":"需要查询的设备点位信息列表。","minItems":1,"items":{"type":"object","required":["deviceId","endpointId","functionCode"],"properties":{"deviceId":{"type":"string","description":"设备 ID。"},"endpointId":{"type":"integer","description":"端点 ID。"},"functionCode":{"type":"string","description":"功能编码。"},"traitCode":{"type":"string","nullable":true,"description":"功能点编码。"},"commandCode":{"type":"string","nullable":true,"description":"命令编码。"}},"description":"traitCode 与 commandCode 必须且只能传一个。","title":"QueryDevicePointInfoItem"}}},"title":"QueryDevicePointInfoRequest"},"example":{"data":[{"deviceId":"device-001","endpointId":1,"functionCode":"Output","traitCode":"OnOff"}]}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"成功","content":{"application/json":{"schema":{"allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息 ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"title":"BaseResponse"},{"type":"object","properties":{"data":{"type":"array","items":{"allOf":[{"type":"object","required":["deviceId","endpointId","functionCode"],"properties":{"deviceId":{"type":"string","description":"设备 ID。"},"endpointId":{"type":"integer","description":"端点 ID。"},"functionCode":{"type":"string","description":"功能编码。"},"traitCode":{"type":"string","nullable":true,"description":"功能点编码。"},"commandCode":{"type":"string","nullable":true,"description":"命令编码。"}},"description":"traitCode 与 commandCode 必须且只能传一个。","title":"QueryDevicePointInfoItem"},{"type":"object","required":["code"],"properties":{"deviceName":{"type":"string","nullable":true,"description":"设备名称。"},"pointName":{"type":"string","nullable":true,"description":"点位名称。"},"space":{"type":"object","required":["spaceId","name"],"properties":{"parentSpaceId":{"type":"string","nullable":true,"description":"父空间 ID；没有父空间时省略此字段。"},"spaceId":{"type":"string","description":"空间 ID。"},"name":{"type":"string","description":"空间名称。"}},"title":"DeviceSpace","nullable":true,"description":"空间信息。"},"code":{"type":"integer","description":"状态码。"},"message":{"type":"string","nullable":true,"description":"提示信息。"}}}],"title":"QueryDevicePointInfoResult"}},"type":{"type":"string","enum":["QueryDevicePointInfoResponse"]}}}],"example":{"type":"QueryDevicePointInfoResponse","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-000000000029","code":0,"message":"success","data":[{"deviceId":"device-001","endpointId":1,"functionCode":"Output","traitCode":"OnOff","deviceName":"客厅灯","pointName":"主灯开关","space":{"parentSpaceId":"space-home-001","spaceId":"space-livingroom-001","name":"客厅"},"code":0,"message":"success"}]},"title":"QueryDevicePointInfoResponse"}}}},"400":{"description":"请求参数错误","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"}}}},"401":{"description":"未认证或认证失效","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"},"example":{"version":"","msgId":"","code":401,"message":"Authentication failed: Token is empty"}}}},"403":{"description":"无权限访问","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"},"example":{"version":"","msgId":"","code":403,"message":"无权访问该资源"}}}},"404":{"description":"资源不存在","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"}}}},"429":{"description":"请求频率过高","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"}}}},"500":{"description":"服务内部错误","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

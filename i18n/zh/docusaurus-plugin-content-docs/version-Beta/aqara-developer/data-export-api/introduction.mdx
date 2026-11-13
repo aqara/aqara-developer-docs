@@ -25,6 +25,7 @@ Aqara Studio API提供了一套丰富的接口，支持用户高效、安全地�
 | [查询空间列表](./get-spaces.api.mdx) | /open/api/v1/spaces | GET |
 | [创建空间](./create-space.api.mdx) | /open/api/v1/spaces | POST |
 | [修改空间名称](./update-space-name.api.mdx) | /open/api/v1/spaces/name | POST |
+| [删除空间](./delete-space.api.mdx) | /open/api/v1/spaces/delete | POST |
 
 ### 网关
 
@@ -42,14 +43,19 @@ Aqara Studio API提供了一套丰富的接口，支持用户高效、安全地�
 | [查询设备类型列表](./get-device-types.api.mdx) | /open/api/v1/devices/types | GET |
 | [查询设备信息列表](./get-devices.api.mdx) | /open/api/v1/devices | GET |
 | [查询设备模型定义](./get-device-definitions.api.mdx) | /open/api/v1/devices/definitions | GET |
+| [查询设备匹配能力](./get-matched-device-capabilities.api.mdx) | /open/api/v1/devices/capabilities | GET |
 | [通过 Trait 控制设备](./execute-device-trait.api.mdx) | /open/api/v1/devices/trait/execute | POST |
 | [查询 Trait 值](./get-trait-values.api.mdx) | /open/api/v1/devices/trait/read | POST |
 | [通过 Command 控制设备](./execute-device-command.api.mdx) | /open/api/v1/devices/command/execute | POST |
 | [向设备下发 Command 并等待响应](./execute-device-command-await.api.mdx) | /open/api/v1/devices/command/execute/await | POST |
+| [批量查询设备点位信息](./query-device-point-info.api.mdx) | /open/api/v1/devices/points/info | POST |
+| [修改设备名称](./update-device-name.api.mdx) | /open/api/v1/devices/name | POST |
+| [修改设备点位名称](./update-device-point-name.api.mdx) | /open/api/v1/devices/points/name | POST |
 | [删除设备点位](./delete-device-point.api.mdx) | /open/api/v1/devices/points/delete | POST |
 | [添加虚拟设备](./add-virtual-device.api.mdx) | /open/api/v1/virtual-devices | POST |
+| [绑定设备功能点](./bind-virtual-device-points.api.mdx) | /open/api/v1/virtual-devices/points/bind | POST |
+| [解绑源设备功能点](./unbind-virtual-device-points.api.mdx) | /open/api/v1/virtual-devices/points/unbind | POST |
 | [设备解绑](./unbind-device.api.mdx) | /open/api/v1/devices/unbind | POST |
-
 
 ### 自动化
 
@@ -63,14 +69,38 @@ Aqara Studio API提供了一套丰富的接口，支持用户高效、安全地�
 | [批量更新自动化状态](./update-automation-status.api.mdx) | /open/api/v1/automations/status | POST |
 | [批量更新自动化关联空间](./update-automation-space.api.mdx) | /open/api/v1/automations/space | POST |
 | [删除自动化](./delete-automations.api.mdx) | /open/api/v1/automations/delete | POST |
-| [获取手动触发器列表](./query-automation-manual-trigger-list.api.mdx) | /open/api/v1/automations/manual-triggers | GET |
-| [执行手动触发器](./execute-automation-manual-trigger.api.mdx) | /open/api/v1/automations/manual-triggers/execute | POST |
+
+### 固件
+
+| 功能 | API 端点 | 请求方法 |
+| --- | --- | --- |
+| [按设备ID查询可升级设备固件](./search-upgradable-devices-firmware-by-device-ids.api.mdx) | /open/api/v1/firmware/upgradable-devices/search-by-device-ids | POST |
+| [发起固件升级](./upgrade-firmware.api.mdx) | /open/api/v1/firmware/upgrade | POST |
+| [查询固件升级进度和结果](./search-firmware-upgrade-status.api.mdx) | /open/api/v1/firmware/upgrade/status/search | POST |
+| [取消固件升级](./cancel-upgrade-firmware.api.mdx) | /open/api/v1/firmware/upgrade/cancel | POST |
+
+### 历史
+
+| 功能 | API 端点 | 请求方法 |
+| --- | --- | --- |
+| [查询设备点位值变化历史](./query-device-point-history.api.mdx) | /open/api/v1/history/device-point-values/query | POST |
 
 ### Studio 
 
 | 功能 | API 端点 | 请求方法 |
 | --- | --- | --- |
 | [获取 Studio 统计信息](./get-studio-statistics.api.mdx) | /open/api/v1/studio/statistics | GET |
+
+### EMS
+
+| 功能 | API 端点 | 请求方法 |
+| --- | --- | --- |
+| [查询单设备能耗趋势](./get-ems-trend-device.api.mdx) | /open/api/v1/ems/trend/device | POST |
+| [查询单空间能耗趋势](./get-ems-trend-space.api.mdx) | /open/api/v1/ems/trend/space | POST |
+| [查询单设备能耗总量](./get-ems-total-device.api.mdx) | /open/api/v1/ems/total/device | POST |
+| [查询单空间能耗总量](./get-ems-total-space.api.mdx) | /open/api/v1/ems/total/space | POST |
+| [查询空间能耗摘要](./get-ems-summary-space.api.mdx) | /open/api/v1/ems/summary/space | POST |
+| [查询多设备能耗摘要](./get-ems-summary-devices.api.mdx) | /open/api/v1/ems/summary/devices | POST |
 
 ## WebSocket API
 

@@ -17,21 +17,30 @@
 - 查询空间列表: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-spaces
 - 创建空间: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/create-space
 - 修改空间名称: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/update-space-name
+- 删除空间: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/delete-space
 - Gateway: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/gateway
 - 查询网关列表: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-gateways
 - 开启网关子设备添加模式: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/join-subdevice
 - 关闭网关子设备添加模式: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/stop-subdevice-join
 - 查询子设备入网结果: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-device-bind-result
 - Device: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/device
-- 查询设备类型列表: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-device-types
+- 查询设备类型（DeviceType）列表: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-device-types
 - 查询设备信息列表: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-devices
-- 查询设备模型定义: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-device-definitions
+- 查询设备定义（设备详细信息）: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-device-definitions
+- 获取设备筛选选项: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-device-filter-options
+- 查询单个设备匹配能力: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-matched-device-capabilities
+- 批量查询设备匹配能力及 trait 当前值: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/batch-device-capabilities
 - 通过 Trait 控制设备: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/execute-device-trait
 - 查询 Trait 值: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-trait-values
 - 通过 Command 控制设备: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/execute-device-command
 - 向设备下发 Command 并等待响应: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/execute-device-command-await
+- 批量查询设备点位信息: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/query-device-point-info
+- 修改设备名称: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/update-device-name
+- 修改设备点位名称: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/update-device-point-name
 - 删除设备点位: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/delete-device-point
 - 添加虚拟设备: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/add-virtual-device
+- 绑定源设备功能点: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/bind-virtual-device-points
+- 解绑源设备功能点: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/unbind-virtual-device-points
 - 设备解绑: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/unbind-device
 - Automation: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/automation
 - 查询支持自动化的端点能力列表: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-automation-capabilities
@@ -42,11 +51,32 @@
 - 批量更新自动化状态: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/update-automation-status
 - 批量更新自动化关联空间: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/update-automation-space
 - 删除自动化: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/delete-automations
-- 获取手动触发器列表: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/query-automation-manual-trigger-list
-- 执行手动触发器: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/execute-automation-manual-trigger
-- JSON 自动化脚本定义: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/reference/json-automation-script
+- Event: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/event
+- 上报外部系统事件: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/report-external-event
+- Firmware: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/firmware
+- 按设备 ID 查询可升级设备固件: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/search-upgradable-devices-firmware-by-device-ids
+- 发起固件升级: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/upgrade-firmware
+- 查询固件升级进度和结果: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/search-firmware-upgrade-status
+- 取消固件升级: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/cancel-upgrade-firmware
+- History: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/history
+- 查询设备 Trait 值变化历史: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/query-device-point-history
 - Studio: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/studio
 - 获取 Studio 统计信息: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-studio-statistics
+- Scene: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/scene
+- 创建场景: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/create-scene
+- 执行场景: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/execute-scene
+- 更新场景: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/update-scene
+- 关联场景空间: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/update-scene-space
+- 查询场景详情: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/query-scene-details
+- 查询场景列表: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/query-scene-list
+- 删除场景: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/delete-scenes
+- EMS: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/ems
+- 查询单设备能耗趋势: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-ems-trend-device
+- 查询单空间能耗趋势: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-ems-trend-space
+- 查询单设备能耗总量: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-ems-total-device
+- 查询单空间能耗总量: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-ems-total-space
+- 查询空间能耗摘要: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-ems-summary-space
+- 查询多设备能耗摘要: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-ems-summary-devices
 - 在线体验 WebSocket API: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/websocket-api/websocket-api
 - MQTT: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/mqtt-api/mqtt-api
 - 红外设备接入: https://docs.aqara.com/zh/docs/aqara-developer/local-studio-development/features/infrared-device-integration

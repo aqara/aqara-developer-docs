@@ -98252,27 +98252,9 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
   </thead>
   <tbody>
     <tr>
-      <td>0x4EBC</td>
-      <td><a href="#ref_ScreenHeight">ScreenHeight</a></td>
-      <td>屏幕高度</td>
-      <td>M</td>
-    </tr>
-    <tr>
-      <td>0x4EBB</td>
-      <td><a href="#ref_ScreenWidth">ScreenWidth</a></td>
-      <td>屏幕宽度</td>
-      <td>M</td>
-    </tr>
-    <tr>
-      <td>0x4EBA</td>
-      <td><a href="#ref_MaxPageNum">MaxPageNum</a></td>
-      <td>最大页面数量</td>
-      <td>M</td>
-    </tr>
-    <tr>
-      <td>0x4EB9</td>
-      <td><a href="#ref_DataVersion">DataVersion</a></td>
-      <td>数据版本</td>
+      <td>0x4E77</td>
+      <td><a href="#ref_ThemeVersion">ThemeVersion</a></td>
+      <td>主题版本</td>
       <td>M</td>
     </tr>
     <tr>
@@ -98282,9 +98264,93 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
       <td>M</td>
     </tr>
     <tr>
-      <td>0x4E77</td>
-      <td><a href="#ref_ThemeVersion">ThemeVersion</a></td>
-      <td>主题版本</td>
+      <td>0x4EB9</td>
+      <td><a href="#ref_DataVersion">DataVersion</a></td>
+      <td>数据版本</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4EBA</td>
+      <td><a href="#ref_MaxPageNum">MaxPageNum</a></td>
+      <td>最大页面数量</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4EBB</td>
+      <td><a href="#ref_ScreenWidth">ScreenWidth</a></td>
+      <td>屏幕宽度</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4EBC</td>
+      <td><a href="#ref_ScreenHeight">ScreenHeight</a></td>
+      <td>屏幕高度</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4EBD</td>
+      <td><a href="#ref_AllPages">AllPages</a></td>
+      <td>所有页面</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ECE</td>
+      <td><a href="#ref_HomePageIndex">HomePageIndex</a></td>
+      <td>首页索引</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ECF</td>
+      <td><a href="#ref_AssociatedDeviceNameSize">AssociatedDeviceNameSize</a></td>
+      <td>关联设备名称大小</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ED0</td>
+      <td><a href="#ref_AssociatedDeviceIconSize">AssociatedDeviceIconSize</a></td>
+      <td>关联设备图标大小</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ED1</td>
+      <td><a href="#ref_PageNameSize">PageNameSize</a></td>
+      <td>页面名称大小</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ED2</td>
+      <td><a href="#ref_UserDataSize">UserDataSize</a></td>
+      <td>用户数据大小</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ED3</td>
+      <td><a href="#ref_MaxWidgetNum">MaxWidgetNum</a></td>
+      <td>最大卡片数量</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ED4</td>
+      <td><a href="#ref_PageLayoutSize">PageLayoutSize</a></td>
+      <td>页面布局大小</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ED5</td>
+      <td><a href="#ref_SupportedDeviceTypes">SupportedDeviceTypes</a></td>
+      <td>支持设备类型</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ED6</td>
+      <td><a href="#ref_SupportedPageLayouts">SupportedPageLayouts</a></td>
+      <td>支持页面布局</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4F0E</td>
+      <td><a href="#ref_StandbyStyles">StandbyStyles</a></td>
+      <td>待机样式</td>
       <td>M</td>
     </tr>
   </tbody>
@@ -98292,11 +98358,405 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
 
 ### Command
 
-本 Function 不包含 Command。
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Code</th>
+      <th>名称</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9C70</td>
+      <td><a href="#ref_SetAllPages">SetAllPages</a></td>
+      <td>配置所有页面</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x9C6D</td>
+      <td><a href="#ref_RemovePage">RemovePage</a></td>
+      <td>移除页面</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
 
 ### 数据类型
 
-本 Function 无自定义数据类型。
+##### WidgetPositionStructure Type {#ref_ScreenUserInterfaceWidgetPositionStructure}
+
+该结构体定义 Widget 的 WidgetPosition 字段布局。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>x</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>控件 X 坐标。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>y</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>控件 Y 坐标。</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>width</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>控件宽度。</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>height</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>控件高度。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### AssociatedDeviceInfoStructure Type {#ref_ScreenUserInterfaceAssociatedDeviceInfoStructure}
+
+该结构体定义 Widget 的 AssociatedDeviceInfo 字段布局。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>DeviceName</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>关联设备名称。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>DeviceTypeID</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>Aqara 设备类型 ID。</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>DeviceIcon</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>设备图标。</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>DeviceID</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>目标设备 Device ID。</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>EndPointID</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>目标 Endpoint ID。</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>ParentID</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>父设备 Device ID；同一 Matter 控制器下可省略。</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>ModelValue</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>非 Matter 设备的模型值；场景无需设置。</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>FunctionID</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>目标设备的 Function ID。</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>TraitID</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>目标设备的 Trait ID。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### WidgetModeEnum8 Type {#ref_ScreenUserInterfaceWidgetModeEnum8}
+
+该枚举定义 Widget 的 WidgetMode 有效取值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Basic</td>
+      <td>基础模式</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Lighting-ColorTempControl</td>
+      <td>灯光色温控制</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Lighting-BrightnessControl</td>
+      <td>灯光亮度控制</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Lighting-ColorControl</td>
+      <td>灯光颜色控制</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>AirCondition-TemperatureControl</td>
+      <td>空调温度控制</td>
+    </tr>
+    <tr>
+      <td>0x05</td>
+      <td>AirCondition-FanSpeed</td>
+      <td>空调风速控制</td>
+    </tr>
+    <tr>
+      <td>0x06</td>
+      <td>WindowCovering-Operation</td>
+      <td>窗帘操作</td>
+    </tr>
+    <tr>
+      <td>0x07</td>
+      <td>DoorLock-Operation</td>
+      <td>门锁操作</td>
+    </tr>
+  </tbody>
+</table>
+
+##### AllPagesWidgetStructure Type {#ref_ScreenUserInterfaceAllPagesWidgetStructure}
+
+该结构体定义 AllPages 页面 Widgets 列表元素字段布局。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>WidgetPosition</td>
+      <td><a href="#ref_ScreenUserInterfaceWidgetPositionStructure">WidgetPositionStructure</a></td>
+      <td>M</td>
+      <td>控件位置与尺寸。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>WidgetID</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>控件 ID。</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>WidgetMode</td>
+      <td><a href="#ref_ScreenUserInterfaceWidgetModeEnum8">WidgetModeEnum8</a></td>
+      <td>M</td>
+      <td>控件模式。</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>AssociatedDeviceInfo</td>
+      <td><a href="#ref_ScreenUserInterfaceAssociatedDeviceInfoStructure">AssociatedDeviceInfoStructure</a></td>
+      <td>M</td>
+      <td>关联设备信息。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### AllPagesTraitPresentValueStructure Type {#ref_ScreenUserInterfaceAllPagesTraitPresentValueStructure}
+
+该结构体定义 AllPages Trait 的 Present Value 列表元素（PageInfo）字段布局。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>PageID</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>页面 ID。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>PageName</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>页面名称。</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>PageLayout</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>页面布局 ID。</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>PageIndex</td>
+      <td>uint16</td>
+      <td>M</td>
+      <td>页面索引。</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Widgets</td>
+      <td><a href="#ref_ScreenUserInterfaceAllPagesWidgetStructure">list[AllPagesWidgetStructure]</a></td>
+      <td>M</td>
+      <td>页面控件列表。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### SetAllPages Command Structure Type {#ref_ScreenUserInterfaceSetAllPagesCommandStructure}
+
+SetAllPages Command 的参数结构体。列表元素布局见 [AllPagesTraitPresentValueStructure](#ref_ScreenUserInterfaceAllPagesTraitPresentValueStructure)。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>AllPagesInfo</td>
+      <td><a href="#ref_ScreenUserInterfaceAllPagesTraitPresentValueStructure">list[AllPagesInfo]</a></td>
+      <td>M</td>
+      <td>所有页面信息。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### RemovePage Command Structure Type {#ref_ScreenUserInterfaceRemovePageCommandStructure}
+
+RemovePage Command 的参数结构体。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>PageList</td>
+      <td>list[uint16]</td>
+      <td>M</td>
+      <td>待移除的页面 ID 列表。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### StandbyStyleIDEnum8 Type {#ref_ScreenUserInterfaceStandbyStyleIDEnum8}
+
+该枚举定义 StandbyStyles Trait 的 Present Value / Supported Value 有效取值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>GeneralWallpaper</td>
+      <td>通用壁纸</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>DigitalClock</td>
+      <td>数字时钟</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>AnalogClock</td>
+      <td>模拟时钟</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>Weather</td>
+      <td>天气</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>IndoorEnvironment</td>
+      <td>室内环境</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Trait 定义
 
@@ -98310,23 +98770,8 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
   </thead>
   <tbody>
     <tr>
-      <td>0x4EBC</td>
-      <td><a href="#ref_ScreenHeight">ScreenHeight</a></td>
-      <td>M</td>
-    </tr>
-    <tr>
-      <td>0x4EBB</td>
-      <td><a href="#ref_ScreenWidth">ScreenWidth</a></td>
-      <td>M</td>
-    </tr>
-    <tr>
-      <td>0x4EBA</td>
-      <td><a href="#ref_MaxPageNum">MaxPageNum</a></td>
-      <td>M</td>
-    </tr>
-    <tr>
-      <td>0x4EB9</td>
-      <td><a href="#ref_DataVersion">DataVersion</a></td>
+      <td>0x4E77</td>
+      <td><a href="#ref_ThemeVersion">ThemeVersion</a></td>
       <td>M</td>
     </tr>
     <tr>
@@ -98335,8 +98780,308 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
       <td>M</td>
     </tr>
     <tr>
+      <td>0x4EB9</td>
+      <td><a href="#ref_DataVersion">DataVersion</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4EBA</td>
+      <td><a href="#ref_MaxPageNum">MaxPageNum</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4EBB</td>
+      <td><a href="#ref_ScreenWidth">ScreenWidth</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4EBC</td>
+      <td><a href="#ref_ScreenHeight">ScreenHeight</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4EBD</td>
+      <td><a href="#ref_AllPages">AllPages</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ECE</td>
+      <td><a href="#ref_HomePageIndex">HomePageIndex</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ECF</td>
+      <td><a href="#ref_AssociatedDeviceNameSize">AssociatedDeviceNameSize</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ED0</td>
+      <td><a href="#ref_AssociatedDeviceIconSize">AssociatedDeviceIconSize</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ED1</td>
+      <td><a href="#ref_PageNameSize">PageNameSize</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ED2</td>
+      <td><a href="#ref_UserDataSize">UserDataSize</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ED3</td>
+      <td><a href="#ref_MaxWidgetNum">MaxWidgetNum</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ED4</td>
+      <td><a href="#ref_PageLayoutSize">PageLayoutSize</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ED5</td>
+      <td><a href="#ref_SupportedDeviceTypes">SupportedDeviceTypes</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4ED6</td>
+      <td><a href="#ref_SupportedPageLayouts">SupportedPageLayouts</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4F0E</td>
+      <td><a href="#ref_StandbyStyles">StandbyStyles</a></td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ThemeVersion Trait（主题版本） {#ref_ThemeVersion}
+
+主题版本。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
       <td>0x4E77</td>
-      <td><a href="#ref_ThemeVersion">ThemeVersion</a></td>
+      <td>ThemeVersion</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>1</td>
+      <td>RV</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ThemeID Trait（主题ID） {#ref_ThemeID}
+
+该 Trait 用于「主题ID」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4E78</td>
+      <td>ThemeID</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>1</td>
+      <td>RV</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DataVersion Trait（数据版本） {#ref_DataVersion}
+
+该 Trait 用于「数据版本」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4EB9</td>
+      <td>DataVersion</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint64</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### MaxPageNum Trait（最大页面数量） {#ref_MaxPageNum}
+
+该 Trait 用于「最大页面数量」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4EBA</td>
+      <td>MaxPageNum</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>1</td>
+      <td>RV</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ScreenWidth Trait（屏幕宽度） {#ref_ScreenWidth}
+
+该 Trait 用于「屏幕宽度」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4EBB</td>
+      <td>ScreenWidth</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>240</td>
+      <td>RV</td>
       <td>M</td>
     </tr>
   </tbody>
@@ -98380,44 +99125,17 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
       <td>0x0001</td>
       <td>Present Value</td>
       <td>uint16</td>
-      <td>O</td>
+      <td></td>
       <td>240</td>
       <td>RV</td>
       <td>M</td>
     </tr>
-    <tr>
-      <td>0x0002</td>
-      <td>Maximum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>65535</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0003</td>
-      <td>Minimum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>0</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>uint16</td>
-      <td>O</td>
-      <td>240</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
   </tbody>
 </table>
 
-#### ScreenWidth Trait（屏幕宽度） {#ref_ScreenWidth}
+#### AllPages Trait（所有页面） {#ref_AllPages}
 
-该 Trait 用于「屏幕宽度」相关数据的访问与上报。
+该 Trait 提供所有已配置页面及其控件信息。Present Value 为 PageInfo 列表。
 
 <table>
   <thead>
@@ -98428,8 +99146,54 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
   </thead>
   <tbody>
     <tr>
-      <td>0x4EBB</td>
-      <td>ScreenWidth</td>
+      <td>0x4EBD</td>
+      <td>AllPages</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_ScreenUserInterfaceAllPagesTraitPresentValueStructure">list[AllPagesTraitPresentValueStructure]</a></td>
+      <td></td>
+      <td></td>
+      <td>RVW</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### HomePageIndex Trait（首页索引） {#ref_HomePageIndex}
+
+该 Trait 用于「首页索引」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4ECE</td>
+      <td>HomePageIndex</td>
     </tr>
   </tbody>
 </table>
@@ -98453,44 +99217,26 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
       <td>0x0001</td>
       <td>Present Value</td>
       <td>uint16</td>
-      <td>O</td>
-      <td>240</td>
-      <td>RV</td>
+      <td></td>
+      <td></td>
+      <td>RVW</td>
       <td>M</td>
     </tr>
     <tr>
-      <td>0x0002</td>
-      <td>Maximum Value</td>
-      <td>uint16</td>
+      <td>0x000D</td>
+      <td>Is Null</td>
+      <td>boolean</td>
       <td></td>
-      <td>65535</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0003</td>
-      <td>Minimum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>0</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>uint16</td>
-      <td>O</td>
-      <td>240</td>
-      <td>RW</td>
+      <td>False</td>
+      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
 </table>
 
-#### MaxPageNum Trait（最大页面数量） {#ref_MaxPageNum}
+#### AssociatedDeviceNameSize Trait（关联设备名称大小） {#ref_AssociatedDeviceNameSize}
 
-该 Trait 用于「最大页面数量」相关数据的访问与上报。
+该 Trait 用于「关联设备名称大小」相关数据的访问与上报。
 
 <table>
   <thead>
@@ -98501,8 +99247,8 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
   </thead>
   <tbody>
     <tr>
-      <td>0x4EBA</td>
-      <td>MaxPageNum</td>
+      <td>0x4ECF</td>
+      <td>AssociatedDeviceNameSize</td>
     </tr>
   </tbody>
 </table>
@@ -98526,44 +99272,17 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
       <td>0x0001</td>
       <td>Present Value</td>
       <td>uint16</td>
-      <td>O</td>
-      <td>1</td>
-      <td>RV</td>
+      <td></td>
+      <td>32</td>
+      <td>RVW</td>
       <td>M</td>
-    </tr>
-    <tr>
-      <td>0x0002</td>
-      <td>Maximum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>65535</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0003</td>
-      <td>Minimum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>0</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>uint16</td>
-      <td>O</td>
-      <td>1</td>
-      <td>RW</td>
-      <td>O</td>
     </tr>
   </tbody>
 </table>
 
-#### DataVersion Trait（数据版本） {#ref_DataVersion}
+#### AssociatedDeviceIconSize Trait（关联设备图标大小） {#ref_AssociatedDeviceIconSize}
 
-该 Trait 用于「数据版本」相关数据的访问与上报。
+该 Trait 用于「关联设备图标大小」相关数据的访问与上报。
 
 <table>
   <thead>
@@ -98574,81 +99293,8 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
   </thead>
   <tbody>
     <tr>
-      <td>0x4EB9</td>
-      <td>DataVersion</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>uint64</td>
-      <td>O</td>
-      <td>0</td>
-      <td>RV</td>
-      <td>M</td>
-    </tr>
-    <tr>
-      <td>0x0002</td>
-      <td>Maximum Value</td>
-      <td>uint64</td>
-      <td></td>
-      <td>18446744073709551615</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0003</td>
-      <td>Minimum Value</td>
-      <td>uint64</td>
-      <td></td>
-      <td>0</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>uint64</td>
-      <td>O</td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### ThemeID Trait（主题ID） {#ref_ThemeID}
-
-该 Trait 用于「主题ID」相关数据的访问与上报。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x4E78</td>
-      <td>ThemeID</td>
+      <td>0x4ED0</td>
+      <td>AssociatedDeviceIconSize</td>
     </tr>
   </tbody>
 </table>
@@ -98672,44 +99318,17 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
       <td>0x0001</td>
       <td>Present Value</td>
       <td>uint16</td>
-      <td>O</td>
-      <td>1</td>
-      <td>RV</td>
+      <td></td>
+      <td>32</td>
+      <td>RVW</td>
       <td>M</td>
-    </tr>
-    <tr>
-      <td>0x0002</td>
-      <td>Maximum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>65535</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0003</td>
-      <td>Minimum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>1</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>uint16</td>
-      <td>O</td>
-      <td>1</td>
-      <td>RW</td>
-      <td>O</td>
     </tr>
   </tbody>
 </table>
 
-#### ThemeVersion Trait（主题版本） {#ref_ThemeVersion}
+#### PageNameSize Trait（页面名称大小） {#ref_PageNameSize}
 
-主题版本
+该 Trait 用于「页面名称大小」相关数据的访问与上报。
 
 <table>
   <thead>
@@ -98720,8 +99339,8 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
   </thead>
   <tbody>
     <tr>
-      <td>0x4E77</td>
-      <td>ThemeVersion</td>
+      <td>0x4ED1</td>
+      <td>PageNameSize</td>
     </tr>
   </tbody>
 </table>
@@ -98745,53 +99364,368 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
       <td>0x0001</td>
       <td>Present Value</td>
       <td>uint16</td>
-      <td>O</td>
-      <td>1</td>
-      <td>RV</td>
+      <td></td>
+      <td>32</td>
+      <td>RVW</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### UserDataSize Trait（用户数据大小） {#ref_UserDataSize}
+
+该 Trait 用于「用户数据大小」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4ED2</td>
+      <td>UserDataSize</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>128</td>
+      <td>RVW</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### MaxWidgetNum Trait（最大卡片数量） {#ref_MaxWidgetNum}
+
+该 Trait 用于「最大卡片数量」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4ED3</td>
+      <td>MaxWidgetNum</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td></td>
+      <td>RVW</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### PageLayoutSize Trait（页面布局大小） {#ref_PageLayoutSize}
+
+该 Trait 用于「页面布局大小」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4ED4</td>
+      <td>PageLayoutSize</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td></td>
+      <td>RVW</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### SupportedDeviceTypes Trait（支持设备类型） {#ref_SupportedDeviceTypes}
+
+该 Trait 用于上报/配置屏端支持的设备类型列表。典型支持取值包括：Lock（0x000A）、Button（0x000F）、Air Quality Sensor（0x002C）、Fan（0x002B）、OnOff Light（0x0100）、Dimmable Light（0x0101）、Color Temperature Light（0x010C）、Extended Color Light（0x010D）、Contact Sensor（0x0015）、Occupancy Sensor（0x0107）、Mounted On/Off Control（0x010F）、Socket（0x010A）、Thermostat（0x0301）、Temperature Sensor（0x0302）、Humidity Sensor（0x0307）、Scene（0xFFF1）。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4ED5</td>
+      <td>SupportedDeviceTypes</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[uint16]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### SupportedPageLayouts Trait（支持页面布局） {#ref_SupportedPageLayouts}
+
+该 Trait 用于「支持页面布局」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4ED6</td>
+      <td>SupportedPageLayouts</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[uint16]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### StandbyStyles Trait（待机样式） {#ref_StandbyStyles}
+
+该 Trait 用于配置当前待机样式，并上报设备支持的待机样式集合。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4F0E</td>
+      <td>StandbyStyles</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_ScreenUserInterfaceStandbyStyleIDEnum8">StandbyStyleIDEnum8</a></td>
+      <td></td>
+      <td></td>
+      <td>RVW</td>
       <td>M</td>
     </tr>
     <tr>
-      <td>0x0002</td>
-      <td>Maximum Value</td>
-      <td>uint16</td>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_ScreenUserInterfaceStandbyStyleIDEnum8">StandbyStyleIDEnum8</a>]</td>
       <td></td>
-      <td>65535</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0003</td>
-      <td>Minimum Value</td>
-      <td>uint16</td>
       <td></td>
-      <td>1</td>
       <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0005</td>
-      <td>Step Value</td>
-      <td>uint32</td>
-      <td></td>
-      <td>1</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>uint16</td>
-      <td>O</td>
-      <td>1</td>
-      <td>RW</td>
-      <td>O</td>
+      <td>M</td>
     </tr>
   </tbody>
 </table>
 
 ### Command 定义
 
-本 Function 不包含 Command。
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9C70</td>
+      <td><a href="#ref_SetAllPages">SetAllPages</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x9C6D</td>
+      <td><a href="#ref_RemovePage">RemovePage</a></td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### SetAllPages Command {#ref_SetAllPages}
+
+该 Command 用于配置所有页面及其控件信息。
+
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9C70</td>
+      <td>SetAllPages</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+[SetAllPages Command Structure](#ref_ScreenUserInterfaceSetAllPagesCommandStructure)
+
+#### RemovePage Command {#ref_RemovePage}
+
+该 Command 用于按页面 ID 列表移除页面。
+
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9C6D</td>
+      <td>RemovePage</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+[RemovePage Command Structure](#ref_ScreenUserInterfaceRemovePageCommandStructure)
 
 ## DeviceAnomalyMonitoring（设备异常监控） {#ref_Aqara_Spec_DeviceAnomalyMonitoring}
 
