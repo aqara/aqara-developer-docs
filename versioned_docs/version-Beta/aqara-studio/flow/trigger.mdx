@@ -14,13 +14,14 @@ In automation Flows, trigger nodes define the starting conditions of a process a
 In Flow, the following can be used as triggers, serving as the starting point of a process:
 
 - [Device](#device): Triggers the process when listening for device events or state changes
-- [Manual Trigger](#manual-trigger): Triggers the process through manual operation
-- [Schedule](#schedule): Scheduled trigger at specified times or periods
-- [Variable Trigger](#variable-trigger): Triggers the process when listening for variable changes
+- [Time](#time): Triggers at a set time or on a repeating cycle
+- [Alarm](#alarm): Triggers the process when the state of a specified alarm changes
+- [Variable](#variable): Triggers the process when listening for variable changes
+- [External Event](#external-event): Triggers the process when a Claude or CodeX task completes or is waiting for confirmation, or when a custom external event is received
 
 ## Device
 
-Device-based trigger blocks allow you to listen for device events or state changes, serving as the starting point of an automation process. When the selected device undergoes a specified event (such as a switch being pressed) or enters a particular state (such as value change or status change), the process is activated to execute subsequent conditions and actions.
+A device-based trigger block monitors a device property (such as value change or status change) or event (such as a switch being pressed), and triggers the next steps when a change or event satisfies the comparison. Supports a required hold duration, repeat-trigger suppression and rising/falling threshold crossings.
 
 By configuring the device and its supported events or states, you can flexibly define auto-response trigger conditions. For example: when someone enters a room, when temperature or humidity exceeds thresholds, when a light is turned on manually, etc.—all can use device-based trigger blocks to initiate the automation process.
 
@@ -44,31 +45,18 @@ You can select multiple events/states of different devices to monitor, meeting v
 
 4. After completing the above configuration, you can connect this with [Condition Blocks](./condition.mdx) and [Action Blocks](./action.mdx).
 
-## Manual Trigger
+## Time
 
-Manual trigger is a type of trigger initiated by the user to start a process. You can use the Manual Trigger block when there is a need to manually start an automation, or for immediate triggering during the testing and debugging of a flow.
-
-### How to Use
-
-1. In the left sidebar of the canvas, click the **+** button. Under **Trigger**, select **Manual**. Then click **Manual Trigger** to add the block to the canvas.
-2. Connect the **Manual Trigger** block with [Condition Blocks](./condition.mdx) and [Action Blocks](./action.mdx).
-3. Click the icon on the **Manual Trigger** block to test the Flow.
-
-    At this point, the border color of the Flow will gradually change from gray to blue, indicating the process is running.
-
-    When the manual trigger has completed successfully, a prompt will pop up on the interface, indicating that the process has finished executing.
-
-## Schedule
-
-Time-based trigger blocks mainly include **Periodic Trigger**, **Scheduled Trigger**, and **Interval Trigger**, which can be used to meet the automation scheduling needs of different scenarios.
+Time-based trigger blocks include **Periodic Trigger**, **Scheduled Trigger**, **Interval Trigger** and **Trigger After Sustained Match**, which can be used to meet the automation scheduling needs of different scenarios.
 
 | Type         | Applicable Scenario Description                                        | Example                       |
 |---------------------|-----------------------------------------------------------------------|-------------------------------|
-| **Periodic Trigger**  | Automatically executes the flow at a specific time according to a set period (such as daily, weekly, specified weekdays, etc.) | Turn on the lights at 7:00 every day |
-| **Scheduled Trigger** | Executes the flow only once at a specified date and time              | Open curtains at 2024/07/01 08:00 |
-| **Interval Trigger**  | Repeats the execution of the flow at fixed intervals                  | Turn on the lights every 10 minutes |
+| **Periodic Trigger**  | This card triggers at a selected time on selected weekdays (such as Monday, Wednesday, Friday, etc.), or at sunrise/sunset with an offset at the configured location. Use it for daily or weekly automations. | Turn on the lights at 7:00 from Monday to Friday |
+| **Scheduled Trigger** | This card triggers **once** at a selected date and time, or at sunrise/sunset with an offset at the configured location. Past times are not replayed.| Open curtains at 2024/07/01 08:00 |
+| **Interval Trigger**  | This card triggers repeatedly at a fixed interval with a configurable initial running/stopped state and repeat count. A count of 0 loops indefinitely. Wait one full interval before the first trigger and stop after the configured count. The interval must be greater than 0.  | Turn on the lights every 10 minutes |
+| **Trigger After Sustained Match** | This card monitors changes to a device property, flow variable or global variable, and triggers **once **after the comparison remains true for the required duration. A false condition cancels timing; after firing, the condition must become false and then hold true again before another trigger. | Turn on the lights when the temperature is above 25°C for 10 minutes |
 
-In addition, these time trigger blocks support a variety of parameter settings such as custom periods, designated times, and selecting time points based on sunrise or sunset (supporting manual latitude/longitude input), helping you precisely control when your automation runs. By combining them flexibly, you can easily achieve complex scheduled linkage management and make smart devices better fit actual life and work needs.
+In addition, these time trigger blocks support a variety of parameter settings, such as custom periods, a specified time, and time points based on sunrise or sunset (by selecting a city or entering the latitude and longitude manually). This helps you precisely control when the automation runs. Used together, they make it easy to build complex scheduled automations that better fit everyday life and work.
 
 ### How to Use
 
@@ -82,6 +70,23 @@ In addition, these time trigger blocks support a variety of parameter settings s
         - Select the second parameter “Trigger Time” on the block. For details, see [Time Types](#time-types).
     - For **Interval Trigger**:  
         Select the time interval parameter on the block, which indicates how often the flow will be triggered.
+    - For **Trigger After Sustained Match**:
+        - Select the first parameter on the block, and set the device property, flow variable, or global variable to monitor as comparison parameter A.
+
+            <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/AdvancedFlow-SetTriggerAfterSustainedMatch-1.png" alt="Configure comparison parameter A for Trigger After Sustained Match"  style={{ width: '50%' }} />
+
+        - Select the second parameter on the block to set the comparison condition.
+
+            <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/AdvancedFlow-SetTriggerAfterSustainedMatch-2.png" alt="Select the comparison condition for Trigger After Sustained Match"  style={{ width: '70%' }} />
+
+        - Select the third parameter on the block, and set a device property, flow variable, global variable, or trigger value as comparison parameter B.
+
+            <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/AdvancedFlow-SetTriggerAfterSustainedMatch-3.png" alt="Configure comparison parameter B for Trigger After Sustained Match"  style={{ width: '50%' }} />
+
+        - Select the fourth parameter on the block to set how long the comparison condition must remain true.
+
+            <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/AdvancedFlow-SetTriggerAfterSustainedMatch-4.png" alt="Set the duration for Trigger After Sustained Match"  style={{ width: '70%' }} />
+            
 3. Connect the above blocks with [Condition Blocks](./condition.mdx) and [Action Blocks](./action.mdx).
 
 ### Time Types
@@ -96,7 +101,24 @@ The descriptions are as follows:
 | Sunrise/Sunset Time    | You need to provide the latitude and longitude of your location. Rules: <ul><li>North latitude and east longitude are positive numbers (e.g., 35.0 means 35.0° N)</li><li>South latitude and west longitude are negative numbers (e.g., -120.0 means 120.0° W)</li></ul> Once set, Aqara Studio will automatically obtain the local sunrise and sunset times. |
 | Before/After Sunrise/Sunset | Enter the latitude and longitude as well as the desired relative time interval (e.g., 15 minutes) to enable more flexible time control. |
 
-## Variable Trigger
+## Alarm
+
+This card is used to monitor the state of a configured alarm and trigger the next blocks when its state matches the selected active, acknowledged, restored or closed state.
+
+### How to Use
+
+1. In the left sidebar of the canvas, click the **+** button. Under **Trigger**, select **Alarm** to add an **Alarm Trigger** block to the canvas.
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/AdvancedFlow-AddAlarmTrigger.png" alt="Add an Alarm Trigger block" />
+
+2. Select the first parameter on the block to choose the alarm to monitor.
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/AdvancedFlow-SetAlarmTriggerParameter1.png" alt="Configure parameter A of the Alarm Trigger block" style={{ width: '70%' }} />
+
+3. Select the second parameter on the block to choose a target alarm state, such as `Active-Unacknowledged` or `Normal-Acknowledged`.
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/AdvancedFlow-SetAlarmTriggerParameter2.png" alt="Configure parameter B of the Alarm Trigger block" style={{ width: '70%' }} />
+
+4. Connect the block with [Condition Blocks](./condition.mdx) and [Action Blocks](./action.mdx).
+
+## Variable
 
 In automation workflows, the variable trigger is used to sense and respond to changes in variables within the system, enabling dynamic and intelligent process control. The system supports monitoring three types of variables: [global variable](./flow-introduction.mdx#variable-types), [local variable](./flow-introduction.mdx#variable-types), and **device variable**.
 
@@ -112,6 +134,19 @@ Before using this block, please make sure you have [created a variable](./flow-i
 
 ### How to Use
 
-1. In the left sidebar of the canvas, click the **+** button. Under **Trigger**, select **Variable**. Then click **Variable Trigger** to add this block to the canvas.
+1. In the left sidebar of the canvas, click the **+** button. Under **Trigger**, select **Variable** to add this block to the canvas.
 2. For the first parameter on the block, select a global variable, local variable, or device variable. When this variable updates, the automation flow will be triggered.
 3. Connect the block with [Condition Blocks](./condition.mdx) and [Action Blocks](./action.mdx).
+
+![Configure Variable Trigger block](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/AdvancedFlow-SetVariableTrigger.png)
+
+## External Event
+
+External event trigger blocks can monitor a service event property or receive a selected event reported by an external system. When Aqara Studio receives a new event, the card trigger the next steps on a new event. Event data can be referenced by later blocks and used in conditions.
+
+The following external events are currently supported:
+- Claude task finished
+- Claude needs attention
+- CodeX task finished
+- CodeX needs attention
+- Custom external event
