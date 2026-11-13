@@ -4828,8 +4828,6 @@ The Aqara Keypad Screen Configuration Cluster of the Zigbee In-Home Display maps
 
 Indicates the persistent binding relationship between an endpoint and one or more other local or remote Endpoints.
 
-This Function also carries the standby, screensaver and dark screen settings of the Aqara Keypad Screen Configuration Cluster. `O` in this Function indicates that the capability is optional; when the Zigbee cluster supports the corresponding `STBY`, `SCRN` or `DARK` Feature, the cluster attributes must still meet the mandatory requirements of the device-side specification. When the cluster is present, the `ScreenOff` and `ScreenOn` commands are mandatory. The `DarkScreenOff` attribute of the cluster reuses the `DarkScreenOffEnable` Trait. The screen on/off commands of this cluster are not equivalent to the existing `ScreenOnOff` Trait, so they are modeled separately.
-
 ### Function Identification
 
 <table>
@@ -31164,8 +31162,6 @@ This Function does not contain any Commands.
 ### Introduction
 
 Provides heating/cooling control capabilities, including HVAC parameters such as target temperature, operating mode, and fan speed.
-
-This Function also carries the label, page presentation and level icon settings of the Aqara Keypad Screen Configuration Cluster. The corresponding cluster Features are `LABEL`, `PRES` and `LVIC`; `O` in this Function indicates that the capability is optional, and the attribute requirements after a Feature is enabled are subject to the device-side cluster specification. When the cluster is present, `EndpointList` is a mandatory attribute. `HomePageIndex` reuses the existing Trait, and the other fields reuse the existing definitions only when the semantics and the data types fit. The device-side `LABEL` Feature uses the boolean `ElderMode` to control elder mode and no longer uses a font size enumeration.
 
 ### Function Identifier
 
@@ -80769,7 +80765,9 @@ This Function does not contain Commands.
 
 ### Introduction
 
-Manages screen display related hardware properties, such as resolution, brightness, backlight and display state.
+Manages the hardware properties related to screen display, such as resolution, brightness, backlight, standby and screensaver, as well as the display state.
+
+This Function also carries the standby, screensaver and dark screen configuration of the Aqara Keypad Screen Configuration Cluster. `O` in this Function indicates that the capability is optional; when the Zigbee cluster supports the corresponding `STBY`, `SCRN` or `DARK` Feature, the cluster attributes must still meet the mandatory requirements of the device-side specification. When the cluster is present, the `ScreenOff` and `ScreenOn` commands are mandatory. The `DarkScreenOff` attribute of the cluster reuses the `DarkScreenOffEnable` Trait. The screen on/off commands of this cluster are not equivalent to the existing `ScreenOnOff` Trait, so they are modeled separately.
 
 ### Function Identification
 
@@ -130520,7 +130518,9 @@ Total:   23 bytes
 
 ### Introduction
 
-Provides unified UI configuration for screens, including page layouts, themes, card counts, and multi-page information management.
+Provides unified UI configuration for the screen side, including page layouts, tag display, page carousel, level icons and multi-page information management.
+
+This Function also carries the tag, page display and level icon configuration of the Aqara Keypad Screen Configuration Cluster. The corresponding cluster Features are `LABEL`, `PRES` and `LVIC` respectively; `O` in this Function indicates that the capability is optional, and the attribute requirements after the Feature is enabled are subject to the device-side cluster specification. When the cluster is present, `EndpointList` is a mandatory attribute. `HomePageIndex` reuses the existing Trait, and other fields reuse existing definitions only when the semantics and data types fit. The device-side `LABEL` Feature uses the boolean `ElderMode` to control elder mode and no longer uses a font size enumeration.
 
 ### Function Identifier
 
