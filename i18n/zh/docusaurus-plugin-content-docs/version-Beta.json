@@ -131,6 +131,10 @@
     "message": "设备",
     "description": "The label for category 'Device' in sidebar 'aqaraDeveloperSidebar'"
   },
+  "sidebar.aqaraDeveloperSidebar.category.local-api-mqtt": {
+    "message": "MQTT",
+    "description": "The label for category 'MQTT' in sidebar 'aqaraDeveloperSidebar'"
+  },
   "sidebar.aqaraDeveloperSidebar.category.cloud-api-http": {
     "message": "HTTP",
     "description": "The label for category 'HTTP' in sidebar 'aqaraDeveloperSidebar'"
@@ -147,9 +151,29 @@
     "message": "订阅",
     "description": "The label for category 'Subscription' in sidebar 'aqaraDeveloperSidebar'"
   },
+  "sidebar.aqaraDeveloperSidebar.category.Resource": {
+    "message": "资源",
+    "description": "The label for category 'Resource' in sidebar 'aqaraDeveloperSidebar'"
+  },
   "sidebar.aqaraDeveloperSidebar.category.Automation": {
     "message": "自动化",
     "description": "The label for category 'Automation' in sidebar 'aqaraDeveloperSidebar'"
+  },
+  "sidebar.aqaraDeveloperSidebar.category.Firmware": {
+    "message": "固件",
+    "description": "The label for category 'Firmware' in sidebar 'aqaraDeveloperSidebar'"
+  },
+  "sidebar.aqaraDeveloperSidebar.category.History": {
+    "message": "历史",
+    "description": "The label for category 'History' in sidebar 'aqaraDeveloperSidebar'"
+  },
+  "sidebar.aqaraDeveloperSidebar.category.EMS": {
+    "message": "能耗",
+    "description": "The label for category 'EMS' in sidebar 'aqaraDeveloperSidebar'"
+  },
+  "sidebar.aqaraDeveloperSidebar.category.Alarm": {
+    "message": "告警",
+    "description": "The label for category 'Alarm' in sidebar 'aqaraDeveloperSidebar'"
   },
   "sidebar.aqaraDeveloperSidebar.category.Studio Development": {
     "message": "Studio 开发",

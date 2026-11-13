@@ -1,0 +1,76 @@
+---
+id: get-ems-trend-device
+title: "查询单设备能耗趋势"
+description: "按时间维度（1h/1d/month）统计指定设备在设定时间范围内的能耗趋势，返回每个时间段内的能耗值。"
+sidebar_label: "查询单设备能耗趋势"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "post api-method"
+info_path: i18n/zh/docusaurus-plugin-content-docs/version-Beta/aqara-developer/data-export-api/data-export-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"查询单设备能耗趋势"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/ems/trend/device"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+按时间维度（1h/1d/month）统计指定设备在设定时间范围内的能耗趋势，返回每个时间段内的能耗值。
+
+:::tip
+仅可查询能够提供耗电量数据的设备。详情请参考 Aqara Studio 文档 [能耗管理](https://docs.aqara.com/zh/docs/aqara-studio/energy-management-system#%E5%89%8D%E6%8F%90%E6%9D%A1%E4%BB%B6)。
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"Lang","in":"header","required":false,"schema":{"type":"string","example":"{{Lang}}"},"description":"语言。使用 `zh-CN` 表示中文，使用 `en-US` 表示英文。"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["startTime","endTime","deviceId","dimension"],"properties":{"startTime":{"type":"integer","format":"int64","description":"查询起始时间（UTC 毫秒时间戳）。","example":1704067200000},"endTime":{"type":"integer","format":"int64","description":"查询结束时间（UTC 毫秒时间戳）。","example":1704153600000},"deviceId":{"type":"string","description":"设备 ID。","example":"device_001"},"dimension":{"type":"string","description":"聚合维度。","enum":["1h","1d","month"],"example":"1h"}},"title":"EmsTrendDeviceRequest"},"examples":{"hourlyTrend":{"value":{"startTime":1704067200000,"endTime":1704153600000,"deviceId":"device_001","dimension":"1h"}}}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"请求发起成功","content":{"application/json":{"schema":{"allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息 ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"title":"BaseResponse"},{"type":"object","properties":{"data":{"type":"array","items":{"type":"object","required":["startTime","value"],"properties":{"startTime":{"type":"string","description":"时间范围的起始时间，格式取决于查询维度：\n- 1h: yyyyMMddHH\n- 1d: yyyyMMdd\n- month: yyyyMM\n","example":"2024010100"},"value":{"type":"number","format":"double","description":"该时间范围内的能耗值（kWh）","example":1.5}},"title":"EmsTrendPoint"}},"type":{"type":"string","enum":["EmsDeviceTrendResponse"]}}}],"example":{"type":"EmsDeviceTrendResponse","version":"v1","msgId":"2df2f431-a58d-4fdb-b39c-4f0d29e7f010","code":0,"message":"success","data":[{"startTime":"2024010100","value":1.5},{"startTime":"2024010101","value":2.3}]},"title":"EmsDeviceTrendResponse"},"examples":{"hourlyTrendSuccess":{"value":{"type":"EmsDeviceTrendResponse","version":"v1","msgId":"2df2f431-a58d-4fdb-b39c-4f0d29e7f010","code":0,"message":"success","data":[{"startTime":"2024010100","value":1.5},{"startTime":"2024010101","value":2.3},{"startTime":"2024010102","value":0.8}]}}}}}},"400":{"description":"请求参数错误","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"}}}},"401":{"description":"未认证或认证失效","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"},"example":{"version":"","msgId":"","code":401,"message":"Authentication failed: Token is empty"}}}},"403":{"description":"无权限访问","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"},"example":{"version":"","msgId":"","code":403,"message":"无权访问该资源"}}}},"404":{"description":"资源不存在","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"}}}},"429":{"description":"请求频率过高","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"}}}},"500":{"description":"服务内部错误","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"}}}},"503":{"description":"服务不可用；通常表示当前为 Edge 端，或 Cloud 端 cloudlinkcloud 服务未加载","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

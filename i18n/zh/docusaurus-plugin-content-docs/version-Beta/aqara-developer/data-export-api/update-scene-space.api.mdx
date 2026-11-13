@@ -1,0 +1,71 @@
+---
+id: update-scene-space
+title: "关联场景空间"
+description: "调用本接口，您可以整组替换每个场景的直接空间关联；spaceIds 支持多个 ID，空数组清空直接关联；旧 spaceId 单空间参数继续兼容，两者只能提供一种非 null 形式。批量操作逐项返回 successIds / failedItems；部分成功 code=0，全部失败 code=2023、REST HTTP 400。"
+sidebar_label: "关联场景空间"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "post api-method"
+info_path: i18n/zh/docusaurus-plugin-content-docs/version-Beta/aqara-developer/data-export-api/data-export-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"关联场景空间"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/scenes/space"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+调用本接口，您可以整组替换每个场景的直接空间关联；spaceIds 支持多个 ID，空数组清空直接关联；旧 spaceId 单空间参数继续兼容，两者只能提供一种非 null 形式。批量操作逐项返回 successIds / failedItems；部分成功 code=0，全部失败 code=2023、REST HTTP 400。
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"Lang","in":"header","required":false,"schema":{"type":"string","example":"{{Lang}}"},"description":"语言。使用 `zh-CN` 表示中文，使用 `en-US` 表示英文。"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["sceneIds"],"properties":{"spaceId":{"type":"string","minLength":1,"description":"旧单空间参数；等价于仅含该 ID 的 spaceIds，与非 null 的 spaceIds 互斥。","nullable":true},"sceneIds":{"type":"array","minItems":1,"description":"要更新空间关联的场景 ID 列表。","items":{"type":"string"}},"spaceIds":{"type":"array","nullable":true,"items":{"type":"string","minLength":1,"pattern":"\\S"},"description":"目标空间 ID 数组；整组替换而非追加，服务端去重；空数组清空直接关联。"}},"example":{"spaceIds":["space-livingroom-001","space-bedroom-001"],"sceneIds":["auto_01HXYZABCDEF1234567890"]},"description":"替换每个对象的整组直接空间关联。spaceId 与 spaceIds 必须且只能提供一种非 null 形式；spaceIds=[] 清空直接关联。","oneOf":[{"required":["spaceId"],"properties":{"spaceId":{"type":"string","minLength":1,"pattern":"\\S"},"spaceIds":{"type":"array","nullable":true,"enum":[null]}}},{"required":["spaceIds"],"properties":{"spaceIds":{"type":"array","items":{"type":"string","minLength":1,"pattern":"\\S"}},"spaceId":{"type":"string","nullable":true,"enum":[null]}}}],"title":"UpdateSceneSpaceRequest"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"成功","content":{"application/json":{"schema":{"allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["type","version","msgId","code"],"properties":{"type":{"type":"string","description":"消息类型"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息 ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"title":"BaseResponse"},{"type":"object","properties":{"data":{"type":"object","required":["successIds","failedItems"],"properties":{"successIds":{"type":"array","description":"批量处理成功的 sceneId 列表。","items":{"type":"string"}},"failedItems":{"type":"array","description":"批量处理失败项列表。","items":{"type":"object","required":["sceneId","code","message"],"properties":{"sceneId":{"type":"string","description":"处理失败的 sceneId。"},"code":{"type":"integer","description":"失败项错误码。"},"message":{"type":"string","description":"失败项错误信息。"}},"title":"SceneBatchFailure"}}},"title":"SceneBatchResultData"},"type":{"type":"string","enum":["UpdateSceneSpaceResponse"]}}}],"title":"UpdateSceneSpaceResponse"}}}},"400":{"description":"请求参数错误","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"}}}},"401":{"description":"未认证或认证失效","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"},"example":{"version":"","msgId":"","code":401,"message":"Authentication failed: Token is empty"}}}},"403":{"description":"无权限访问","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"},"example":{"version":"","msgId":"","code":403,"message":"无权访问该资源"}}}},"404":{"description":"资源不存在","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"}}}},"429":{"description":"请求频率过高","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"}}}},"500":{"description":"服务内部错误","content":{"application/json":{"schema":{"description":"错误信息通过 code 与 message 提供；鉴权等直接错误响应可省略 type。","allOf":[{"type":"object","x-business-success-condition":"code == 0","required":["version","msgId","code"],"properties":{"type":{"type":"string","description":"可省略的消息类型；不能仅凭此字段判断成功，仍须检查 HTTP 状态和 code。"},"version":{"type":"string","description":"接口版本","example":"v1"},"msgId":{"type":"string","description":"消息ID"},"code":{"type":"integer","description":"业务状态码；仅 0 表示业务成功，HTTP 200 下的非 0 值仍表示业务失败"},"message":{"type":"string","description":"提示信息"}},"description":"不强制 type 的响应信封，用于错误响应及 REST 初始化/MCP 配置的直接 JSON 响应；正常消息业务响应仍使用 BaseResponse，要求 type。","title":"ResponseEnvelope"}],"example":{"type":"ErrorMessage","version":"v1","msgId":"a1b2c3d4-e5f6-7890-abcd-err000000001","code":400,"message":"参数 deviceId 不能为空"},"title":"ErrorResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      
