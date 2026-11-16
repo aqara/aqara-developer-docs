@@ -12116,7 +12116,7 @@ This structure defines the Present Value field layout of XYToRGBMatrix. The coef
       <td>bC</td>
       <td>float</td>
       <td>M</td>
-      <td>Coefficient of the B channel with respect to the Z tristimulus value of CIE XYZ.</td>
+      <td>Coefficient of the B channel with respect to the Z tristimulus value of CIE XYZ; the default value is 1.057.</td>
     </tr>
   </tbody>
 </table>
@@ -41925,15 +41925,15 @@ This structure defines the Present Value field layout of the AqaraUserChange Tra
       <td>2</td>
       <td>UserId</td>
       <td>uint16</td>
-      <td>M</td>
-      <td>User ID involved in the change.</td>
+      <td>O</td>
+      <td>The user ID involved in the change; it may be null when there is no associated user.</td>
     </tr>
     <tr>
       <td>3</td>
       <td>UserType</td>
       <td><a href="#ref_AqaraUserTypeEnum8">AqaraUserTypeEnum8</a></td>
-      <td>M</td>
-      <td>The type and access level of the user after the change.</td>
+      <td>O</td>
+      <td>The type and access level of the user after the change; it may be null when there is no associated user.</td>
     </tr>
     <tr>
       <td>4</td>
@@ -114344,11 +114344,11 @@ This Trait is used for access to and reporting of "interference source recogniti
 
 #### DetectionRange Trait {#ref_DetectionRange}
 
-This Trait is used to configure the radar detection range as a set of discrete detection range units.
+This Trait is used to configure the radar detection range as a set of discrete detection range units, corresponding to the Matter `DetectionRangeBitmask` attribute. The value is a bitmask of up to 6 bytes.
 
-The distance units of `MinDetectionRange`, `MaxDetectionRange` and `DetectionRangeStep` are all cm. The server should ensure that `(MaxDetectionRange - MinDetectionRange) / DetectionRangeStep` is always an integer multiple of 8, so that the detection range units can be completely mapped to bytes without padding bits.
+The distance units of `MinDetectionRange`, `MaxDetectionRange` and `DetectionRangeStep` are all cm. Each bit corresponds to one detection range unit; the number of bits is `(MaxDetectionRange - MinDetectionRange) / DetectionRangeStep`, and the required number of bytes is `ceil(number of bits / 8)`.
 
-The bitmask byte length of this Trait is `(MaxDetectionRange - MinDetectionRange) / DetectionRangeStep / 8`. For example, with a minimum range of 0, a maximum range of 600 and a step of 25 cm, the bitmask length is `600 / 25 / 8 = 3` bytes, representing 24 detection range units of 25 cm each.
+For example, with a minimum range of 0, a maximum range of 600 and a step of 25 cm, the bitmask length is `ceil(24 / 8) = 3` bytes, representing 24 detection range units of 25 cm each. The bitmask length must not exceed 6 bytes.
 
 image::../images/aqara_Ambient_configuration_cluster/detection_range_bitmask.svg[DetectionRangeBitmask layout example,780]
 
@@ -114400,7 +114400,7 @@ When this Trait is NULL, it indicates that the detection range is not configured
 
 #### DetectionRangeStep Trait {#ref_DetectionRangeStep}
 
-This Trait indicates the step of each detection range unit, in cm. A value of 25 means 25 cm. The client should use this value in combination with `MinDetectionRange` and `MaxDetectionRange` to determine the expected byte length of the `DetectionRange` bitmask and the distance represented by each bit.
+This Trait indicates the step of each detection range unit, in cm, corresponding to the Matter `DetectionRangeStep` attribute. The client should use this value in combination with `MinDetectionRange` and `MaxDetectionRange` to determine the expected byte length of the `DetectionRange` bitmask and the distance represented by each bit.
 
 <table>
   <thead>
@@ -114601,7 +114601,7 @@ This Trait is used to set the PIR detection time parameter in order to control t
 
 #### DetectionRangeTargetPosition Trait {#ref_DetectionRangeTargetPosition}
 
-This Trait is used to report data related to target positions within the detection range, facilitating visual calibration and range calibration.
+This Trait maps the Matter `DetectionRangeTargetPosition` event and is used to report the distance to the nearest target within the configured detection range. The event field `TargetDistance` maps to the `Present Value` of this Trait, in cm. The server should report once when each active reporting window starts or restarts; afterwards it reports only when the target distance changes. Each event reports at most one target.
 
 <table>
   <thead>
@@ -114782,7 +114782,7 @@ This Command is used to execute the "set zones" operation.
 
 #### SubscribeDetectionRangeTargetPosition Command {#ref_SubscribeDetectionRangeTargetPosition}
 
-This Command is used to execute the "subscribe target position within detection range" operation.
+This Command is used by the client to subscribe to the detection range target position event. The server should report the current target distance once when the active reporting window of this event starts or restarts, and afterwards report only when the target distance changes.
 
 This Command has no parameters.
 
