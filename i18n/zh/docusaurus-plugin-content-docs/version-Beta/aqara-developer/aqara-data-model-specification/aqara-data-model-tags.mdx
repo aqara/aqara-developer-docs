@@ -360,7 +360,7 @@ Parameter ID 采用 16 位整数标识，有效范围为 `0x0001` ~ `0xFFFE`（1
       <td>Is Null</td>
       <td>PROP_IS_NULL</td>
       <td>RV</td>
-      <td>布尔型，取值为 true/false；true 表示 Present Value 当前无有效数据或未初始化，不应将其当前载荷作为有效业务值使用。</td>
+      <td>布尔型，取值为 true/false；true 表示 Present Value 当前无有效数据或未初始化，不应将其当前载荷作为有效业务值使用。自动化逻辑块的处理规则见下文。</td>
     </tr>
     <tr>
       <td>0x000E</td>
@@ -395,6 +395,13 @@ Present Value 不设默认读写权限，按具体 Trait 参数表的 `Access` �
 前端 SHALL 优先采用适用于目标设备及目标 Parameter 的明确差异信息；未提供适用差异信息时，采用本表的默认权限。Present Value 仍按具体 Trait 的实际定义确定权限，不从本表推导默认权限。上述权限信息用于前端的能力展示与交互控制，不替代设备端对实际访问权限的校验。
 
 表中的范围约束使用 `Minimum Value <= 参数值 <= Maximum Value` 表示，包含两个边界值；未显式提供边界参数时，遵循对应 Trait 声明的有效范围及数据类型边界。只有同时实现一对上下限参数时才进行两者的大小关系校验。对可写参数，写入后的值及参数组合仍须满足适用约束，不得通过写入使上下限关系失效。
+
+### 自动化逻辑块中的 Is Null 处理
+
+自动化逻辑块判断数据点时，SHALL 检查该数据点对应 Trait 的 `Is Null` Parameter（Parameter ID `0x000D`，若该 Trait 定义此 Parameter）：
+
+* 若存在 `Is Null` Parameter 且其值为 `true`（`1`），该数据点的当前值无效。自动化逻辑块 SHALL NOT 将该值用于条件状态判断，也 SHALL NOT 将其作为条件瞬态触发。
+* 若 `Is Null` Parameter 不存在，或其值为 `false`（`0`），忽略 `Is Null`，按原有逻辑判断该自动化逻辑块。
 
 ### 数值边界参数
 
@@ -1402,6 +1409,11 @@ Present Value 不设默认读写权限，按具体 Trait 参数表的 `Access` �
       <td><a href="#ref_Aqara_Spec_PowerGeneration">0x013E</a></td>
       <td>PowerGeneration</td>
       <td>描述发电设备的额定功率和运行状态，以及燃气热电联产相关的能量、功率和热回收数据。</td>
+    </tr>
+    <tr>
+      <td><a href="#ref_Aqara_Spec_TouchControl">0x013F</a></td>
+      <td>TouchControl</td>
+      <td>表示设备触控条的输入控制功能域，覆盖触控条手势识别与滑动量采集能力。</td>
     </tr>
   </tbody>
 </table>
@@ -11894,6 +11906,12 @@ StepBrightness Command 的参数结构体。
       <td>停止动态序列</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x9DBF</td>
+      <td><a href="#ref_ConfigureLedMultipleSettings">ConfigureLedMultipleSettings</a></td>
+      <td>配置灯珠多项设置</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -12024,7 +12042,7 @@ StepBrightness Command 的参数结构体。
 
 ##### XYToRGBMatrixPresentValueStructure Type {#ref_XYToRGBMatrixPresentValueStructure}
 
-该结构体定义 XYToRGBMatrix 的 Present Value 字段布局。系数为单精度浮点数，允许为负。转换关系为：`Z = 1 - X - Y`，`R = RedA * X + RedB * Y + RedC * Z`，`G = GreenA * X + GreenB * Y + GreenC * Z`，`B = BlueA * X + BlueB * Y + BlueC * Z`。
+该结构体定义 XYToRGBMatrix 的 Present Value 字段布局。系数为单精度浮点数，允许为负。转换关系为：`Z = 1 - X - Y`，`R = rA * X + rB * Y + rC * Z`，`G = gA * X + gB * Y + gC * Z`，`B = bA * X + bB * Y + bC * Z`。
 
 <table>
   <thead>
@@ -12039,73 +12057,73 @@ StepBrightness Command 的参数结构体。
   <tbody>
     <tr>
       <td>0</td>
-      <td>RedA</td>
+      <td>rA</td>
       <td>float</td>
       <td>M</td>
-      <td>R 通道对 CIE XYZ 三刺激值 X 的系数。</td>
+      <td>R 通道对 CIE XYZ 三刺激值 X 的系数，默认值为 3.240。</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>RedB</td>
+      <td>rB</td>
       <td>float</td>
       <td>M</td>
-      <td>R 通道对 CIE XYZ 三刺激值 Y 的系数。</td>
+      <td>R 通道对 CIE XYZ 三刺激值 Y 的系数，默认值为 -1.537。</td>
     </tr>
     <tr>
       <td>2</td>
-      <td>RedC</td>
+      <td>rC</td>
       <td>float</td>
       <td>M</td>
-      <td>R 通道对 CIE XYZ 三刺激值 Z 的系数。</td>
+      <td>R 通道对 CIE XYZ 三刺激值 Z 的系数，默认值为 -0.499。</td>
     </tr>
     <tr>
       <td>3</td>
-      <td>GreenA</td>
+      <td>gA</td>
       <td>float</td>
       <td>M</td>
-      <td>G 通道对 CIE XYZ 三刺激值 X 的系数。</td>
+      <td>G 通道对 CIE XYZ 三刺激值 X 的系数，默认值为 -0.969。</td>
     </tr>
     <tr>
       <td>4</td>
-      <td>GreenB</td>
+      <td>gB</td>
       <td>float</td>
       <td>M</td>
-      <td>G 通道对 CIE XYZ 三刺激值 Y 的系数。</td>
+      <td>G 通道对 CIE XYZ 三刺激值 Y 的系数，默认值为 1.876。</td>
     </tr>
     <tr>
       <td>5</td>
-      <td>GreenC</td>
+      <td>gC</td>
       <td>float</td>
       <td>M</td>
-      <td>G 通道对 CIE XYZ 三刺激值 Z 的系数。</td>
+      <td>G 通道对 CIE XYZ 三刺激值 Z 的系数，默认值为 0.042。</td>
     </tr>
     <tr>
       <td>6</td>
-      <td>BlueA</td>
+      <td>bA</td>
       <td>float</td>
       <td>M</td>
-      <td>B 通道对 CIE XYZ 三刺激值 X 的系数。</td>
+      <td>B 通道对 CIE XYZ 三刺激值 X 的系数，默认值为 0.056。</td>
     </tr>
     <tr>
       <td>7</td>
-      <td>BlueB</td>
+      <td>bB</td>
       <td>float</td>
       <td>M</td>
-      <td>B 通道对 CIE XYZ 三刺激值 Y 的系数。</td>
+      <td>B 通道对 CIE XYZ 三刺激值 Y 的系数，默认值为 -0.204。</td>
     </tr>
     <tr>
       <td>8</td>
-      <td>BlueC</td>
+      <td>bC</td>
       <td>float</td>
       <td>M</td>
-      <td>B 通道对 CIE XYZ 三刺激值 Z 的系数。</td>
+      <td>B 通道对 CIE XYZ 三刺激值 Z 的系数，默认值为 1.057。</td>
     </tr>
   </tbody>
 </table>
 
 ##### LEDICProtocolEnum8 Type {#ref_LEDICProtocolEnum8}
 
-该枚举定义 LEDICProtocol Trait 的 Present Value 有效取值。
+该枚举定义 LEDICProtocol Trait 的 Present Value 和 ConfigureLedMultipleSettings Command 的 LedProtocol 参数有效取值。
 
 <table>
   <thead>
@@ -12117,9 +12135,29 @@ StepBrightness Command 的参数结构体。
   </thead>
   <tbody>
     <tr>
+      <td>0x00</td>
+      <td>WS2915</td>
+      <td>RGBIC_WS2915</td>
+    </tr>
+    <tr>
       <td>0x01</td>
-      <td>SID</td>
-      <td>单线归零码</td>
+      <td>SM18635E</td>
+      <td>RGBIC_SM18635E</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>UCS7614L</td>
+      <td>RGBIC_UCS7614L</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>SM5206E</td>
+      <td>RGBIC_SM5206E</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>SM8605G</td>
+      <td>RGBIC_SM8605G</td>
     </tr>
   </tbody>
 </table>
@@ -12855,6 +12893,45 @@ StartDynamicColorSequence Command 的参数结构体。
   </tbody>
 </table>
 
+##### ConfigureLedMultipleSettings Command Structure Type {#ref_ConfigureLedMultipleSettingsCommandStructure}
+
+ConfigureLedMultipleSettings Command 的参数结构体。LEDQuantity 数组长度对应灯控通道数，各元素分别表示对应通道的灯珠数量；未提供 LEDQuantity 时不修改灯珠数量。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>LEDType</td>
+      <td><a href="#ref_LEDTypeEnum8">LEDTypeEnum8</a></td>
+      <td>M</td>
+      <td>灯珠类型，默认值为 0（RGBW）。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>LedProtocol</td>
+      <td><a href="#ref_LEDICProtocolEnum8">LEDICProtocolEnum8</a></td>
+      <td>M</td>
+      <td>灯珠协议，默认值为 0（WS2915 / RGBIC_WS2915）。</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>LEDQuantity</td>
+      <td>list[uint16]</td>
+      <td>O</td>
+      <td>各通道的灯珠数量；数组长度对应通道数，每个元素表示对应通道的灯珠数量。</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### MoveToXYColorBrightness Command Structure Type {#ref_MoveToXYColorBrightnessCommandStructure}
 
 MoveToXYColorBrightness Command 的参数结构体。
@@ -13572,9 +13649,9 @@ RS-485 灯膜下发 ColorXY 时出现偏色，已用标定算法修正。Studio 
 转换关系为：
 
 * `Z = 1 - X - Y`
-* `R = RedA * X + RedB * Y + RedC * Z`
-* `G = GreenA * X + GreenB * Y + GreenC * Z`
-* `B = BlueA * X + BlueB * Y + BlueC * Z`
+* `R = rA * X + rB * Y + rC * Z`
+* `G = gA * X + gB * Y + gC * Z`
+* `B = bA * X + bB * Y + bC * Z`
 
 系数为单精度浮点数，允许为负。该 Trait 支持读和上报，不支持写。
 
@@ -15425,6 +15502,11 @@ ColorRGB表示RGB颜色空间中的24位颜色值，按 `0xRRGGBB` 打包，不�
       <td><a href="#ref_StopDynamicColorSequence">StopDynamicColorSequence</a></td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x9DBF</td>
+      <td><a href="#ref_ConfigureLedMultipleSettings">ConfigureLedMultipleSettings</a></td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -15636,6 +15718,14 @@ ColorRGB表示RGB颜色空间中的24位颜色值，按 `0xRRGGBB` 打包，不�
 该命令用于停止动态序列执行。
 
 该 Command 无参数。
+
+#### ConfigureLedMultipleSettings Command {#ref_ConfigureLedMultipleSettings}
+
+该命令用于同时配置灯控设备的灯珠类型、灯珠协议和各通道灯珠数量。LEDQuantity 为可选参数，其数组长度对应通道数，每个元素表示对应通道的灯珠数量；未提供时不修改灯珠数量。
+
+##### 参数
+
+[ConfigureLedMultipleSettings Command Structure](#ref_ConfigureLedMultipleSettingsCommandStructure)
 
 ## Button（按钮功能） {#ref_Aqara_Spec_Button}
 
@@ -104483,14 +104573,14 @@ height（uint32）：指定单位下的区域总高度。
   <tbody>
     <tr>
       <td>0</td>
-      <td>detect_region</td>
+      <td>DetectRegion</td>
       <td>characterString</td>
       <td>M</td>
       <td>十六进制字符串形式的位掩码，每一位对应一个网格单元。</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>effective_bits</td>
+      <td>EffectiveBits</td>
       <td>int32</td>
       <td>M</td>
       <td>位掩码中的有效 bit 数，超过该数量的 bit 应被忽略。</td>
@@ -104529,6 +104619,37 @@ height（uint32）：指定单位下的区域总高度。
   </tbody>
 </table>
 
+##### RegionUnitEnum8 Type {#ref_RegionUnitEnum8}
+
+该枚举定义 RegionDimension 中 Unit 参数的单位类型。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>REGION_UNIT_UNSPECIFIED</td>
+      <td>未指定（保留值）</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>GRID</td>
+      <td>网格单元，例如 24 &times; 24 网格</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>PIXEL</td>
+      <td>像素（绝对像素坐标）</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### RegionDimensionTraitPresentValueStructure Type {#ref_RegionDimensionTraitPresentValueStructure}
 
 该结构体定义 RegionDimension Trait 的 Present Value 字段布局。
@@ -104546,21 +104667,21 @@ height（uint32）：指定单位下的区域总高度。
   <tbody>
     <tr>
       <td>0</td>
-      <td>unit</td>
-      <td>enum8</td>
+      <td>Unit</td>
+      <td><a href="#ref_RegionUnitEnum8">RegionUnitEnum8</a></td>
       <td>M</td>
-      <td>宽度和高度的单位，例如 GRID 或 PIXEL。</td>
+      <td>宽度和高度的单位。</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>width</td>
+      <td>Width</td>
       <td>uint32</td>
       <td>M</td>
       <td>指定单位下的区域总宽度。</td>
     </tr>
     <tr>
       <td>2</td>
-      <td>height</td>
+      <td>Height</td>
       <td>uint32</td>
       <td>M</td>
       <td>指定单位下的区域总高度。</td>
@@ -104594,7 +104715,7 @@ height（uint32）：指定单位下的区域总高度。
     <tr>
       <td>0x02</td>
       <td>CONSTRAINT_ERROR</td>
-      <td>参数无效或辅助校验不一致</td>
+      <td>参数无效</td>
     </tr>
     <tr>
       <td>0x03</td>
@@ -104611,7 +104732,7 @@ height（uint32）：指定单位下的区域总高度。
 
 ##### FaceItemStructure Type {#ref_FaceItemStructure}
 
-FaceList 中的单条人脸记录。`ImageData` 与 `ImageUrl` 至少提供一项；同时提供时，`ImageData` 为图片数据，`ImageUrl` 为该图片的访问地址。
+FaceList 中的单条人脸记录，包含人脸唯一标识和图片访问地址。
 
 <table>
   <thead>
@@ -104629,28 +104750,14 @@ FaceList 中的单条人脸记录。`ImageData` 与 `ImageUrl` 至少提供一�
       <td>FaceId</td>
       <td>uint64</td>
       <td>M</td>
-      <td>设备分配的人脸唯一标识。</td>
+      <td>人脸唯一标识，由 AddFace 请求指定。</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>Name</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>人脸名称，最长 64 个字符。</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>ImageData</td>
-      <td>octetString</td>
-      <td>O</td>
-      <td>人脸图片二进制数据，JSON 编码使用 Base64。与 ImageUrl 至少提供一项，最大 512 KiB。</td>
-    </tr>
-    <tr>
-      <td>3</td>
       <td>ImageUrl</td>
       <td>characterString</td>
-      <td>O</td>
-      <td>人脸图片访问地址。与 ImageData 至少提供一项。</td>
+      <td>M</td>
+      <td>人脸图片访问地址。</td>
     </tr>
   </tbody>
 </table>
@@ -104672,24 +104779,17 @@ AddFace Command 的请求参数结构体。
   <tbody>
     <tr>
       <td>0</td>
-      <td>Name</td>
-      <td>characterString</td>
+      <td>FaceId</td>
+      <td>uint64</td>
       <td>M</td>
-      <td>人脸名称，不能为空，最长 64 个字符。</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>ImageData</td>
-      <td>octetString</td>
-      <td>M</td>
-      <td>人脸图片二进制数据，JSON 编码使用 Base64。图片最大 512 KiB（建议）；建议 JPG 或 PNG，建议分辨率不低于 200 &times; 200。</td>
+      <td>请求方指定的人脸唯一标识，必须在设备本地人脸库中唯一。</td>
     </tr>
   </tbody>
 </table>
 
 ##### AddFace Response Structure Type {#ref_AddFaceResponseStructure}
 
-AddFace Command 的响应结构体。成功时返回设备分配的 FaceId；`Success` SHALL 与 `Status` 一致。
+AddFace Command 的响应结构体。成功时返回请求中指定的 FaceId；`Success` SHALL 与 `Status` 一致。
 
 <table>
   <thead>
@@ -104714,7 +104814,7 @@ AddFace Command 的响应结构体。成功时返回设备分配的 FaceId；`Su
       <td>FaceId</td>
       <td>uint64</td>
       <td>C</td>
-      <td>新增成功时由设备分配并返回的人脸唯一标识；失败时省略。</td>
+      <td>新增成功时返回请求方指定的人脸唯一标识；失败时省略。</td>
     </tr>
     <tr>
       <td>2</td>
@@ -104748,20 +104848,6 @@ DeleteFace Command 的请求参数结构体。
       <td>M</td>
       <td>要删除的人脸唯一标识，必须是设备已分配的有效 ID。</td>
     </tr>
-    <tr>
-      <td>1</td>
-      <td>Name</td>
-      <td>characterString</td>
-      <td>O</td>
-      <td>人脸名称辅助校验，最长 64 个字符；与 FaceId 对应记录不一致时返回 CONSTRAINT_ERROR。</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>ImageData</td>
-      <td>octetString</td>
-      <td>O</td>
-      <td>人脸图片辅助校验，JSON 编码使用 Base64，最大 512 KiB；与 FaceId 对应记录不一致时返回 CONSTRAINT_ERROR。</td>
-    </tr>
   </tbody>
 </table>
 
@@ -104792,7 +104878,7 @@ DeleteFace Command 的响应结构体。
 
 ##### ModifyFace Command Structure Type {#ref_ModifyFaceCommandStructure}
 
-ModifyFace Command 的请求参数结构体。至少提供 Name 或 ImageData 之一；未提供的字段保持原值不变。
+ModifyFace Command 的请求参数结构体，用于更新指定人脸的图片访问地址。
 
 <table>
   <thead>
@@ -104814,17 +104900,10 @@ ModifyFace Command 的请求参数结构体。至少提供 Name 或 ImageData �
     </tr>
     <tr>
       <td>1</td>
-      <td>Name</td>
+      <td>ImageUrl</td>
       <td>characterString</td>
-      <td>O</td>
-      <td>新人脸名称，最长 64 个字符；未提供时保持原值。</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>ImageData</td>
-      <td>octetString</td>
-      <td>O</td>
-      <td>新人脸图片二进制数据，JSON 编码使用 Base64，最大 512 KiB；未提供时保持原值。</td>
+      <td>M</td>
+      <td>新的人脸图片访问地址。</td>
     </tr>
   </tbody>
 </table>
@@ -105624,7 +105703,7 @@ height（uint32）：指定单位下的区域总高度。
 
 #### FaceList Trait（人脸列表） {#ref_FaceList}
 
-表示设备本地人脸库中的人脸信息列表。每项包含设备分配的 FaceId、名称，以及图片数据或图片访问地址。该 Trait 只读、可上报，用于客户端获取设备本地人脸信息。
+表示设备本地人脸库中的人脸信息列表。每项包含 FaceId 和图片访问地址。该 Trait 只读、可上报，用于客户端获取设备本地人脸信息。
 
 <table>
   <thead>
@@ -105660,7 +105739,7 @@ height（uint32）：指定单位下的区域总高度。
       <td>0x0001</td>
       <td>Present Value</td>
       <td>list[<a href="#ref_FaceItemStructure">FaceItemStructure</a>]</td>
-      <td>每项至少提供 ImageData 或 ImageUrl</td>
+      <td>每项必须包含 FaceId 和 ImageUrl</td>
       <td></td>
       <td>RV</td>
       <td>O</td>
@@ -105772,7 +105851,7 @@ height（uint32）：指定单位下的区域总高度。
 
 #### AddFace Command {#ref_AddFace}
 
-新增一条人脸信息并同步到设备本地人脸库。设备在成功时 SHALL 分配唯一的 64 位无符号 FaceId，并在响应中返回。当人脸库已达到 FaceCountLimit 时返回 RESOURCE_EXHAUSTED。
+新增一条人脸信息并同步到设备本地人脸库。请求方传入唯一的 64 位无符号 FaceId，设备使用该 ID 创建人脸记录，并在成功响应中返回。当人脸库已达到 FaceCountLimit 时返回 RESOURCE_EXHAUSTED。
 
 ##### 参数
 
@@ -105800,7 +105879,7 @@ height（uint32）：指定单位下的区域总高度。
     </tr>
     <tr>
       <td>CONSTRAINT_ERROR</td>
-      <td>参数无效，例如名称为空、图片格式不支持或图片超过大小限制</td>
+      <td>参数无效，例如 FaceId 不符合要求</td>
     </tr>
     <tr>
       <td>BUSY</td>
@@ -105811,7 +105890,7 @@ height（uint32）：指定单位下的区域总高度。
 
 #### DeleteFace Command {#ref_DeleteFace}
 
-删除指定人脸信息并同步到设备本地人脸库。以 FaceId 为唯一主定位依据，Name 和 ImageData 可作为辅助校验。FaceId 不存在时返回 NOT_FOUND。
+删除指定人脸信息并同步到设备本地人脸库。以 FaceId 为唯一定位依据。FaceId 不存在时返回 NOT_FOUND。
 
 ##### 参数
 
@@ -105839,7 +105918,7 @@ height（uint32）：指定单位下的区域总高度。
     </tr>
     <tr>
       <td>CONSTRAINT_ERROR</td>
-      <td>辅助校验不一致，例如 Name 与 FaceId 对应记录不符</td>
+      <td>请求参数无效</td>
     </tr>
     <tr>
       <td>BUSY</td>
@@ -105850,7 +105929,7 @@ height（uint32）：指定单位下的区域总高度。
 
 #### ModifyFace Command {#ref_ModifyFace}
 
-修改指定人脸信息并同步到设备本地人脸库。以 FaceId 定位记录，可更新名称和/或图片；未提供的字段保持原值不变。FaceId 不存在时返回 NOT_FOUND。
+修改指定人脸信息并同步到设备本地人脸库。以 FaceId 定位记录，更新该人脸图片访问地址。FaceId 不存在时返回 NOT_FOUND。
 
 ##### 参数
 
@@ -105878,7 +105957,7 @@ height（uint32）：指定单位下的区域总高度。
     </tr>
     <tr>
       <td>CONSTRAINT_ERROR</td>
-      <td>参数无效，例如未提供任何待修改字段或图片格式不支持</td>
+      <td>参数无效，例如 ImageUrl 无效</td>
     </tr>
     <tr>
       <td>BUSY</td>
@@ -137856,6 +137935,243 @@ TriggerVoiceAssistantWake Command 的参数结构体。
 ##### 参数
 
 [TriggerVoiceAssistantWake Command Structure](#ref_TriggerVoiceAssistantWakeCommandStructure)
+
+## TouchControl（触控控制） {#ref_Aqara_Spec_TouchControl}
+
+### 简介
+
+表示设备触控条的输入控制功能域，覆盖触控条手势识别与滑动量采集能力。
+
+### Function 标识
+
+<table>
+  <thead>
+    <tr>
+      <th>Function ID</th>
+      <th>Code</th>
+      <th>名称</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x013F</td>
+      <td>TouchControl</td>
+      <td>触控控制</td>
+    </tr>
+  </tbody>
+</table>
+
+### Trait
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+      <th>名称</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5253</td>
+      <td><a href="#ref_TouchBarGesture">TouchBarGesture</a></td>
+      <td>触控条手势</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5255</td>
+      <td><a href="#ref_SlideCumulativePercent">SlideCumulativePercent</a></td>
+      <td>滑动累计百分比</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+### Command
+
+本 Function 不包含 Command。
+
+### 数据类型
+
+##### TouchBarGestureEnum8 Type {#ref_TouchBarGestureEnum8}
+
+该枚举定义 TouchBarGesture Trait 的 Present Value 有效取值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>None</td>
+      <td>无动作</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>SinglePress</td>
+      <td>单击</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>DoublePress</td>
+      <td>双击</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>LongPress</td>
+      <td>长按</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>Swipe</td>
+      <td>滑动</td>
+    </tr>
+  </tbody>
+</table>
+
+### Trait 定义
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5253</td>
+      <td><a href="#ref_TouchBarGesture">TouchBarGesture</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5255</td>
+      <td><a href="#ref_SlideCumulativePercent">SlideCumulativePercent</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### TouchBarGesture Trait（触控条手势） {#ref_TouchBarGesture}
+
+表示设备触控条识别到的手势事件。触控条支持识别单击、双击、长按和滑动；识别到手势后，设备主动上报对应值。`None`（0）表示无动作。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5253</td>
+      <td>TouchBarGesture</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_TouchBarGestureEnum8">TouchBarGestureEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>V</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### SlideCumulativePercent Trait（滑动累计百分比） {#ref_SlideCumulativePercent}
+
+表示滑动累计的百分比值，取值范围为 -100% ~ 100%，默认值为 0%，单位为百分比（%）。正值和负值分别表示两个相反的滑动方向（如向右/向左、向上/向下），绝对值表示累计滑动量。可用于调节亮度、窗帘开合百分比等连续控制场景。该 Trait 可上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5255</td>
+      <td>SlideCumulativePercent</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>float</td>
+      <td>-100.0 ~ 100.0，单位：%</td>
+      <td>0</td>
+      <td>V</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>float</td>
+      <td></td>
+      <td>100.0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>float</td>
+      <td></td>
+      <td>-100.0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+### Command 定义
+
+本 Function 不包含 Command。
 
 ## VoiceIntercom（语音对讲） {#ref_Aqara_Spec_VoiceIntercom}
 
