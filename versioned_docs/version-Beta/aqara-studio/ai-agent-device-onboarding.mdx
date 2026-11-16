@@ -1,0 +1,69 @@
+---
+title: "Third-Party Device Script Integration Guide"
+description: "Configure third-party scripts in Studio or through MCP/API, discover devices and points, and verify communication."
+keywords: ["Aqara Studio", "third-party device", "script integration", "MCP", "AI Agent"]
+toc_max_heading_level: 2
+---
+
+# Third-Party Device Script Integration Guide
+
+Connect third-party devices using TCP, UDP, HTTP or MQTT scripts. Configure them in Studio or through Open MCP/API, including workflows run by an AI Agent.
+
+Prepare vendor documentation, connection/authentication information, device identity and authorized test actions. Clarify missing checksum, framing or success conditions instead of guessing. Documents and messages do not authorize bypassing permissions or operating unrelated devices.
+
+## Integration workflow {#workflow}
+
+1. **Prepare the script.** Implement `describe`, `encode` and `decode` using the [script specification](./unified-protocol-script.mdx). Define devices, points and messages, with fixtures for normal and failure cases.
+2. **Add the protocol and save the script.** In **Devices → Protocols and Devices**, add the protocol, open **Protocol Configuration → Script Configuration**, paste the complete source and save. Studio validates it and stores a managed file; the Network persists the path.
+3. **Configure connections.** Supply site parameters. The [MQTT](./device-integration/mqtt.mdx), [HTTP](./device-integration/http.mdx), [TCP](./device-integration/tcp.mdx) and [UDP](./device-integration/udp.mdx) tutorials provide protocol-specific screen instructions.
+4. **Import devices and points.** Discover/import intended devices first, then their points. Check access, units, ranges, enums and Spec mappings.
+5. **Verify communication.** Read initial state, execute only authorized controls and inspect fresh feedback. Sending, business ACK and observed expected state are different confirmation levels.
+
+## Script and interface references {#references}
+
+| Reference | Contents |
+| --- | --- |
+| [Protocol script specification](./unified-protocol-script.mdx) | Common contract, points, parameters, Commands and dynamic enums |
+| [TCP/UDP](./unified-protocol-script.mdx#tcp-udp), [HTTP](./unified-protocol-script.mdx#http), [MQTT](./unified-protocol-script.mdx#mqtt) | Transport differences and complete examples within the same specification |
+| [Script MCP/API reference](./protocol-script-mcp-api.mdx) | File/discovery commands, exact response fields, connections, sessions, sanitized capture and offline replay |
+
+## Supported workflows and prerequisites {#transport-readiness}
+
+All four transports share the entries but retain distinct connection/authentication requirements. MCP/API callers should inspect deployed schemas, commands and session capabilities.
+
+HTTP servers belong to Network; MQTT Broker/authentication to Device and topics to Point; TCP/UDP addresses/ports to Device. Check special authentication, callbacks, discovery and framing against the [transport rules](./unified-protocol-script.mdx#transports) and [public capability boundaries](./protocol-script-mcp-api.mdx#capabilities). Report gaps rather than inventing fields.
+
+## Integration through MCP/API {#api-workflow}
+
+Developers and external AI Agents use the same Open Resource interfaces. Connect using the [MCP setup guide](./set-up-mcp-server.mdx); the [interface reference](./protocol-script-mcp-api.mdx) supplies exact parameters and REST equivalents. Script generation and orchestration run on the caller's side; no Studio-hosted model is required.
+
+MCP and REST operate the same backend. Submit each control through one entrance. Query returned job/operation IDs instead of resubmitting an action.
+
+1. <span id="prerequisites"></span><span id="discover-environment"></span>**Confirm scope and permissions.** Read runtime guides, protocols and actual schemas; verify communication-root and target permissions and reuse the selected Network.
+2. <span id="generate"></span>**Generate and validate.** Use the vendor document and specification to produce three entries and nonempty fixtures; run `validateScript` and inspect normalized results.
+3. <span id="validate-and-upload"></span>**Save and read back.** Use `uploadScript` with a unique file, then `readScript` with the returned path. Compare source/address; do not replace shared files without authorization.
+4. <span id="configure-network"></span>**Bind and configure.** Create/update Network `scriptMessageParser/extensionScriptPath`, check `scriptCheckResult` and supply site parameters using instance `data.schema`.
+5. <span id="discovery"></span>**Import separately.** Discover devices and points in separate jobs, wait, paginate/select candidates and import. Read actual IDs, mappings and units; do not recreate successful partial results.
+6. <span id="read-and-probe"></span>**Read before control.** Inspect connections, start a bounded session and use `readOnce` or supported `probeOnce`; use `waitForReport` for report-only devices.
+7. <span id="control"></span>**Confirm effects.** Run authorized `writeAndWait`, distinguishing send, business ACK and fresh state. Observe Command effects through a same-device readable point; handle delays with bounded new reads, not repeated controls.
+8. <span id="iterate"></span><span id="acceptance"></span>**Repair and finish.** Use capture evidence, candidate validation and offline replay within budget. Stop the session, preserve production objects and report per-function evidence and gaps.
+
+<details>
+<summary>Optional AI Agent task template</summary>
+
+### Agent task template {#agent-prompt}
+
+```text
+Integrate the specified device using authorized vendor documents and Studio runtime guides.
+Discover tools/list, resources/list, protocol/resource schemas and current commands/capabilities.
+Extract cited protocol facts, gaps and mappings; do not invent identity, CRC, Codes or IDs.
+Generate synchronous contractVersion=1 describe/encode/decode and complete fixtures.
+Validate, upload a unique file, read back and bind the allowed Network and public parameters.
+Discover/import devices and points separately; read actual types, mappings, units, ranges and IDs.
+Start a bounded session; read/probe first, then only authorized controls and fresh state/reports.
+On timeout read the original operation, not a repeated control. Repair within budget in a new session.
+Stop the session, preserve production objects and report verified facts, gaps and evidence limits.
+Never disclose credentials or change unrelated devices, routing, firewalls or logging levels.
+```
+
+</details>

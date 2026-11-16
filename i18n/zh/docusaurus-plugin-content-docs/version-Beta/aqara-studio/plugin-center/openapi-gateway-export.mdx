@@ -1,0 +1,85 @@
+---
+title: "OpenAPI（Gateway） Export 插件使用流程"
+description: "本文将详细介绍如何将 Studio 内的网关作为本地 API 服务端。通过网关的本地 API 服务端，即使与 Aqara Studio 连接中断，仍可对网关及其子设备进行查询和控制，并在局域网内独立提供设备与自动化能力。"
+keywords: ["Aqara 文档", "Aqara Studio", "OpenAPI（Gateway） Export 插件使用流程", "openapi"]
+---
+
+# OpenAPI（Gateway） Export 插件使用流程
+
+Aqara Studio 提供了一套丰富的接口，支持用户高效、安全地访问和管理设备与自动化相关数据。但默认情况下，调用这些接口必须依赖 Aqara Studio 与各网关之间的连接。一旦网关与 Aqara Studio 连接中断，便无法再通过该链路获取断联网关及其子设备的最新状态，也无法对其进行控制。
+
+为解决上述问题，您可安装 **OpenAPI（Gateway） Export 插件**，使 Aqara Studio 支持将网关作为本地 API 服务端。通过网关的本地 API 服务端，可以实现：
+- 即使网关与 Aqara Studio 连接中断，仍可对网关及其子设备进行查询和控制。
+- 网关作为独立服务端，在局域网内提供设备与自动化能力。
+- 独立管理各网关的服务状态、Token 与 API 白名单。
+
+本文将详细介绍如何在 Aqara Studio 中安装插件、配置网关，并将配置信息下发给网关，使其能够独立监听、鉴权并执行 API。配置成功下发后，您可在网络可达的前提下直连网关；即使网关与 Aqara Studio 断连，也不影响最后一次成功配置的本地 OpenAPI 服务继续运行。
+
+## 前提条件
+
+在开始之前，请确保您的 Aqara Studio 已经 [连接至 Aqara Cloud](./../cloud.mdx)。
+
+## 安装插件
+
+请参考 [插件市场](./../plugin-center.mdx) 文档：
+1. 前往 [Aqara Builder 工坊 - 市场](https://builder.aqara.com/lab/plugin-store) 获取 `OpenAPI (Gateway) Export（OpenAPI（Gateway）转出）` 插件。
+2. 将其分配到 Aqara Studio。
+3. 并前往 Aqara Studio 的 **插件中心** 安装该插件。
+
+## 配置流程
+
+1. 在 **插件中心** 找到 `OpenAPI (Gateway) Export` 插件，点击 **转出** 按钮。
+
+    ![转出按钮](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/OpenAPI-Gateway-Export-ChooseThePlugin.png)
+
+2. 此时，页面会跳转到 **开发者** 页面。找到 **网关 OpenAPI 服务**，单击 **新建服务** 按钮。
+
+    ![转出按钮](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/OpenAPI-Gateway-NewService.png)
+
+3. 选择要配置的网关，并单击 **下一步** 按钮。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/OpenAPI-Gateway-SelectDevicesAndNextStep.png" alt="选择网关" style={{width: '60%'}} />
+
+4. 配置此网关的服务到期时间，并单击 **下一步** 按钮。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/OpenAPI-Gateway-ConfigureExpirationTime.png" alt="设置服务到期时间" style={{width: '60%'}} />
+
+5. 在弹窗中选择允许此网关调用的 API，单击 **确定并下发**。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/OpenAPI-Gateway-SelectAPI.png" alt="选择 API" style={{width: '60%'}} />
+
+6.成功下发后，您可以从弹窗中获取到适用于此网关的 Token，请注意妥善保存。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/OpenAPI-Gateway-GetToken.png" alt="获取 Token" style={{width: '60%'}} />
+
+7. 刷新 **开发者** 页面，您即可在 **网关 OpenAPI 服务** 卡片中看到您刚刚配置的服务。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/OpenAPI-Gateway-CheckNewService.png" alt="查看新服务" />
+
+## 更多操作
+
+在完成网关 OpenAPI 服务的配置与下发后，您可在 **开发者** 页面的 **网关 OpenAPI 服务** 中对已创建的服务进行日常管理，包括 [启用与禁用服务](#启用与禁用服务)、[修改 Token 过期时间](#修改-token-过期时间)、[管理可用 API](#管理可用-api)以及[更新配置](#更新配置)等操作。
+
+### 启用与禁用服务
+
+服务创建后，默认为 **启用** 状态。若暂时不需要使用此服务，可在该服务中找到 **服务状态** 按钮，单击即可禁用。禁用后，网关将不再监听、鉴权并执行 API。如需再次启用，再次单击该按钮即可。
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/OpenAPI-Gateway-EnableService.png" alt="启用与禁用服务" />
+
+### 修改 Token 过期时间
+
+如果您需要修改 Token 的过期时间，可在该服务中找到 **操作** 一列，单击 **... > 编辑 Token** 按钮即可修改。修改后，Token 过期时间将更新为新设置的时间。
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/OpenAPI-Gateway-UpdateToken.png" alt="修改 Token 过期时间" />
+
+### 管理可用 API
+
+如果您想要修改此服务允许调用的 API，可在该服务中找到 **操作** 一列，单击 **... > API 管理** 按钮，在弹窗中选择需要调用的 API，单击 **确定** 按钮即可。
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/OpenAPI-Gateway-ManageAPI.png" alt="修改 Token 过期时间" />
+
+### 更新配置
+
+如果您希望将 Studio 中的最新服务、Token 和 API 配置同步到该网关，可在该服务中找到 **操作** 一列，单击 **... > 更新配置** 按钮，在弹窗中单击 **确认** 按钮即可。
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/OpenAPI-Gateway-UpdateConfiguration.png" alt="修改 Token 过期时间" />

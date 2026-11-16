@@ -6,15 +6,23 @@ sidebar_label: "MQTT"
 
 # MQTT API
 
-通过 MQTT 转出功能，您可以借助 MQTT Broker，以发布/订阅方式发送请求消息，调用 [已开放的数据转出 HTTP API](#调用-http-接口)。此外，您还可以实现 [心跳保活](#心跳与订阅续租)、[订阅或取消订阅设备数据](#订阅设备数据)，以及接收设备数据变化和其他对象事件。
+通过 MQTT 转出功能，您可以借助 MQTT Broker，以发布/订阅方式调用 [已对 MQTT 开放的 HTTP 业务接口](#调用-http-接口)、[订阅或取消订阅数据](#订阅设备数据)，并接收实时推送。[应用层 ping](#心跳与订阅续租) 用于订阅续租。
 
 ## 获取 MQTT 连接信息
 
-在开始发布/订阅请求消息之前，您需要在 Aqara Studio 上启用 MQTT 转出服务，选择本地 Broker 或第三方 Broker，以此获取 MQTT 连接信息。相关流程请阅读 [以 MQTT 转出设备数据](./../../../aqara-studio/data-export-by-mqtt.mdx)。
+在 **开发者 → MQTT 转出** 中启用转出并选择 Broker。选择 **本地 MQTT Broker** 时，在同名的独立卡片上启用本地服务，Studio 会在服务就绪后自动连接；选择 **第三方 Broker** 时，本地服务仍可独立运行，供局域网设备使用。连接参数、证书和重试操作请参阅 [以 MQTT 转出设备数据](./../../../aqara-studio/data-export-by-mqtt.mdx)。
+
+:::note 默认仅使用新版 Topic
+提供 `enableLegacyTopics` 属性的 Studio 版本默认只订阅 `/open/api/v1/request/+`，响应和推送均发送到 `/open/api/v1/response/{clientId}`。仅使用新版时，无需配置旧版 Topic，也无需向 Studio 账号开放旧版请求/响应 Topic 权限。
+
+仍需旧版接入时，请在高级节点属性 `OpenService → mqttDriver` 中开启 `enableLegacyTopics`（启用旧版 Topic 兼容），并为所配置的旧版 Topic 授权。历史保存的旧请求过滤器不会自动开启兼容。该开关保存后跨 Studio 重启保留；修改后须断开并重新连接，已有连接不会自动重新订阅。Web 开发者页面目前未提供此高级属性的编辑控件。
+
+未提供该开关的历史版本仍可能默认同时订阅新旧 Topic。上线状态和遗嘱消息为独立可选功能，若已开启，仍需为它们使用的状态 Topic 配置发布权限。
+:::
 
 ## 鉴权
 
-MQTT 通道身份认证和 Topic 访问权限由 Broker 的连接凭据与 ACL 负责。您无需使用 OpenAPI Token，也不需要发送 `AuthRequest` 消息进行身份认证。
+MQTT 通道身份认证和 Topic 访问权限由 Broker 的连接凭据与 ACL 负责。您无需使用 OpenAPI Token；新版 MQTT 不支持 `AuthRequest`，不要发送该消息。
 
 对于生产环境，您应该配置 Broker ACL，使您的应用只能向分配给自己的请求 Topic 发布消息，并且只能订阅分配给自己的响应 Topic。
 
@@ -22,35 +30,75 @@ MQTT 通道身份认证和 Topic 访问权限由 Broker 的连接凭据与 ACL �
 
 ## Topic
 
+### 默认 Topic 与 clientId
+
+未填写固定 Topic 时，使用以下地址：
+
 | Topic 类型 | 方向 | 格式 | 用途 |
 | --- | --- | --- | --- |
 | 请求 Topic | 应用到 Studio | `/open/api/v1/request/{clientId}` | API 请求、心跳、订阅和取消订阅消息 |
 | 响应 Topic | Studio 到应用 | `/open/api/v1/response/{clientId}` | API 响应、订阅响应、推送消息和错误消息 |
 
-:::tip
-请求 Topic 和响应 Topic 开头的 `/` 是 Topic 名称的一部分，不能省略。
-:::
+默认地址开头的 `/` 是 Topic 名称的一部分，不能省略。
 
-格式中的 `{clientId}` 是您的应用在此 MQTT 通道中的逻辑会话和响应路由标识。常规情况下，一个 MQTT 连接对应一个应用，应用应使用其连接 Broker 时在 `CONNECT` 报文中提交的 MQTT Client ID 作为 Topic 中的 `{clientId}`。
+`{clientId}` 是应用的逻辑会话和响应路由标识。通常一个应用对应一个 MQTT 连接，建议使用该应用连接 Broker 时的 MQTT Client ID，并在请求和响应 Topic 中使用同一个值。代理程序通过一个物理 MQTT 连接承载多个逻辑应用时，可以使用不同的逻辑标识；Studio 不会从 Broker 的 `CONNECT` 报文校验两者是否相同，应通过 Broker ACL 绑定访问权限。
 
-格式中的 `{clientId}` 不是 Aqara Studio 在 **MQTT 转出**页面配置的 Client ID。Aqara Studio 使用自己的单个 MQTT 连接服务多个第三方应用，因此两者不应相同。只有代理程序通过一个 MQTT 连接承载多个逻辑客户端时，Topic 中的 `{clientId}` 才可以与该代理连接的 MQTT Client ID 不同；生产环境应通过 Broker ACL 限制每个应用可访问的请求和响应 Topic。
+这里的标识与 **MQTT 转出** 页面上 Studio 自身连接 Broker 使用的 **客户端 ID** 分别属于应用和 Studio。不要让应用复用 Studio 的物理 Client ID，否则 Broker 可能踢掉已有连接。
 
-`clientId` 长度为 1～128 个字符，只能包含字母、数字、`.`、`_`、`:` 和 `-`。
+默认 Topic 中的 `clientId` 长度为 1～128，只能包含字母、数字、`.`、`_`、`:` 和 `-`。
+
+### 第三方 Broker 的固定 Topic
+
+在开发者页面选择“第三方 Broker”后，可以成对填写以下两个可选字段：
+
+| 字段（以 Studio 为视角） | 示例 | 用途 |
+| --- | --- | --- |
+| 订阅 Topic（Studio 接收请求） | `vendor/studio/request` | 发送 OpenAPI 请求、ping、订阅和取消订阅消息到此地址 |
+| 发布 Topic（Studio 发送响应与推送） | `vendor/studio/response` | 从此地址订阅 API 响应、错误及所有数据推送 |
+
+两项必须同时填写或同时留空。填写后，Studio 只使用指定的这对 Topic，不再额外订阅默认或旧版请求 Topic。名称去除首尾空白后按原样使用，保留大小写及前导、尾随 `/`，不追加 `clientId`，也不替换 `{clientId}` 等占位符。每项 UTF-8 编码长度不能超过 65535 字节；收发 Topic 必须不同，不接受 `+`、`#`、`$share/` 前缀或控制字符。
+
+例如上表的固定地址没有开头 `/`，就必须按该名称使用，不能自行添加。固定收发地址不会改变 JSON 报文，也不会改变 `data.path` 的 `/open/api/v1/` 前缀。
+
+一对固定 Topic 对应一个第三方平台逻辑会话，不读取第三方请求中的 `clientId` 做路由。共用此通道的请求共享订阅和取消订阅操作、心跳续租以及写请求的 `msgId` 幂等空间。不同写操作应使用不同 `msgId`。请求或 `ping` 为整个平台会话续租，90 秒未收到请求时清理该会话的订阅。
+
+两个字段一起保存，跨 Studio 重启保留。更改并保存后旧连接会断开，需要重新连接并重新订阅；两项留空并保存，或点击 **恢复默认 Topic**，可恢复默认地址。切回本地 Broker 时忽略但保留固定配置，切回第三方后可复用；固定配置生效期间忽略旧版兼容设置，恢复默认后兼容开关仍按原设置处理。
+
+固定通道共用同一平台会话，不提供通道内多个客户端的独立订阅或权限隔离。多个应用共用该通道时，一方的取消订阅会影响其他应用，必须统一管理订阅和 `msgId`。
+
+旧版 Studio 不支持保存固定 Topic 时，页面会提示升级 open 模块并禁用保存。
+
+### Broker 权限方向
+
+| 连接方 | 请求 Topic | 响应 Topic |
+| --- | --- | --- |
+| Studio | 订阅 | 发布 |
+| 应用 | 发布 | 订阅 |
+
+默认模式下，Studio 订阅 `/open/api/v1/request/+`，应用只应访问分配给自己的具体请求和响应地址；固定模式下，权限对应配置的两个具体地址。若显式启用了上线状态或遗嘱功能，其状态 Topic 仍需独立的发布权限。Broker 在建连阶段拒绝 Studio 订阅请求 Topic 时，Studio 会清理连接并显示连接失败。
 
 ## 服务质量（QoS） 
 
 建议请求发布和响应订阅均使用 QoS 1。
 
-发送请求前，您应先订阅响应 Topic，避免遗漏立即返回的响应。
+请求必须设置 `retain=false`，响应和推送也不 retain。发送请求前，先订阅响应 Topic，避免遗漏立即返回的响应。MQTT 的 PUBACK 仅表示 Broker 已确认投递流程，不代表 Studio 已执行业务；应以响应中的 `msgId` 和 `code` 判断结果。
 
 ## 调用 HTTP 接口
 
-若要调用 以下已开放的数据转出 HTTP API：
-- [空间相关接口](./../introduction.mdx#空间)
-- [设备相关接口](./../introduction.mdx#设备)
-- [自动化相关接口](./../introduction.mdx#自动化)
+业务接口通过 `type: OpenApiRequest` 发送；`data.method`、`data.path`、`data.query` 和 `data.body` 指定要调用的 HTTP 业务接口。**不要把 `type` 改成该 HTTP 接口的响应类型或旧版 WebSocket 查询、控制消息类型。**
 
-请编写并发送 `type` 为 `OpenApiRequest` 的请求消息。
+MQTT 支持已登记的 JSON 业务接口，不代表 `/open/api/v1/` 下全部 HTTP 接口均可使用。
+
+| 业务范围 | 支持情况 |
+| --- | --- |
+| 设备查询、Trait/Command 控制、设备和点位管理、虚拟设备 | 支持已登记接口；设备绑定凭据和解绑接口除外 |
+| 空间、自动化、场景、外部事件 | 支持已登记接口，包含带 ID 的动态路径 |
+| 资源类型、资源读写、资源命令和对象元数据 | 支持已登记 JSON 接口 |
+| 设备固件升级、历史、能耗、告警及告警规则 | 支持已登记接口；屏端专用 `/ems/summary/devices`、`/ems/summary/space` 除外 |
+| 网关列表、Studio 信息、系统位置、空间图、数据同步及屏端只读资源 | 支持已登记接口 |
+| 登录和 Token、凭据签发、云绑定、文件传输、灯箱接口、Matter 入网和子设备配网 | 不支持，继续使用 HTTP |
+
+具体业务字段见 [HTTP 接口目录](./../introduction.mdx)。请求格式有效且使用受支持的 HTTP 方法时，未对 MQTT 开放的 method/path 组合返回 `ErrorMessage`，`code` 为 `404`。
 
 ### 请求字段
 
@@ -60,10 +108,18 @@ MQTT 通道身份认证和 Topic 访问权限由 Broker 的连接凭据与 ACL �
 | version | ✔ | string | 固定为 `v1`。 |
 | msgId | ✔ | string | 请求标识，响应使用相同的值。长度为 1～128 个字符，只能包含字母、数字、`.`、`_`、`:`、`@` 或 `-`。每个逻辑操作使用一个新值；重试同一操作时保持不变。 |
 | data.method | ✔ | string | 支持 `GET`、`POST`、`PATCH` 或 `DELETE`。请根据上述各 HTTP API 文档选择合适的 HTTP 方法。 |
-| data.path | ✔ | string | 传入上述 HTTP API 的 Endpoint，如 `/open/api/v1/devices`。  |
-| data.query | ✘ | object | JSON 对象形式的查询参数。值可以是字符串、数字、布尔值或这些基础类型组成的数组，具体请参考各 HTTP API 文档中的 **Request - Query Parameters** 说明。 |
-| data.headers | ✘ | object | 可选的 OpenAPI 元数据 Header，例如 `Lang`。不能包含 `Authorization` 或 Cookie；路由使用的 `ClientId` 取自 Topic，不能在此覆盖。 |
-| data.body | ✘ | object \| null | JSON 请求 Body。接口没有请求 Body 时，此字段可以省略或传 `null`。具体请参考各 HTTP API 文档中的 **Request - Body** 说明。 |
+| data.path | ✔ | string | 已对 MQTT 开放的 `/open/api/v1/` 下具体路径，最长 1024 个字符。将路径中的 ID 占位符替换为实际值；不要附加 `?查询字符串` 或 `#fragment`。 |
+| data.query | ✘ | object | JSON 查询参数。值可以是字符串、数字、布尔值或这些类型的数组，不接受 `null` 或嵌套对象。具体字段见相应 HTTP 接口的 Query Parameters。 |
+| data.headers | ✘ | object | 可选的 OpenAPI 元数据 Header，例如 `Lang`。不能包含 `Authorization` 或 Cookie；路由使用的 `ClientId` 在默认模式取自 Topic，在固定模式由 Studio 为平台会话生成，不能在此覆盖。 |
+| data.body | ✘ | JSON \| null | 直接放入 HTTP 接口要求的 JSON 请求体，结构由该接口定义；不要转成 JSON 字符串。无请求体时省略或传 `null`。 |
+
+`data.headers` 当前支持 `Lang`、`App-Version`、`Sys-Version`、`Sys-Type`、`Phone-Model`、`Device-Unique-Id`、`Client-Source`、`Time`、`Nonce`、`Appid`、`X-Gateway-Appid`、`studio-id`、`X-Studio-Id`、`studioId` 和 `ClientId`，名称不区分大小写。`ClientId` 即使传入也会被会话标识覆盖；不能借此切换会话。
+
+### 路径参数与查询参数
+
+`/open/api/v1/automations/{automationId}` 中的 `{automationId}` 是路径参数。传入 `/open/api/v1/automations/auto_123` 是正确用法；`auto_123` 仅为示例，请替换为真实 ID。
+
+查询参数放在独立的 `data.query` 中。例如查询设备列表应使用 `path: "/open/api/v1/devices"` 和 `query: {"pageNum": 1}`，不能写成 `/open/api/v1/devices?pageNum=1`。固定 MQTT Topic 不影响上述 HTTP 路径规则。
 
 ### 请求示例
 
@@ -89,7 +145,9 @@ MQTT 通道身份认证和 Topic 访问权限由 Broker 的连接凭据与 ACL �
 
 ### 响应说明
 
-响应 Topic 会直接收到标准 HTTP OpenAPI 响应体，因此，您只需按照上述各 HTTP API 文档中的 **Responses** 说明解析响应体即可。
+响应复用对应 HTTP 接口的业务响应结构，不再增加 MQTT 外层包装。正常响应携带原请求 `msgId`，其 `type` 由业务接口决定，例如 `GetDeviceInfoResponse`。MQTT 没有 HTTP 状态行，收到任何响应都应检查 `code`；`code: 0` 表示该响应处理成功。
+
+`POST /open/api/v1/events` 在 MQTT 下返回 `ExternalEventResponse`，其 `data` 包含 `accepted`、`event` 和 `seq`。
 
 ### 响应示例
 
@@ -101,10 +159,37 @@ MQTT 通道身份认证和 Topic 访问权限由 Broker 的连接凭据与 ACL �
   "code": 0,
   "message": "success",
   "data": {
-    "totalCount": 1,
+    "totalCount": 0,
     "pageNum": 1,
     "pageSize": 20,
     "data": []
+  }
+}
+```
+
+### 设备控制请求示例
+
+`POST /open/api/v1/devices/trait/execute` 的 `data.body` 沿用 HTTP 接口要求的批量结构，内部仍须包含 `data` 数组。将下列设备、端点和功能代码替换为实际值；每次新的控制操作使用新的 `msgId`。
+
+```json
+{
+  "type": "OpenApiRequest",
+  "version": "v1",
+  "msgId": "control-001",
+  "data": {
+    "method": "POST",
+    "path": "/open/api/v1/devices/trait/execute",
+    "body": {
+      "data": [
+        {
+          "deviceId": "device-001",
+          "endpointId": 1,
+          "functionCode": "Output",
+          "traitCode": "OnOff",
+          "value": true
+        }
+      ]
+    }
   }
 }
 ```
@@ -113,14 +198,16 @@ MQTT 通道身份认证和 Topic 访问权限由 Broker 的连接凭据与 ACL �
 
 MQTT 协议自身的 Keep Alive 用于维护客户端与 Broker 之间的连接。通常由 MQTT SDK 自动发送 `PINGREQ` 并处理 `PINGRESP`，不需要应用为了保持 Broker 连接而额外发布下面的 JSON `ping`。
 
-本文的 `ping` 是 Studio 应用层的**逻辑订阅续租消息**，作用是告诉 Studio：该请求 Topic 对应的 `clientId` 仍在使用此前建立的数据订阅。请按以下规则使用：   
+本文的 `ping` 是 Studio 应用层的**逻辑订阅续租消息**，作用是告诉 Studio：该请求 Topic 对应的逻辑会话仍在使用此前建立的数据订阅。默认模式按 Topic 中的 `clientId` 续租，固定模式为整个平台会话续租。请按以下规则使用：
 - 仅调用 OpenAPI、没有建立 [数据订阅](#订阅设备数据) 的客户端，不需要周期性发送 `ping`。
-- 存在有效数据订阅时，发送到该 `clientId` 请求 Topic 的任意请求都会续期订阅；如果 30 秒内已经发送过其他请求，不需要再单独发送 `ping`。
+- 存在有效订阅时，发送到当前会话请求 Topic、能够进入处理流程的请求会续期；如果 30 秒内已经发送过其他请求，不需要再单独发送 `ping`。被忽略的 Retain 历史请求或超大消息不续期。
 - 有效订阅处于空闲状态、没有其他请求可用于续期时，建议每 30 秒内发送一次 `ping`。
 - Studio 只根据请求 Topic 上收到的消息续期。客户端持续收到推送消息并不会自动续期订阅。
-- 请求 Topic 连续 90 秒没有收到任何消息时，逻辑会话会过期，Studio 将清理该 `clientId` 的全部订阅并停止相关推送。之后再次发送 `ping` 只会创建新的逻辑会话，不会恢复已经清理的订阅；客户端必须重新发送相应的订阅请求。
+- 逻辑会话的空闲超时为 90 秒，Studio 的后台任务按周期清理过期会话及其全部订阅，实际停推可能略晚。超过 90 秒未发送请求时，客户端应按会话已过期处理；不要依赖清理延迟。已被清理的订阅不能通过 `ping` 恢复，必须重新发送订阅请求。
 
 MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互替代。客户端仍应根据所使用的 MQTT SDK 和 Broker 配置合适的 MQTT Keep Alive。
+
+这里的续租规则适用于设备数据、独立告警和精确对象事件等全部订阅。逻辑会话过期不会要求 Broker 断开应用的物理 MQTT 连接。
 
 ### 请求字段
 
@@ -177,6 +264,8 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 
 `SubscribeAllRequest` 会替换当前会话的 Trait 单项订阅。
 
+非空设备 ID 列表会追加到当前设备级订阅；从“全部设备”改为非空列表时会切换到设备级订阅。若要完整替换此前的指定设备集合，应先取消原设备订阅，再订阅新集合。固定 Topic 模式下这些操作作用于整个平台共享会话。
+
 #### 请求字段
 
 | 字段 | 必填 | 类型 | 说明 |
@@ -184,7 +273,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 | type | ✔ | string | 固定为 `SubscribeAllRequest`。 |
 | version | ✔ | string | 固定为 `v1`。 |
 | msgId | ✔ | string | 请求标识，响应使用相同的值。长度为 1～128 个字符，只能包含字母、数字、`.`、`_`、`:`、`@` 或 `-`。每个逻辑操作使用一个新值；重试同一操作时保持不变。 |
-| data | ✘ | array | 设备 ID 数组。当此字段被省略、为 `null` 或空数组时，表示订阅当前可访问的全部设备的数据；当此字段非空，为非空设备 ID 数组时，表示只订阅指定设备的数据。 |
+| data | ✘ | string[] \| null | 省略、`null` 或空数组订阅全部可访问设备；非空列表增加指定设备订阅，并退出全量模式。 |
 
 #### 请求示例
 
@@ -192,7 +281,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 {
   "type": "SubscribeAllRequest",
   "version": "v1",
-  "msgId": "1789909097657_777ov8",
+  "msgId": "subscribe-all-001",
   "data": null
 }
 ```
@@ -203,7 +292,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 | --- | --- | --- |
 | type | string | 固定为 `SubscribeAllResponse`。 |
 | version | string | 固定为 `v1`。 |
-| msgId | string | 消息唯一标识。正常请求和响应使用相同 msgId 关联；解析失败、部分权限或内部异常可能返回 UNKNOWN；服务端推送由服务端生成，不等同于订阅请求 msgId。非空，且长度不超过 64 个字符。 |
+| msgId | string | 沿用对应请求的标识；解析失败等情况下可能为 `UNKNOWN`。 |
 | data | string | 默认值为空。 |
 | code | number | 必填。处理结果码，0 表示成功，非 0 表示失败。 |
 | message | string | 处理结果描述。 |
@@ -214,7 +303,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 {
   "type": "SubscribeAllResponse",
   "version": "v1",
-  "msgId": "1789909303093_0jwcut",
+  "msgId": "subscribe-all-001",
   "data": "",
   "code": 0,
   "message": ""
@@ -234,8 +323,8 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 | --- | --- | --- | --- |
 | type | ✔ | string | 固定为 `UnsubscribeAllRequest`。 |
 | version | ✔ | string | 固定为 `v1`。 |
-| msgId | ✔ | string | 消息唯一标识。正常请求和响应使用相同 msgId 关联；解析失败、部分权限或内部异常可能返回 UNKNOWN；服务端推送由服务端生成，不等同于订阅请求 msgId。非空，且长度不超过 64 个字符。 |
-| data | ✘ | string[] \| null | 设备 ID 列表。省略、为 `null` 或空数组时，表示取消全部设备数据订阅；非空时，表示仅取消指定设备的数据订阅。默认值为 `null`。<br />若此前已订阅全部设备数据，则仅取消部分设备不会生效，需传空值取消全部订阅。<br />同一连接内，`UnsubscribeAllRequest` 会同时清理此前通过 `SubscribeTraitValueRequest` 建立的 Trait 订阅。<br />按特定设备取消订阅只取消设备级订阅，不等同于关闭当前连接的全部推送。 |
+| msgId | ✔ | string | 请求标识，响应沿用此值。建议遵循 OpenApiRequest 的 1～128 字符规则。 |
+| data | ✘ | string[] \| null | 设备 ID 列表。省略、为 `null` 或空数组时，表示取消全部设备数据订阅；非空时，表示仅取消指定设备的数据订阅。默认值为 `null`。<br />若此前已订阅全部设备数据，则仅取消部分设备不会生效，需传空值取消全部订阅。<br />同一逻辑会话内，`UnsubscribeAllRequest` 会同时清理此前通过 `SubscribeTraitValueRequest` 建立的 Trait 订阅。<br />按特定设备取消订阅只取消设备级订阅，不等同于关闭当前逻辑会话的全部推送。 |
 
 #### 请求示例
 
@@ -243,7 +332,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 {
   "type": "UnsubscribeAllRequest",
   "version": "v1",
-  "msgId": "1789909759573_4ozfm7",
+  "msgId": "unsubscribe-all-001",
   "data": null
 }
 ```
@@ -254,7 +343,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 | --- | --- | --- |
 | type | string | 固定为 `UnsubscribeAllResponse`。 |
 | version | string | 固定为 `v1`。 |
-| msgId | string | 消息唯一标识。正常请求和响应使用相同 msgId 关联；解析失败、部分权限或内部异常可能返回 UNKNOWN；服务端推送由服务端生成，不等同于订阅请求 msgId。非空，且长度不超过 64 个字符。 |
+| msgId | string | 沿用对应请求的标识；解析失败等情况下可能为 `UNKNOWN`。 |
 | data | string | 默认为空。 |
 | code | number | 处理结果码，0 表示成功，非 0 表示失败。 |
 | message | string | 处理结果描述。 |
@@ -265,7 +354,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 {
   "type": "UnsubscribeAllResponse",
   "version": "v1",
-  "msgId": "1789909884409_ln6tck",
+  "msgId": "unsubscribe-all-001",
   "data": "",
   "code": 0,
   "message": ""
@@ -282,7 +371,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 | --- | --- | --- | --- |
 | type | ✔ | string | 固定为 `SubscribeTraitValueRequest`。 |
 | version | ✔ | string | 固定为 `v1`。 |
-| msgId | ✔ | string | 消息唯一标识。正常请求和响应使用相同 msgId 关联；解析失败、部分权限或内部异常可能返回 UNKNOWN；服务端推送由服务端生成，不等同于订阅请求 msgId。非空，且长度不超过 64 个字符。 |
+| msgId | ✔ | string | 请求标识，响应沿用此值。建议遵循 OpenApiRequest 的 1～128 字符规则。 |
 | data | ✔ | object[] | 需要订阅的 Trait 列表。建议传非空数组；省略 data 会解析失败。当前实现对空数组或 traitCodes 为空数组仍可能返回成功响应，但不会创建有效的 TraitValueUpdate 订阅。 |
 | data[].deviceId | ✔ | string | 设备 ID。 |
 | data[].endpointId | ✔ | int32 | 端点 ID。 |
@@ -300,7 +389,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
     {
       "deviceId": "device-001",
       "endpointId": 1,
-      "functionCode": "Light",
+      "functionCode": "Output",
       "traitCodes": ["OnOff"]
     }
   ]
@@ -313,7 +402,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 | --- | --- | --- |
 | type | string | 固定为 `SubscribeTraitValueResponse`。 |
 | version | string | 固定为 `v1`。 |
-| msgId | string | 消息唯一标识。正常请求和响应使用相同 msgId 关联；解析失败、部分权限或内部异常可能返回 UNKNOWN；服务端推送由服务端生成，不等同于订阅请求 msgId。非空，且长度不超过 64 个字符。 |
+| msgId | string | 沿用对应请求的标识；解析失败等情况下可能为 `UNKNOWN`。 |
 | data | string| 默认值为空。 |
 | code | int32 | 处理结果码，0 表示成功，非 0 表示失败。 |
 | message | string | 处理结果描述。可为 `null`。 |
@@ -324,7 +413,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 {
   "type": "SubscribeTraitValueResponse",
   "version": "v1",
-  "msgId": "1789957892004_ownm4j",
+  "msgId": "subscribe-trait-001",
   "data": "",
   "code": 0,
   "message": ""
@@ -341,7 +430,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 | --- | --- | --- | --- |
 | type | ✔ | string | 固定为 `UnsubscribeTraitValueRequest`。 |
 | version | ✔ | string | 固定为 `v1`。 |
-| msgId | ✔ | string | 消息唯一标识。正常请求和响应使用相同 msgId 关联；解析失败、部分权限或内部异常可能返回 UNKNOWN；服务端推送由服务端生成，不等同于订阅请求 msgId。非空，且长度不超过 64 个字符。 |
+| msgId | ✔ | string | 请求标识，响应沿用此值。建议遵循 OpenApiRequest 的 1～128 字符规则。 |
 | data | ✘ | object[] | 需要取消订阅的 Trait 列表。建议传非空数组。省略 data、传空数组或 traitCodes 为空数组不会取消任何 Trait 订阅，但当前实现仍可能返回成功响应。 |
 | data[].deviceId | ✔ | string | 设备 ID。 |
 | data[].endpointId | ✔ | int32 | 端点 ID。 |
@@ -354,7 +443,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 {
   "type": "UnsubscribeTraitValueRequest",
   "version": "v1",
-  "msgId": "1789960932713_6yexkw",
+  "msgId": "unsubscribe-trait-001",
   "data": [
     {
       "deviceId": "lumi3.86108040f2b03a4e",
@@ -374,7 +463,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 | --- | --- | --- |
 | type | string | 固定为 `UnsubscribeTraitValueResponse`。 |
 | version | string | 固定为 `v1`。 |
-| msgId | string | 消息唯一标识。正常请求和响应使用相同 msgId 关联；解析失败、部分权限或内部异常可能返回 UNKNOWN；服务端推送由服务端生成，不等同于订阅请求 msgId。非空，且长度不超过 64 个字符。 |
+| msgId | string | 沿用对应请求的标识；解析失败等情况下可能为 `UNKNOWN`。 |
 | data | string | 默认值为空。 |
 | code | int32 | 处理结果码，0 表示成功，非 0 表示失败。 |
 | message | string | 处理结果描述。可为 `null`。 |
@@ -385,16 +474,74 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 {
     "type": "UnsubscribeTraitValueResponse",
     "version": "v1",
-    "msgId": "1789961117378_xd3ov7",
+    "msgId": "unsubscribe-trait-001",
     "data": "",
     "code": 0,
     "message": ""
 }
 ```
 
+## 订阅独立告警事件
+
+使用下列消息管理告警订阅，`data` 为事件类型字符串数组，告警使用 `ALARM`：
+
+| 请求 type | 成功响应 type | data 说明 |
+| --- | --- | --- |
+| `SubscribeEventRequest` | `SubscribeEventResponse` | 传 `["ALARM"]` 开启告警订阅；不能传空列表 |
+| `UnsubscribeEventRequest` | `UnsubscribeEventResponse` | 传 `["ALARM"]` 取消告警订阅；与订阅一样必须传非空列表，省略或空数组会报错，不表示取消全部 |
+
+```json
+{
+  "type": "SubscribeEventRequest",
+  "version": "v1",
+  "msgId": "subscribe-alarm-001",
+  "data": ["ALARM"]
+}
+```
+
+成功响应沿用请求 `msgId`，`code` 为 `0`，`data` 为 `""`。`SubscribeAllRequest` 和 Trait 订阅不会隐式订阅告警；`UnsubscribeAllRequest` 也不会取消告警。
+
+## 订阅精确对象事件
+
+空间变化、设备所属空间变化、自动化和场景变化，以及执行结果事件，使用独立的对象事件订阅：
+
+| 请求 type | 成功响应 type |
+| --- | --- |
+| `SubscribeObjectEventRequest` | `SubscribeObjectEventResponse` |
+| `UnsubscribeObjectEventRequest` | `UnsubscribeObjectEventResponse` |
+
+两种请求的 `data` 均为非空数组，单次最多 100 项；每项 `objectIds` 最多 1000 个且不能包含空白 ID。字段如下：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| eventTypes | string[] | 非空事件类型列表；支持下面列出的精确对象事件 |
+| objectIds | string[] \| null | 省略、`null` 或空数组表示这些事件类型下全部可访问对象；非空表示指定对象。指定 ID 时，同一项须属于同一对象 ID 家族，且不能包含新增事件；自动化与场景共用 ID 家族，可在一项中组合 |
+
+支持的事件为 `DEVICE_SPACE_UPDATED`；`SPACE_ADDED`、`SPACE_REMOVED`、`SPACE_UPDATED`；`AUTOMATION_ADDED`、`AUTOMATION_REMOVED`、`AUTOMATION_UPDATED`、`AUTOMATION_SPACE_UPDATED`、`AUTOMATION_EXECUTION_RESULT`；`SCENE_ADDED`、`SCENE_REMOVED`、`SCENE_UPDATED`、`SCENE_SPACE_UPDATED`、`SCENE_EXECUTION_RESULT`。
+
+```json
+{
+  "type": "SubscribeObjectEventRequest",
+  "version": "v1",
+  "msgId": "subscribe-object-001",
+  "data": [
+    {
+      "eventTypes": ["SPACE_ADDED", "SPACE_REMOVED", "SPACE_UPDATED"],
+      "objectIds": null
+    }
+  ]
+}
+```
+
+成功响应沿用请求 `msgId`，`code` 为 `0`，`data` 为 `""`。取消订阅时，指定 `objectIds` 只移除这些对象；省略、`null` 或空数组清理对应 `eventTypes` 的全部规则。取消指定对象不能从“全部对象”规则中排除该对象；请先取消该事件类型的全部规则，再订阅需要的指定对象。
+
+`UnsubscribeAllRequest` 不会取消精确对象事件。需要停止所有推送时，应分别取消设备、独立事件和精确对象事件订阅。
+
 ## 接收推送消息
 
-所有推送均发布到 `/open/api/v1/response/{clientId}`。
+所有推送均发布到当前会话的响应 Topic：默认模式为 `/open/api/v1/response/{clientId}`，固定模式为用户配置的发布 Topic。
+
+推送使用 v1 JSON 信封，`msgId` 由服务端生成，不与订阅请求一一对应。部分推送还包含 `studioId`、`eventId` 等标识，应允许附加字段。只提供实时消息，不补发断线期间历史；断线重连、Studio 重启或转出切换目标后必须重新订阅。
 
 ### Trait 值变化
 
@@ -428,7 +575,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
     {
       "deviceId": "device-001",
       "endpointId": 1,
-      "functionCode": "Light",
+      "functionCode": "Output",
       "traitCode": "OnOff",
       "value": true,
       "time": 1754469720110
@@ -441,12 +588,14 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 
 ### 对象事件
 
-当您 [订阅了设备数据](#订阅全部或指定设备) 或 [订阅了指定 Trait 值](#订阅指定-trait-值) 时，只要目标设备发生增减、端点发生增减或目标 Trait 的参数发生变化，就会收到 `objectEvent` 类型的推送消息。具体事件类型包括：
+`objectEvent` 根据订阅范围投递，不表示连接成功后自动收到所有对象变化。设备数据订阅可收到相应范围的以下结构事件：
 - `DEVICE_ADDED`：设备新增。
 - `DEVICE_REMOVED`：设备移除。
 - `DEVICE_ENDPOINT_ADDED`：端点新增。
 - `DEVICE_ENDPOINT_REMOVED`：端点移除。
 - `DEVICE_TRAIT_PARAMETER_UPDATE`：Trait 参数更新。
+
+空间、设备所属空间、自动化和场景事件也使用相同的 `objectEvent` 信封，但须通过 [精确对象事件订阅](#订阅精确对象事件) 显式开启，不会因 `SubscribeAllRequest` 或 Trait 订阅自动开启。
 
 因此，当您收到此事件推送后，应该先根据 `eventType` 和 `objectId` 分发事件，再解析 `data.data` 内的具体数据结构。
 
@@ -458,7 +607,7 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 | version | string | 必填。固定为 `v1`。 |
 | msgId | string | 消息唯一标识。由 Aqara Studio 生成，不对应某条订阅请求。 |
 | data | object | 必填。对象事件数据。 |
-| data.eventType | string | 必填。对象事件类型。可能值为 `DEVICE_ADDED`、`DEVICE_REMOVED`、`DEVICE_ENDPOINT_ADDED`、`DEVICE_ENDPOINT_REMOVED`、`DEVICE_TRAIT_PARAMETER_UPDATE`。 |
+| data.eventType | string | 必填。设备结构事件或已显式订阅的精确对象事件类型。 |
 | data.objectId | string | 必填。对象 ID，设备事件场景通常为设备 ID。 |
 | data.time | int64 | 必填。事件发生时间戳，单位毫秒。 |
 | data.data | object | 可为 `null`。根据 `eventType` 判断具体结构。 |
@@ -496,16 +645,28 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 
 
 
+### 网关命令结果
+
+`CommandReport` 随 `SubscribeAllRequest` 的全部设备或指定设备范围推送；只订阅 Trait 不会收到。它报告网关返回的命令执行信息，不等同于设备物理状态已变化，也不保证每次 API 调用都恰好产生一条。
+
+`data` 包含 `deviceId`、`sequence`、Studio 原始毫秒 `timestamp`、网关 `did`、`reportTime`、`source`、命令 Spec 地址映射 `data` 和原始响应 `content`。其中 `reportTime`、`source` 可能为 `null`。外层不再添加 MQTT 包装；`sequence` 不是请求 `msgId`，也不是历史补发游标。
+
+### 告警消息
+
+显式订阅 `ALARM` 后收到 `type: AlarmEvent`。其 `data` 是原始告警对象，包含告警 `uuid`、设备信息、规则和告警文字、`sourceState`、`alarmTime` 等字段，可带多语言 `localized` 数据；不是 `objectEvent` 的内层对象，也不只限于某一个告警状态。
+
+MQTT 的订阅与推送业务字段复用 [WebSocket 消息定义](./../websocket-api/index.mdx)。复用的是消息结构；MQTT 的 Broker 鉴权、Topic 路由和订阅续租仍遵循本文。
+
 ### 错误响应
 
-当请求消息格式错误、请求消息类型不适用、路由未开放或业务处理失败时，您会收到一条 `type` 为 `ErrorMessage` 的推送消息，相关字段说明见下文。
+请求格式错误、消息类型不支持或路由未开放时，通常返回 `ErrorMessage`。业务失败也可能返回对应接口的响应类型且 `code` 非 `0`；请关联 `msgId` 并检查所有响应的 `code`，不要只等待固定的成功响应类型。因超大消息、非法 Topic 标识或入站过载被直接忽略的请求，不保证收到错误响应。
 
 #### 字段说明
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | type | string | 固定为 `ErrorMessage`。 |
 | version | string | 固定为 `v1`。 |
-| msgId | string | 消息唯一标识。由 Aqara Studio 生成，不对应某条订阅请求。 |
+| msgId | string | 尽可能沿用请求标识；请求无法解析或标识无效时可能为 `UNKNOWN`。 |
 | data | object | 可为 `null`。 |
 | code | int32 | 错误码。 |
 | message | string | 错误原因描述。 |
@@ -526,8 +687,11 @@ MQTT Keep Alive 与 Studio 逻辑订阅续租相互独立，两者不能相互�
 
 ## 投递与重试规则
 
-- 单条 MQTT OpenAPI 请求不能超过 256 KiB。
-- 同一逻辑 `clientId` 的请求按 Broker 到达顺序处理，不同逻辑客户端可以并行处理。
+- 新版请求的 UTF-8 载荷不能超过 256 KiB，超出时直接忽略，不保证返回错误。
+- 同一逻辑会话的请求按 Broker 到达顺序处理。默认模式的不同 `clientId` 可以并行；固定模式的所有请求共用一个平台会话。
 - 未收到响应时，使用原 `msgId` 重试同一逻辑操作。在确认实际操作状态前，不要改用新 `msgId` 重复执行。
-- Studio 会暂时复用写请求的最终响应，避免 QoS 1 重投造成同一修改重复执行。不同写请求复用同一 `msgId` 时会返回错误。
-- 重连时使用 clean session，并主动重试未收到结果的请求；不要依赖 Broker 在 Studio 断线期间积压控制请求。
+- 写请求的防重记录在内存中保留 60 秒，并受容量限制；同一 Broker 身份与逻辑会话下的同一 `msgId`、同一请求会复用结果，不再次执行业务。重连不立即清空记录，Studio 进程重启会清空；不能把它当作持久化或无限期的“只执行一次”保证。
+- 每次新的写操作必须使用新的 `msgId`，包括再次发送完全相同的开灯指令。即使期间通过 Studio 页面改变了设备状态，重用之前的 `msgId` 也只会返回缓存，不会再次控制；不是需要等待某个控制间隔。仅重试同一次操作时保留原值。
+- 防重记录仍有效时，不同写请求复用相同 `msgId` 会返回错误；取消等原因使前次执行结果不确定时，可能返回 `code: 409`，应先查询实际状态。缓存预算不足时，重复响应可能只保留结果码和描述，不含原完整业务数据。
+- 查询类请求不依赖此写请求缓存。请求、订阅响应与业务推送共用响应 Topic，须结合 `type` 和 `msgId` 分发；Broker 过载等情况下可能收不到响应。
+- Studio 使用 clean session，不保留断线期间的控制请求队列；应用应重新订阅响应 Topic 和业务数据，再按实际操作状态处理未完成请求。请求均须 `retain=false`，Studio 对重订阅收到的 Retain 历史请求会直接忽略且不返回业务响应。

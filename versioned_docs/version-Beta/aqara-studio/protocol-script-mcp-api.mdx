@@ -1,0 +1,293 @@
+---
+title: "Protocol Script MCP/API Reference"
+displayed_sidebar: aqaraStudioSidebar
+description: "Implemented Open script management, protocol resources, connection snapshots, bounded debug sessions, safe payload capture and offline replay."
+keywords: ["Aqara Studio", "Open", "MCP", "API", "Agent", "script debugging", "replayCapture"]
+---
+
+# Protocol Script MCP/API Reference
+
+Script configuration and debugging use Open's generic Resource tools and the [v1 script contract](./unified-protocol-script.mdx). For the workflow, see the [third-party device script integration guide](./ai-agent-device-onboarding.mdx).
+
+## Authentication and live contracts {#authentication}
+
+MCP JSON-RPC uses `/open/api/mcp`; REST uses prefix `/open/api/v1`. ApiAccessToken requests use `Authorization: Bearer <token>` and JSON Content-Type. The token must be valid and permit MCP/tool scopes or the REST Resource scope. The user also needs target management permissions. Login JWTs follow their own login/binding contract; do not assume identical ApiAccessToken behavior.
+
+validateScript/listScripts/readScript/uploadScript on a protocol resource specifically require administration permission on **Station.station.communication** (the communication root). Network administration alone is insufficient. Connection/session/target operations have their own node checks; Token scopes and node permissions are independent requirements. This guide does not instruct an Agent to grant itself broader permissions.
+
+Read tools/list, resources/list and deployed type/instance schemas. **Type descriptions list potential commands; instance commands declare current availability**, rechecked on execution. Do not invent missing tools, fields, commands or IDs.
+
+Use MCP resources/read, not resource_read, for these URI guides:
+
+| URI | Content |
+| --- | --- |
+| `agent://contracts/mcp/guide` | Tool routing, auth and errors |
+| `agent://contracts/resource-api/guide` | Generic Resource contract |
+| `agent://contracts/protocol-script/guide` | Generation, validation, deployment and transport differences |
+| `agent://contracts/protocol-point/guide` | Spec lookup, point mapping and readback |
+| `agent://contracts/protocol-debug/guide` | Sessions, connection diagnosis, confirmation and safe replay |
+
+No additional REST download-guide endpoint exists. REST-only Agents need documentation matching the deployed version.
+
+Runtime guides resolve Station overrides first, then system resource files, then bundled JAR defaults. Updating defaults does not replace existing overrides. If a deployed guide conflicts with current schemas, report a documentation-version conflict for the maintainer to resolve; do not automatically delete Station files.
+
+## Six tools and REST equivalents {#resource-tools}
+
+| MCP tool | Direct arguments | REST equivalent |
+| --- | --- | --- |
+| `resource_list_types` | `{}` | GET `/resource-types` |
+| `resource_describe_type` | `{type}` | GET `/resource-types/{type}` |
+| `resource_query` | `{type,parentId?,filters?,page?,pageSize?,sort?}` | GET `/resource-types/{type}/resources`; filters become query parameters |
+| `resource_read` | `{id}` | GET `/resources/{id}` |
+| `resource_update` | `{id,properties}` | POST `/resources/{id}`, body `{properties}` |
+| `resource_invoke_command` | `{id,command,input?}` | POST `/actions/{command}`, body `{id,input}` |
+
+Add the REST prefix above and URL-encode IDs. Generic MCP arguments are not wrapped in data; only dedicated tools declaring data use that shape.
+
+REST returns `{msgId,code,message,data}`. Parse MCP result.content text as JSON. Handle JSON-RPC errors, isError, nonzero code, success=false and partial per-item failures. No error does not mean an asynchronous task completed.
+
+### Response paths and pagination {#response-paths}
+
+These paths start at the unpacked Resource response, not internal ProtocolOnboardingFacade objects:
+
+| Operation | Actual response path |
+| --- | --- |
+| describe_type(protocol.network/device/point) | `data.protocols.<protocolId>` is the protocol's type-level configuration schema |
+| Instance read/update/create | `data.id`, `data.properties`, `data.schema`, `data.commands`; the instance schema is not named configSchema |
+| Script load result | `data.properties["scriptMessageParser/scriptCheckResult"]` |
+| discover / startDebugSession / single debug operation | `data.id` is the returned job/session/operation ID; status/details are in data.properties |
+| connectionSnapshot / validateScript / file commands | Command-specific results directly in `data`, not wrapped in properties |
+| query | `data.items`, `data.page`, `data.pageSize`, `data.hasMore`; no total field |
+
+Queries default to page=1 and pageSize=20, with maximum pageSize=100. Process each page, increment page while hasMore=true and keep the same filters, until false or the client budget ends. One page does not establish a complete inventory. Secret fields are not read back in plaintext; sensitive/writeOnly schema flags authorize writes but do not provide a credential source.
+
+```json title="MCP tools/call"
+{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"resource_invoke_command","arguments":{"id":"<network-resource-id>","command":"connectionSnapshot","input":{}}}}
+```
+
+```http title="Equivalent REST request (do not execute both)"
+POST /open/api/v1/actions/connectionSnapshot
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{"id":"<network-resource-id>","input":{}}
+```
+
+## Resource ownership and commands {#resources}
+
+| Resource type | Purpose/current commands |
+| --- | --- |
+| `protocol` | Catalog/configuration for tcp/udp/http/mqtt; create, discover, validateScript, listScripts, readScript, uploadScript |
+| `protocol.network` | Configuration; connectionSnapshot, startDebugSession and eligible delete |
+| `protocol.device` / `protocol.point` | Query below parentId, read/update published configuration, eligible delete |
+| `job` | Discovery status; import exposed after success |
+| `discovery` | Candidates using filters.jobId and filters.kind=device/point |
+| `protocol.debug.session` | Returned by startDebugSession; access by returned ID only, no list query |
+| `protocol.debug.operation` | Returned by a single operation; read returned ID only, no query or constructed ID |
+
+Business deviceId/pointId, candidate IDs, instance IDs and Command field IDs are distinct. Preserve returned identifiers.
+
+### Script file commands {#script-files}
+
+Invoke on the protocol resource:
+
+| Command | Input | Result/boundary |
+| --- | --- | --- |
+| validateScript | scriptContent, optional fixtures | Isolated GraalJS validation; no file writes or device I/O |
+| listScripts | Optional networkBeanId | Managed files for the Network type |
+| readScript | scriptPath, optional networkBeanId | scriptContent, canonical scriptPath, referenceCount; not the upload-only result fields |
+| uploadScript | scriptPath/scriptContent, optional fixtures/networkBeanId | Validated atomic write; extensionScriptPath, validated, replaced, referenceCount, reloadFailedCount |
+
+Source limit: **1,048,576 characters**, with an additional file limit of **3,145,728 bytes**. Fixtures: at most **16**, **1,048,576 serialized JSON characters** total, depth **64**. Individual inputs also follow text/transport limits. Sequential fixtures share one bounded candidate Context; clients cannot raise the execution budget.
+
+Each fixture is exactly `{entry:"encode" or "decode",input:{...},expected:complete normalized result}`. No describe fixture. valid=true and fixturesPassed are offline evidence, not deviceCommunicationVerified=true.
+
+Managed paths are `file:%/protocol-scripts/<namespace>/...js` for the Network type, not arbitrary disk paths/traversal. Before the first upload, call `listScripts` and read `data.networkBeanId`; an empty `data.scripts` does not prevent constructing the path. To derive the namespace, trim whitespace from networkBeanId, replace each character outside `[A-Za-z0-9._-]` with `_`, then trim leading/trailing `_`; the result must not be empty, `.` or `..`. Do not use a colon-containing beanId directly as the directory name.
+
+| networkBeanId | namespace | Example scriptPath |
+| --- | --- | --- |
+| `tcp:TcpNetwork` | `tcp_TcpNetwork` | `file:%/protocol-scripts/tcp_TcpNetwork/vendor.js` |
+| `udp:UdpNetwork` | `udp_UdpNetwork` | `file:%/protocol-scripts/udp_UdpNetwork/vendor.js` |
+| `http:HttpNetwork` | `http_HttpNetwork` | `file:%/protocol-scripts/http_HttpNetwork/vendor.js` |
+| `mqtt:MqttConnNetwork` | `mqtt_MqttConnNetwork` | `file:%/protocol-scripts/mqtt_MqttConnNetwork/vendor.js` |
+
+These are examples for the four current types; use the deployed instance's networkBeanId. For a custom Network type, pass the same networkBeanId to listScripts, uploadScript and readScript. After uploading, bind and read back the returned `extensionScriptPath`.
+
+Validation failure leaves the file unchanged. Successful upload still requires checking reloadFailedCount and referenced Network status. Replacement reloads shared references; no version CAS exists. Prefer unique names.
+
+Use nonempty fixtures covering encoding, valid parsing, negative ACKs, wrong IDs and missing fields. Check the outer code and inner valid/fixturesPassed; zero fixtures is not sufficient acceptance. After upload, pass its extensionScriptPath to readScript.input.scriptPath:
+
+```json title="resource_invoke_command arguments: read back saved source"
+{"id":"<protocol-resource-id>","command":"readScript","input":{"scriptPath":"<upload-returned extensionScriptPath>"}}
+```
+
+Compare readScript.scriptContent with the candidate and its scriptPath with the uploaded address. Upload does not bind a Network; readScript does not return replaced, reloadFailedCount or extensionScriptPath.
+
+Write only Network `scriptMessageParser/extensionScriptPath`, not scriptContent or an entire scriptMessageParser object. Obtain scriptParameters fields from instance `data.schema` after binding; their JS declaration remains describe().configSchema.
+
+### Create, discover and import {#discovery}
+
+protocol.create input is `{entityKind,parentId?,name?,config}`. Use network for a Network; Device/Point parentId is the actual parent instance. Manually created script Devices require a valid business deviceId; prefer discovery/import.
+
+The following demonstrates TCP file binding only; take connection fields from `data.protocols.<protocolId>` and site information:
+
+```json title="resource_invoke_command arguments: create Network"
+{"id":"<protocol-resource-id>","command":"create","input":{"entityKind":"network","name":"Vendor integration","config":{"scriptMessageParser/extensionScriptPath":"<upload-returned extensionScriptPath>"}}}
+```
+
+Read scriptCheckResult after binding, then configure Network parameters using data.schema. Configure Device parameters after import. Missing required parameters blocks execution even if script loading succeeded.
+
+protocol.discover takes `{ownerKind,ownerId,targetKind,options?}`: network/device for device discovery; device/point for point discovery. The generic command currently exposes options only as an object, without detailed per-protocol option schemas. Prefer known targets in describe().discovery and omit options. Overrides require explicit same-version field contracts; never guess ip/port or scan parameters.
+
+Read job.id: pending/running are active; succeeded/failed/cancelled terminal; unknown/not-found never success. Follow published polling policy, about 1000 ms and at most 120 seconds per client wait. Timeout retains the same job ID, not resubmission. Generic jobs have no cancellation command.
+
+After success, query discovery candidates and invoke that job's import with `{ownerId,discoveryObjectIds:[...]}`, at most 200 distinct candidates per call; split larger batches. Inspect per-item results and query actual Device/Point lists. Never recreate successfully imported candidates.
+
+```json title="resource_query arguments: device candidates"
+{"type":"discovery","filters":{"jobId":"<discovery-job-id>","kind":"device"}}
+```
+
+After importing the intended devices, start point discovery with `ownerKind=device`, `ownerId=<device-instance-id>`, `targetKind=point`. Wait for that separate job, query kind=point and import. Static candidates use the same selection/import flow.
+
+## Dedicated Spec mapping MCP tools {#point-tools}
+
+These existing dedicated MCP tools are not new REST debug endpoints. Use tools/list:
+
+| Tool | Main input/purpose |
+| --- | --- |
+| `protocol_point_describe` | protocolId; point configuration and mappingSchema |
+| `protocol_point_specOptions` | Optional deviceType/functionCode/kind/keyword/page/pageSize, max pageSize 100 |
+| `protocol_point_mappingOptions` | protocolId/ownerId; manual config or jobId/discoveryObjectId preflight |
+| `protocol_point_create` | protocolId/ownerId/config, optional name |
+| `protocol_point_createFromDiscovery` | protocolId/ownerId/jobId/discoveryObjectIds, optional pointConfigs; max 100 distinct candidates |
+| `protocol_point_read` | instanceId; actual pointMapping/configuration |
+
+targetProperty takes deviceType/functionCode and exactly one traitCode/commandCode. Its access values are readOnly/readWrite/reportOnly/command, **not the integer JS point access mask**. Use job.import when custom mapping is unnecessary; never use both creation routes for one candidate.
+
+Distinguish device, conversion-target and actual system units; never scale twice. Creation success with readback failure still means the point exists: query its returned ID. Registering new system Spec Codes is unsupported here.
+
+## Read-only connection snapshots {#connection}
+
+Invoke Network connectionSnapshot with `{}` or `{targetId:"<same-Network Device/Point ID>"}`. No session, valid script or online state is needed. It does not create connections, subscriptions or polling, and accepts no arbitrary host/port.
+
+Returns schemaVersion=1, observedAt, transport, running/enabled, phase and best-effort local/remote/configuredRemote, discovery, subscriptionRegistered/subscriptionReady, reportReceiverEnabled/reportListener and lastError. Null is unknown, not false/success.
+
+- TCP/MQTT Network IDLE without a device does not aggregate device connections.
+- TCP CONNECTED means an existing socket; UDP BOUND means binding; HTTP REQUEST_READY means Client availability.
+- MQTT subscriptionRegistered is local registration; subscriptionReady is currently always null, not SUBACK.
+- HTTP reportListener does not prove public/firewall reachability; interfaceSelection does not infer VPN/routing correctness.
+- Controlled latest errors are not a complete history, reset at restart and may remain after recovery. Snapshot fields are not an atomic health verdict; credentials, raw errors and payloads are omitted.
+
+## Bounded sessions {#sessions}
+
+Network.startDebugSession defaults to `{ttlMs:60000,payloadMode:"metadata"}`. Network must be running/enabled, scriptCheckResult=success and have an adapter. Read returned session.id, properties.expiresAt/latestSequence/capabilities and commands.
+
+| Session command | Input | Behavior |
+| --- | --- | --- |
+| probeOnce | Device targetId, optional timeoutMs | Actual probe; unsupported for MQTT |
+| readOnce | Point targetId, optional timeoutMs | Actual read and application, not cached data |
+| writeAndWait | targetId/clientOperationId/waitFor, exactly one value or args; optional expectedValue/observePointId/timeoutMs | One control, including same-value writes; zero business retries |
+| waitForReport | Readable Point targetId, optional afterSequence/expectedValue/timeoutMs | No send; waits for new report, including unchanged values; not a Device/Network target |
+| readCapture | afterSequence=0, limit=64 (1..128) | Metadata page; continue with nextSequence |
+| readPayloadCapture | afterSequence=0, limit=16 (1..16) | Sanitized session payloads only |
+| replayCapture | scriptContent/frames, optional context | Sanitized session, isolated offline decode, no send |
+| stop | `{}` | Cancels debug tasks/observers, not business connections |
+
+Operations return operation.id. Read that ID until properties.status is succeeded/failed/cancelled; pending/running are not completion. Sessions/operations are in-memory, not restart-persistent.
+
+### Write confirmation
+
+Read initial state, actual units and legal ranges before authorized control. A same-value write can change the device if read/write scaling differs; stop testing that function on a domain mismatch. Do not treat UI echo, requested values or stale cache as feedback.
+
+| waitFor | Condition |
+| --- | --- |
+| send | Transport completion; HTTP received a response, not business success |
+| protocolAck | Explicit decoded business success; unsupported for MQTT, where Broker ACK is not business ACK |
+| stateUpdate | expectedValue observed; optional same-device readable observePointId for Command effects |
+
+Supply exactly one value or args. Ordinary points use scalars; Command args is a numeric-fieldId-keyed object. Server checks constraints, control permissions and higher-priority ownership. stateUpdate requires expectedValue and a readable observation target.
+
+expectedValue is a finite scalar with serialized JSON size at most **512 UTF-8 bytes**. waitForReport uses the same limit. This is separate from the 4096-byte command-input budget and is not a maximum Command text length.
+
+```json title="One ordinary write (requires prior authorization)"
+{"targetId":"<point-resource-id>","clientOperationId":"test-write-001","waitFor":"stateUpdate","value":true,"expectedValue":true,"timeoutMs":10000}
+```
+
+Same clientOperationId/input within the session returns the same operation without resending. Same ID with different input fails. New sessions do not inherit deduplication. This is not exactly-once across restarts; timeout/cancellation cannot retract sent controls.
+
+When ACK succeeds but feedback lags, use bounded new readOnce/report waits within the vendor's delay budget. Do not resend the control to wait for state. If expected state is still absent, report state acceptance failure; devices without readable feedback can only reach send/ACK confirmation.
+
+### Budgets and lifecycle
+
+- TTL default 60000 ms, max 120000; timeout default 10000, max 30000.
+- One active session per Network, two globally; four records including stopped sessions.
+- At most 32 operations per session, one active request and two report waits concurrently.
+- Metadata at most 128 events/32 KiB; values above 512 UTF-8 bytes omitted with valueTruncated.
+- Ordinary debug input at most 4096 UTF-8 bytes; depth 32, 8192 JSON nodes. Replay has separate budgets.
+- stop, expiry, target stop, script reload, Open stop, credential revocation/logout cancel tasks. Metadata remains 60 seconds after stop, but payloads clear immediately; later SESSION_EXPIRED.
+
+Credentials, target permissions and lifecycle are rechecked at admission/execution and before sending. Already-started transmission cannot be undone; check real device state after cancellation.
+
+Stop the owned session in finally without closing shared business connections. Restore initial state only through an authorized safe plan; preserve production Networks, Devices, Points and scripts. Delete only explicitly disposable task-owned resources. After a repair/reload, use a new session and do not mix evidence from different script versions.
+
+## Results and failures {#results}
+
+operation.properties.result separates encoded, sent, responseReceived, protocolAck, stateObserved, value, valueTruncated, correlation, failureStage and reasonCode. Null means unknown/not applicable. succeeded only means the chosen condition was reached.
+
+Correlation can be protocolId, serializedWindow, observationOnly, none, or offline for replay. New state without a request ID does not prove causality. Use captureWindow.afterSequence/throughSequence; an event with operationId=null is not automatically the latest control. Report CURSOR_EXPIRED rather than re-executing a control to recover logs.
+
+| Reason | Response |
+| --- | --- |
+| INVALID_ARGUMENT | Fix schema/types/budget; MCP may reject earlier with JSON-RPC -32602 |
+| TARGET_NOT_ACCESSIBLE / TARGET_STOPPED | Verify permissions/lifecycle without bypassing access |
+| NOT_SUPPORTED / NO_REQUEST_BUILT | Distinguish missing capability from no encoded request |
+| BUSY | Resolve existing operation/session occupancy, not concurrent controls |
+| DEVICE_REJECTED | Vendor negative ACK; inspect conditions |
+| DECODE_FAILED / POINT_MISSING | Check parsing, identity, operation, requested point and application |
+| SEND_FAILED / HTTP_ERROR / TIMEOUT | Inspect sent evidence; execution may be unknown, do not blindly resend |
+| SESSION_EXPIRED / SCRIPT_RELOADED / CURSOR_EXPIRED | Old reference/evidence invalid; re-evaluate within budget |
+| PAYLOAD_NOT_ENABLED / FRAME_NOT_AVAILABLE / REPLAY_FAILED | Payload mode, retention or replay assertion failure |
+
+ENCODE_FAILED and STATE_NOT_OBSERVED are reserved; current empty requests use NO_REQUEST_BUILT, and state waits generally TIMEOUT.
+
+For delivery, report script/vendor versions, target IDs, mappings, units, expected/observed state and operation/capture evidence per function. Distinguish generated, offline-validated, saved/bound, imported and communication-verified. These are client report categories, not new endpoints; simulator, vendor-device, autonomous-Agent and Native Image/M300 evidence are separate.
+
+## Safe payload capture and offline replay {#payload}
+
+Default metadata retains no payload. Explicit sanitized mode requires payloadPolicy and management permission on the Network and all imported Device/Points. Reads, replay admission/execution and result reads recheck permissions.
+
+Pointers select leaves in the **vendor payload body**, not the unified input envelope or decode result. For the [MQTT demonstration](./unified-protocol-script.mdx#mqtt-example), the incoming body is `{"deviceId":"demo-1","volume":20}`:
+
+```json title="MQTT demonstration JSON body allowlist"
+{"ttlMs":60000,"payloadMode":"sanitized","payloadPolicy":{"format":"json","jsonPointers":["/deviceId","/volume"],"maxFrames":16,"maxBytes":8192,"maxFrameBytes":1024}}
+```
+
+JSON selects explicit leaves only, at most 16 paths/8 segments each, array indexes 0..63. Missing paths are omitted; if none select a leaf the frame is rejected. Whole objects/arrays, wildcards and escaped paths are unsupported. Sensitive keys are prohibited; known credential text and malformed/deep/oversized payloads reject a whole frame. More than 64 opening object/array characters is conservatively rejected. Arbitrary unknown secrets or anonymously named sensitive values cannot be guaranteed detectable; callers must review selected paths.
+
+For non-JSON use format=bytes and byteRanges(offset/length): at most 16 ranges and 512 selected bytes within maxFrameBytes. All other bytes become zero. Callers must establish ranges contain no secrets; arbitrary binary credentials and anonymously named sensitive values cannot be automatically recognized.
+
+Default payload budgets: 16 frames/8192 bytes/1024 bytes per frame. Maximum: 32/32768/4096, counting rejected attempts. Capture does not indefinitely roll over after budget exhaustion. wireExact is always false; reconstructed JSON/zeroed bytes are not original wire, signature or checksum evidence.
+
+Only inputs entering unified decode are captured, including decode failures. Unframed socket chunks, transport-rejected data and HTTP errors filtered before decode are not captured. There is no packet sniffer, arbitrary-host raw send or wire retransmission.
+
+Each frame's input retains transport, available operation/deviceId/pointId and **one of sanitized body or bytes**. It does not preserve topic/path/requestId/config/statusCode/headers. JSON mode prefers an available text body; byte mode captures bytes and does not recreate a text body for replay. Inspect the returned input, never assume the full live decode context survived.
+
+readCapture and readPayloadCapture have **independent sequence spaces**. captureWindow uses metadata sequences; replayCapture.frames[].sequence must come from readPayloadCapture.frames[].sequence. Increment each cursor using that API's own nextSequence. Rejected captures can leave gaps, so sequence 1 is not necessarily a retained frame.
+
+For that MQTT example, supply the known non-secret topic explicitly. The following uses sequence 1 **only if that retained frame actually contains the example body above**; otherwise use the returned sequence and matching expected value:
+
+```json title="Offline MQTT replay of a retained example frame"
+{"scriptContent":"<complete MQTT demonstration source>","frames":[{"sequence":1,"expected":{"operation":"report","deviceId":"demo-1","points":[{"pointId":"volume","value":20}]}}],"context":{"operation":"report","topic":"vendor/demo-1/state"}}
+```
+
+Use 1..16 distinct retained sequence IDs and expected outputs, at most 32768 serialized bytes. context is at most 4096 bytes and only operation/deviceId/pointId/requestId/topic/path/config; it cannot replace body/bytes/transport or specify host/port. No actual config/live state is copied. A new bounded Context runs sequential describe/decode for at most 5 seconds, consuming session operation/active-request budgets.
+
+context is common to all replayed frames; group frames with compatible context. HTTP decoding that depends on statusCode/headers cannot be fully reproduced by replayCapture: those fields are neither retained nor allowed as overrides. Use validateScript decode fixtures with explicitly supplied, non-secret metadata instead. Such fixtures remain offline assertions, not proof of the original HTTP exchange. A byte-mode frame likewise cannot replay a script that requires a text body unless the script explicitly parses bytes.
+
+Read the returned operation ID. Terminal result has sent=false, correlation=offline and value containing valid/fixturesPassed/offline/deviceCommunicationVerified=false. Replay sends nothing, installs nothing, updates no point and does not prove real-device acceptance.
+
+## Transport boundaries {#capabilities}
+
+All four transports support Spec Commands. HTTP exposes httpResponseMetadata/httpErrorResponse; MQTT exposes mqttBinaryPayload/mqttPublishOptions but no probe/protocolAck. Inspect session.properties.capabilities. MQTT routing remains on the current Broker; old MqttConnDevice lacks this adapter.
+
+No arbitrary Shell/host raw send, dynamic subscription management, file CAS, persistent sessions or server scenario runner exists. Agents orchestrate bounded steps client-side; no Studio-hosted model is required. Special authentication, TCP-server/framing/TLS requirements still depend on actual transport support.

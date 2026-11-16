@@ -1,0 +1,650 @@
+---
+title: "Protocol Script Specification"
+description: "Shared script entries, points, parameters, transport differences and complete examples for TCP, UDP, HTTP and MQTT."
+keywords: ["Aqara Studio", "TCP", "UDP", "HTTP", "MQTT", "describe", "encode", "decode"]
+displayed_sidebar: aqaraStudioSidebar
+toc_max_heading_level: 2
+---
+
+# Protocol Script Specification
+
+TCP, UDP, HTTP and MQTT share one JavaScript contract. Scripts build and parse messages; Studio manages connections, transport, discovery, polling and point application. See the [integration guide](./ai-agent-device-onboarding.mdx) for configuration and the [MCP/API reference](./protocol-script-mcp-api.mdx) for remote debugging.
+
+`contractVersion: 1` identifies the script contract, not the Studio product version. The complete examples use fictional protocols; replace them with vendor messages and site parameters for real devices.
+
+## Entries and messages {#contract}
+
+### Three global entry points {#entry-points}
+
+| Entry | Input | Result |
+| --- | --- | --- |
+| `describe()` | None | Descriptor with integer `contractVersion: 1` |
+| `encode(request)` | Unified operation context | Transport message object, or `null` to send nothing |
+| `decode(message)` | Incoming message and available context | Business result object; `{ operation: "ignore" }` to discard a message |
+
+Expose all three **synchronous** functions globally. Promises, bare byte arrays, top-level device/point arrays and scalar read results are not accepted. Do not assume Node.js `require`/`Buffer`, browser `fetch`/`window` or arbitrary Java access. Do not create sockets, timers or reconnect loops.
+
+```javascript title="Entry skeleton (no device communication)"
+(function () {
+    "use strict";
+    function describe() {
+        return { contractVersion: 1, scriptVersion: "V1.0" };
+    }
+    function encode(request) {
+        return null;
+    }
+    function decode(message) {
+        if (message.operation === "discoverDevices") return { devices: [] };
+        if (message.operation === "discoverPoints") return { pointDefinitions: [] };
+        return { operation: "ignore" };
+    }
+    globalThis.describe = describe;
+    globalThis.encode = encode;
+    globalThis.decode = decode;
+})();
+```
+
+`scriptVersion` is an author-controlled label. Read `scriptCheckResult` for loading errors; `success` proves loading and contract validation, not device connectivity.
+
+### Descriptor {#describe}
+
+| Field | Rule |
+| --- | --- |
+| `contractVersion` | Required integer `1` |
+| `scriptVersion` | Optional script label, for example `"V1.0"` |
+| `protocol.msgIdMatch` | Optional Boolean, default `false`; TCP/UDP request correlation |
+| `protocol.stateSyncMode` | `"push"`, `"query"` or `"mixed"`; default `"mixed"` |
+| `protocol.connection` | Optional TCP connection policy; requires the matching Studio connection extensions; see [connection lifecycle](./unified-protocol-script.mdx#tcp-connection) |
+| `discovery` | TCP/UDP target; see [discovery](./unified-protocol-script.mdx#tcp-udp-discovery) |
+| `framing` | TCP/UDP configuration; see [framing limits](./unified-protocol-script.mdx#tcp-udp-framing) |
+| `configSchema` | Ordinary Network/Device parameters, described below |
+
+Keep `describe()` fast, deterministic and free of side effects. It may be read repeatedly. Protocol settings are parsed and cached at loading, not a place to advance session state.
+
+#### Correlation and state feedback
+
+Enable `msgIdMatch` only if the device protocol has a stable identifier and the script can encode Studio's `requestId` and recover it from responses. Otherwise the request ID is an empty string. With matching enabled, missing, incorrect or expired IDs cannot complete a pending transaction. Historical Network `msgIdMatch` values are no longer authoritative.
+
+`stateSyncMode` describes feedback, not point access or `isResponseExpected`:
+
+- `push`: every write reliably produces a `report`; ordinary writes do not add automatic readback/query publishing.
+- `query` / `mixed`: successful ordinary writes trigger one immediate readback on readable, subscribed points. MQTT publishes a query and applies a later report instead of creating a synchronous response transaction. Existing periodic polling remains. Debug-session state confirmation has its own execution path.
+- Commands are not polled or automatically read back. Observe a readable property to verify a side effect.
+- MQTT reads publish queries and wait for asynchronous `report`; no new business-ACK transaction is created.
+
+Device state may lag behind an ACK. One stale read is not proof of failure. Within a predetermined time/count budget, read again; do not repeat the control to wait for state.
+
+### Unified inputs {#inputs}
+
+Every input contains `transport`: `tcp`, `udp`, `http` or `mqtt`. A TCP plugin performing UDP discovery still passes `tcp`.
+
+| Field | Meaning |
+| --- | --- |
+| `operation` | `discoverDevices`, `discoverPoints`, `probe`, `read`, `write`, `report`, `ack`; TCP connection extensions also support `disconnect`; unknown on ordinary TCP/UDP receive |
+| `deviceId` / `pointId` | Vendor business identifiers, not Open Resource IDs |
+| `connectionId` | Optional opaque TCP connection identifier; absent when no connection context is available, including discovery |
+| `requestId` | Framework request identifier; not guessed before TCP/UDP decoding |
+| `value` | Primitive write value: Boolean, number, text, or integer enum ordinal |
+| `config` | Isolated parameter snapshot for this call |
+| `ip` / `port` | Destination supplied to encode(discoverDevices), not discovery-response sender metadata |
+| `bytes` / `body` / `topic` / `path` | Transport-specific fields, not always present |
+| `statusCode` / `headers` | Real HTTP client responses only |
+| `code` / `errorMsg` | TCP/UDP encode(ack): framework point-application result, not the raw vendor status |
+
+Unavailable fields can be absent or `null`. Command `value` is a normalized **JSON string** keyed by numeric fieldId, including `"{}"` for a parameterless Command. Parse it when needed. Explicitly convert vendor 0/1, HEX, endianness and scale factors.
+
+For TCP/UDP report ACKs, requestId/deviceId and any available pointId accompany code/errorMsg; report points are not copied into encode(ack). Keep any vendor-specific ACK fields in bounded per-device state if required, then construct the ACK bytes according to the vendor protocol.
+
+### Decode results {#results}
+
+| Operation | Business fields | Meaning |
+| --- | --- | --- |
+| `discoverDevices` | `devices: [{deviceId, deviceName?, ...}]` | Candidates, not automatic imports |
+| `discoverPoints` | `pointDefinitions: [...]` | Definitions, not live values |
+| `read` / `report` | `points: [{pointId, value}]`, optional `enumRangeUpdates` | Validated values applied through the transport Proxy |
+| `write` / `probe` | Integer `code`, optional `errorMsg`, `pointId` | `0` succeeds; nonzero fails; missing code is not success |
+| `disconnect` | Integer `code`, optional `errorMsg` | TCP connection extensions only: `0` confirms exit; nonzero reports failure |
+| `ignore` | None | Drops all other fields, without application or transaction completion |
+
+Results may include `operation`, `deviceId` and `requestId`. When the input already has an operation, output may omit it and Studio fills it in. An explicitly different operation is rejected. Ordinary TCP/UDP receive must classify and return `operation`; an ID alone is insufficient.
+
+Point values must be strings, Booleans or finite numbers. Empty strings are valid; `null`, objects, arrays, `NaN` and `Infinity` are not. Point IDs must not repeat within a result. Never conceal missing data with `0`, `false` or an empty string.
+
+A `read` must contain the requested point; otherwise its other values are not applied either. A nonzero read `code` means device rejection. Extra `points` on `write` / `probe` are not applied. Reports cannot complete unrelated transactions by reusing a request ID.
+
+## Points and parameters {#points-and-parameters}
+
+### Point definitions {#point-definitions}
+
+Every definition, **including Spec points**, requires integer `access`: read=`1`, write=`2`, report=`4`; combine as `3`, `5`, `6` or `7`.
+
+| Field | Meaning |
+| --- | --- |
+| `pointId` | Nonblank, stable and unique within the device |
+| `pointName` | Optional; defaults to pointId |
+| `dataType` | Prefer `bool`, `number`, `text`, `enum` for generic points; existing normalization also accepts aliases such as `numerical` |
+| `devType` / `functionCode` / `traitCode` | A valid combination from the deployed Spec catalog; see [data model architecture and tags](../aqara-developer/aqara-data-model-specification/aqara-data-model-tags.mdx) |
+| `commandCode` | Spec Command; mutually exclusive with traitCode; Commands use `access: 2`; see [data model architecture and tags](../aqara-developer/aqara-data-model-specification/aqara-data-model-tags.mdx) |
+| `customSchema` | Object containing device-specific Command constraints, not a `customSchemeJson` string |
+| `enumRange` | Nonempty static array of `{value: integer, label: nonblank string}` |
+| `dynamicEnumRange` | Boolean flag, described below |
+| `min` / `max` | Numeric bounds; aliases `minimum` / `maximum` are accepted |
+| `step` | Positive UI increment |
+| `resolution` | Positive device resolution, not an alias for step |
+| `decimals` | Nonnegative integer display/write-format decimal-place setting; `precision` is no longer parsed |
+| `unit` | Device data unit; aliases `units` / `unitName`; see [unit table](./script-supported-unit-symbols.mdx) |
+| `trueText` / `falseText` | Generic Boolean labels, default On / Off |
+
+```json title="Shared point definition example"
+{
+  "pointDefinitions": [
+    {"pointId":"power","pointName":"Power","dataType":"bool","access":7},
+    {"pointId":"temperature","dataType":"number","access":5,"min":-20,"max":80,"step":0.1,"resolution":0.1,"decimals":1,"unit":"celsius"},
+    {"pointId":"mode","dataType":"enum","access":3,"enumRange":[{"value":0,"label":"Auto"},{"value":1,"label":"Manual"}]}
+  ]
+}
+```
+
+Query actual Spec Codes rather than inventing them from names. A write-only primitive is not automatically a nonexistent generic Command. Queryable values are usually attributes; one-shot actions such as Play/Pause can use existing Spec Commands. Device-specific schema must not change the global Spec used by other devices.
+
+Units describe device data, while system settings can convert displayed units. Apply scaling only once and verify value, unit and timestamp together. Parameter string enums are different from numeric point enums.
+
+#### Device-specific Command schema
+
+customSchema is a command descriptor wrapper, not a bare JSON Schema on the point. Its inputSchema uses **numeric fieldId strings** as keys and retains Spec metadata for forms/validation. Obtain commandId and fields from the deployed catalog, not another model.
+
+For example, the current MediaPlaybackCommand catalog ID is 40001. This example device accepts Music and full Command text, without Title. The override belongs only to this point:
+
+```json title="Device-specific Command constraints"
+{
+  "pointId":"onDemandPlay","pointName":"Voice request","devType":"Speaker","functionCode":"MediaPlayback","commandCode":"MediaPlaybackCommand","access":2,
+  "customSchema":{
+    "commandId":40001,"commandCode":"MediaPlaybackCommand","title":"Media request",
+    "inputSchema":{"type":"object","additionalProperties":false,
+      "properties":{
+        "0":{"type":"integer","title":"Media type","default":0,"oneOf":[{"const":0,"title":"Music","x-value":"0"}],"x-enums":[{"value":"0","key":"Music"}],"x-fieldCode":"MediaType","x-fieldId":0,"x-format":6,"x-paramType":1},
+        "1":{"type":"string","title":"Command content","minLength":1,"x-fieldCode":"Command","x-fieldId":1,"x-format":11,"x-paramType":3}
+      },"required":["0","1"]},
+    "returnSchema":{"type":"object"},"valueExample":"{\"0\":0,\"1\":\"\"}"
+  }
+}
+```
+
+Debug args could be `{"0":0,"1":"Play music by Jay Chou"}`; encode(write) receives the object's JSON string. The vendor parses the full text, not Studio splitting artist/title. For other runtime device-schema needs inspect actual supported points/mapping entries; the Kotlin property customDynamicSchema is not automatically an available JS field.
+
+### Dynamic enums {#dynamic-enums}
+
+Discover `{pointId:"scene", dataType:"enum", access:7, dynamicEnumRange:true}`. Do not also declare static `enumRange` or `traitCode`. Do not invent runtime metadata keys.
+
+Return vendor-provided options in a valid `read` / `report`:
+
+```json title="Options and current state"
+{
+  "operation":"report",
+  "deviceId":"demo-1",
+  "points":[{"pointId":"scene","value":1}],
+  "enumRangeUpdates":[{"pointId":"scene","enumRange":[{"value":0,"label":"Movie"},{"value":1,"label":"Music"}]}]
+}
+```
+
+Only emit updates when the message actually contains option configuration. Do not query or regenerate the full configuration for every property read. Changing an internal JS array does not publish UI choices. Ranges are transient metadata, not point-structure/binlog updates, and must be reacquired after restart/lifecycle cleanup. Empty choices before a configuration response are possible; do not invent options. Updates must match imported dynamic-enum points. A runtime empty array explicitly clears a range.
+
+### Ordinary site parameters {#parameters}
+
+```json title="Optional describe().configSchema"
+{
+  "network":{"type":"object","properties":{"siteCode":{"type":"string","title":"Site code","maxLength":32}},"required":["siteCode"]},
+  "device":{"type":"object","properties":{"channel":{"type":"integer","minimum":1,"maximum":255,"default":1},"mode":{"type":"string","enum":["normal","extended"],"default":"normal"}}}
+}
+```
+
+Network/Device values live in `scriptParameters`. Device values override same-name Network values for device calls, with required fields validated per scope. Each call receives an isolated `config`; mutation does not write back. Optional unset fields without defaults are omitted. Preserve explicit `0` and `false`.
+
+Supported schema is flat `string / integer / number / boolean`, string `enum`, `title`, `description`, `default`, `required`, numeric bounds and string lengths. Each scope has at most 64 fields; strings at most 4096 characters; integers are 32-bit. Nested objects, arrays, `$ref`, patterns and arbitrary JSON Schema are unsupported. Names start with a letter, contain only letters/digits/underscores and are at most 64 characters. Reserved names and names containing password/secret/token/credential are rejected.
+
+These are not secret storage or transport configuration. TCP/UDP addresses, HTTP servers, MQTT Brokers/subscriptions and authentication use existing protocol fields. Missing required values may be saved, but execution fails. Schema updates retain compatible same-name values and reject incompatible constraints/types; removed fields are not injected or exposed by Open.
+
+Device discovery has only Network parameters. HTTP/MQTT reports also have only Network parameters before device identity is decoded; do not depend on private Device parameters to recognize a report.
+
+## Transport adaptations {#transports}
+
+The shared business contract does not make transport formats interchangeable. Follow the selected transport's message and discovery rules; addresses, authentication and subscriptions remain in the existing protocol configuration.
+
+### TCP/UDP {#tcp-udp}
+
+#### Byte messages {#tcp-udp-messages}
+
+Return `{bytes: Uint8Array or integer array, isResponseExpected?: Boolean}` from encode. Bytes are integers 0 to 255. Bare arrays, text and implicit HEX strings are not accepted.
+
+`isResponseExpected` defaults to true. False is only for a vendor-defined one-way `write`; do not disable read/probe/discovery response checks to hide timeouts. Sending does not prove business execution.
+
+Ordinary receive inputs contain `bytes` and the owning business `deviceId`, not pre-matched `operation`, `pointId` or `requestId`. Decode must recover classification/correlation from the protocol and return a [standard result](./unified-protocol-script.mdx#results). An ID alone is insufficient even when ID matching is enabled.
+
+Reports follow complete frame → decode(report) → point application → encode(ack). Return null when no ACK is needed. ACK transmission occurs outside the JS execution thread and does not wait for another response. Validate CRC, escaping, sequences and vendor error codes according to the actual protocol.
+
+#### Discovery configuration {#tcp-udp-discovery}
+
+Use `describe().discovery`:
+
+| Field | Rule |
+| --- | --- |
+| `discoveryType` | `"udp"` or `"tcp"`; defaults to the owning plugin's transport |
+| `ip` | IPv4 literal, unicast/broadcast/multicast; required for TCP, optional/blank for UDP |
+| `port` | Required integer 1 to 65535; request destination port |
+| `editable` | Default false; true allows the page to override script defaults |
+
+```json title="Example describe().discovery"
+{"discoveryType":"udp","port":5919,"editable":false}
+```
+
+Omitting discovery retains manual configuration. An invalid declared configuration or execution failure fails discovery rather than silently falling back.
+
+With UDP and no IP, Studio derives broadcast destinations from eligible up, non-loopback, non-virtual, non-point-to-point, non-link-local IPv4 interfaces, sorts/deduplicates them and sends to all. No eligible address is an explicit failure. The page displays the first sorted address. An explicit IP remains authoritative rather than being replaced by automatic broadcasts; editable=true uses the user's confirmed configuration.
+
+A TCP plugin may discover over UDP. Its encode input still contains `transport:"tcp"`, plus operation discoverDevices, ip, port and config. A fixed response listener may be specified on the **encoded discovery message**, not on devices:
+
+```json title="TCP-plugin UDP send/listen example (not a vendor protocol)"
+{"bytes":[170,1,85],"responseIp":"0.0.0.0","responsePort":9001}
+```
+
+responseIp requires a valid responsePort. Use the actual response multicast group when required. The send destination port is not the local listening port. Multiple broadcast targets must return consistent responseIp/responsePort.
+
+These listener overrides belong to the **TCP plugin's UDP discovery** only. The UDP plugin's own discovery opens an ephemeral local DatagramSocket and reuses it to receive replies; it does not read responseIp/responsePort or join a response multicast group. A vendor requiring a fixed UDP reply port/group needs an appropriate implemented discovery path or transport extension, not extra ignored JS fields.
+
+Decode discovery as `{devices:[{deviceId,deviceName,ip,port,...}]}`. IP/port are subsequent device communication targets; optional fields include vendor, model and firmwareVersion; UDP can also supply localPort. Obtain vendor serial numbers from discovery replies instead of hardcoding site values from an example.
+
+Discovery decode receives response bytes, not the packet sender's IP/port or the earlier destination fields. Derive device endpoints from documented payload fields or authorized known configuration. If only the UDP source address identifies the endpoint, the current callback cannot recover it; report that capability gap rather than using message.ip/message.port or a broadcast/group address as the device endpoint.
+
+Device discovery requires a real supported transport procedure; encode(null) does not automatically import static TCP/UDP devices. Static **point** discovery is supported: encode(discoverPoints) returns null and decode receives bytes=null to return pointDefinitions.
+
+#### TCP connection lifecycle {#tcp-connection}
+
+The following optional extensions require a Studio build containing the matching **ConnectorCore, Script and TCP** updates. `contractVersion: 1` does not negotiate these capabilities. Omitting `protocol.connection` keeps the existing connection and health policy; enable fields only when required by the vendor protocol. HTTP, UDP and MQTT do not acquire this TCP lifecycle by declaring the same fields.
+
+| `describe().protocol.connection` field | Default | Rule |
+| --- | --- | --- |
+| `initializeWithProbe` | `false` | When true, each new TCP connection must complete the script's `probe` before ordinary requests. Use that operation to encode vendor registration or authentication and validate the actual response. |
+| `heartbeatIntervalMillis` | `0` | Integer milliseconds: `0` preserves the existing interval; otherwise `1,000` to `86,400,000`. Uses the existing health probe, without a script timer. |
+| `failureGraceMillis` | `0` | Integer milliseconds: `0` preserves the existing health policy; otherwise `1` to `3,600,000`. Delays the health probe's offline decision after unsuccessful replies; it does not turn a failed request into success. |
+| `gracefulClose` | `false` | When true, normal shutdown attempts `encode({operation:"disconnect", ...})` and handles the matching exit response. The attempt has a total budget of one second; shutdown still releases the connection when busy, cancelled, unsupported or timed out. |
+
+```json title="Optional TCP connection and LF-framing descriptor fragment"
+{
+  "protocol": {
+    "connection": {
+      "initializeWithProbe": true,
+      "heartbeatIntervalMillis": 30000,
+      "failureGraceMillis": 180000,
+      "gracefulClose": true
+    }
+  },
+  "framing": {"delimiterBytes": [10]}
+}
+```
+
+These values are an example, not defaults for every device. Keep the vendor's registration, heartbeat and exit bytes in `encode` / `decode`. Return a successful `probe` only after a valid reply. If no exit message is required, `encode(disconnect)` may return `null`. An unsolicited exit notification for the current device/connection may return `{operation:"disconnect", code:0}`; the TCP transport closes that connection and the existing probe drives recovery. Validate any vendor client identity before accepting an exit.
+
+TCP encode/decode calls can include `connectionId`. Treat it as an opaque string, not a JavaScript number. Isolate temporary buffers and pending work by `deviceId` and connection identity, and discard the old state when the identity changes. Do not reuse a previous connection's partial frame or let a late response overwrite the new state. The field can be absent before connection setup and during discovery.
+
+**Older Studio builds are not a silent fallback.** They may ignore `protocol.connection`, but a descriptor containing `framing.delimiterBytes` fails the older length-framing validator (`framing.frameStartBytes is required`), and a decoded `disconnect` result is an unsupported operation (`decode() returned an unknown operation`). A script such as HOPE V1.3.0 can therefore fail to load or communicate, rather than merely retain the earlier intermittent-offline behavior. Deploy the matching three modules together, or keep a script prepared and validated for the older build. Uploading only a new JS package does not add backend capabilities.
+
+#### Framing and reassembly {#tcp-udp-framing}
+
+UDP preserves datagram boundaries. TCP is a stream: one socket read is not necessarily one frame.
+
+TCP supports an optional delimiter mode, for example `{"delimiterBytes":[10]}` for LF. `delimiterBytes` must contain 1 to 16 integer bytes (`0` to `255`), also bounded by `maxMessageBytes`. It is mutually exclusive with every length-framing field below. The delivered frame **includes the delimiter** and is bounded by `maxMessageBytes`; EOF or cancellation discards an unfinished frame. This mode applies to TCP reads. UDP packets, including a TCP plugin's UDP discovery replies, retain their existing datagram receive path.
+
+Length framing remains available for TCP/UDP:
+
+| describe().framing field | Rule in length mode |
+| --- | --- |
+| `frameStartBytes` | Required nonempty byte array |
+| `lengthKnownAfterBytes` | Required integer, at least header length and at most maxMessageBytes |
+| `remainingBytes` | Optional nonnegative integer, default 0 |
+| `totalLength` | Optional fixed total length, at least lengthKnownAfterBytes |
+
+With totalLength, framing is fixed length. Otherwise the **lengthKnownAfterBytes-th byte (1-based)** is an unsigned length, with 0 meaning 256. Total length is lengthKnownAfterBytes + data length + remainingBytes, bounded by Parser maxMessageBytes.
+
+This is not an arbitrary length-expression parser. Fields named `delimiter`, `lengthFieldSize` or custom multibyte-length expressions are not supported; the TCP delimiter field is specifically `delimiterBytes`. Without framing, TCP retains chunk-based fallback. If the script reassembles chunks, bound the size/count/lifetime and isolate them by device and connection as described above. Never share one pending buffer across devices or connections. Some multistage protocols still require transport extensions.
+
+TCP fallback reads at most **128 bytes per chunk**, not one complete message or a guaranteed 128 bytes. UDP without framing passes the whole bounded datagram. With length framing enabled, UDP extracts only the **first complete frame** inside that datagram, does not retain the tail and does not reassemble across datagrams. Do not enable length framing for vendor multi-frame datagrams without accounting for that limit; do not configure `delimiterBytes` on the UDP plugin.
+
+#### Five-byte demonstration protocol {#tcp-udp-example}
+
+<details>
+<summary>Complete demonstration and validation examples</summary>
+
+This is a **fictional protocol**, not vendor device code. Assume an existing device with business ID demo-1 and frames `[0xAA, opcode, unit 1, value/error, 0x55]`. Read uses 0x10/0x90, write 0x11/0x91, probe 0x12/0x92, report 0x93. Volume ranges from 0 to 100.
+
+The example supports static point discovery, read/write, probe and report, **not device discovery**. Configure an existing device through its published fields. Implement real discovery from the vendor document before enabling it.
+
+```javascript title="Complete three-entry five-byte example"
+(function () {
+    "use strict";
+    function describe() {
+        return {
+            contractVersion: 1, scriptVersion: "V1.0",
+            protocol: {msgIdMatch: false, stateSyncMode: "query"},
+            framing: {frameStartBytes: [170], lengthKnownAfterBytes: 1, totalLength: 5}
+        };
+    }
+    function encode(r) {
+        if (r.deviceId !== "demo-1") return null;
+        if (r.operation === "probe") return {bytes: [170, 18, 1, 0, 85]};
+        if (r.pointId !== "volume") return null;
+        if (r.operation === "read") return {bytes: [170, 16, 1, 0, 85]};
+        if (r.operation !== "write") return null;
+        if (typeof r.value !== "number" || !isFinite(r.value) ||
+                Math.floor(r.value) !== r.value || r.value < 0 || r.value > 100) {
+            throw new Error("Invalid volume");
+        }
+        return {bytes: [170, 17, 1, r.value, 85]};
+    }
+    function decode(m) {
+        if (m.operation === "discoverPoints") {
+            return {pointDefinitions: m.deviceId === "demo-1" ? [
+                {pointId: "volume", pointName: "Volume", dataType: "number",
+                 access: 7, min: 0, max: 100, step: 1, decimals: 0}
+            ] : []};
+        }
+        var b = m.bytes;
+        if (m.deviceId !== "demo-1" || !b || b.length !== 5 ||
+                b[0] !== 170 || b[2] !== 1 || b[4] !== 85) return {operation: "ignore"};
+        if ((b[1] === 144 || b[1] === 147) && b[3] <= 100) {
+            return {operation: b[1] === 144 ? "read" : "report", deviceId: m.deviceId,
+                    points: [{pointId: "volume", value: b[3]}]};
+        }
+        if (b[1] === 145 || b[1] === 146) {
+            return {operation: b[1] === 145 ? "write" : "probe", deviceId: m.deviceId, code: b[3]};
+        }
+        return {operation: "ignore"};
+    }
+    globalThis.describe = describe;
+    globalThis.encode = encode;
+    globalThis.decode = decode;
+})();
+```
+
+Without IDs, serialized framework transactions still cannot completely distinguish late responses of the same type. Use stable protocol IDs when available; the latest sent request is not reliable correlation.
+
+</details>
+
+#### Debugging checklist {#tcp-udp-debugging}
+
+Use Open [connectionSnapshot](./protocol-script-mcp-api.mdx) for observed bound/remote endpoints and discovery interfaces. It does not scan, send or reconnect. CONNECTED still requires real probe/read evidence.
+
+Check discovery destination versus listener port, subnet/interface, changed IP, framing, IDs, types and actual point application. Do not change the user's gateway, VPN or firewall for testing. Windows multihomed verification is not M300 verification.
+
+Configure polling through Network/Proxy settings. Distinguish send, ACK and observed state in Agent tests. Stop debug sessions afterwards without closing shared business connections.
+
+### HTTP {#http}
+
+#### Requests and responses {#http-messages}
+
+| Encode field | Rule |
+| --- | --- |
+| `path` | Required, single leading `/`, relative to configured Network server; at most 4096 UTF-8 bytes; no `//`, backslash or control characters |
+| `method` | Default GET; GET/POST/PUT/PATCH/DELETE/HEAD/OPTIONS |
+| `headers` | Object with string values, not a JSON string; at most 64 entries/16 KiB serialized; invalid names and CR/LF/NUL injection are rejected |
+| `body` | Optional string, including POST/PUT/PATCH bodies; not legacy postParams |
+| `acceptHttpErrors` | Optional Boolean, default false, applies only to this request |
+
+```json title="HTTP encoded message"
+{"path":"/devices/demo-1/power","method":"PUT","headers":{"Content-Type":"application/json"},"body":"{\"value\":true}"}
+```
+
+Real client responses supply body, statusCode and headers to decode. Header names are lowercase; values are string arrays preserving duplicates, bounded by 64 names/128 values/16 KiB. Body streaming is bounded by Parser maxMessageBytes, not an unlimited read followed by truncation.
+
+Non-2xx responses fail by default. Set acceptHttpErrors=true only when the vendor puts business results in error responses; decode then decides success. Such a response does not automatically trigger 401 challenge retry. HTTP status is not a substitute for business code=0. Existing redirect behavior remains; metadata describes the final delivered response, not a configurable redirect chain.
+
+Ordinary read/write decode inputs include device/point context. Static discovery has body=null and no real response metadata. Bodies are text; binary bodies, arbitrary-host routing and complete inbound authentication context are unsupported.
+
+Generating an Authorization header is not secure credential injection. Current HTTP public configuration has no generic dedicated password/API Key/Bearer Token store and JS injection path. configSchema/scriptParameters are readable ordinary parameters: never rename or hard-code secrets to bypass this boundary. Vendors needing these credentials require a verified same-version secure provisioning solution; without one, report the gap rather than claiming fully automatic onboarding.
+
+#### Discovery and reports {#http-discovery-and-report}
+
+Device/point discovery may issue real requests or return null from encode and a static list from decode. Devices use `{deviceId,deviceName?,model?}`; Network configuration owns the connection address. **Discover/import devices, then discover/import points**. Static lists still require import.
+
+The existing POST Servlet supplies `{transport:"http",operation:"report",path,body,config}`. Decode must return top-level business deviceId and points. Optional replyBody is the HTTP response text, not legacy responseMsg. Application is limited to the matching device in this Network. Only Network parameters exist before identity is decoded.
+
+Callbacks also need an enabled, reachable WebService and the actual Servlet path for this Network. Current protocol Resource templates do not expose WebService/Servlet configuration; connectionSnapshot reports the listener endpoint, not its path. Never use Open's `/open/api/v1` as a device callback or assume every Network uses `/report`. Provisioning callbacks from scratch or validating inbound auth headers remains a public-capability gap.
+
+Reads, writes and reports share one serialized JS Context per Network. Former report-parser shard settings are retired and do not create parallel independent Contexts.
+
+#### Offline-testable demonstration {#http-example}
+
+<details>
+<summary>Complete demonstration and validation examples</summary>
+
+This is a **fictional REST device**, not vendor facts. demo-1 exposes GET `/devices/demo-1/power` returning `{"value":true}`, PUT on that path with `{value}` returning `{"ok":true}`, GET `/devices/demo-1/health` returning `{"ok":true}`, and POST reports `{"deviceId":"demo-1","value":true}`.
+
+Configure the server through the Network, without embedding real credentials. The example statically discovers one device/Boolean point and supports probe/read/write/report.
+
+```javascript title="Complete HTTP demonstration"
+(function () {
+    "use strict";
+    function describe() {
+        return {contractVersion: 1, scriptVersion: "V1.0",
+                protocol: {stateSyncMode: "query"}};
+    }
+    function encode(r) {
+        if (r.deviceId !== "demo-1") return null;
+        if (r.operation === "probe") return {path: "/devices/demo-1/health"};
+        if (r.pointId !== "power") return null;
+        if (r.operation === "read") return {path: "/devices/demo-1/power"};
+        if (r.operation === "write") {
+            if (typeof r.value !== "boolean") throw new Error("Expected Boolean");
+            return {path: "/devices/demo-1/power", method: "PUT",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({value: r.value})};
+        }
+        return null;
+    }
+    function decode(m) {
+        if (m.operation === "discoverDevices") {
+            return {devices: [{deviceId: "demo-1", deviceName: "REST demo"}]};
+        }
+        if (m.operation === "discoverPoints") {
+            return {pointDefinitions: m.deviceId === "demo-1" ? [
+                {pointId: "power", pointName: "Power", dataType: "bool", access: 7}
+            ] : []};
+        }
+        var j;
+        try { j = JSON.parse(m.body || "{}"); } catch (_) { j = null; }
+        if (m.operation === "report") {
+            if (!j || j.deviceId !== "demo-1" || typeof j.value !== "boolean") {
+                return {operation: "ignore"};
+            }
+            return {deviceId: j.deviceId, points: [{pointId: "power", value: j.value}],
+                    replyBody: "{\"accepted\":true}"};
+        }
+        if (m.deviceId !== "demo-1") return {operation: "ignore"};
+        if (m.operation === "read" && m.pointId === "power") {
+            if (!j || typeof j.value !== "boolean") {
+                return {code: 1, points: [], errorMsg: "Missing power value"};
+            }
+            return {points: [{pointId: "power", value: j.value}]};
+        }
+        if (m.operation === "write" || m.operation === "probe") {
+            return {code: j && j.ok === true ? 0 : 1};
+        }
+        return {operation: "ignore"};
+    }
+    globalThis.describe = describe;
+    globalThis.encode = encode;
+    globalThis.decode = decode;
+})();
+```
+
+Fixtures assert complete **normalized output**, including operation filled from known context:
+
+```json title="validateScript fixtures"
+[
+  {"entry":"encode","input":{"transport":"http","operation":"write","deviceId":"demo-1","pointId":"power","value":true},"expected":{"path":"/devices/demo-1/power","method":"PUT","headers":{"Content-Type":"application/json"},"body":"{\"value\":true}"}},
+  {"entry":"decode","input":{"transport":"http","operation":"read","deviceId":"demo-1","pointId":"power","body":"{\"value\":true}","statusCode":200,"headers":{}},"expected":{"operation":"read","points":[{"pointId":"power","value":true}]}}
+]
+```
+
+</details>
+
+#### Commands, diagnostics and limits {#http-debugging}
+
+HTTP supports Spec Command/customSchema using write encoding, fieldId JSON-string value and explicit business code. Status 200 alone does not prove execution.
+
+Debug sessions support probe/read/write, business ACK, state observation and report waiting, subject to instance capabilities. HTTP send only confirms a response was received. Timeout/no response may leave sent=null; do not automatically resend. An over-limit body can prove response receipt, not ACK.
+
+connectionSnapshot REQUEST_READY means a Client is available. reportReceiverEnabled/reportListener describe a component and configured endpoint, not vendor or public reachability. Inbound headers/auth context, binary bodies and script-selected arbitrary hosts remain unsupported.
+
+Normal HttpDevice.doProbe currently marks the device healthy without sending the script's probe request. The actual encode(probe) → HTTP → decode(probe) business check is provided by Open probeOnce. Neither the device's Online label nor REQUEST_READY alone proves vendor reachability or a successful business probe.
+
+TrafficLog is separate from bounded debug capture. Persistent logs can contain redacted/truncated request summaries and response bodies; do not call them payload-free. Prefer [metadata/sanitized sessions](./protocol-script-mcp-api.mdx#payload) for remote diagnostics.
+
+### MQTT {#mqtt}
+
+#### Device and point discovery {#mqtt-discovery}
+
+Discovery is static decode with operation discoverDevices/discoverPoints and body=null, not a remote discovery publish. Return `{devices:[...]}` / `{pointDefinitions:[...]}` and perform separate discovery, selection and import.
+
+Device fields include deviceId, deviceName, brokerEndpoint, brokerPort, connectionType, username, password and clientId. deviceId/brokerEndpoint must be valid. Omitted brokerPort defaults to 1883, connectionType to 3. Types: 0 anonymous, 1 anonymous SSL, 2 username/password SSL, 3 username/password without SSL. Use real plugin authentication configuration; never place real passwords in public scripts, fixtures or logs.
+
+The plugin also defines **connectionType=4 (X.509 over SSL)**. Script discovery does not import certificate/key paths; this mode additionally needs root CA, client certificate and private-key configuration in the existing authenticator. A discovered type number alone is not a usable X.509 configuration. Read the deployed configuration schema and use authorized credential provisioning; do not invent certificate fields inside devices or configSchema.
+
+The current Open MQTT template exposes Broker, clientID, connectionType and username/password fields, but not certificate/key paths. Existing X.509 configuration can be reused; the Resource workflow documented here cannot provision its certificates from scratch.
+
+| Point extension | Purpose |
+| --- | --- |
+| `subTopic` | Incoming state/query responses; subscriptions may use vendor-appropriate +/# |
+| `pubTopic` | Default publishing destination; writes and queries need a valid publishing route |
+| `receiveBinding` | Optional cross-point targetPoint Ord, with optional sourcePropertyName/targetPropertyName |
+| `publishBinding` | Optional cross-point sourcePoint Ord, with optional sourcePropertyName/targetPropertyName; writable points only |
+
+Omit bindings when unnecessary. All definitions require [common access](./unified-protocol-script.mdx#point-definitions), including Spec points; do not retain the old rule that only generic points need access.
+
+#### Payloads and ownership {#mqtt-messages}
+
+Read/write encode requires **exactly one of body or bytes**:
+
+```json title="Binary publish with per-message options"
+{"bytes":[0,128,255],"topic":"vendor/demo-1/set","qos":1,"retained":false}
+```
+
+body is UTF-8 text; bytes is an exact Uint8Array/integer array. Optional topic/qos/retained override this message only, otherwise point defaults apply. Topic remains on the current device Broker, nonempty valid UTF-8, without NUL/+/#, at most 1024 UTF-8 bytes. QoS is integer 0..2; retained is Boolean. Overrides do not persist bindings, subscribe or create connections.
+
+Incoming decode receives `{transport:"mqtt",operation:"report",topic,bytes,body,config}`. bytes preserves exact payload; body exists only for valid UTF-8, otherwise null. Each Parser group decodes a message once, not once per subscribed point.
+
+Top-level deviceId identifies ownership. It may be omitted in a single-device subscription group; multiple devices sharing topics must identify the device or application is rejected. Never apply same-name points to every device. Reports have only Network parameters before identity is known.
+
+Within a subscription group, an ID must identify exactly one device instance. If distinct devices have the same business ID or fallback ID, routing rejects the report rather than applying it to both. Multiple points owned by the same device remain valid.
+
+For unified MqttDevice, point discovery, rediscovery/import matching, ordinary read/write encode, report ownership and Open debugging use the same effective ID: a nonblank business `deviceId` is passed unchanged; an empty or whitespace-only ID falls back to `getDeviceUuid()`. For MqttDevice and legacy MqttConnDevice, that fallback is the existing `clientId`. This does not modify persisted deviceId/clientId. A valid business ID cannot be replaced by clientId when routing reports; clientId remains the separate Broker connection identifier.
+
+Newly discovered devices must still provide a nonblank deviceId; fallback only supports existing uninitialized or legacy devices. Verify that the deployed package includes both business-ID routing and blank-ID fallback fixes; older packages may use different IDs across these entry points.
+
+#### Queries and Commands {#mqtt-commands}
+
+encode(read) publishes a query and later reports update state. Establish subscriptions first. The publish route, query payload, response subscription and pointId must all exist. Do not fabricate queries for report-only devices to make readOnce appear supported.
+
+The script Proxy currently uses the fixed normal refresh tier, whose interval belongs to the Network Poll Scheduler; changing another device-frequency field does not necessarily change per-point query frequency. After ordinary writes on readable, subscribed points, query/mixed triggers one query publish; push does not add that query.
+
+Spec Commands use commandCode/customSchema, access=2 and write publishing. Commands default to retained=false to avoid replaying one-shot actions on reconnect; review any explicit override against vendor semantics. Command value is a fieldId JSON string, not an ordinary number.
+
+**SDK publish completion and PUBACK/PUBCOMP are not device business ACKs.** MQTT probeOnce/protocolAck are unsupported; no generic publish-and-wait business transaction was added. Confirm send or observe a real same-device report for effects.
+
+#### Demonstration script {#mqtt-example}
+
+<details>
+<summary>Complete demonstration and validation examples</summary>
+
+This **fictional protocol** uses demo-1, example Broker `192.0.2.20` (replace before deployment), state messages `{"deviceId":"demo-1","volume":20}`, set accepting volume, and get accepting `{get:"volume"}`. Volume is integer 0..100. Anonymous demo authentication is not suitable for vendors requiring credentials.
+
+```javascript title="Complete MQTT demonstration"
+(function () {
+    "use strict";
+    function describe() {
+        return {contractVersion: 1, scriptVersion: "V1.0",
+                protocol: {stateSyncMode: "mixed"}};
+    }
+    function encode(r) {
+        if (r.deviceId !== "demo-1" || r.pointId !== "volume") return null;
+        if (r.operation === "read") {
+            return {body: "{\"get\":\"volume\"}", topic: "vendor/demo-1/get", retained: false};
+        }
+        if (r.operation !== "write") return null;
+        if (typeof r.value !== "number" || !isFinite(r.value) ||
+                Math.floor(r.value) !== r.value || r.value < 0 || r.value > 100) {
+            throw new Error("Invalid volume");
+        }
+        return {body: JSON.stringify({volume: r.value}), qos: 1, retained: false};
+    }
+    function decode(m) {
+        if (m.operation === "discoverDevices") {
+            return {devices: [{deviceId: "demo-1", deviceName: "MQTT demo",
+                    brokerEndpoint: "192.0.2.20", brokerPort: 1883, connectionType: 0,
+                    clientId: "studio-demo-client"}]};
+        }
+        if (m.operation === "discoverPoints") {
+            return {pointDefinitions: m.deviceId === "demo-1" ? [
+                {pointId: "volume", pointName: "Volume", dataType: "number", access: 7,
+                 min: 0, max: 100, step: 1, decimals: 0,
+                 subTopic: "vendor/demo-1/state", pubTopic: "vendor/demo-1/set"}
+            ] : []};
+        }
+        if (m.operation !== "report" || m.topic !== "vendor/demo-1/state" ||
+                typeof m.body !== "string") return {operation: "ignore"};
+        var j;
+        try { j = JSON.parse(m.body); } catch (_) { return {operation: "ignore"}; }
+        if (!j || j.deviceId !== "demo-1" || typeof j.volume !== "number" ||
+                !isFinite(j.volume) || Math.floor(j.volume) !== j.volume ||
+                j.volume < 0 || j.volume > 100) return {operation: "ignore"};
+        return {deviceId: j.deviceId, points: [{pointId: "volume", value: j.volume}]};
+    }
+    globalThis.describe = describe;
+    globalThis.encode = encode;
+    globalThis.decode = decode;
+})();
+```
+
+For binary vendor protocols, parse m.bytes; do not turn body=null into empty text and report success.
+
+</details>
+
+#### Debugging checks {#mqtt-debugging}
+
+The debug adapter is for unified-script MqttDevice, not legacy MqttConnDevice. Inspect command, mqttBinaryPayload, mqttPublishOptions and read/write/report capabilities.
+
+connectionSnapshot CONNECTED means a Broker connection. subscriptionRegistered is local registration, and subscriptionReady is currently null, not Broker SUBACK or proof of device health. readOnce must publish and observe a real target report. writeAndWait(stateUpdate) needs a working feedback route; correlation is observationOnly, not strict causality.
+
+Normal MqttDevice probing also checks the Broker connection rather than invoking encode(probe); an Online label does not prove that the third-party device processed a query or control.
+
+For validation, configuration and communication checks, see the [integration guide](./ai-agent-device-onboarding.mdx#api-workflow). Debug sessions do not require a device-detail page subscription.
+
+## Runtime and migration {#runtime-and-migration}
+
+### State, limits and polling {#runtime}
+
+Devices in one Network reuse a JS Context. `globalThis.studioScriptState` starts as a plain object and may hold bounded JSON state. Isolate partial frames, request associations and snapshots by deviceId. Do not store functions, BigInt, circular data, host resources or credentials. Reclamation, updates or timeouts can rebuild the Context; it is not a durable database.
+
+The default state-size warning threshold is 2 MiB, configurable through `maxPersistentStateBytes`; `0` disables warnings. Overflow does not automatically delete state. `heapRejectPercent` defaults to `0`, disabling heap-pressure rejection; scripts must still bound allocations.
+
+Default `scriptExecutionTimeout` is 5 seconds. Default `maxMessageBytes` is 64 KiB for TCP/UDP and 256 KiB for HTTP/MQTT. Default per-call limits are 128 discovered devices, 512 discovered points and 512 live values; consult Parser configuration. Do not treat a rejected/partial over-limit result as a complete success.
+
+Proxy `pollFrequency` and the existing Network Poll Scheduler own polling. Do not add script timers. For vendor bulk queries, keep bounded per-device snapshots or return multiple values and use reports where supported. Cached values alone do not prove a `readOnce` acquired a fresh response.
+
+### Storage, editing and migration {#migration}
+
+The frontend can still edit full source. Saving validates and writes a managed `.js` file; the Network persists only the AOrd `scriptMessageParser/extensionScriptPath`. Open `scriptContent` is an input to `validateScript` / `uploadScript`, not a writable Network property.
+
+An address looks like `file:%/protocol-scripts/tcp_TcpNetwork/vendor-v1.js`; namespace follows Network type. See [script file commands](./protocol-script-mcp-api.mdx#script-files) for the first upload; bind the returned upload address, not a guessed disk path. Same-type Networks can share a file; replacement reloads all references and invalidates old debug sessions. Prefer unique new names. No file-version CAS is provided; inspect `referenceCount` before authorizing replacement.
+
+Upgrade migration preserves Network/Device/Point identity and bindings, converting old source/path storage to managed references. Failure retains old fields for repair/retry. **Storage migration does not translate JavaScript**: rewrite legacy entry points; the new runtime has no automatic legacy fallback.
+
+| Legacy entry/result | New contract |
+| --- | --- |
+| `protocolConfig()` / `discoveryConfig()` / `packetProcessConfig()` | `describe().protocol` / `.discovery` / `.framing` |
+| `build*Request` / `buildReportResponse` | `encode` branches by request.operation; report replies use `ack` |
+| `dispatch` + separate `parse*Response` | One `decode` returning classified business results |
+| Top-level lists/scalar reads | `{devices}`, `{pointDefinitions}`, `{points}` |
+| HTTP string headers / postParams | Object headers / string body |
+| MQTT bare text / implicit HEX guessing | `{body}` or `{bytes}` |
+
+Changed point semantics, such as converting a numeric point to a dynamic enum or splitting attributes/Commands, may require rediscovery/recreation. Check automations and references first. Replacing JS does not automatically rebuild every old point.

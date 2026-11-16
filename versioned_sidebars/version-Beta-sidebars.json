@@ -49,7 +49,9 @@
                   "aqara-studio/device-integration/sonos",
                   "aqara-studio/device-integration/aqara-coap",
                   "aqara-studio/device-integration/virtual/infrared-equipment",
-                  "aqara-studio/device-integration/virtual/light-box"
+                  "aqara-studio/device-integration/virtual/light-box",
+                  "aqara-studio/device-integration/virtual/group-control-equipment",
+                  "aqara-studio/device-integration/virtual/custom-device"
                 ]
               },
               {
@@ -178,7 +180,9 @@
           "id": "aqara-studio/plugin-center"
       },
       "items": [
-        "aqara-studio/plugin-center/aiot-data-migration"
+        "aqara-studio/plugin-center/aiot-data-migration",
+        "aqara-studio/plugin-center/openapi-gateway-export"
+
       ]
     },
     {
@@ -191,6 +195,7 @@
         "aqara-studio/set-up-mcp-server"
       ]      
     },
+    "aqara-studio/matter-bridge",
     "aqara-studio/faq",
     {
       "type": "category",
@@ -200,9 +205,9 @@
           "type": "category",
           "label": "JavaScript for Integration",
           "items": [
-            "aqara-studio/javascript-for-mqtt-integration",
-            "aqara-studio/javascript-for-http-integration",
-            "aqara-studio/javascript-for-udp-tcp-integration",
+            "aqara-studio/ai-agent-device-onboarding",
+            "aqara-studio/unified-protocol-script",
+            "aqara-studio/protocol-script-mcp-api",
             "aqara-studio/script-supported-unit-symbols"
           ]
         },
@@ -697,7 +702,8 @@
           "type": "category",
           "label": "Features",
           "items": [
-            "aqara-developer/local-studio-development/features/infrared-device-integration"
+            "aqara-developer/local-studio-development/features/infrared-device-integration",
+            "aqara-developer/local-studio-development/features/custom-device-integration"
           ]
         }
       ]
@@ -797,13 +803,7 @@
       "type": "category",
       "label": "Aqara Data Model Specification",
       "items": [
-        "aqara-developer/aqara-data-model-specification/aqara-data-model-tags",
-        "aqara-developer/aqara-data-model-specification/core-concepts",
-        "aqara-developer/aqara-data-model-specification/device-types",
-        "aqara-developer/aqara-data-model-specification/function-codes",
-        "aqara-developer/aqara-data-model-specification/trait-codes",
-        "aqara-developer/aqara-data-model-specification/command-codes",
-        "aqara-developer/aqara-data-model-specification/data-types"
+        "aqara-developer/aqara-data-model-specification/aqara-data-model-tags"
       ]
     }
   ],

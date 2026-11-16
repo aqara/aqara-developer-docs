@@ -13,9 +13,20 @@ keywords: ["Aqara 文档", "Aqara Studio", "以 MQTT 转出设备数据", "data 
 
 ## 您可以通过 MQTT 转出实现哪些功能？
 
-通过 MQTT 转出功能，您可以借助 MQTT Broker，以发布/订阅方式发送请求消息，调用已开放的数据转出 HTTP API。此外，您还可以实现心跳保活、订阅或取消订阅设备数据，以及接收设备数据变化和其他对象事件。
+通过 MQTT 转出功能，您可以借助 MQTT Broker，以发布/订阅方式调用已对 MQTT 开放的 JSON 业务 API、订阅或取消订阅设备数据，以及接收设备数据变化和其他事件。应用层 `ping` 用于订阅续租，不是维护 Broker 连接所需的 MQTT 协议心跳。
 
 上述功能的请求体与响应体的 JSON 对象说明，请参考 Aqara Developer [Studio 本地开发 - MQTT](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx)。
+
+## 本地 MQTT Broker 与 MQTT 转出的区别
+
+| 功能 | 作用 | 是否需要 MQTT Export 插件 |
+| --- | --- | --- |
+| 本地 MQTT Broker | 为局域网设备和应用提供 MQTT 接入服务 | 不需要，在支持本地服务的设备上独立启停 |
+| MQTT 转出 | Studio 作为 MQTT 客户端连接选定的 Broker，处理 API 请求并推送订阅数据 | 需要 |
+
+两个开关分别保存。启用、停用或卸载 MQTT 转出插件，不会代替您启停本地 Broker。选择第三方 Broker 转出的同时，可以继续开启本地服务，供其他局域网设备使用。一个 MQTT 转出实例同一时间只连接一个选定的 Broker，不会同时向两端转出。
+
+本地服务的卡片只在设备具备相应运行环境时显示；普通 Windows 开发环境未安装本地服务时，不会显示该卡片。只使用本地 Broker 接入局域网设备时，可以跳过下面的插件安装和转出步骤。
 
 ## 安装插件
 
@@ -37,20 +48,25 @@ keywords: ["Aqara 文档", "Aqara Studio", "以 MQTT 转出设备数据", "data 
 ## 选择 Broker
 
 根据您的实际需求选择合适的 Broker：
-- 如果您没有自建的 MQTT Broker，可直接 [使用 Aqara Studio 内置的本地 Broker](#使用本地-broker)。
-- 如果您不想使用 Aqara Studio 的内置 Broker，可选择 [使用第三方 Broker](#使用第三方-broker)。
+- 可以 [使用 Aqara Studio 内置的本地 MQTT Broker](#使用本地-mqtt-broker) 转出。
+- 如果已经有可用的 MQTT Broker，可以 [使用第三方 Broker](#使用第三方-broker) 转出，并继续运行本地服务。
 
-### 使用本地 Broker
+### 使用本地 MQTT Broker
 
-如需使用 Aqara Studio 内置的本地 Broker，请选择 **本地 Broker**。
+1. 在 **开发者 → 本地 MQTT Broker** 卡片中开启服务，等待服务状态变为 **运行中**。Studio 在启动时确认该卡片所示端口可连接后，才会显示运行中；请使用页面展示的实际端口，不要固定假设为 `1893`。
+2. 局域网设备和应用使用这张卡片上的 **局域网地址、端口、用户名和密码** 连接。参数由 Studio 管理，页面只读；用户名和密码旁的复制图标用于复制完整内容。有写权限且服务运行时，可以点击眼睛查看密码。
+3. 如需转出 Studio 数据，在 **MQTT 转出** 中启用转出并选择 **本地 MQTT Broker**。无需再次填写连接参数；本地服务就绪后，Studio 自动连接。
 
-此时，Aqara Studio 默认连接该 Broker。
+| 页面状态 | 含义及操作 |
+| --- | --- |
+| 本地服务启动中 | 等待本地服务启动和端口就绪确认 |
+| 本地服务启动失败或停止失败 | 在本地服务卡片点击 **重试**，重新执行当前开关对应的操作 |
+| 转出显示等待本地 MQTT Broker | 转出已启用，本地服务尚未就绪；先检查本地服务卡片 |
+| 本地服务运行中，但转出连接失败 | 在 MQTT 转出区域点击 **重试**；运行本地服务与完成 MQTT 连接是两个状态 |
 
-![使用本地 Broker](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTExport-SelectLocalBroker.png) 
+关闭本地服务会断开连接到它的所有客户端。若 MQTT 转出使用本地服务，转出会进入等待状态，重新开启本地服务后自动连接；若转出连接的是另一项独立的第三方 Broker 服务，则不受影响。只关闭 MQTT 转出时，本地服务和其他局域网客户端可以继续使用。
 
-如果连接状态为 **未连接**，您可以选择 **... > 连接** 来手动连接。
-
-![手动连接](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTExport-ConnectToLocalBroker.png) 
+本地服务的启用设置及凭据跨 Studio 重启保留，启用的服务会恢复启动；选择本地 Broker 且已启用的转出会在服务就绪后自动连接。**运行中** 表示启动流程已确认端口就绪，不表示系统持续进行 MQTT 健康探测。连接异常时，应分别检查本地服务与 MQTT 转出的状态。
 
 ### 使用第三方 Broker
 
@@ -59,16 +75,16 @@ keywords: ["Aqara 文档", "Aqara Studio", "以 MQTT 转出设备数据", "data 
 
     | 名称       | 说明                         |
     |----------|----------------------------|
-    | HOST       | 第三方 MQTT Broker 的地址。              |
+    | HOST       | 第三方 MQTT Broker 的 IP 或域名，不含 `mqtt://`、`mqtts://` 等协议前缀。 |
     | 端口     | 第三方 MQTT Broker 的端口号。            |
     | 客户端 ID | Aqara Studio 用于连接该 Broker 的客户端**唯一**标识。         |
     | 用户名    | 连接第三方 MQTT Broker 时所需的用户名。            |
     | 密码     | 连接第三方 MQTT Broker 时所需的密码。              |
-    | 启用 TLS | 是否启用 TLS 加密传输。<ul><li>开启：MQTT Broker 地址需使用 MQTTS 协议；</li><li>关闭：使用 MQTT 协议。</li></ul> |
+    | 启用 TLS | 是否通过 TLS 连接；Studio 根据此开关选择加密传输，HOST 仍只填写 IP 或域名。 |
 
-    ![选择第三方 Broker](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTExport-SelectThirdPartyBroker.png) 
+    此处 **客户端 ID** 属于 Studio 自己的 MQTT 连接，必须避免与其他设备或 MQTTX 使用相同的值，否则 Broker 可能断开原连接。第三方密码输入框离开焦点后保存，已保存的密码默认以圆点占位；点击眼睛可以读取完整密码，圆点本身不是真实密码内容。复制按钮仅在本地 Broker 卡片提供。
 
-2. （**若已启用 TLS**）根据您希望实现单向认证，或是双向认证，您需要提供的如下内容：
+2. 按 Broker 的认证方式配置 TLS：
 
     <table>
         <thead>
@@ -82,15 +98,15 @@ keywords: ["Aqara 文档", "Aqara Studio", "以 MQTT 转出设备数据", "data 
         <tbody>
             <tr>
                 <td>单向认证</td>
-                <td>CA 证书</td>
-                <td><ul><li>.pem</li><li>.crt</li><li>.cer（X.509）</li></ul></td>
-                <td>仅用于验证 Broker 身份。</td>
+                <td>无需在此导入证书</td>
+                <td>—</td>
+                <td>开启 TLS，使用系统信任的 CA 验证 Broker 证书。</td>
             </tr>
             <tr>
-                <td rowspan="3">双向认证</td>
+                <td rowSpan="3">双向认证</td>
                 <td>CA 证书</td>
-                <td rowspan="2"><ul><li>.pem</li><li>.crt</li><li>.cer（X.509）</li></ul></td>
-                <td rowspan="3">在单向基础上，额外提供客户端自己的证书和私钥，供 Broker 验证你的身份。</td>
+                <td rowSpan="2"><ul><li>.pem</li><li>.crt</li><li>.cer（X.509）</li></ul></td>
+                <td rowSpan="3">三项必须完整导入。客户端私钥须为 PKCS#8 PEM，内容以 BEGIN PRIVATE KEY 或 BEGIN ENCRYPTED PRIVATE KEY 开始；加密私钥还需填写并保存私钥密码。</td>
             </tr>
             <tr>
                 <td>客户端证书</td>
@@ -103,15 +119,20 @@ keywords: ["Aqara 文档", "Aqara Studio", "以 MQTT 转出设备数据", "data 
     </table>
     
     :::tip
+    - 当前页面不支持仅导入自定义 CA 的单向认证配置。导入证书时须提供完整的 CA、客户端证书和客户端私钥，缺少任一项将无法点击连接；导入完整三项后自动使用 TLS。
     - 若您清除已导入的证书，仅解除证书引用，不会删除证书文件。
     - 如果您重新上传了新的证书，需要断开现有连接，重新连接才能生效。
     :::
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTExport-UploadCertificates.png" alt="上传证书" /> 
 
-3. 点击 *...* 按钮，呼出操作菜单，选择 **连接**，等待连接成功。
+3. 如果平台要求固定收发地址，在 **固定 Topic** 中填写并保存 **订阅 Topic（Studio 接收请求）** 和 **发布 Topic（Studio 发送响应与推送）**。必须同时填写或同时留空；填写后按名称原样使用，不追加 `clientId`。具体限制参见 [第三方 Broker 的固定 Topic](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx#第三方-broker-的固定-topic)。更改并保存后旧连接会断开，需重新连接并重新订阅数据。
+
+4. 点击 *...* 按钮，呼出操作菜单，选择 **连接**，等待连接成功。第三方连接要求 Studio 账号有请求 Topic 的订阅权限，以及响应 Topic 的发布权限；连接阶段订阅被拒绝时，也会显示连接失败。
 
     ![连接第三方 Broker](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTExport-ConnectToThirdPartyBroker.png) 
+
+切换 Broker 目标会断开原转出连接，并清理原连接的数据订阅，但不会改变独立的本地服务开关。第三方配置会保留；切回第三方、修改连接参数、Studio 重启或第三方连接丢失后，需要通过 **... > 连接** 手动连接，连接后重新订阅数据。
 
 ## 测试 MQTT Broker 连接
 
@@ -120,11 +141,9 @@ keywords: ["Aqara 文档", "Aqara Studio", "以 MQTT 转出设备数据", "data 
 - 下列步骤以 MQTTX 为例，其他 MQTT 客户端工具的使用方法请阅读其官方文档。
 :::
 
-1. 从上述 Aqara Studio 的 **开发者** 页面中获取 MQTT 连接所需的所有信息（如 HOST、端口、用户名、密码），以及请求和响应 Topic 的格式。
+1. 使用本地 Broker 时，从独立的 **本地 MQTT Broker** 卡片复制连接信息；使用第三方 Broker 时，使用平台分配给您的应用的连接凭据和唯一客户端 ID。应用的凭据不一定与 Studio 的连接账号相同，均须具有各自需要的 Topic 权限。
 
-    下图以使用本地 Broker 为例：
-
-    ![获取 MQTT 连接所需信息](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTExport-FindInfo.png) 
+    在 **MQTT 转出** 卡片底部核对当前请求与响应 Topic。
 
 2. 参考 MQTTX 官方文档 [开始使用 - 快速建立连接](https://mqttx.app/zh/docs/get-started#%E5%BF%AB%E9%80%9F%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5)，使用上述获取的信息，建立 MQTT 连接。
 
@@ -134,20 +153,14 @@ keywords: ["Aqara 文档", "Aqara Studio", "以 MQTT 转出设备数据", "data 
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTX-NewSubscription.png" alt="新建订阅" style={{width: '60%'}} /> 
 
-    根据 Aqara Studio 显示的 **响应 Topic 格式**，将其中的 ClientID 替换为 MQTTX 自动生成的实际 ClientID，以完成对响应消息的订阅。
+    默认模式：把 **响应 Topic 格式** 中的 `{clientId}` 替换为 MQTTX 此连接的实际 Client ID。固定模式：直接订阅配置的 **发布 Topic**，不替换占位符、不拼接客户端 ID。
 
     选择 QoS 为 1，单击 **Confirm** 按钮，以创建订阅。
 
-    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-3.png" alt="订阅响应" style={{width: '60%'}} /> 
-
-4. 在已创建的订阅中，将 Aqara Studio 提供的 **请求 Topic 格式**中的 ClientID 替换为 MQTTX 自动生成的实际 ClientID，并填写到 Topic 输入框。
+4. 默认模式：把 **请求 Topic 格式** 中的 `{clientId}` 替换为同一个 MQTTX Client ID。固定模式：直接使用配置的 **订阅 Topic**。选择 QoS 1，关闭 Retain，再发布 JSON 请求。必须先订阅响应 Topic，再发送请求。
     
     参照 Aqara Developer [Studio 本地开发 - MQTT](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx) 中各接口的请求参数说明，编写 JSON 格式的消息并发送，即可获得响应。
 
-    下图以 [订阅全部设备数据](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx#订阅全部或指定设备) 的请求为例：
+    可先发送 [订阅全部设备数据](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx#订阅全部或指定设备) 的示例，核对响应 `msgId` 与请求一致、`code` 为 `0`，再观察实际推送。
 
-    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-4.png" alt="发送请求" style={{width: '70%'}} /> 
-
-    以下为响应示意图：
-
-    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-5.png" alt="收到响应" style={{width: '70%'}} /> 
+只有建立了数据订阅才需要周期性发送应用层 `ping`。建议在没有其他请求时每 30 秒内发送一次；持续收到推送不会自动续租。断线重连或会话过期后应重新订阅，详见 [心跳与订阅续租](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx#心跳与订阅续租)。

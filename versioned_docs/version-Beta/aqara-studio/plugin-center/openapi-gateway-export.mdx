@@ -1,0 +1,86 @@
+---
+title: "OpenAPI (Gateway) Export Plugin Instruction"
+description: "This article explains how to use gateways in Studio as a local API server. With the gateway’s local API server, you can still query and control the gateway and its sub-devices even if the connection to Aqara Studio is interrupted, and independently provide device and automation capabilities within the local network."
+keywords: ["Aqara Docs", "Aqara Studio", "OpenAPI (Gateway) Export Plugin Instruction", "openapi"]
+---
+
+# OpenAPI (Gateway) Export Plugin Instruction
+
+Aqara Studio provides a rich set of APIs that let you efficiently and securely access and manage device and automation data. By default, however, calling these APIs depends on the connection between Aqara Studio and each gateway. Once a gateway disconnects from Aqara Studio, you can no longer obtain the latest status of that gateway and its sub-devices through that link, nor control them.
+
+To address this, you can install the **OpenAPI (Gateway) Export** plugin so that Aqara Studio supports using a gateway as a local API server. With the gateway’s local API server, you can:
+- Query and control the gateway and its sub-devices even if the connection between the gateway and Aqara Studio is interrupted.
+- Use the gateway as an independent server that provides device and automation capabilities within the local network.
+- Independently manage each gateway’s service status, Token, and API whitelist.
+
+This article explains how to install the plugin in Aqara Studio, configure the gateway, and push the configuration to the gateway so it can independently listen, authenticate, and execute APIs. After a successful configuration push, you can connect directly to the gateway as long as the network is reachable; even if the gateway disconnects from Aqara Studio, the last successfully configured local OpenAPI service continues to run.
+
+## Prerequisites
+
+Before you begin, make sure your Aqara Studio is already [connected to Aqara Cloud](./../cloud.mdx).
+
+## Install the Plugin
+
+Refer to the [Plugin Marketplace](./../plugin-center.mdx) documentation:
+1. Go to [Aqara Builder Lab - Marketplace](https://builder.aqara.com/lab/plugin-store) and get the `OpenAPI (Gateway) Export` plugin.
+2. Assign it to Aqara Studio.
+3. Go to the **Plugin Center** in Aqara Studio and install the plugin.
+
+## Configuration Flow
+
+1. In the **Plugin Center**, find the `OpenAPI (Gateway) Export` plugin and click the **Transfer
+ Out** button.
+
+    ![Export button](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenAPI-Gateway-Export-ChooseThePlugin.png)
+
+2. The page navigates to the **Developer** page. Find **Gateway OpenAPI Service** and click the **New Service** button.
+
+    ![Create service](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenAPI-Gateway-NewService.png)
+
+3. Select the gateway to configure, then click the **Next step** button.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenAPI-Gateway-SelectDevicesAndNextStep.png" alt="Select gateway" style={{width: '60%'}} />
+
+4. Configure the service expiration time for this gateway, then click the **Next step** button.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenAPI-Gateway-ConfigureExpirationTime.png" alt="Set service expiration time" style={{width: '60%'}} />
+
+5. In the dialog, select the APIs this gateway is allowed to call, then click **Confirm and deploy**.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenAPI-Gateway-SelectAPI.png" alt="Select APIs" style={{width: '60%'}} />
+
+6. After a successful deployment, you can obtain the Token for this gateway from the dialog. Please keep it safe.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenAPI-Gateway-GetToken.png" alt="Get Token" style={{width: '60%'}} />
+
+7. Refresh the **Developer** page. You can then see the service you just configured in the **Gateway OpenAPI Service** card.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenAPI-Gateway-CheckNewService.png" alt="View new service" />
+
+## More Operations
+
+After configuring and deploying the Gateway OpenAPI Service, you can manage created services on the **Developer** page under **Gateway OpenAPI Service**, including [Enable and Disable Service](#enable-and-disable-service), [Modify Token Expiration Time](#modify-token-expiration-time), [Manage Available APIs](#manage-available-apis), and [Update Configuration](#update-configuration).
+
+### Enable and Disable Service
+
+After a service is created, it is **Enabled** by default. If you temporarily do not need this service, find the **Service Status** button for that service and click it to disable. After disabling, the gateway will no longer listen, authenticate, or execute APIs. To enable it again, click the same button.
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenAPI-Gateway-EnableService.png" alt="Enable and disable service" />
+
+### Modify Token Expiration Time
+
+If you need to change the Token expiration time, find the **Actions** column for that service and click **... > Edit Token**. After the change, the Token expiration time is updated to the newly set time.
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenAPI-Gateway-UpdateToken.png" alt="Modify Token expiration time" />
+
+### Manage Available APIs
+
+If you want to change the APIs this service is allowed to call, find the **Actions** column for that service and click **... > API Management**. In the dialog, select the APIs you need, then click **Confirm**.
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenAPI-Gateway-ManageAPI.png" alt="Manage available APIs" />
+
+### Update Configuration
+
+If you want to sync the latest service, Token, and API configuration from Studio to the gateway, find the **Actions** column for that service and click **... > Update configuration**. In the dialog, click **Confirm**.
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/OpenAPI-Gateway-UpdateConfiguration.png" alt="Update configuration" />

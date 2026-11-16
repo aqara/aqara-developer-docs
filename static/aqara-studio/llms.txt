@@ -31,6 +31,8 @@
 - Aqara Coap: https://docs.aqara.com/docs/aqara-studio/device-integration/aqara-coap
 - Infrared Equipment: https://docs.aqara.com/docs/aqara-studio/device-integration/virtual/infrared-equipment
 - Light Box: https://docs.aqara.com/docs/aqara-studio/device-integration/virtual/light-box
+- Group Control Equipment: https://docs.aqara.com/docs/aqara-studio/device-integration/virtual/group-control-equipment
+- Custom Device: https://docs.aqara.com/docs/aqara-studio/device-integration/virtual/custom-device
 - Export via Haystack Framework: https://docs.aqara.com/docs/aqara-studio/device-export/haystack
 - Data Export by MQTT: https://docs.aqara.com/docs/aqara-studio/data-export-by-mqtt
 - View and Edit Basic Information: https://docs.aqara.com/docs/aqara-studio/device-management/basic-information
@@ -69,14 +71,16 @@
 - Factory Reset: https://docs.aqara.com/docs/aqara-studio/factory-reset
 - Plugin Center: https://docs.aqara.com/docs/aqara-studio/plugin-center
 - AIOT Data Migration: https://docs.aqara.com/docs/aqara-studio/plugin-center/aiot-data-migration
+- OpenAPI (Gateway) Export Plugin Instruction: https://docs.aqara.com/docs/aqara-studio/plugin-center/openapi-gateway-export
 - Developer Guide: https://docs.aqara.com/docs/aqara-studio/developer-guide
 - HTTP Push: https://docs.aqara.com/docs/aqara-studio/http-push
 - Use Aqara Studio Skill in OpenClaw Web UI: https://docs.aqara.com/docs/aqara-studio/use-aqara-studio-skill-in-openclaw-web-ui
 - Connect to Aqara Studio MCP Server: https://docs.aqara.com/docs/aqara-studio/set-up-mcp-server
+- Matter Bridge: https://docs.aqara.com/docs/aqara-studio/matter-bridge
 - FAQ: https://docs.aqara.com/docs/aqara-studio/faq
-- JavaScript Script for MQTT Integration: https://docs.aqara.com/docs/aqara-studio/javascript-for-mqtt-integration
-- JavaScript for HTTP Integration: https://docs.aqara.com/docs/aqara-studio/javascript-for-http-integration
-- JavaScript Script for UDP and TCP Integration: https://docs.aqara.com/docs/aqara-studio/javascript-for-udp-tcp-integration
+- Third-Party Device Script Integration Guide: https://docs.aqara.com/docs/aqara-studio/ai-agent-device-onboarding
+- Protocol Script Specification: https://docs.aqara.com/docs/aqara-studio/unified-protocol-script
+- Protocol Script MCP/API Reference: https://docs.aqara.com/docs/aqara-studio/protocol-script-mcp-api
 - Unit Names and Symbols Supported by Scripts: https://docs.aqara.com/docs/aqara-studio/script-supported-unit-symbols
 - Numerical Mapping Functions: https://docs.aqara.com/docs/aqara-studio/numerical-mapping-functions
 - Studio Hub Comparison: https://docs.aqara.com/docs/aqara-studio/product-knowledge/gateways/studio-hub-comparison
