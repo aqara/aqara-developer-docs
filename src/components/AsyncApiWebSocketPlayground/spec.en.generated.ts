@@ -81,6 +81,7 @@ const aqaraLifeWebSocketSpecEn = {
       "action": "receive",
       "messages": [
         "TraitValueUpdate",
+        "CommandReport",
         "AlarmEvent",
         "ObjectEvent",
         "ErrorMessage"
@@ -88,6 +89,159 @@ const aqaraLifeWebSocketSpecEn = {
     }
   ],
   "messages": {
+    "CommandReport": {
+      "name": "CommandReport",
+      "title": "Gateway command execution result",
+      "summary": "Sent with v1 device-level or full-device subscriptions, preserving the original gateway result without indicating that the device physical action has been completed.",
+      "examples": [
+        {
+          "name": "command_report",
+          "payload": {
+            "type": "CommandReport",
+            "version": "v1",
+            "msgId": "report-example",
+            "studioId": "studio-example",
+            "eventId": "449fd6f6-c52c-4488-a3a2-828db5f9ab6e",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "deviceId": "device-1",
+              "sequence": 1,
+              "timestamp": 1793577600000,
+              "did": "gateway-device-example",
+              "reportTime": null,
+              "source": null,
+              "data": {
+                "2.148.33050.0": "0"
+              },
+              "content": {
+                "0": 0,
+                "2": 2
+              }
+            }
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "description": "All business notifications now carry studioId/eventId pair; ordinary historical messages allow omission for compatibility with legacy producers. Ordinary request/response messages do not reference this structure. Execution results and the four new scene object events have additional identity constraints.",
+        "dependencies": {
+          "eventId": [
+            "studioId"
+          ],
+          "studioId": [
+            "eventId"
+          ]
+        },
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data",
+          "code",
+          "message"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "CommandReport"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "object",
+            "required": [
+              "deviceId",
+              "sequence",
+              "timestamp",
+              "did",
+              "reportTime",
+              "source",
+              "data",
+              "content"
+            ],
+            "properties": {
+              "deviceId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sequence": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "timestamp": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Studio recorded time",
+                "Unix milliseconds": null
+              },
+              "did": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reportTime": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "Gateway original report time",
+                "null if not available": null
+              },
+              "source": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "data": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "content": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          },
+          "eventId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "An opaque string for this logical notification. It must contain at least one non-whitespace character. Store and compare it as-is without relying on its format. It remains unchanged across channels and HTTP retries. Consecutive notifications with the same content use different values."
+          },
+          "studioId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "The official Studio identity that publishes the notification. It must contain at least one non-whitespace character. It is not a gateway identity or an authentication credential."
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Processing result code. 0 indicates success, and any non-zero value indicates failure."
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Processing result message."
+          }
+        }
+      }
+    },
     "AuthRequest": {
       "name": "AuthRequest",
       "title": "WebSocket authentication request",
@@ -1130,8 +1284,16 @@ const aqaraLifeWebSocketSpecEn = {
         }
       ],
       "payloadSchema": {
-        "description": "WebSocket and HTTP shared raw alarm-push payload. WebSocket explicitly subscribes to `ALARM` to receive, and HTTP enables alarms according to configuration; does not use the app notification payload.",
+        "description": "All business notifications now carry studioId/eventId pair; ordinary historical messages allow omission for compatibility with legacy producers. Ordinary request/response messages do not reference this structure. Execution results and the four new scene object events have additional identity constraints.",
         "type": "object",
+        "dependencies": {
+          "eventId": [
+            "studioId"
+          ],
+          "studioId": [
+            "eventId"
+          ]
+        },
         "required": [
           "type",
           "version",
@@ -1249,6 +1411,18 @@ const aqaraLifeWebSocketSpecEn = {
                 }
               }
             }
+          },
+          "eventId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "An opaque string for this logical notification. It must contain at least one non-whitespace character. Store and compare it as-is without relying on its format. It remains unchanged across channels and HTTP retries. Consecutive notifications with the same content use different values."
+          },
+          "studioId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "The official Studio identity that publishes the notification. It must contain at least one non-whitespace character. It is not a gateway identity or an authentication credential."
           },
           "code": {
             "type": "integer",
@@ -1375,7 +1549,13 @@ const aqaraLifeWebSocketSpecEn = {
                       "AUTOMATION_ADDED",
                       "AUTOMATION_REMOVED",
                       "AUTOMATION_UPDATED",
-                      "AUTOMATION_SPACE_UPDATED"
+                      "AUTOMATION_SPACE_UPDATED",
+                      "AUTOMATION_EXECUTION_RESULT",
+                      "SCENE_EXECUTION_RESULT",
+                      "SCENE_ADDED",
+                      "SCENE_REMOVED",
+                      "SCENE_UPDATED",
+                      "SCENE_SPACE_UPDATED"
                     ]
                   }
                 },
@@ -1390,11 +1570,11 @@ const aqaraLifeWebSocketSpecEn = {
                     "type": "string",
                     "minLength": 1
                   },
-                  "description": "When subscribing, omitted, null, or empty objectIds means all objects within the current permission scope; when non-empty, only the specified objects are matched.\nWhen unsubscribing, omitted, null, or empty objectIds means clearing all rules for the corresponding eventTypes; when non-empty, only the specified objects are removed.\nWithin the same WebSocket session, at most 1000 distinct objectIds may be cumulatively subscribed under each eventType.\nWhen objectIds is non-empty, the eventTypes in the same item must belong to the same object type; SPACE_ADDED and AUTOMATION_ADDED support only the all-objects semantic.\nThe protocol does not use a scope field; the all-objects semantic is represented uniformly through objectIds.\n"
+                  "description": "When subscribing, omitted, null, or empty objectIds means all objects within the current permission scope; when non-empty, only the specified objects are matched.\nWhen unsubscribing, omitted, null, or empty objectIds means clearing all rules for the corresponding eventTypes; when non-empty, only the specified objects are removed.\nWithin the same WebSocket session, at most 1000 distinct objectIds may be cumulatively subscribed under each eventType.\nWhen objectIds is non-empty, the eventTypes in the same item must belong to the same public ID family (device, space, automation/scene); SPACE_ADDED, AUTOMATION_ADDED, and SCENE_ADDED support only the all-objects semantic.\nThe protocol does not use a scope field; the all-objects semantic is represented uniformly through objectIds.\n"
                 }
               }
             },
-            "description": "Must contain 1 to 100 subscription items. Requests are merged incrementally by session, and duplicate subscriptions are idempotent.\nSPACE_ADDED and AUTOMATION_ADDED only allow the all-objects semantic for objectIds.\n"
+            "description": "Must contain 1 to 100 subscription items. Requests are merged incrementally by session, and duplicate subscriptions are idempotent.\nSPACE_ADDED, AUTOMATION_ADDED, and SCENE_ADDED only allow the all-objects semantic for objectIds.\n"
           }
         }
       }
@@ -1546,7 +1726,13 @@ const aqaraLifeWebSocketSpecEn = {
                       "AUTOMATION_ADDED",
                       "AUTOMATION_REMOVED",
                       "AUTOMATION_UPDATED",
-                      "AUTOMATION_SPACE_UPDATED"
+                      "AUTOMATION_SPACE_UPDATED",
+                      "AUTOMATION_EXECUTION_RESULT",
+                      "SCENE_EXECUTION_RESULT",
+                      "SCENE_ADDED",
+                      "SCENE_REMOVED",
+                      "SCENE_UPDATED",
+                      "SCENE_SPACE_UPDATED"
                     ]
                   }
                 },
@@ -1561,7 +1747,7 @@ const aqaraLifeWebSocketSpecEn = {
                     "type": "string",
                     "minLength": 1
                   },
-                  "description": "When subscribing, omitted, null, or empty objectIds means all objects within the current permission scope; when non-empty, only the specified objects are matched.\nWhen unsubscribing, omitted, null, or empty objectIds means clearing all rules for the corresponding eventTypes; when non-empty, only the specified objects are removed.\nWithin the same WebSocket session, at most 1000 distinct objectIds may be cumulatively subscribed under each eventType.\nWhen objectIds is non-empty, the eventTypes in the same item must belong to the same object type; SPACE_ADDED and AUTOMATION_ADDED support only the all-objects semantic.\nThe protocol does not use a scope field; the all-objects semantic is represented uniformly through objectIds.\n"
+                  "description": "When subscribing, omitted, null, or empty objectIds means all objects within the current permission scope; when non-empty, only the specified objects are matched.\nWhen unsubscribing, omitted, null, or empty objectIds means clearing all rules for the corresponding eventTypes; when non-empty, only the specified objects are removed.\nWithin the same WebSocket session, at most 1000 distinct objectIds may be cumulatively subscribed under each eventType.\nWhen objectIds is non-empty, the eventTypes in the same item must belong to the same public ID family (device, space, automation/scene); SPACE_ADDED, AUTOMATION_ADDED, and SCENE_ADDED support only the all-objects semantic.\nThe protocol does not use a scope field; the all-objects semantic is represented uniformly through objectIds.\n"
                 }
               }
             },
@@ -1633,6 +1819,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "traitValueUpdate",
           "payload": {
             "type": "TraitValueUpdate",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000002",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "1754469720110",
             "data": [
@@ -1653,6 +1841,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "deviceNameUpdated",
           "payload": {
             "type": "TraitValueUpdate",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000003",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "1789113600000",
             "data": [
@@ -1672,6 +1862,15 @@ const aqaraLifeWebSocketSpecEn = {
       ],
       "payloadSchema": {
         "type": "object",
+        "description": "All business notifications now carry studioId/eventId pair; ordinary historical messages allow omission for compatibility with legacy producers. Ordinary request/response messages do not reference this structure. Execution results and the four new scene object events have additional identity constraints.",
+        "dependencies": {
+          "eventId": [
+            "studioId"
+          ],
+          "studioId": [
+            "eventId"
+          ]
+        },
         "required": [
           "type",
           "version",
@@ -1739,6 +1938,18 @@ const aqaraLifeWebSocketSpecEn = {
               }
             }
           },
+          "eventId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "An opaque string for this logical notification. It must contain at least one non-whitespace character. Store and compare it as-is without relying on its format. It remains unchanged across channels and HTTP retries. Consecutive notifications with the same content use different values."
+          },
+          "studioId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "The official Studio identity that publishes the notification. It must contain at least one non-whitespace character. It is not a gateway identity or an authentication credential."
+          },
           "code": {
             "type": "integer",
             "format": "int32",
@@ -1757,13 +1968,114 @@ const aqaraLifeWebSocketSpecEn = {
     "ObjectEvent": {
       "name": "objectEvent",
       "title": "Object event push",
-      "summary": "Device add/remove events are pushed by default; changes to spaces, automations, and space relationships are delivered according to precise object subscriptions. Current 13 object event types are provided with examples.",
-      "description": "DEVICE_ADDED and DEVICE_REMOVED are pushed by default after an authenticated connection is established.\n\nSPACE_*, AUTOMATION_*, and DEVICE_SPACE_UPDATED are delivered only to SubscribeObjectEventRequest sessions that match the eventType, objectId, and current permissions.\n\nDEVICE_ENDPOINT_* and DEVICE_TRAIT_PARAMETER_UPDATE continue to follow the existing device-data subscriptions.\n\nIndependent scenes are managed through `/scenes`, and change notifications reuse the `AUTOMATION_*` event family. Object classification is based on the query results from `/automations` and `/scenes`. No separate event is provided for count changes. Creating or deleting an automation sends only the corresponding lifecycle snapshot and does not additionally send a space-relationship event. For an existing object, `AUTOMATION_SPACE_UPDATED` is sent only when its space relationship changes. If both the content and the relationship change at the same time, both types of events may be received.\n\nThe `manualTriggers` field in an automation snapshot contains `triggerNodeId` and `triggerName`. Adding, deleting, or renaming a manual trigger entry returns the full list through `AUTOMATION_UPDATED`. Replace the cache with the full list, and clear previous entries when the array is empty. No additional event subscription type is required.\n\nThe protocol does not provide a globally unique event ID; the push `msgId` is only for link tracing. Callers should process events idempotently according to object state rather than deduplicating only by `objectId`, `eventType`, and `time`.\n",
+      "summary": "Device add/remove events are pushed by default; changes to spaces, automations, standalone scenes, and space relationships are delivered according to precise object subscriptions. Current 19 object event types are provided with examples.",
+      "description": "DEVICE_ADDED and DEVICE_REMOVED are pushed by default after an authenticated connection is established.\n\nDEVICE_SPACE_UPDATED, the three SPACE_* changes, the four AUTOMATION_* changes, the four SCENE_* changes, and AUTOMATION_EXECUTION_RESULT and SCENE_EXECUTION_RESULT are delivered only to SubscribeObjectEventRequest sessions that match the eventType, objectId, and current permissions.\n\nDEVICE_ENDPOINT_* and DEVICE_TRAIT_PARAMETER_UPDATE continue to follow the existing device-data subscriptions.\n\nIndependent scenes are managed through `/scenes`, and change notifications use four `SCENE_*` event families, still using `AUTOMATION_*` for automation. Trustworthiness is determined by the server. No separate event is provided for count changes. Creating or deleting an automation sends only the corresponding lifecycle snapshot and does not additionally send a space-relationship event. For an existing object, `AUTOMATION_SPACE_UPDATED` is sent only when its space relationship changes. If both the content and the relationship change at the same time, both types of events may be received.\n\nIndependent scenes use `SCENE_ADDED/REMOVED/UPDATED/SPACE_UPDATED`, no longer sending `AUTOMATION_*`; the `sceneId` still uses the `auto_` prefix. Old automation manual entries still belong to automation. Scene definition comparison excludes space, and space and definition changes in the same batch generate two different `eventId` notifications.\n\nThe `manualTriggers` field in an automation snapshot contains `triggerNodeId` and `triggerName`. Adding, deleting, or renaming a manual trigger entry returns the full list through `AUTOMATION_UPDATED`. Replace the cache with the full list, and clear previous entries when the array is empty. No additional event subscription type is required.\n\nmsgId is used only for trace correlation. New business notifications are idempotent by `studioId` + `eventId`; old object changes without a common identity are idempotently handled based on object state, and should not be deduplicated solely by `objectId`, `eventType`, or `time`.\n\n\nThe new `AUTOMATION_EXECUTION_RESULT` and `SCENE_EXECUTION_RESULT` events notify per effective action record, for automations and scenes respectively. They are not completion events for an entire execution. Both Studio and Gateway are covered. A native optimization is notified once per native call. An unconfirmed result is unknown and is not expanded into per-device successes.\n\nThe two new events and the four independent scene changes must carry the common-layer `studioId` and `eventId`. The same notification identity is kept across channels and HTTP retries. The action results can be trimmed according to the receiver's permissions. They are idempotent by `studioId` + `eventId`. `executionId` only correlates an execution and is explicitly `null` when unavailable. A new subscription may receive records that the shared queue has not yet delivered. Historical replay is not provided.\n",
       "examples": [
+        {
+          "name": "scene_added",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "trace-scene_added",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000020",
+            "studioId": "studio-example",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "eventType": "SCENE_ADDED",
+              "objectId": "auto_scene001",
+              "time": 1793836800123,
+              "data": {
+                "objectId": "auto_scene001",
+                "name": "Movie scene",
+                "createTime": 1793836800000,
+                "spaces": []
+              }
+            }
+          }
+        },
+        {
+          "name": "scene_removed",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "trace-scene_removed",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000021",
+            "studioId": "studio-example",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "eventType": "SCENE_REMOVED",
+              "objectId": "auto_scene001",
+              "time": 1793836800123,
+              "data": {
+                "objectId": "auto_scene001",
+                "name": "Movie scene",
+                "createTime": 1793836800000,
+                "spaces": []
+              }
+            }
+          }
+        },
+        {
+          "name": "scene_updated",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "trace-scene_updated",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000022",
+            "studioId": "studio-example",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "eventType": "SCENE_UPDATED",
+              "objectId": "auto_scene001",
+              "time": 1793836800123,
+              "data": {
+                "objectId": "auto_scene001",
+                "name": "Movie scene",
+                "createTime": 1793836800000,
+                "spaces": []
+              }
+            }
+          }
+        },
+        {
+          "name": "scene_space_updated",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "trace-scene_space_updated",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000023",
+            "studioId": "studio-example",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "eventType": "SCENE_SPACE_UPDATED",
+              "objectId": "auto_scene001",
+              "time": 1793836800123,
+              "data": {
+                "objectId": "auto_scene001",
+                "oldSpaceIds": [
+                  "space-old"
+                ],
+                "spaces": [
+                  {
+                    "spaceId": "space-new",
+                    "name": "会议室",
+                    "parentSpaceId": null
+                  }
+                ]
+              }
+            }
+          }
+        },
         {
           "name": "deviceAdded",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000004",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "2",
             "data": {
@@ -1792,6 +2104,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "deviceSpaceUpdated",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000005",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "object-event-1",
             "data": {
@@ -1817,6 +2131,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "automationUpdated",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000006",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "object-event-2",
             "data": {
@@ -1826,13 +2142,13 @@ const aqaraLifeWebSocketSpecEn = {
               "data": {
                 "automationId": "automation-1",
                 "definitionType": "SCRIPT_JSON",
-                "name": "Home Mode",
+                "name": "Home mode",
                 "enabled": true,
                 "createTime": 1789000000000,
                 "manualTriggers": [
                   {
                     "triggerNodeId": "trigger-1",
-                    "triggerName": "Enable Home Mode"
+                    "triggerName": "Enable home mode"
                   }
                 ]
               }
@@ -1845,6 +2161,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "automationSpaceUnassigned",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000007",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "object-event-3",
             "data": {
@@ -1854,7 +2172,11 @@ const aqaraLifeWebSocketSpecEn = {
               "data": {
                 "automationId": "automation-1",
                 "oldSpaceId": "space-2",
-                "space": null
+                "oldSpaceIds": [
+                  "space-2",
+                  "space-3"
+                ],
+                "spaces": []
               }
             },
             "code": 0,
@@ -1865,6 +2187,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "device_removed",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000008",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-device_removed",
             "data": {
@@ -1873,7 +2197,7 @@ const aqaraLifeWebSocketSpecEn = {
               "time": 1793577600000,
               "data": {
                 "deviceId": "device-1",
-                "name": "Living Room Light",
+                "name": "Living room light",
                 "deviceTypesList": [
                   "Light"
                 ],
@@ -1892,6 +2216,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "device_endpoint_added",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000009",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-device_endpoint_added",
             "data": {
@@ -1900,7 +2226,7 @@ const aqaraLifeWebSocketSpecEn = {
               "time": 1793577600000,
               "data": {
                 "deviceId": "device-1",
-                "name": "Living Room Light",
+                "name": "Living room light",
                 "deviceTypesList": [
                   "Light"
                 ],
@@ -1920,6 +2246,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "device_endpoint_removed",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-00000000000a",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-device_endpoint_removed",
             "data": {
@@ -1928,7 +2256,7 @@ const aqaraLifeWebSocketSpecEn = {
               "time": 1793577600000,
               "data": {
                 "deviceId": "device-1",
-                "name": "Living Room Light",
+                "name": "Living room light",
                 "deviceTypesList": [
                   "Light"
                 ],
@@ -1947,6 +2275,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "device_trait_parameter_update",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-00000000000b",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-device_trait_parameter_update",
             "data": {
@@ -1986,6 +2316,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "space_added",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-00000000000c",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-space_added",
             "data": {
@@ -2007,6 +2339,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "space_removed",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-00000000000d",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-space_removed",
             "data": {
@@ -2028,6 +2362,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "space_updated",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-00000000000e",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-space_updated",
             "data": {
@@ -2036,7 +2372,7 @@ const aqaraLifeWebSocketSpecEn = {
               "time": 1793577600000,
               "data": {
                 "spaceId": "space-2",
-                "name": "Master Bedroom",
+                "name": "Master bedroom",
                 "spatialMarking": "room",
                 "parentSpaceId": "home-1"
               }
@@ -2049,6 +2385,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "automation_added",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-00000000000f",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-automation_added",
             "data": {
@@ -2058,7 +2396,7 @@ const aqaraLifeWebSocketSpecEn = {
               "data": {
                 "automationId": "automation-1",
                 "definitionType": "WHEN_IF_THEN",
-                "name": "Home Mode",
+                "name": "Home mode",
                 "enabled": true,
                 "createTime": 1793491200000,
                 "manualTriggers": []
@@ -2072,6 +2410,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "automation_removed",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000010",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-automation_removed",
             "data": {
@@ -2081,7 +2421,7 @@ const aqaraLifeWebSocketSpecEn = {
               "data": {
                 "automationId": "automation-1",
                 "definitionType": "WHEN_IF_THEN",
-                "name": "Home Mode",
+                "name": "Home mode",
                 "enabled": true,
                 "createTime": 1793491200000,
                 "manualTriggers": []
@@ -2095,6 +2435,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "automationSpaceAssigned",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000011",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-automation_space_updated",
             "data": {
@@ -2109,7 +2451,16 @@ const aqaraLifeWebSocketSpecEn = {
                   "name": "Bedroom",
                   "spatialMarking": "room",
                   "parentSpaceId": "home-1"
-                }
+                },
+                "oldSpaceIds": [],
+                "spaces": [
+                  {
+                    "spaceId": "space-2",
+                    "name": "Bedroom",
+                    "spatialMarking": "room",
+                    "parentSpaceId": "home-1"
+                  }
+                ]
               }
             },
             "code": 0,
@@ -2120,6 +2471,8 @@ const aqaraLifeWebSocketSpecEn = {
           "name": "deviceSpaceUnassigned",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000012",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-device_space_updated",
             "data": {
@@ -2135,10 +2488,103 @@ const aqaraLifeWebSocketSpecEn = {
             "code": 0,
             "message": "success"
           }
+        },
+        {
+          "name": "sceneActionResult",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "trace-example",
+            "eventId": "449fd6f6-c52c-4488-a3a2-828db5f9ab6e",
+            "studioId": "studio-example",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "eventType": "SCENE_EXECUTION_RESULT",
+              "objectId": "auto_scene001",
+              "time": 1793664000123,
+              "data": {
+                "objectId": "auto_scene001",
+                "name": "Home scene",
+                "executionId": "opaque-run-example",
+                "triggeredAt": 1793664000000,
+                "actionOccurredAt": null,
+                "executeMode": "Gateway",
+                "resultCode": 0,
+                "actionKind": "device_write",
+                "actionTarget": {
+                  "type": "device",
+                  "id": "device-example",
+                  "name": "Living room light",
+                  "resourceId": "4.1.85",
+                  "resourceName": "开关"
+                },
+                "triggerSource": {
+                  "sourceType": 60,
+                  "triggerSubjectId": null,
+                  "triggerSubjectName": null,
+                  "triggerResourceId": null,
+                  "triggerResourceName": null
+                },
+                "spaces": [
+                  {
+                    "spaceId": "space-example",
+                    "name": "Living room",
+                    "parentSpaceId": null
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "name": "automationNativeInvocationUnknown",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "trace-native-example",
+            "eventId": "6f913a2c-9484-42d5-bfa9-00b0b1fd23ee",
+            "studioId": "studio-example",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "eventType": "AUTOMATION_EXECUTION_RESULT",
+              "objectId": "auto_automation001",
+              "time": 1793664000123,
+              "data": {
+                "objectId": "auto_automation001",
+                "name": "Away automation",
+                "executionId": "opaque-run-example",
+                "triggeredAt": 1793664000000,
+                "actionOccurredAt": null,
+                "executeMode": "Studio",
+                "resultCode": 2,
+                "actionKind": "native_scene_recall",
+                "actionTarget": null,
+                "triggerSource": {
+                  "sourceType": 51,
+                  "triggerSubjectId": null,
+                  "triggerSubjectName": null,
+                  "triggerResourceId": null,
+                  "triggerResourceName": null
+                },
+                "spaces": []
+              }
+            }
+          }
         }
       ],
       "payloadSchema": {
         "type": "object",
+        "description": "All business notifications now carry studioId/eventId pair; ordinary historical messages allow omission for compatibility with legacy producers. Ordinary request/response messages do not reference this structure. Execution results and the four new scene object events have additional identity constraints.",
+        "dependencies": {
+          "eventId": [
+            "studioId"
+          ],
+          "studioId": [
+            "eventId"
+          ]
+        },
         "required": [
           "type",
           "version",
@@ -2182,7 +2628,7 @@ const aqaraLifeWebSocketSpecEn = {
               },
               "objectId": {
                 "type": "string",
-                "description": "Object ID; depending on the event type, this is a device, space, or automation ID."
+                "description": "Object ID; by event type, device, space, automation, or scene ID. The scene value still uses `auto_<nodeID>` and cannot be classified by the ID prefix."
               },
               "time": {
                 "type": "integer",
@@ -2194,7 +2640,7 @@ const aqaraLifeWebSocketSpecEn = {
                   "object",
                   "null"
                 ],
-                "description": "The concrete structure is determined by `eventType`. The current structures are described by PushObjectEventDeviceData, PushObjectEventTraitParameterData, DeviceSpaceUpdateEventData, SpaceEventData, AutomationPushSnapshot, and AutomationSpaceUpdateEventData.\nFuture new structures may be added on the push side; PreciseObjectEventType in subscription requests remains a strict enum in the current version.\n",
+                "description": "The concrete structure is determined by `eventType`. The current structures are described by PushObjectEventDeviceData, PushObjectEventTraitParameterData, DeviceSpaceUpdateEventData, SpaceEventData, AutomationPushSnapshot, AutomationSpaceUpdateEventData, ScenePushSnapshot, SceneSpaceUpdateEventData and ExecutionResultData.\nFuture new structures may be added on the push side; PreciseObjectEventType in subscription requests remains a strict enum in the current version.\n",
                 "oneOf": [
                   {
                     "type": "object",
@@ -2688,7 +3134,7 @@ const aqaraLifeWebSocketSpecEn = {
                   },
                   {
                     "type": "object",
-                    "description": "Lightweight snapshot used for automation and standalone scene change notifications; does not include the full config. For known scenes, the `automationId` event field is the sceneId; distinguish the type according to the query list, and query details via GET /automations/{automationId} or GET /scenes/{sceneId} respectively. The scene list does not use `enabled` or `definitionType` in the snapshot. manualtriggers are the complete list of manual trigger entries inside the automation, and changes to them also trigger `AUTOMATION_UPDATED`.",
+                    "description": "Lightweight snapshot used for automation object changes; does not include the full config. Query details via GET /automations/{automationId}. manualTriggers is the complete replacement list of manual trigger entries inside the old automation; standalone scenes use ScenePushSnapshot. Use the last stable merge baseline for deletion.",
                     "required": [
                       "automationId",
                       "definitionType",
@@ -2746,7 +3192,7 @@ const aqaraLifeWebSocketSpecEn = {
                   },
                   {
                     "type": "object",
-                    "description": "Lightweight snapshot used for automation and standalone scene change notifications; does not include the full config. For known scenes, the `automationId` event field is the sceneId; distinguish the type according to the query list, and query details via GET /automations/{automationId} or GET /scenes/{sceneId} respectively. The scene list does not use `enabled` or `definitionType` in the snapshot. manualtriggers are the complete list of manual trigger entries inside the automation, and changes to them also trigger `AUTOMATION_UPDATED`.",
+                    "description": "Lightweight snapshot used for automation object changes; does not include the full config. Query details via GET /automations/{automationId}. manualTriggers is the complete replacement list of manual trigger entries inside the old automation; standalone scenes use ScenePushSnapshot. Use the last stable merge baseline for deletion.",
                     "required": [
                       "automationId",
                       "definitionType",
@@ -2804,7 +3250,7 @@ const aqaraLifeWebSocketSpecEn = {
                   },
                   {
                     "type": "object",
-                    "description": "Lightweight snapshot used for automation and standalone scene change notifications; does not include the full config. For known scenes, the `automationId` event field is the sceneId; distinguish the type according to the query list, and query details via GET /automations/{automationId} or GET /scenes/{sceneId} respectively. The scene list does not use `enabled` or `definitionType` in the snapshot. manualtriggers are the complete list of manual trigger entries inside the automation, and changes to them also trigger `AUTOMATION_UPDATED`.",
+                    "description": "Lightweight snapshot used for automation object changes; does not include the full config. Query details via GET /automations/{automationId}. manualTriggers is the complete replacement list of manual trigger entries inside the old automation; standalone scenes use ScenePushSnapshot. Use the last stable merge baseline for deletion.",
                     "required": [
                       "automationId",
                       "definitionType",
@@ -2864,8 +3310,8 @@ const aqaraLifeWebSocketSpecEn = {
                     "type": "object",
                     "required": [
                       "automationId",
-                      "oldSpaceId",
-                      "space"
+                      "oldSpaceIds",
+                      "spaces"
                     ],
                     "properties": {
                       "automationId": {
@@ -2877,7 +3323,7 @@ const aqaraLifeWebSocketSpecEn = {
                           "string",
                           "null"
                         ],
-                        "description": "Space ID before the change; null when associated for the first time."
+                        "description": "Compatibility field. Uses the first item of `oldSpaceIds`. `null` or omitted when there is no previous association."
                       },
                       "space": {
                         "anyOf": [
@@ -2918,14 +3364,709 @@ const aqaraLifeWebSocketSpecEn = {
                             "type": "null"
                           }
                         ],
-                        "description": "Space summary at the time the relationship changes; null when the relationship is removed. Read the space ID from `space.spaceId`; subsequent name, marking, or parent changes should update a unified space cache via SPACE_UPDATED. This relationship also applies to scenes inside the automation."
+                        "description": "Compatibility field. Uses the first item of `spaces`. `null` or omitted when there is no new association. The complete relationship is defined by `spaces`. Independent scenes use `SCENE_SPACE_UPDATED`."
+                      },
+                      "oldSpaceIds": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Complete list of associated space IDs before the change. `[]` when there is no previous association."
+                      },
+                      "spaces": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "description": "Latest space summary. The client should maintain a unified space cache by `spaceId` to avoid repeatedly storing potentially stale names, markings, and parent relationships in device or automation relationship data; `parentSpaceId` indicates the parent space of the summary, and is null for a root space.",
+                          "required": [
+                            "spaceId",
+                            "name",
+                            "parentSpaceId"
+                          ],
+                          "properties": {
+                            "spaceId": {
+                              "type": "string",
+                              "description": "Space ID."
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "Space name."
+                            },
+                            "spatialMarking": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Space marking; null when no marking exists."
+                            },
+                            "parentSpaceId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Parent space ID of the space; null for a root space. For SPACE_ADDED and SPACE_UPDATED this is the parent space after the event; for SPACE_REMOVED it is the parent space before deletion."
+                            }
+                          }
+                        },
+                        "description": "Complete array of space summaries after the change. `[]` when no association can be resolved. The client replaces the relationship as a whole. The event is still sent when other spaces change, even if the first item stays the same. Name, marking, and parent changes update the unified space cache through `SPACE_UPDATED`."
                       }
                     },
                     "title": "AUTOMATION_SPACE_UPDATED"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "objectId",
+                      "name",
+                      "executionId",
+                      "triggeredAt",
+                      "actionOccurredAt",
+                      "executeMode",
+                      "resultCode",
+                      "actionKind",
+                      "actionTarget",
+                      "triggerSource",
+                      "spaces"
+                    ],
+                    "properties": {
+                      "objectId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Public automation or scene ID, identical to the outer `objectId`."
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Snapshot of the object name at the time the record was received."
+                      },
+                      "executionId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "Opaque execution correlation. `null` when unreliable. Do not use it to deduplicate different actions or to decide that the whole execution has finished."
+                      },
+                      "triggeredAt": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "description": "Trusted trigger time of the original execution chain, in Unix milliseconds. `null` when unknown. A nested scene may inherit the originating time."
+                      },
+                      "actionOccurredAt": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "description": "Trusted time when the upstream action result occurred, in Unix milliseconds. `null` when not provided. Do not fill in the receive time."
+                      },
+                      "executeMode": {
+                        "type": "string",
+                        "enum": [
+                          "Studio",
+                          "Gateway"
+                        ],
+                        "description": "The actual executor. Studio remains `Studio` when it controls a device through a gateway."
+                      },
+                      "resultCode": {
+                        "type": "integer",
+                        "enum": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "description": "`0` means this record succeeded or is non-failure under the existing business rules, `1` means failure, and `2` means unknown. It does not summarize the whole execution or indicate that a physical action completed."
+                      },
+                      "actionKind": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Stable action category, such as `device_write`, `variable_set`, `flow_invoke`, or `native_scene_recall`. Unknown categories added in the future must be tolerated."
+                      },
+                      "actionTarget": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "required": [
+                              "type",
+                              "id",
+                              "name",
+                              "resourceId",
+                              "resourceName"
+                            ],
+                            "properties": {
+                              "type": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "name": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "resourceId": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "resourceName": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            },
+                            "description": "Summary of the target identity and its name in the default language. A resource is provided only when it can be mapped reliably. Content the caller is not permitted to see is explicitly empty. Clients must tolerate new target categories."
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "triggerSource": {
+                        "type": "object",
+                        "required": [
+                          "sourceType",
+                          "triggerSubjectId",
+                          "triggerSubjectName",
+                          "triggerResourceId",
+                          "triggerResourceName"
+                        ],
+                        "properties": {
+                          "sourceType": {
+                            "type": "integer",
+                            "description": "Reuses the trigger-source protocol code. The fine-grained trigger category cannot be inferred from this code alone."
+                          },
+                          "triggerSubjectId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "triggerSubjectName": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "triggerResourceId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "triggerResourceName": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        }
+                      },
+                      "spaces": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "description": "Latest space summary. The client should maintain a unified space cache by `spaceId` to avoid repeatedly storing potentially stale names, markings, and parent relationships in device or automation relationship data; `parentSpaceId` indicates the parent space of the summary, and is null for a root space.",
+                          "required": [
+                            "spaceId",
+                            "name",
+                            "parentSpaceId"
+                          ],
+                          "properties": {
+                            "spaceId": {
+                              "type": "string",
+                              "description": "Space ID."
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "Space name."
+                            },
+                            "spatialMarking": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Space marking; null when no marking exists."
+                            },
+                            "parentSpaceId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Parent space ID of the space; null for a root space. For SPACE_ADDED and SPACE_UPDATED this is the parent space after the event; for SPACE_REMOVED it is the parent space before deletion."
+                            }
+                          }
+                        },
+                        "description": "All associated space summaries that can be provided. `[]` when there is no association."
+                      }
+                    },
+                    "description": "Immutable business payload for one effective action record. Keys declared nullable are always present and explicitly `null`. Names use the Studio default language.",
+                    "title": "AUTOMATION_EXECUTION_RESULT"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "objectId",
+                      "name",
+                      "executionId",
+                      "triggeredAt",
+                      "actionOccurredAt",
+                      "executeMode",
+                      "resultCode",
+                      "actionKind",
+                      "actionTarget",
+                      "triggerSource",
+                      "spaces"
+                    ],
+                    "properties": {
+                      "objectId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Public automation or scene ID, identical to the outer `objectId`."
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Snapshot of the object name at the time the record was received."
+                      },
+                      "executionId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "Opaque execution correlation. `null` when unreliable. Do not use it to deduplicate different actions or to decide that the whole execution has finished."
+                      },
+                      "triggeredAt": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "description": "Trusted trigger time of the original execution chain, in Unix milliseconds. `null` when unknown. A nested scene may inherit the originating time."
+                      },
+                      "actionOccurredAt": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "description": "Trusted time when the upstream action result occurred, in Unix milliseconds. `null` when not provided. Do not fill in the receive time."
+                      },
+                      "executeMode": {
+                        "type": "string",
+                        "enum": [
+                          "Studio",
+                          "Gateway"
+                        ],
+                        "description": "The actual executor. Studio remains `Studio` when it controls a device through a gateway."
+                      },
+                      "resultCode": {
+                        "type": "integer",
+                        "enum": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "description": "`0` means this record succeeded or is non-failure under the existing business rules, `1` means failure, and `2` means unknown. It does not summarize the whole execution or indicate that a physical action completed."
+                      },
+                      "actionKind": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Stable action category, such as `device_write`, `variable_set`, `flow_invoke`, or `native_scene_recall`. Unknown categories added in the future must be tolerated."
+                      },
+                      "actionTarget": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "required": [
+                              "type",
+                              "id",
+                              "name",
+                              "resourceId",
+                              "resourceName"
+                            ],
+                            "properties": {
+                              "type": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "name": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "resourceId": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "resourceName": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            },
+                            "description": "Summary of the target identity and its name in the default language. A resource is provided only when it can be mapped reliably. Content the caller is not permitted to see is explicitly empty. Clients must tolerate new target categories."
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "triggerSource": {
+                        "type": "object",
+                        "required": [
+                          "sourceType",
+                          "triggerSubjectId",
+                          "triggerSubjectName",
+                          "triggerResourceId",
+                          "triggerResourceName"
+                        ],
+                        "properties": {
+                          "sourceType": {
+                            "type": "integer",
+                            "description": "Reuses the trigger-source protocol code. The fine-grained trigger category cannot be inferred from this code alone."
+                          },
+                          "triggerSubjectId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "triggerSubjectName": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "triggerResourceId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "triggerResourceName": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        }
+                      },
+                      "spaces": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "description": "Latest space summary. The client should maintain a unified space cache by `spaceId` to avoid repeatedly storing potentially stale names, markings, and parent relationships in device or automation relationship data; `parentSpaceId` indicates the parent space of the summary, and is null for a root space.",
+                          "required": [
+                            "spaceId",
+                            "name",
+                            "parentSpaceId"
+                          ],
+                          "properties": {
+                            "spaceId": {
+                              "type": "string",
+                              "description": "Space ID."
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "Space name."
+                            },
+                            "spatialMarking": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Space marking; null when no marking exists."
+                            },
+                            "parentSpaceId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Parent space ID of the space; null for a root space. For SPACE_ADDED and SPACE_UPDATED this is the parent space after the event; for SPACE_REMOVED it is the parent space before deletion."
+                            }
+                          }
+                        },
+                        "description": "All associated space summaries that can be provided. `[]` when there is no association."
+                      }
+                    },
+                    "description": "Immutable business payload for one effective action record. Keys declared nullable are always present and explicitly `null`. Names use the Studio default language.",
+                    "title": "SCENE_EXECUTION_RESULT"
+                  },
+                  {
+                    "type": "object",
+                    "description": "Lightweight snapshot of an independent scene. `objectId` matches the outer value and is the `sceneId` returned by the scenes query (`auto_` prefix). It does not include `enabled`, `manualTriggers`, or the full action configuration. Deletion uses the last stable merged baseline.",
+                    "required": [
+                      "objectId",
+                      "name",
+                      "createTime",
+                      "spaces"
+                    ],
+                    "properties": {
+                      "objectId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "createTime": {
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "spaces": {
+                        "type": "array",
+                        "description": "Complete effective space summaries, including calculated inherited results. An empty array when there is no effective relationship.",
+                        "items": {
+                          "type": "object",
+                          "description": "Latest space summary. The client should maintain a unified space cache by `spaceId` to avoid repeatedly storing potentially stale names, markings, and parent relationships in device or automation relationship data; `parentSpaceId` indicates the parent space of the summary, and is null for a root space.",
+                          "required": [
+                            "spaceId",
+                            "name",
+                            "parentSpaceId"
+                          ],
+                          "properties": {
+                            "spaceId": {
+                              "type": "string",
+                              "description": "Space ID."
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "Space name."
+                            },
+                            "spatialMarking": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Space marking; null when no marking exists."
+                            },
+                            "parentSpaceId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Parent space ID of the space; null for a root space. For SPACE_ADDED and SPACE_UPDATED this is the parent space after the event; for SPACE_REMOVED it is the parent space before deletion."
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "title": "SCENE_ADDED"
+                  },
+                  {
+                    "type": "object",
+                    "description": "Lightweight snapshot of an independent scene. `objectId` matches the outer value and is the `sceneId` returned by the scenes query (`auto_` prefix). It does not include `enabled`, `manualTriggers`, or the full action configuration. Deletion uses the last stable merged baseline.",
+                    "required": [
+                      "objectId",
+                      "name",
+                      "createTime",
+                      "spaces"
+                    ],
+                    "properties": {
+                      "objectId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "createTime": {
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "spaces": {
+                        "type": "array",
+                        "description": "Complete effective space summaries, including calculated inherited results. An empty array when there is no effective relationship.",
+                        "items": {
+                          "type": "object",
+                          "description": "Latest space summary. The client should maintain a unified space cache by `spaceId` to avoid repeatedly storing potentially stale names, markings, and parent relationships in device or automation relationship data; `parentSpaceId` indicates the parent space of the summary, and is null for a root space.",
+                          "required": [
+                            "spaceId",
+                            "name",
+                            "parentSpaceId"
+                          ],
+                          "properties": {
+                            "spaceId": {
+                              "type": "string",
+                              "description": "Space ID."
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "Space name."
+                            },
+                            "spatialMarking": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Space marking; null when no marking exists."
+                            },
+                            "parentSpaceId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Parent space ID of the space; null for a root space. For SPACE_ADDED and SPACE_UPDATED this is the parent space after the event; for SPACE_REMOVED it is the parent space before deletion."
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "title": "SCENE_REMOVED"
+                  },
+                  {
+                    "type": "object",
+                    "description": "Lightweight snapshot of an independent scene. `objectId` matches the outer value and is the `sceneId` returned by the scenes query (`auto_` prefix). It does not include `enabled`, `manualTriggers`, or the full action configuration. Deletion uses the last stable merged baseline.",
+                    "required": [
+                      "objectId",
+                      "name",
+                      "createTime",
+                      "spaces"
+                    ],
+                    "properties": {
+                      "objectId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "createTime": {
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "spaces": {
+                        "type": "array",
+                        "description": "Complete effective space summaries, including calculated inherited results. An empty array when there is no effective relationship.",
+                        "items": {
+                          "type": "object",
+                          "description": "Latest space summary. The client should maintain a unified space cache by `spaceId` to avoid repeatedly storing potentially stale names, markings, and parent relationships in device or automation relationship data; `parentSpaceId` indicates the parent space of the summary, and is null for a root space.",
+                          "required": [
+                            "spaceId",
+                            "name",
+                            "parentSpaceId"
+                          ],
+                          "properties": {
+                            "spaceId": {
+                              "type": "string",
+                              "description": "Space ID."
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "Space name."
+                            },
+                            "spatialMarking": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Space marking; null when no marking exists."
+                            },
+                            "parentSpaceId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Parent space ID of the space; null for a root space. For SPACE_ADDED and SPACE_UPDATED this is the parent space after the event; for SPACE_REMOVED it is the parent space before deletion."
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "title": "SCENE_UPDATED"
+                  },
+                  {
+                    "type": "object",
+                    "description": "Full replacement of a scene's space relationships. The compatibility single values `oldSpaceId` and `space` are not provided. After direct relationships are cleared, inherited spaces may still remain.",
+                    "required": [
+                      "objectId",
+                      "oldSpaceIds",
+                      "spaces"
+                    ],
+                    "properties": {
+                      "objectId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "oldSpaceIds": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "spaces": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "description": "Latest space summary. The client should maintain a unified space cache by `spaceId` to avoid repeatedly storing potentially stale names, markings, and parent relationships in device or automation relationship data; `parentSpaceId` indicates the parent space of the summary, and is null for a root space.",
+                          "required": [
+                            "spaceId",
+                            "name",
+                            "parentSpaceId"
+                          ],
+                          "properties": {
+                            "spaceId": {
+                              "type": "string",
+                              "description": "Space ID."
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "Space name."
+                            },
+                            "spatialMarking": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Space marking; null when no marking exists."
+                            },
+                            "parentSpaceId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "Parent space ID of the space; null for a root space. For SPACE_ADDED and SPACE_UPDATED this is the parent space after the event; for SPACE_REMOVED it is the parent space before deletion."
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "title": "SCENE_SPACE_UPDATED"
                   }
                 ]
               }
             }
+          },
+          "eventId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "An opaque string for this logical notification. It must contain at least one non-whitespace character. Store and compare it as-is without relying on its format. It remains unchanged across channels and HTTP retries. Consecutive notifications with the same content use different values."
+          },
+          "studioId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "The official Studio identity that publishes the notification. It must contain at least one non-whitespace character. It is not a gateway identity or an authentication credential."
           },
           "code": {
             "type": "integer",
@@ -2938,6 +4079,42 @@ const aqaraLifeWebSocketSpecEn = {
               "null"
             ],
             "description": "Processing result message."
+          }
+        },
+        "if": {
+          "properties": {
+            "data": {
+              "properties": {
+                "eventType": {
+                  "enum": [
+                    "AUTOMATION_EXECUTION_RESULT",
+                    "SCENE_EXECUTION_RESULT",
+                    "SCENE_ADDED",
+                    "SCENE_REMOVED",
+                    "SCENE_UPDATED",
+                    "SCENE_SPACE_UPDATED"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "eventId",
+            "studioId"
+          ],
+          "properties": {
+            "eventId": {
+              "type": "string",
+              "format": "uuid",
+              "description": "UUID of this logical notification. It remains unchanged across channels and HTTP retries."
+            },
+            "studioId": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The Studio official identity for publishing the notification, not the executing gateway ID."
+            }
           }
         }
       }

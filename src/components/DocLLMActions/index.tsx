@@ -1,6 +1,7 @@
 import React, {type ReactNode, useEffect, useState} from 'react';
 import {useDoc} from '@docusaurus/plugin-content-docs/client';
 import {createPortal} from 'react-dom';
+import {formatLlmsForSite, llmsMatchesLocale} from './llms';
 import styles from './index.module.css';
 
 type Locale = 'en' | 'zh';
@@ -94,7 +95,7 @@ function extractText(node: Node): string {
   }
 
   if (tagName === 'a') {
-    const href = node.getAttribute('href') || '';
+    const href = (node as HTMLAnchorElement).href || '';
     const text = normalizeWhitespace(childText) || href;
     return href ? `[${text}](${href})` : text;
   }
@@ -197,17 +198,6 @@ function productLlmsCandidates(locale: Locale, slug: string): string[] {
   return [`/${slug}/llms.txt`];
 }
 
-function llmsMatchesLocale(content: string, locale: Locale): boolean {
-  if (locale === 'zh') {
-    return content.includes('https://docs.aqara.com/zh/docs/');
-  }
-
-  return (
-    content.includes('https://docs.aqara.com/docs/') &&
-    !content.includes('https://docs.aqara.com/zh/docs/')
-  );
-}
-
 async function fetchLocalizedProductLlms(
   locale: Locale,
   slug: string,
@@ -222,8 +212,8 @@ async function fetchLocalizedProductLlms(
       }
 
       const content = await response.text();
-      if (content.trim() && llmsMatchesLocale(content, locale)) {
-        return content;
+      if (content.trim() && llmsMatchesLocale(content, locale, window.location.origin)) {
+        return formatLlmsForSite(content, window.location.origin);
       }
     } catch {
       continue;

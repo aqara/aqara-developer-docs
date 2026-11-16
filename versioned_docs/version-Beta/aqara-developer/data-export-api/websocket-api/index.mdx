@@ -14,7 +14,7 @@ You can directly test the Aqara Studio WebSocket channel on this page. Customize
 
 ## Usage Recommendations
 
-1. First, select either the local network environment or remote access environment in the "Connect" section, then modify the Host address as needed.
+1. First, select either the local network environment in the "Connect" section, then modify the Host address as needed.
 2. Since browsers' native WebSocket does not support custom handshake `Authorization` headers, it is recommended to enable the option to automatically send an `AuthRequest` to complete authentication with the first message. In the `Token` input box, just enter the Token obtained from Aqara Studio; the playground will automatically assemble the authentication content as `Bearer <Token>`.
 3. If your Studio exposes a non-default path, you can further modify the `Path`; the default contract path is `/open/ws`.
 4. To keep the WebSocket connection alive, the client should regularly send `PingRequest` or other business messages, and **at least one message should be sent every 30 seconds**; if there are no outbound messages within 30 seconds, the connection will be closed.

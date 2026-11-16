@@ -31,6 +31,8 @@
 - Aqara Coap 设备接入: https://docs.aqara.com/zh/docs/aqara-studio/device-integration/aqara-coap
 - 红外设备接入: https://docs.aqara.com/zh/docs/aqara-studio/device-integration/virtual/infrared-equipment
 - 灯箱设备接入: https://docs.aqara.com/zh/docs/aqara-studio/device-integration/virtual/light-box
+- 组控设备接入: https://docs.aqara.com/zh/docs/aqara-studio/device-integration/virtual/group-control-equipment
+- 自定义设备接入: https://docs.aqara.com/zh/docs/aqara-studio/device-integration/virtual/custom-device
 - 以 Haystack 框架转出: https://docs.aqara.com/zh/docs/aqara-studio/device-export/haystack
 - 以 MQTT 转出设备数据: https://docs.aqara.com/zh/docs/aqara-studio/data-export-by-mqtt
 - 查看和修改基本信息: https://docs.aqara.com/zh/docs/aqara-studio/device-management/basic-information
@@ -69,14 +71,16 @@
 - 恢复出厂设置: https://docs.aqara.com/zh/docs/aqara-studio/factory-reset
 - 插件中心: https://docs.aqara.com/zh/docs/aqara-studio/plugin-center
 - AIOT 数据迁移: https://docs.aqara.com/zh/docs/aqara-studio/plugin-center/aiot-data-migration
+- OpenAPI（Gateway） Export 插件使用流程: https://docs.aqara.com/zh/docs/aqara-studio/plugin-center/openapi-gateway-export
 - 开发者指南: https://docs.aqara.com/zh/docs/aqara-studio/developer-guide
 - HTTP Push 推送: https://docs.aqara.com/zh/docs/aqara-studio/http-push
 - 在 OpenClaw Web UI 中使用 Aqara Studio Skill: https://docs.aqara.com/zh/docs/aqara-studio/use-aqara-studio-skill-in-openclaw-web-ui
 - 连接至 Aqara Studio MCP Server: https://docs.aqara.com/zh/docs/aqara-studio/set-up-mcp-server
+- Matter Bridge: https://docs.aqara.com/zh/docs/aqara-studio/matter-bridge
 - 常见问题: https://docs.aqara.com/zh/docs/aqara-studio/faq
-- JavaScript 脚本（适用于 MQTT）: https://docs.aqara.com/zh/docs/aqara-studio/javascript-for-mqtt-integration
-- JavaScript 脚本（适用于 HTTP）: https://docs.aqara.com/zh/docs/aqara-studio/javascript-for-http-integration
-- JavaScript 脚本（适用于 UDP 和 TCP）: https://docs.aqara.com/zh/docs/aqara-studio/javascript-for-udp-tcp-integration
+- 第三方设备脚本接入指南: https://docs.aqara.com/zh/docs/aqara-studio/ai-agent-device-onboarding
+- 协议脚本规范: https://docs.aqara.com/zh/docs/aqara-studio/unified-protocol-script
+- 脚本接入与调试 MCP/API 参考: https://docs.aqara.com/zh/docs/aqara-studio/protocol-script-mcp-api
 - 脚本支持的单位名称与符号: https://docs.aqara.com/zh/docs/aqara-studio/script-supported-unit-symbols
 - 数值映射函数: https://docs.aqara.com/zh/docs/aqara-studio/numerical-mapping-functions
 - Studio 网关功能一览: https://docs.aqara.com/zh/docs/aqara-studio/product-knowledge/gateways/studio-hub-comparison

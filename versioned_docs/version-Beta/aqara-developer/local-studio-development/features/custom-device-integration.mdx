@@ -1,0 +1,488 @@
+---
+title: "Custom Device Integration"
+description: "How to create a custom device via Studio's local API and integrate multiple function points from various Aqara Studio devices to achieve more efficient unified device management and control."
+keywords: ["Aqara Documentation", "Aqara Developer", "Local Studio Development", "Infrared Device Integration"]
+---
+
+# Custom Device Creation
+
+This article describes how to create a custom device via Studio's local API and integrate multiple function points from various Aqara Studio devices to achieve more efficient unified device management and control.
+
+## 1. Create a Custom Device
+
+Use the Studio local API [`POST` /open/api/v1/virtual-devices](./../../data-export-api/add-virtual-device.api.mdx) endpoint to create a custom device, and obtain the custom device ID.
+
+Sample Request:
+```json
+{
+  "name": "Custom Virtual Device",
+  "virtualDeviceType": "virtual"
+}
+```
+
+Sample Response:
+```json
+{
+  "type": "VirtualDeviceAddResponse",
+  "version": "v1",
+  "msgId": "1",
+  "data": {
+    "deviceId": "virtual.1790253917450"
+  },
+  "code": 0,
+  "message": "success"
+}
+```
+
+## 2. Query Device Information List
+
+Use the Studio local API [`GET` /open/api/v1/devices](./../../data-export-api/get-devices.api.mdx) endpoint to obtain information about all devices currently integrated into Aqara Studio. From the returned device list, you can select one or more devices' `deviceId` as the source of function points to integrate into your custom device.
+
+From the following sample response, you can see that in addition to the M300 and the custom device just created above, there are 2 other devices, namely Smart Switch T1 and Climate Sensor W100.
+
+```json {23-32, 35-46}
+{
+  "type": "GetDeviceInfoResponse",
+  "version": "v1",
+  "msgId": "2",
+  "data": {
+    "totalCount": 4,
+    "pageNum": 1,
+    "pageSize": 200,
+    "data": [
+      {
+        "deviceId": "lumi3.a2b91c7279d815d5",
+        "deviceName": "Edge Hub M300",
+        "deviceTypesList": [
+          "Hub",
+          "IRDevice"
+        ],
+        "createTime": 1790047450565,
+        "state": true,
+        "gatewayId": "lumi3.a2b91c7279d815d5",
+        "model": "lumi.models.4447_2059"
+      },
+      {
+        "deviceId": "lumi.54ef4410000d9618",
+        "deviceName": "Smart Switch T1",
+        "deviceTypesList": [
+          "Switch",
+          "Button"
+        ],
+        "createTime": 1790064137622,
+        "state": false,
+        "gatewayId": "lumi3.a2b91c7279d815d5",
+        "model": "lumi.switch.b2nacn01"
+      },
+      {
+        "deviceId": "matt.04692c7f67c43e582d",
+        "deviceName": "Climate Sensor W100",
+        "deviceTypesList": [
+          "TemperatureSensor",
+          "HumiditySensor",
+          "Button",
+          "ThermostatController"
+        ],
+        "createTime": 1790217559182,
+        "state": false,
+        "gatewayId": "lumi3.a2b91c7279d815d5",
+        "model": "aqara.matter.4447_8196"
+      },
+      {
+        "deviceId": "virtual.1790253917450",
+        "deviceName": "Custom Virtual Device",
+        "deviceTypesList": [],
+        "createTime": 1790244961237,
+        "state": false,
+        "model": ""
+      }
+    ]
+  },
+  "code": 0,
+  "message": "success"
+}
+```
+
+## 3. Query Device Model Definition
+
+Use the Studio local API [`GET` /open/api/v1/devices/definitions](./../../data-export-api/get-device-definitions.api.mdx) endpoint, providing the target device's `deviceId`, to query its device model definition. This allows you to obtain the required **endpointId**, **functionCode**, **traitCode**, or **commandCode** for subsequent operations.
+
+Below are sample responses for retrieving the device model definitions for Smart Switch T1 and Climate Sensor W100 (the highlighted code blocks indicate the required information for function points that will be integrated into the custom device):
+
+```json {7,17,22,25,43,71,139,151,156,159}
+{
+  "type": "GetDevicesResponse",
+  "version": "v1",
+  "msgId": "3",
+  "data": [
+    {
+      "deviceId": "lumi.54ef4410000d9618",
+      "name": "Smart Switch T1",
+      "gatewayId": "lumi3.a2b91c7279d815d5",
+      "deviceTypesList": [
+        "Switch",
+        "Button"
+      ],
+      "endpoints": [
+        ...
+        {
+          "endpointId": 2,
+          "endpointName": "Switch",
+          "deviceType": "Switch",
+          "functions": [
+            {
+              "functionCode": "Output",
+              "traits": [
+                {
+                  "traitCode": "OnOff",
+                  "parameter": {
+                    "type": "Bool",
+                    "readable": true,
+                    "writable": true,
+                    "subscribable": true,
+                    "unit": ""
+                  },
+                  "value": false,
+                  "time": 1790247705173,
+                  "pointName": "Left Switch - On/Off",
+                  "displayTags": [
+                    "0",
+                    "1",
+                    "96"
+                  ]
+                },
+                {
+                  "traitCode": "StartUpOnOff",
+                  "parameter": {
+                    "type": "Enum",
+                    "readable": true,
+                    "writable": true,
+                    "subscribable": true,
+                    "supportedValues": [
+                      {
+                        "key": "Off",
+                        "value": "0"
+                      },
+                      {
+                        "key": "Hold",
+                        "value": "3"
+                      }
+                    ],
+                    "unit": ""
+                  },
+                  "value": "0",
+                  "time": 1790247705273,
+                  "pointName": "Left Switch - Power on switch",
+                  "displayTags": [
+                    "2"
+                  ]
+                }
+              ],
+              "commands": [
+                {
+                  "commandCode": "Toggle",
+                  "fields": [],
+                  "description": "On/Off",
+                  "pointName": "Left Switch - On/off",
+                  "displayTags": [
+                    "1"
+                  ]
+                }
+              ]
+            },
+            {
+              "functionCode": "Button",
+              "traits": [
+                {
+                  "traitCode": "ButtonEvent",
+                  "parameter": {
+                    "type": "Enum",
+                    "readable": false,
+                    "writable": false,
+                    "subscribable": true,
+                    "supportedValues": [
+                      {
+                        "key": "SinglePress",
+                        "value": "0"
+                      },
+                      {
+                        "key": "DoublePress",
+                        "value": "1"
+                      },
+                      {
+                        "key": "LongPress",
+                        "value": "2"
+                      }
+                    ],
+                    "unit": ""
+                  },
+                  "time": 0,
+                  "pointName": "Left Switch - Button Events",
+                  "displayTags": [
+                    "0",
+                    "1"
+                  ]
+                },
+                {
+                  "traitCode": "LocalControlDisabled",
+                  "parameter": {
+                    "type": "Bool",
+                    "readable": true,
+                    "writable": true,
+                    "subscribable": true,
+                    "unit": ""
+                  },
+                  "value": false,
+                  "time": 1790247705726,
+                  "pointName": "Left Switch - Whether the switch disables local control (Convert to wireless switch function)",
+                  "displayTags": [
+                    "2"
+                  ]
+                }
+              ],
+              "commands": []
+            }
+          ]
+        },
+        ...
+      ]
+    },
+    {
+      "deviceId": "matt.04692c7f67c43e582d",
+      "name": "Climate Sensor W100",
+      "gatewayId": "lumi3.a2b91c7279d815d5",
+      "deviceTypesList": [
+        "TemperatureSensor",
+        "HumiditySensor",
+        "Button",
+        "ThermostatController"
+      ],
+      "endpoints": [
+        ...
+        {
+          "endpointId": 2,
+          "endpointName": "Temperature Sensor",
+          "deviceType": "TemperatureSensor",
+          "functions": [
+            {
+              "functionCode": "Temperature",
+              "traits": [
+                {
+                  "traitCode": "CurrentTemperature",
+                  "parameter": {
+                    "type": "Float",
+                    "readable": true,
+                    "writable": false,
+                    "subscribable": true,
+                    "min": -40,
+                    "max": 125,
+                    "unit": "°C",
+                    "step": 0.01
+                  },
+                  "value": 25.59,
+                  "time": 0,
+                  "pointName": "Temperature Sensor - Temperature",
+                  "displayTags": [
+                    "0",
+                    "1",
+                    "96"
+                  ]
+                }
+              ],
+              "commands": []
+            }
+          ]
+        },
+        ...
+      ]
+    }
+  ],
+  "code": 0,
+  "message": "success"
+}
+```
+
+## 4. Bind Function Points to the Custom Device
+
+Use the Studio local API [`POST` /open/api/v1/virtual-devices/points/bind](./../../data-export-api/bind-virtual-device-points.api.mdx) endpoint to bind the selected function points above to the custom device you created.
+
+The following sample request demonstrates how to bind two traits and one command from the Smart Switch T1, as well as one trait from the Climate Sensor W100, to the custom device.
+
+```json
+{
+  "deviceId": "virtual.1790253917450",
+  "sourcePoints": [
+    {
+      "deviceId": "lumi.54ef4410000d9618",
+      "endpointId": 2,
+      "functionCode": "Output",
+      "traitCode": "OnOff"
+    },
+    {
+      "deviceId": "lumi.54ef4410000d9618",
+      "endpointId": 2,
+      "functionCode": "Output",
+      "traitCode": "StartUpOnOff"
+    },
+    {
+      "deviceId": "lumi.54ef4410000d9618",
+      "endpointId": 2,
+      "functionCode": "Output",
+      "commandCode": "Toggle"
+    },
+    {
+      "deviceId": "matt.04692c7f67c43e582d",
+      "endpointId": 2,
+      "functionCode": "Temperature",
+      "traitCode": "CurrentTemperature"
+    }
+  ]
+}
+```
+
+Sample Response:
+```json
+{
+  "type": "VirtualDeviceBindPointsResponse",
+  "version": "v1",
+  "msgId": "4",
+  "data": "",
+  "code": 0,
+  "message": "success"
+}
+```
+
+## 5. Unbind Function Points from the Custom Device
+
+If you no longer need some function points, you can use the Studio local API [`POST /open/api/v1/virtual-devices/points/unbind`](./../../data-export-api/unbind-virtual-device-points.api.mdx) endpoint to unbind these points from the custom device.
+
+The following sample request demonstrates how to unbind the `StartUpOnOff` function point from Smart Switch T1 on the custom device:
+
+```json
+{
+  "deviceId": "virtual.1790253917450",
+  "sourcePoints": [
+    {
+      "deviceId": "lumi.54ef4410000d9618",
+      "endpointId": 2,
+      "functionCode": "Output",
+      "traitCode": "StartUpOnOff"
+    }
+  ]
+}
+```
+
+Sample Response:
+```json
+{
+  "type": "VirtualDeviceUnbindPointsResponse",
+  "version": "v1",
+  "msgId": "5",
+  "data": "",
+  "code": 0,
+  "message": "success"
+}
+```
+
+## 6. Query Custom Device Information
+
+Use the Studio local API [`GET` /open/api/v1/devices/definitions](./../../data-export-api/get-device-definitions.api.mdx) endpoint to query the list of function points in this custom device to confirm whether the above bind and unbind operations were successful.
+
+The following sample response displays the list of function points in the custom device. As you can see from the highlighted code block, this device now has `OnOff` (trait), `Toggle` (command), and `CurrentTemperature` (trait) function points, and the `StartUpOnOff` (trait) function point is no longer present:
+
+```json {31, 51, 64}
+{
+  "type": "GetDevicesResponse",
+  "version": "v1",
+  "msgId": "6",
+  "data": [
+    {
+      "deviceId": "virtual.1790253917450",
+      "name": "Custom Virtual Device",
+      "deviceTypesList": [
+        "Switch",
+        "TemperatureSensor"
+      ],
+      "endpoints": [
+        {
+          "endpointId": 0,
+          "endpointName": "Root",
+          "deviceType": "Root",
+          "functions": [
+            ...
+          ]
+        },
+        {
+          "endpointId": 2,
+          "endpointName": "OBJ_1",
+          "deviceType": "Switch",
+          "functions": [
+            {
+              "functionCode": "Output",
+              "traits": [
+                {
+                  "traitCode": "OnOff",
+                  "parameter": {
+                    "type": "Bool",
+                    "readable": true,
+                    "writable": true,
+                    "subscribable": true,
+                    "unit": ""
+                  },
+                  "value": false,
+                  "time": 1790254058561,
+                  "pointName": "Left Switch - On/Off",
+                  "displayTags": [
+                    "0",
+                    "1",
+                    "96"
+                  ]
+                }
+              ],
+              "commands": [
+                {
+                  "commandCode": "Toggle",
+                  "fields": [],
+                  "pointName": "Left Switch - On/off",
+                  "displayTags": [
+                    "1"
+                  ]
+                }
+              ]
+            },
+            {
+              "functionCode": "Temperature",
+              "traits": [
+                {
+                  "traitCode": "CurrentTemperature",
+                  "parameter": {
+                    "type": "Float",
+                    "readable": true,
+                    "writable": false,
+                    "subscribable": true,
+                    "min": -40,
+                    "max": 125,
+                    "unit": "°C",
+                    "step": 0.01
+                  },
+                  "value": 26.03,
+                  "time": 1790254107189,
+                  "pointName": "Temperature Sensor - Temperature",
+                  "displayTags": [
+                    "0",
+                    "1",
+                    "96"
+                  ]
+                }
+              ],
+              "commands": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "code": 0,
+  "message": "success"
+}
+```

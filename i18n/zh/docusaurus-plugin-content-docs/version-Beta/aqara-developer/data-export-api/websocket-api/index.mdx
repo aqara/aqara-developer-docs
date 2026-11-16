@@ -8,13 +8,13 @@ hide_table_of_contents: true
 
 import AsyncApiWebSocketPlayground from "@site/src/components/AsyncApiWebSocketPlayground";
 
-# WebSocket API Playground
+# 在线体验 WebSocket API
 
 您可以在本页面直接测试 Aqara Studio 的 WebSocket 通道。支持自定义 Host，连接至您的 Studio 端点，并发送 `AuthRequest`、`ping` 及订阅消息，同时实时查看推送事件的返回结果。
 
 ## 使用建议
 
-1. 先在「连接」中选择局域网环境或远程访问环境，再按需修改 Host 地址。
+1. 先在「连接」中选择局域网环境，再按需修改 Host 地址。
 2. 由于浏览器原生 WebSocket 不支持自定义握手 `Authorization` Header，推荐勾选自动发送 `AuthRequest`，通过首包完成鉴权。`Token` 输入框中只需填写从 Aqara Studio 获取的 Token，playground 会自动按 `Bearer <Token>` 形式组装鉴权内容。
 3. 如果您的 Studio 暴露的是非默认路径，可继续调整 `Path`；默认契约路径为 `/open/ws`。
 4. 为保持 WebSocket 连接活跃，客户端应定期发送 `PingRequest` 或其他业务消息，并在 **每 30 秒内至少发送一次消息**；若 30 秒内没有任何出站消息，连接会被断开。

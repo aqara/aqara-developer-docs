@@ -1,0 +1,293 @@
+---
+title: "脚本接入与调试 MCP/API 参考"
+displayed_sidebar: aqaraStudioSidebar
+description: "Open 已实现的脚本管理、协议资源、连接快照、调试会话、状态确认、安全正文采集与离线重放。"
+keywords: ["Aqara Studio", "Open", "MCP", "API", "Agent", "脚本调试", "replayCapture"]
+---
+
+# 脚本接入与调试 MCP/API 参考
+
+脚本配置与调试复用 Open 的通用 Resource 工具，脚本格式见 [统一契约 v1](./unified-protocol-script.mdx)，操作流程见 [第三方设备脚本接入指南](./ai-agent-device-onboarding.mdx)。
+
+## 鉴权与运行时契约 {#authentication}
+
+MCP JSON-RPC 地址为 `/open/api/mcp`，REST 前缀为 `/open/api/v1`。ApiAccessToken 使用 `Authorization: Bearer <token>`，JSON 请求使用 Content-Type application/json。Token 必须有效，MCP 开关与工具 scope 或对应 REST Resource scope 必须允许；用户还须对目标有管理权限。登录 JWT 的绑定/登录流程按现有鉴权契约处理，不假定它与 ApiAccessToken 完全相同。
+
+protocol 资源上的 validateScript/listScripts/readScript/uploadScript 明确检查 **Station.station.communication（通信根节点）**的管理权限，仅有 Network 管理权限不够。连接/会话/目标操作另外检查相应节点权限；Token scope 与节点权限必须分别满足。本指南不要求 Agent 自行扩大授权。
+
+先读取 tools/list、resources/list 和当前类型/实例 Schema。**类型说明列举可能命令，实例 commands 决定当下可调用项**，服务端执行时还会再次校验。查询不到的类型、工具、配置字段或命令不能凭本文补造。
+
+MCP 通过 resources/read 读取以下 URI，不是通过 resource_read：
+
+| URI | 内容 |
+| --- | --- |
+| `agent://contracts/mcp/guide` | 工具路由、鉴权与错误判读 |
+| `agent://contracts/resource-api/guide` | 通用 Resource 契约 |
+| `agent://contracts/protocol-script/guide` | 脚本生成、校验、部署与链路差异 |
+| `agent://contracts/protocol-point/guide` | Spec 查询、点映射与实际配置回读 |
+| `agent://contracts/protocol-debug/guide` | 会话、连接诊断、确认语义与安全重放 |
+
+没有新增“下载这些指南”的 REST 路径；纯 REST Agent 应获得与部署版本匹配的文档。
+
+运行时指南读取优先级为 Station 覆写 → 系统资源文件 → JAR 内置。更新包内默认文档不覆盖已有同名覆写；发现现场指南与当前 Schema 不符时，报告文档版本冲突，由维护者同步覆写，不让 Agent 自动删除站点文件。
+
+## 六个通用工具与 REST 对照 {#resource-tools}
+
+| MCP 工具 | 直接 arguments | REST 等价入口 |
+| --- | --- | --- |
+| `resource_list_types` | `{}` | GET `/resource-types` |
+| `resource_describe_type` | `{type}` | GET `/resource-types/{type}` |
+| `resource_query` | `{type,parentId?,filters?,page?,pageSize?,sort?}` | GET `/resource-types/{type}/resources`；filters 展平为查询参数 |
+| `resource_read` | `{id}` | GET `/resources/{id}` |
+| `resource_update` | `{id,properties}` | POST `/resources/{id}`，正文 `{properties}` |
+| `resource_invoke_command` | `{id,command,input?}` | POST `/actions/{command}`，正文 `{id,input}` |
+
+表中 REST 路径均接上述前缀。URL 中的资源 ID 必须编码。通用 MCP arguments 不包在 data 中；只有对应业务工具声明 data 时才使用它。
+
+REST 返回 `{msgId,code,message,data}`。MCP 工具结果需把 `result.content` 中 text 解析为 JSON；JSON-RPC error、isError、非零 code、success=false 和批量单项失败都必须处理。没有错误不等于异步任务已完成。
+
+### 响应路径与分页 {#response-paths}
+
+以下路径从解包后的 Resource 响应开始；不要混用内部 ProtocolOnboardingFacade 的字段名：
+
+| 操作 | 实际读取路径 |
+| --- | --- |
+| describe_type(protocol.network/device/point) | `data.protocols.<protocolId>` 为该协议的类型级配置 Schema |
+| read/update/create 实例 | `data.id`、`data.properties`、`data.schema`、`data.commands`；实例 Schema 不叫 configSchema |
+| 实例脚本加载结果 | `data.properties["scriptMessageParser/scriptCheckResult"]` |
+| discover / startDebugSession / 单次调试 | `data.id` 为返回的 job/session/operation ID，状态及详情在 data.properties |
+| connectionSnapshot / validateScript / 文件命令 | 直接在 `data` 中读取各命令结果，不再包 properties |
+| query | `data.items`、`data.page`、`data.pageSize`、`data.hasMore`，不返回 total |
+
+查询默认 page=1、pageSize=20，最大 pageSize=100。每次处理当前 items，再在 hasMore=true 时递增 page，保持相同筛选条件；直到 false，或达到客户端预算。不能只处理第一页就宣称发现完整。设备/点回读的秘密字段不返回明文；schema 中 sensitive/writeOnly 只表示可授权写入，不提供凭据来源。
+
+```json title="MCP tools/call 示例"
+{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"resource_invoke_command","arguments":{"id":"<network-resource-id>","command":"connectionSnapshot","input":{}}}}
+```
+
+```http title="同一操作的 REST 表达（不需要重复执行）"
+POST /open/api/v1/actions/connectionSnapshot
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{"id":"<network-resource-id>","input":{}}
+```
+
+## 资源归属与命令 {#resources}
+
+| 资源类型 | 用途/当前命令 |
+| --- | --- |
+| `protocol` | 查询 tcp/udp/http/mqtt 目录及配置；create、discover、validateScript、listScripts、readScript、uploadScript |
+| `protocol.network` | Network 配置更新；connectionSnapshot、startDebugSession，以及有资格时 delete |
+| `protocol.device` / `protocol.point` | 按 parentId 查询和回读实例配置；按 Schema 更新、有资格时 delete |
+| `job` | 发现任务状态；成功后公开 import |
+| `discovery` | 用 filters.jobId + filters.kind（device/point）查询候选 |
+| `protocol.debug.session` | 由 startDebugSession 返回；只能按返回 ID 读取/调用，不支持列表查询 |
+| `protocol.debug.operation` | 单次操作返回；只能按返回 ID 读取，不支持列表查询或客户端构造 ID |
+
+业务 deviceId/pointId、发现候选 ID、框架实例 ID、Command 字段 ID 各不相同。必须保存并使用接口返回的 ID。
+
+### 脚本文件命令 {#script-files}
+
+在 protocol 资源调用：
+
+| 命令 | input | 结果与边界 |
+| --- | --- | --- |
+| validateScript | `scriptContent`，可选 fixtures | 隔离 GraalJS 校验，不写文件、不发设备报文 |
+| listScripts | 可选 networkBeanId | 对应 Network 类型托管文件列表 |
+| readScript | scriptPath，可选 networkBeanId | scriptContent、规范化 scriptPath、referenceCount；不是上传专属的结果字段 |
+| uploadScript | scriptPath、scriptContent，可选 fixtures/networkBeanId | 校验后原子写文件，返回 extensionScriptPath、validated、replaced、referenceCount、reloadFailedCount |
+
+源码最多 **1,048,576 字符**，文件另限 **3,145,728 字节**。夹具最多 **16** 个，合计序列化 JSON 最多 **1,048,576 字符**、深度最多 **64**；单个夹具输入还受文本/传输消息限额约束。一组夹具顺序共用一个受限候选 Context，不能由客户端放宽执行预算。
+
+fixtures 每项严格为 `{entry:"encode"或"decode",input:{...},expected:完整规范化结果}`。不支持 describe 夹具。`valid:true`、fixturesPassed 仅为离线证据，deviceCommunicationVerified 不因此为 true。
+
+文件路径必须在该 Network 类型的 `file:%/protocol-scripts/<namespace>/...js` 下；不能遍历目录或使用任意绝对路径。首次上传先调用 `listScripts`，读取 `data.networkBeanId`，即使 `data.scripts` 为空也能构造路径。命名空间规则：去掉 networkBeanId 两端空白，将 `[A-Za-z0-9._-]` 之外的每个字符替换为 `_`，再去掉首尾的 `_`；结果不能是空串、`.` 或 `..`。不要直接把含冒号的 beanId 用作目录名。
+
+| networkBeanId | namespace | scriptPath 示例 |
+| --- | --- | --- |
+| `tcp:TcpNetwork` | `tcp_TcpNetwork` | `file:%/protocol-scripts/tcp_TcpNetwork/vendor.js` |
+| `udp:UdpNetwork` | `udp_UdpNetwork` | `file:%/protocol-scripts/udp_UdpNetwork/vendor.js` |
+| `http:HttpNetwork` | `http_HttpNetwork` | `file:%/protocol-scripts/http_HttpNetwork/vendor.js` |
+| `mqtt:MqttConnNetwork` | `mqtt_MqttConnNetwork` | `file:%/protocol-scripts/mqtt_MqttConnNetwork/vendor.js` |
+
+以上为当前四种类型的示例，以部署实例返回的 networkBeanId 为准。使用自定义 Network 类型时，listScripts、uploadScript 和 readScript 传入同一 networkBeanId；上传后绑定并回读返回的 `extensionScriptPath`。
+
+上传校验失败不替换文件。上传成功也必须检查 reloadFailedCount 并回读引用 Network。覆盖共享文件会重载其他引用者；没有版本 CAS，优先唯一文件名。
+
+使用非空夹具覆盖编码、正常解析、负 ACK、错误身份和缺失字段；检查外层 code 及内层 valid/fixturesPassed，零夹具不能作为验收依据。上传后，将返回的 extensionScriptPath 传给 readScript.input.scriptPath：
+
+```json title="resource_invoke_command arguments：回读已保存源码"
+{"id":"<protocol-resource-id>","command":"readScript","input":{"scriptPath":"<upload-returned extensionScriptPath>"}}
+```
+
+比较 readScript.scriptContent 与候选源码、scriptPath 与上传地址。上传不自动绑定 Network；readScript 不返回 replaced、reloadFailedCount 或 extensionScriptPath。
+
+Network 只写 `scriptMessageParser/extensionScriptPath`，不接受把 scriptContent 或整个 scriptMessageParser 对象作为配置保存。scriptParameters 字段须按绑定脚本后的实例 `data.schema` 取得；JS 中声明它们的字段仍叫 describe().configSchema。
+
+### 创建与发现导入 {#discovery}
+
+protocol.create input 为 `{entityKind,parentId?,name?,config}`，Network 用 entityKind=network；Device/Point 的 parentId 为真实父实例。手工创建脚本 Device 必须填写合法业务 deviceId，优先发现导入。
+
+以下仅示范 TCP 的脚本文件绑定；连接字段从 `data.protocols.<protocolId>` 及现场资料取得：
+
+```json title="resource_invoke_command arguments：创建 Network"
+{"id":"<protocol-resource-id>","command":"create","input":{"entityKind":"network","name":"Vendor integration","config":{"scriptMessageParser/extensionScriptPath":"<upload-returned extensionScriptPath>"}}}
+```
+
+绑定后回读 scriptCheckResult，再按 data.schema 配置 Network 参数；Device 参数在导入后配置。脚本加载成功不代表必填参数齐备，缺失参数会阻止执行。
+
+protocol.discover input 为 `{ownerKind,ownerId,targetKind,options?}`。发现设备用 network/device；发现点用 device/point。当前通用命令只把 options 公开为 object，不提供每种协议的详细选项 Schema。新脚本优先在 describe().discovery 声明已知目标并省略 options；需要覆盖时必须取得同版本的明确字段契约，不能猜 ip/port 或扫描参数。
+
+读取返回 job.id：pending/running 继续等待；succeeded/failed/cancelled 为终态；unknown、not-found 都不是成功。按 job 类型公布策略约每 1000 ms 查询，单轮客户端等待最多 120 秒；超时保留同一 ID，不重提任务。通用 job 没有取消命令。
+
+成功后查询 discovery，检查候选；在该 job 执行 import：`{ownerId,discoveryObjectIds:[...]}`，单次最多 200 个不同候选，更多时分批。检查逐项结果，再回读实际 Device/Point 清单。不能把已导入成功项再次创建。
+
+```json title="resource_query arguments：设备候选"
+{"type":"discovery","filters":{"jobId":"<discovery-job-id>","kind":"device"}}
+```
+
+导入目标设备后，以 `ownerKind=device`、`ownerId=<device-instance-id>`、`targetKind=point` 发起点发现，等待这个独立任务，查询 kind=point 并导入。静态候选也遵守相同的选择、导入流程。
+
+## Spec 点映射 MCP 工具 {#point-tools}
+
+以下是**专用 MCP 工具**，没有对应的 REST 入口。按 tools/list 使用：
+
+| 工具 | 关键输入与用途 |
+| --- | --- |
+| `protocol_point_describe` | protocolId；读取点配置和 mappingSchema |
+| `protocol_point_specOptions` | 可选 deviceType/functionCode/kind/keyword/page/pageSize；查询真实目录，pageSize 最多 100 |
+| `protocol_point_mappingOptions` | protocolId、ownerId；手动 config 或 jobId/discoveryObjectId，预检映射 |
+| `protocol_point_create` | protocolId、ownerId、config，可选 name |
+| `protocol_point_createFromDiscovery` | protocolId、ownerId、jobId、discoveryObjectIds，可选 pointConfigs；最多 100 个不同候选 |
+| `protocol_point_read` | instanceId；回读实际 pointMapping 与配置 |
+
+targetProperty 使用 deviceType/functionCode + traitCode/commandCode 二选一，access 为 readOnly/readWrite/reportOnly/command；这是映射工具的 Schema，**不是 JS 点定义的整数 access**。无需定制映射时可用 job.import；不要为同一候选调用两种创建入口。
+
+转换必须区分设备单位、管线目标单位和系统实际点单位，不重复缩放。创建成功但回读失败不等于创建失败，应使用已返回 ID 继续查询。系统新 Spec Code 注册不在此能力内。
+
+## 只读连接快照 {#connection}
+
+对 Network 调用 connectionSnapshot，input 为 `{}` 或 `{targetId:"<同Network的Device或Point实例ID>"}`。无需会话、有效脚本或在线状态，不创建连接、订阅、轮询，不接受任意 host/port。
+
+返回 schemaVersion=1、observedAt、transport、running/enabled、phase，以及尽力而为的 local/remote/configuredRemote、discovery、subscriptionRegistered/subscriptionReady、reportReceiverEnabled/reportListener、lastError 等。null 表示未知，不是 false 或成功。
+
+- TCP/MQTT 不指定设备时，Network 的 IDLE 不汇总设备连接。
+- TCP CONNECTED 表示已有 socket；UDP BOUND 只表示绑定；HTTP REQUEST_READY 只表示 Client 可用。
+- MQTT subscriptionRegistered 是本地登记，subscriptionReady 当前恒为 null，不证明 SUBACK。
+- HTTP reportListener 不是外网/防火墙可达证明；interfaceSelection 不推断 VPN 或路由正确。
+- 最近受控错误不是完整历史，重启清空，恢复后仍可保留最近错误。快照不是原子健康判定，不包含凭据/原始异常/正文。
+
+## 有界调试会话 {#sessions}
+
+Network.startDebugSession input 默认为 `{ttlMs:60000,payloadMode:"metadata"}`。Network 必须运行、启用、scriptCheckResult=success 且有适配器。返回 session.id、properties.expiresAt、latestSequence、capabilities 和 commands。
+
+| 会话命令 | input | 行为 |
+| --- | --- | --- |
+| probeOnce | targetId=Device ID，timeoutMs? | 真实探活；MQTT 不支持 |
+| readOnce | targetId=Point ID，timeoutMs? | 真实读取并应用目标值，不读旧缓存代替 |
+| writeAndWait | targetId、clientOperationId、waitFor，value 或 args；可选 expectedValue、observePointId、timeoutMs | 单次控制，同值仍发；业务零重试 |
+| waitForReport | targetId=可读 Point ID，afterSequence?、expectedValue?、timeoutMs? | 不发送，只等新 report；同值新上报有效；不能传 Device/Network ID |
+| readCapture | afterSequence=0、limit=64（1..128） | 元数据分页，使用 nextSequence 继续 |
+| readPayloadCapture | afterSequence=0、limit=16（1..16） | sanitized 会话限定正文 |
+| replayCapture | scriptContent、frames、context? | sanitized 会话隔离离线 decode，不发报文 |
+| stop | `{}` | 取消调试任务/观察，不关闭业务连接 |
+
+操作返回 operation.id，继续 resource_read 同一 ID，直到 properties.status 为 succeeded/failed/cancelled；pending/running 不算完成。会话和操作是内存资源，不承诺重启后恢复。
+
+### 控制确认语义
+
+授权控制前先读取初始状态、实际单位和合法范围。读写比例不一致时，同值下发也可能改变设备；发现值域不符应停止该功能测试。不能把页面回显、请求值或旧缓存当成设备反馈。
+
+| waitFor | 确认条件 |
+| --- | --- |
+| send | 发送完成；HTTP 为已收到响应，不表示设备成功 |
+| protocolAck | decode 明确设备业务成功；MQTT 不支持，Broker ACK 不是此条件 |
+| stateUpdate | 观察到 expectedValue；可指定同设备可读 observePointId 验证 Command 副作用 |
+
+value 与 args 必须二选一。普通点使用标量，Command args 使用数字 fieldId 键对象；参数/数值/控制权限及更高优先级占用均由服务端校验。stateUpdate 必须有 expectedValue 和有效可读观察点。
+
+expectedValue 必须是有限标量，序列化 JSON 最多 **512 UTF-8 字节**，waitForReport 也遵守此限制。它与命令 input 的 4096 字节预算不同，不代表 Command 文本长度上限。
+
+```json title="单次普通点控制（需预先授权）"
+{"targetId":"<point-resource-id>","clientOperationId":"test-write-001","waitFor":"stateUpdate","value":true,"expectedValue":true,"timeoutMs":10000}
+```
+
+同会话相同 clientOperationId + 相同输入返回同一操作，不重复发包；同 ID 不同输入拒绝，新会话不继承去重。不是跨重启 exactly-once 保证，超时/取消也不能撤销已发送控制。
+
+ACK 成功但反馈滞后时，在厂商允许的延时预算内有界执行新的 readOnce/report 等待，不为等待状态重复控制。仍未观察到预期状态时报告状态验收失败；没有可读反馈的设备只能达到发送或 ACK 确认等级。
+
+### 预算与生命周期
+
+- TTL 默认 60000 ms、最大 120000 ms；单次 timeoutMs 默认 10000、最大 30000。
+- 每 Network 最多 1 个、全局最多 2 个活动会话；含终态记录最多 4 个。
+- 每会话最多 32 个操作；同时 1 个主动请求、2 个 report 等待。
+- 元数据最多 128 条 / 32 KiB；操作值最多 512 UTF-8 字节，超限省略并标记 valueTruncated。
+- 普通调试 input 最多 4096 UTF-8 字节，JSON 深度最多 32、节点最多 8192；重放有独立预算。
+- stop、TTL、目标停止、脚本重载、Open 停止、凭据撤销/登出使任务取消。停止后元数据保留 60 秒，但正文立即清空；保留期后 SESSION_EXPIRED。
+
+目标权限、凭据和生命周期在准入与执行时复核，发包前也复核取消。已进入发送阶段的控制无法撤回，取消后核对实际设备状态。
+
+在 finally 停止本次拥有的会话，不关闭共享业务连接。仅按已授权的安全方案恢复初始状态；保留正式 Network、Device、Point 和脚本，仅删除明确允许清理的任务自有临时资源。修复、重载后使用新会话，不混用不同脚本版本的证据。
+
+## 结果与失败原因 {#results}
+
+operation.properties.result 分别给出 encoded、sent、responseReceived、protocolAck、stateObserved、value、valueTruncated、correlation、failureStage、reasonCode；null 为未知/不适用。succeeded 只表示本次所选确认条件达到。
+
+correlation 包括 protocolId、serializedWindow、observationOnly、none；离线重放为 offline。没有请求 ID 的新状态不能证明严格因果关系。readCapture 使用 captureWindow.afterSequence/throughSequence 关联操作，operationId 为空的事件不能归给“最近一次控制”。游标过期 CURSOR_EXPIRED 必须报告，不能为补日志再控制。
+
+| 原因 | 处理 |
+| --- | --- |
+| INVALID_ARGUMENT | 修正 Schema/类型/预算；MCP 前置校验可返回 JSON-RPC -32602 |
+| TARGET_NOT_ACCESSIBLE / TARGET_STOPPED | 核实管理权限、目标生命周期，不绕过授权 |
+| NOT_SUPPORTED / NO_REQUEST_BUILT | 区分不支持的能力与 encode 未构造请求，不伪造成功 |
+| BUSY | 处理原操作/会话占用，不并发制造控制 |
+| DEVICE_REJECTED | 设备负业务 ACK，核对厂商条件 |
+| DECODE_FAILED / POINT_MISSING | 核对解析、身份、操作、请求点及实际落点 |
+| SEND_FAILED / HTTP_ERROR / TIMEOUT | 核对已发送事实；执行结果可能未知，不盲目重发 |
+| SESSION_EXPIRED / SCRIPT_RELOADED / CURSOR_EXPIRED | 旧引用/证据失效，重新核对后按预算处理 |
+| PAYLOAD_NOT_ENABLED / FRAME_NOT_AVAILABLE / REPLAY_FAILED | 正文模式、帧保留或重放断言失败 |
+
+ENCODE_FAILED、STATE_NOT_OBSERVED 是保留原因；当前空请求为 NO_REQUEST_BUILT，状态等待未达条件通常为 TIMEOUT。
+
+交付时逐功能记录脚本及厂商版本、目标 ID、映射、单位、预期与观察状态、操作及采集证据。区分已生成、离线校验、保存绑定、导入、通信验收；这些是客户端报告分类，不是新增接口。模拟器、厂商设备、自主 Agent 与 Native Image/M300 验证各自独立。
+
+## 安全正文采集与离线重放 {#payload}
+
+默认 metadata 不保留正文。显式 sanitized 会话需 payloadPolicy，且创建者拥有 Network 及其全部已导入 Device/Point 的管理权限。读取、重放准入、执行前后和结果读取仍会复核。
+
+白名单选择的是**厂商报文正文**中的叶子，不是统一输入外层或 decode 结果。以下沿用 [MQTT 演示](./unified-protocol-script.mdx#mqtt-example)，收到的正文为 `{"deviceId":"demo-1","volume":20}`：
+
+```json title="MQTT 演示的 JSON 正文白名单"
+{"ttlMs":60000,"payloadMode":"sanitized","payloadPolicy":{"format":"json","jsonPointers":["/deviceId","/volume"],"maxFrames":16,"maxBytes":8192,"maxFrameBytes":1024}}
+```
+
+JSON 仅允许明确叶子路径，最多 16 条/每条 8 段，数组索引 0..63。不存在的路径会省略；没有任何叶子匹配时拒绝整帧。不支持整个对象/数组、通配符或转义路径。敏感字段不可选择；已知凭据文本、畸形/深嵌套/超长正文等会拒绝整帧。对象/数组起始结构符超过 64 的 JSON 会保守拒绝。任意未知秘密或匿名敏感值不能保证自动识别，调用者仍须审查所选路径。
+
+非 JSON 使用 format=bytes + byteRanges（offset/length）。最多 16 区间、合计 512 选中字节，其余置零；区间须位于 maxFrameBytes 内。调用者必须确认不含秘密，无法自动识别任意二进制凭据或匿名敏感值。
+
+默认正文预算 16 帧/8192 字节/单帧1024字节，最大 32/32768/4096，帧预算包含拒绝尝试；达到预算后不无限滚动采集。wireExact 恒 false，JSON 重建和字节置零不能当作原始报文或签名/校验和证据。
+
+只捕获进入统一 decode 的输入，包括解析失败输入；未完成分帧块、传输已拒绝的数据、未交给 decode 的 HTTP 错误正文不在此缓存。没有抓包线程、任意地址原始发送或原报文重发能力。
+
+每帧 input 只保留 transport、当时已有的 operation/deviceId/pointId，以及**脱敏 body 或 bytes 其中一种**；不保留 topic/path/requestId/config/statusCode/headers。JSON 模式优先使用已有文本正文；字节模式只留 bytes，不为重放重新生成文本 body。必须查看返回的 input，不能假定现场 decode 的完整上下文都已保留。
+
+readCapture 与 readPayloadCapture 的**序号相互独立**。captureWindow 使用元数据序号；replayCapture.frames[].sequence 必须取自 readPayloadCapture.frames[].sequence。分别用各接口自己的 nextSequence 推进游标。被拒绝的采集可能留下序号空洞，不能假定 1 号帧一定存在。
+
+上述 MQTT 示例需要显式补入已知、不含秘密的 topic。以下**仅当已保留的 1 号帧确实包含上述示例正文时**使用；否则按返回序号和对应值修改：
+
+```json title="对已保留的 MQTT 示例帧离线重放"
+{"scriptContent":"<完整MQTT演示源码>","frames":[{"sequence":1,"expected":{"operation":"report","deviceId":"demo-1","points":[{"pointId":"volume","value":20}]}}],"context":{"operation":"report","topic":"vendor/demo-1/state"}}
+```
+
+frames 为 1..16 个唯一保留序号及 expected，序列化最多 32768 字节。context 最多4096字节，仅 operation/deviceId/pointId/requestId/topic/path/config；不能替换 body/bytes/transport 或指定 host/port，不复制真实配置及线上状态。新的受限 Context 顺序执行 describe/decode，最长5秒，仍占会话主动操作/总次数预算。
+
+一批帧共用同一个 context，必须按兼容上下文分批。依赖 statusCode/headers 的 HTTP 解析不能靠 replayCapture 完整复现：这些字段既不保留，也不能覆盖。应改用 validateScript 的 decode 夹具，显式填写不含秘密的元信息；夹具只是离线断言，不证明原 HTTP 交换。字节模式帧也不能直接重放依赖文本 body 的脚本，除非脚本明确解析 bytes。
+
+重放返回 operation ID；终态 result 为 sent=false、correlation=offline，value 内有 valid、fixturesPassed、offline、deviceCommunicationVerified=false。它不发送报文、不安装脚本、不更新点值，也不证明真实设备验收通过。
+
+## 传输能力边界 {#capabilities}
+
+四协议均支持 Spec Command。HTTP 具有 httpResponseMetadata/httpErrorResponse；MQTT 具有 mqttBinaryPayload/mqttPublishOptions，但没有 probe/protocolAck。这些字段位于 session.properties.capabilities。MQTT 路由只限当前 Broker，旧 MqttConnDevice 不提供新调试适配器。
+
+当前没有任意 Shell、任意 host 原始发包、动态订阅管理、共享文件 CAS、持久化会话或服务端场景执行器。Agent 在客户端有界编排，不需要部署 Studio 内置模型；认证、特殊 TCP 服务端/分帧/TLS 等需求仍须按实际传输能力评估。

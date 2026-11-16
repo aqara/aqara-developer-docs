@@ -5,7 +5,6 @@
 - 概览: https://docs.aqara.com/zh/docs/aqara-developer/introduction
 - AIOT API 简介: https://docs.aqara.com/zh/docs/aqara-developer/aiot-api/introduction
 - 简介: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/introduction
-- 核心概念: https://docs.aqara.com/zh/docs/aqara-developer/aqara-data-model-specification/core-concepts
 
 ## 侧边栏收录的全部文档
 - 概览: https://docs.aqara.com/zh/docs/aqara-developer/introduction
@@ -80,6 +79,7 @@
 - 在线体验 WebSocket API: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/websocket-api/websocket-api
 - MQTT: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/mqtt-api/mqtt-api
 - 红外设备接入: https://docs.aqara.com/zh/docs/aqara-developer/local-studio-development/features/infrared-device-integration
+- 自定义设备接入: https://docs.aqara.com/zh/docs/aqara-developer/local-studio-development/features/custom-device-integration
 - AIOT API 简介: https://docs.aqara.com/zh/docs/aqara-developer/aiot-api/introduction
 - AIOT API 入门: https://docs.aqara.com/zh/docs/aqara-developer/aiot-api/getting-started-with-the-aiot-api
 - 在线体验 API: https://docs.aqara.com/zh/docs/aqara-developer/aiot-api/try-api-online
@@ -95,10 +95,4 @@
 - 查询 Trait 值: https://docs.aqara.com/zh/docs/aqara-developer/aiot-api/get-trait-values
 - 通过 Command 控制设备: https://docs.aqara.com/zh/docs/aqara-developer/aiot-api/execute-device-command
 - Aqara 物模型标签: https://docs.aqara.com/zh/docs/aqara-developer/aqara-data-model-specification/aqara-data-model-tags
-- 核心概念: https://docs.aqara.com/zh/docs/aqara-developer/aqara-data-model-specification/core-concepts
-- 设备类型: https://docs.aqara.com/zh/docs/aqara-developer/aqara-data-model-specification/device-types
-- 功能代码: https://docs.aqara.com/zh/docs/aqara-developer/aqara-data-model-specification/function-codes
-- 功能点代码: https://docs.aqara.com/zh/docs/aqara-developer/aqara-data-model-specification/trait-codes
-- 命令代码: https://docs.aqara.com/zh/docs/aqara-developer/aqara-data-model-specification/command-codes
-- 数据类型: https://docs.aqara.com/zh/docs/aqara-developer/aqara-data-model-specification/data-types
 

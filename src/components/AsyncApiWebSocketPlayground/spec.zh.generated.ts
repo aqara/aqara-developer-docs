@@ -81,6 +81,7 @@ const aqaraLifeWebSocketSpecZh = {
       "action": "receive",
       "messages": [
         "TraitValueUpdate",
+        "CommandReport",
         "AlarmEvent",
         "ObjectEvent",
         "ErrorMessage"
@@ -88,6 +89,157 @@ const aqaraLifeWebSocketSpecZh = {
     }
   ],
   "messages": {
+    "CommandReport": {
+      "name": "CommandReport",
+      "title": "网关命令执行结果",
+      "summary": "随 v1 设备级或全量设备订阅发送，保留原网关结果，不表示设备物理动作已完成。",
+      "examples": [
+        {
+          "name": "command_report",
+          "payload": {
+            "type": "CommandReport",
+            "version": "v1",
+            "msgId": "report-example",
+            "studioId": "studio-example",
+            "eventId": "449fd6f6-c52c-4488-a3a2-828db5f9ab6e",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "deviceId": "device-1",
+              "sequence": 1,
+              "timestamp": 1793577600000,
+              "did": "gateway-device-example",
+              "reportTime": null,
+              "source": null,
+              "data": {
+                "2.148.33050.0": "0"
+              },
+              "content": {
+                "0": 0,
+                "2": 2
+              }
+            }
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "description": "新版所有业务通知成对携带 studioId/eventId；普通历史报文允许缺省以兼容旧生产者。普通请求响应不引用本结构。执行结果与四类新场景对象事件另有强制身份约束。",
+        "dependencies": {
+          "eventId": [
+            "studioId"
+          ],
+          "studioId": [
+            "eventId"
+          ]
+        },
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data",
+          "code",
+          "message"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "CommandReport"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "object",
+            "required": [
+              "deviceId",
+              "sequence",
+              "timestamp",
+              "did",
+              "reportTime",
+              "source",
+              "data",
+              "content"
+            ],
+            "properties": {
+              "deviceId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sequence": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "timestamp": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Studio 记录时间，Unix 毫秒"
+              },
+              "did": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reportTime": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "网关原上报时间，无法提供时为 null"
+              },
+              "source": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "data": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "content": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          },
+          "eventId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "本次逻辑通知的不透明字符串，至少包含一个非空白字符。原样保存和比较，不依赖格式。跨通道及 HTTP 重试保持不变；连续相同内容通知使用不同值。"
+          },
+          "studioId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "发布通知的 Studio 正式身份，至少包含一个非空白字符。不是网关身份或认证凭据。"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "处理结果码，0 表示成功，非 0 表示失败。"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "处理结果描述。"
+          }
+        }
+      }
+    },
     "AuthRequest": {
       "name": "AuthRequest",
       "title": "WebSocket 鉴权请求",
@@ -1130,8 +1282,16 @@ const aqaraLifeWebSocketSpecZh = {
         }
       ],
       "payloadSchema": {
-        "description": "WebSocket 与 HTTP 共用的原始告警推送正文。WebSocket 显式订阅 ALARM 后接收，HTTP 按配置启用告警；不使用 App 通知栏 payload。",
+        "description": "新版所有业务通知成对携带 studioId/eventId；普通历史报文允许缺省以兼容旧生产者。普通请求响应不引用本结构。执行结果与四类新场景对象事件另有强制身份约束。",
         "type": "object",
+        "dependencies": {
+          "eventId": [
+            "studioId"
+          ],
+          "studioId": [
+            "eventId"
+          ]
+        },
         "required": [
           "type",
           "version",
@@ -1249,6 +1409,18 @@ const aqaraLifeWebSocketSpecZh = {
                 }
               }
             }
+          },
+          "eventId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "本次逻辑通知的不透明字符串，至少包含一个非空白字符。原样保存和比较，不依赖格式。跨通道及 HTTP 重试保持不变；连续相同内容通知使用不同值。"
+          },
+          "studioId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "发布通知的 Studio 正式身份，至少包含一个非空白字符。不是网关身份或认证凭据。"
           },
           "code": {
             "type": "integer",
@@ -1375,7 +1547,13 @@ const aqaraLifeWebSocketSpecZh = {
                       "AUTOMATION_ADDED",
                       "AUTOMATION_REMOVED",
                       "AUTOMATION_UPDATED",
-                      "AUTOMATION_SPACE_UPDATED"
+                      "AUTOMATION_SPACE_UPDATED",
+                      "AUTOMATION_EXECUTION_RESULT",
+                      "SCENE_EXECUTION_RESULT",
+                      "SCENE_ADDED",
+                      "SCENE_REMOVED",
+                      "SCENE_UPDATED",
+                      "SCENE_SPACE_UPDATED"
                     ]
                   }
                 },
@@ -1390,11 +1568,11 @@ const aqaraLifeWebSocketSpecZh = {
                     "type": "string",
                     "minLength": 1
                   },
-                  "description": "订阅时，不传、null 或空数组表示当前权限范围内全部对象；非空时只匹配指定对象。\n取消订阅时，不传、null 或空数组表示清空对应 eventTypes，非空时只移除指定对象。\n同一 WebSocket 会话在每个 eventType 下最多累计订阅 1000 个不同 objectId。\nobjectIds 非空时，同一项的 eventTypes 必须属于同一种对象类型；SPACE_ADDED、AUTOMATION_ADDED 只支持全部对象语义。\n协议不使用 scope 字段；全部对象语义统一由 objectIds 表示。\n"
+                  "description": "订阅时，不传、null 或空数组表示当前权限范围内全部对象；非空时只匹配指定对象。\n取消订阅时，不传、null 或空数组表示清空对应 eventTypes，非空时只移除指定对象。\n同一 WebSocket 会话在每个 eventType 下最多累计订阅 1000 个不同 objectId。\nobjectIds 非空时，同一项的 eventTypes 必须属于同一公开 ID 家族（设备、空间、自动化/场景）；SPACE_ADDED、AUTOMATION_ADDED、SCENE_ADDED 只支持全部对象语义。\n协议不使用 scope 字段；全部对象语义统一由 objectIds 表示。\n"
                 }
               }
             },
-            "description": "必须包含 1 至 100 个订阅项。请求按会话增量合并，重复订阅幂等。\nSPACE_ADDED、AUTOMATION_ADDED 只允许 objectIds 为全部对象语义。\n"
+            "description": "必须包含 1 至 100 个订阅项。请求按会话增量合并，重复订阅幂等。\nSPACE_ADDED、AUTOMATION_ADDED、SCENE_ADDED 只允许 objectIds 为全部对象语义。\n"
           }
         }
       }
@@ -1546,7 +1724,13 @@ const aqaraLifeWebSocketSpecZh = {
                       "AUTOMATION_ADDED",
                       "AUTOMATION_REMOVED",
                       "AUTOMATION_UPDATED",
-                      "AUTOMATION_SPACE_UPDATED"
+                      "AUTOMATION_SPACE_UPDATED",
+                      "AUTOMATION_EXECUTION_RESULT",
+                      "SCENE_EXECUTION_RESULT",
+                      "SCENE_ADDED",
+                      "SCENE_REMOVED",
+                      "SCENE_UPDATED",
+                      "SCENE_SPACE_UPDATED"
                     ]
                   }
                 },
@@ -1561,7 +1745,7 @@ const aqaraLifeWebSocketSpecZh = {
                     "type": "string",
                     "minLength": 1
                   },
-                  "description": "订阅时，不传、null 或空数组表示当前权限范围内全部对象；非空时只匹配指定对象。\n取消订阅时，不传、null 或空数组表示清空对应 eventTypes，非空时只移除指定对象。\n同一 WebSocket 会话在每个 eventType 下最多累计订阅 1000 个不同 objectId。\nobjectIds 非空时，同一项的 eventTypes 必须属于同一种对象类型；SPACE_ADDED、AUTOMATION_ADDED 只支持全部对象语义。\n协议不使用 scope 字段；全部对象语义统一由 objectIds 表示。\n"
+                  "description": "订阅时，不传、null 或空数组表示当前权限范围内全部对象；非空时只匹配指定对象。\n取消订阅时，不传、null 或空数组表示清空对应 eventTypes，非空时只移除指定对象。\n同一 WebSocket 会话在每个 eventType 下最多累计订阅 1000 个不同 objectId。\nobjectIds 非空时，同一项的 eventTypes 必须属于同一公开 ID 家族（设备、空间、自动化/场景）；SPACE_ADDED、AUTOMATION_ADDED、SCENE_ADDED 只支持全部对象语义。\n协议不使用 scope 字段；全部对象语义统一由 objectIds 表示。\n"
                 }
               }
             },
@@ -1633,6 +1817,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "traitValueUpdate",
           "payload": {
             "type": "TraitValueUpdate",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000002",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "1754469720110",
             "data": [
@@ -1653,6 +1839,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "deviceNameUpdated",
           "payload": {
             "type": "TraitValueUpdate",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000003",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "1789113600000",
             "data": [
@@ -1672,6 +1860,15 @@ const aqaraLifeWebSocketSpecZh = {
       ],
       "payloadSchema": {
         "type": "object",
+        "description": "新版所有业务通知成对携带 studioId/eventId；普通历史报文允许缺省以兼容旧生产者。普通请求响应不引用本结构。执行结果与四类新场景对象事件另有强制身份约束。",
+        "dependencies": {
+          "eventId": [
+            "studioId"
+          ],
+          "studioId": [
+            "eventId"
+          ]
+        },
         "required": [
           "type",
           "version",
@@ -1739,6 +1936,18 @@ const aqaraLifeWebSocketSpecZh = {
               }
             }
           },
+          "eventId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "本次逻辑通知的不透明字符串，至少包含一个非空白字符。原样保存和比较，不依赖格式。跨通道及 HTTP 重试保持不变；连续相同内容通知使用不同值。"
+          },
+          "studioId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "发布通知的 Studio 正式身份，至少包含一个非空白字符。不是网关身份或认证凭据。"
+          },
           "code": {
             "type": "integer",
             "format": "int32",
@@ -1757,13 +1966,114 @@ const aqaraLifeWebSocketSpecZh = {
     "ObjectEvent": {
       "name": "objectEvent",
       "title": "对象事件推送",
-      "summary": "设备增删默认推送；空间、自动化和空间关联变化按精确对象订阅投递。当前 13 类对象事件均提供示例。",
-      "description": "DEVICE_ADDED、DEVICE_REMOVED 在认证连接建立后默认推送。\n\nSPACE_*、AUTOMATION_*、DEVICE_SPACE_UPDATED 仅投递给命中 eventType、objectId 和当前权限的 SubscribeObjectEventRequest 会话。\n\nDEVICE_ENDPOINT_*、DEVICE_TRAIT_PARAMETER_UPDATE 继续跟随现有设备数据订阅。\n\n独立场景通过 /scenes 管理，变化通知沿用 AUTOMATION_* 事件族；对象分类以 /automations 和 /scenes 查询结果为准。数量变化不提供独立事件。新增、删除自动化只发送对应生命周期快照，不额外发送空间关系事件；已有对象仅空间关系变化时发送 AUTOMATION_SPACE_UPDATED，内容与关系同时变化时两类事件都可能收到。\n\n自动化快照的 manualTriggers 包含 triggerNodeId 和 triggerName；手动触发入口添加、删除或重命名通过 AUTOMATION_UPDATED 返回完整列表。按完整列表替换缓存，空数组清空旧入口；无需新增事件订阅类型。\n\n协议不提供全局唯一的事件 ID；推送 msgId 只用于链路追踪，调用端应按对象状态幂等处理，不应仅按 objectId、eventType、time 去重。\n",
+      "summary": "设备增删默认推送；空间、自动化、独立场景及空间关联变化按精确对象订阅投递。当前 19 类对象事件均提供示例。",
+      "description": "DEVICE_ADDED、DEVICE_REMOVED 在认证连接建立后默认推送。\n\nDEVICE_SPACE_UPDATED、三类空间变化、四类自动化变化、四类场景变化以及 AUTOMATION_EXECUTION_RESULT、SCENE_EXECUTION_RESULT，均只投递给命中 eventType、objectId 和当前权限的 SubscribeObjectEventRequest 会话。\n\nDEVICE_ENDPOINT_*、DEVICE_TRAIT_PARAMETER_UPDATE 继续跟随现有设备数据订阅。\n\n独立场景通过 /scenes 管理，变化通知使用四类 SCENE_* 事件，自动化仍使用 AUTOMATION_*；可信类别由服务端判断。数量变化不提供独立事件。新增、删除自动化只发送对应生命周期快照，不额外发送空间关系事件；已有对象仅空间关系变化时发送 AUTOMATION_SPACE_UPDATED，内容与关系同时变化时两类事件都可能收到。\n\n独立场景使用 SCENE_ADDED/REMOVED/UPDATED/SPACE_UPDATED，不再双发 AUTOMATION_*；sceneId 仍是 auto_ 前缀。旧自动化手动入口仍归自动化。场景定义比较排除空间，空间与定义同批变化产生两条不同 eventId 的通知。\n\n自动化快照的 manualTriggers 包含 triggerNodeId 和 triggerName；手动触发入口添加、删除或重命名通过 AUTOMATION_UPDATED 返回完整列表。按完整列表替换缓存，空数组清空旧入口；无需新增事件订阅类型。\n\nmsgId 只用于链路追踪。新版业务通知按 studioId + eventId 幂等；旧对象变化缺少公共身份时按对象状态幂等处理，不应仅按 objectId、eventType 或 time 去重。\n\n新增 AUTOMATION_EXECUTION_RESULT 和 SCENE_EXECUTION_RESULT 按有效动作记录通知，分别表示自动化与场景；不是整次执行完成事件。Studio 与 Gateway 均覆盖，原生优化按一次原生调用通知，未确认结果为未知，不展开为逐设备成功。\n\n两类动作结果及四类独立场景变化都必须携带公共层 studioId 和 eventId。同一逻辑通知跨通道和 HTTP 重试保留身份；动作结果可按接收者权限裁剪字段。按 studioId + eventId 幂等；executionId 仅关联执行，不可用时显式为 null。新订阅可能收到公共队列尚未分发的记录，不提供历史回放。\n",
       "examples": [
+        {
+          "name": "scene_added",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "trace-scene_added",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000020",
+            "studioId": "studio-example",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "eventType": "SCENE_ADDED",
+              "objectId": "auto_scene001",
+              "time": 1793836800123,
+              "data": {
+                "objectId": "auto_scene001",
+                "name": "电影场景",
+                "createTime": 1793836800000,
+                "spaces": []
+              }
+            }
+          }
+        },
+        {
+          "name": "scene_removed",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "trace-scene_removed",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000021",
+            "studioId": "studio-example",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "eventType": "SCENE_REMOVED",
+              "objectId": "auto_scene001",
+              "time": 1793836800123,
+              "data": {
+                "objectId": "auto_scene001",
+                "name": "电影场景",
+                "createTime": 1793836800000,
+                "spaces": []
+              }
+            }
+          }
+        },
+        {
+          "name": "scene_updated",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "trace-scene_updated",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000022",
+            "studioId": "studio-example",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "eventType": "SCENE_UPDATED",
+              "objectId": "auto_scene001",
+              "time": 1793836800123,
+              "data": {
+                "objectId": "auto_scene001",
+                "name": "电影场景",
+                "createTime": 1793836800000,
+                "spaces": []
+              }
+            }
+          }
+        },
+        {
+          "name": "scene_space_updated",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "trace-scene_space_updated",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000023",
+            "studioId": "studio-example",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "eventType": "SCENE_SPACE_UPDATED",
+              "objectId": "auto_scene001",
+              "time": 1793836800123,
+              "data": {
+                "objectId": "auto_scene001",
+                "oldSpaceIds": [
+                  "space-old"
+                ],
+                "spaces": [
+                  {
+                    "spaceId": "space-new",
+                    "name": "会议室",
+                    "parentSpaceId": null
+                  }
+                ]
+              }
+            }
+          }
+        },
         {
           "name": "deviceAdded",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000004",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "2",
             "data": {
@@ -1792,6 +2102,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "deviceSpaceUpdated",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000005",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "object-event-1",
             "data": {
@@ -1817,6 +2129,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "automationUpdated",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000006",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "object-event-2",
             "data": {
@@ -1845,6 +2159,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "automationSpaceUnassigned",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000007",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "object-event-3",
             "data": {
@@ -1854,7 +2170,11 @@ const aqaraLifeWebSocketSpecZh = {
               "data": {
                 "automationId": "automation-1",
                 "oldSpaceId": "space-2",
-                "space": null
+                "oldSpaceIds": [
+                  "space-2",
+                  "space-3"
+                ],
+                "spaces": []
               }
             },
             "code": 0,
@@ -1865,6 +2185,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "device_removed",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000008",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-device_removed",
             "data": {
@@ -1892,6 +2214,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "device_endpoint_added",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000009",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-device_endpoint_added",
             "data": {
@@ -1920,6 +2244,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "device_endpoint_removed",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-00000000000a",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-device_endpoint_removed",
             "data": {
@@ -1947,6 +2273,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "device_trait_parameter_update",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-00000000000b",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-device_trait_parameter_update",
             "data": {
@@ -1986,6 +2314,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "space_added",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-00000000000c",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-space_added",
             "data": {
@@ -2007,6 +2337,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "space_removed",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-00000000000d",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-space_removed",
             "data": {
@@ -2028,6 +2360,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "space_updated",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-00000000000e",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-space_updated",
             "data": {
@@ -2049,6 +2383,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "automation_added",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-00000000000f",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-automation_added",
             "data": {
@@ -2072,6 +2408,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "automation_removed",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000010",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-automation_removed",
             "data": {
@@ -2095,6 +2433,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "automationSpaceAssigned",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000011",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-automation_space_updated",
             "data": {
@@ -2109,7 +2449,16 @@ const aqaraLifeWebSocketSpecZh = {
                   "name": "卧室",
                   "spatialMarking": "room",
                   "parentSpaceId": "home-1"
-                }
+                },
+                "oldSpaceIds": [],
+                "spaces": [
+                  {
+                    "spaceId": "space-2",
+                    "name": "卧室",
+                    "spatialMarking": "room",
+                    "parentSpaceId": "home-1"
+                  }
+                ]
               }
             },
             "code": 0,
@@ -2120,6 +2469,8 @@ const aqaraLifeWebSocketSpecZh = {
           "name": "deviceSpaceUnassigned",
           "payload": {
             "type": "objectEvent",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000012",
+            "studioId": "studio-example",
             "version": "v1",
             "msgId": "example-device_space_updated",
             "data": {
@@ -2135,10 +2486,103 @@ const aqaraLifeWebSocketSpecZh = {
             "code": 0,
             "message": "success"
           }
+        },
+        {
+          "name": "sceneActionResult",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "trace-example",
+            "eventId": "449fd6f6-c52c-4488-a3a2-828db5f9ab6e",
+            "studioId": "studio-example",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "eventType": "SCENE_EXECUTION_RESULT",
+              "objectId": "auto_scene001",
+              "time": 1793664000123,
+              "data": {
+                "objectId": "auto_scene001",
+                "name": "回家场景",
+                "executionId": "opaque-run-example",
+                "triggeredAt": 1793664000000,
+                "actionOccurredAt": null,
+                "executeMode": "Gateway",
+                "resultCode": 0,
+                "actionKind": "device_write",
+                "actionTarget": {
+                  "type": "device",
+                  "id": "device-example",
+                  "name": "客厅灯",
+                  "resourceId": "4.1.85",
+                  "resourceName": "开关"
+                },
+                "triggerSource": {
+                  "sourceType": 60,
+                  "triggerSubjectId": null,
+                  "triggerSubjectName": null,
+                  "triggerResourceId": null,
+                  "triggerResourceName": null
+                },
+                "spaces": [
+                  {
+                    "spaceId": "space-example",
+                    "name": "客厅",
+                    "parentSpaceId": null
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "name": "automationNativeInvocationUnknown",
+          "payload": {
+            "type": "objectEvent",
+            "version": "v1",
+            "msgId": "trace-native-example",
+            "eventId": "6f913a2c-9484-42d5-bfa9-00b0b1fd23ee",
+            "studioId": "studio-example",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "eventType": "AUTOMATION_EXECUTION_RESULT",
+              "objectId": "auto_automation001",
+              "time": 1793664000123,
+              "data": {
+                "objectId": "auto_automation001",
+                "name": "离家自动化",
+                "executionId": "opaque-run-example",
+                "triggeredAt": 1793664000000,
+                "actionOccurredAt": null,
+                "executeMode": "Studio",
+                "resultCode": 2,
+                "actionKind": "native_scene_recall",
+                "actionTarget": null,
+                "triggerSource": {
+                  "sourceType": 51,
+                  "triggerSubjectId": null,
+                  "triggerSubjectName": null,
+                  "triggerResourceId": null,
+                  "triggerResourceName": null
+                },
+                "spaces": []
+              }
+            }
+          }
         }
       ],
       "payloadSchema": {
         "type": "object",
+        "description": "新版所有业务通知成对携带 studioId/eventId；普通历史报文允许缺省以兼容旧生产者。普通请求响应不引用本结构。执行结果与四类新场景对象事件另有强制身份约束。",
+        "dependencies": {
+          "eventId": [
+            "studioId"
+          ],
+          "studioId": [
+            "eventId"
+          ]
+        },
         "required": [
           "type",
           "version",
@@ -2182,7 +2626,7 @@ const aqaraLifeWebSocketSpecZh = {
               },
               "objectId": {
                 "type": "string",
-                "description": "对象 ID；按事件类型分别为设备、空间或自动化 ID。"
+                "description": "对象 ID；按事件类型分别为设备、空间、自动化或场景 ID。场景值仍为 auto_<节点ID>，不能通过 ID 前缀判断分类。"
               },
               "time": {
                 "type": "integer",
@@ -2194,7 +2638,7 @@ const aqaraLifeWebSocketSpecZh = {
                   "object",
                   "null"
                 ],
-                "description": "根据 eventType 判断具体结构。当前结构分别见 PushObjectEventDeviceData、PushObjectEventTraitParameterData、\nDeviceSpaceUpdateEventData、SpaceEventData、AutomationPushSnapshot 和 AutomationSpaceUpdateEventData。\n推送侧允许后续新增结构；订阅请求中的 PreciseObjectEventType 仍是当前版本的严格枚举。\n",
+                "description": "根据 eventType 判断具体结构。当前结构分别见 PushObjectEventDeviceData、PushObjectEventTraitParameterData、DeviceSpaceUpdateEventData、SpaceEventData、AutomationPushSnapshot、AutomationSpaceUpdateEventData、ScenePushSnapshot、SceneSpaceUpdateEventData 和 ExecutionResultData。\n推送侧允许后续新增结构；订阅请求中的 PreciseObjectEventType 仍是当前版本的严格枚举。\n",
                 "oneOf": [
                   {
                     "type": "object",
@@ -2688,7 +3132,7 @@ const aqaraLifeWebSocketSpecZh = {
                   },
                   {
                     "type": "object",
-                    "description": "自动化和独立场景变化通知沿用的轻量快照，不包含完整 config。事件字段 automationId 对于已知场景是 sceneId；按查询列表识别分类，分别通过 GET /automations/{automationI 或 GET /scenes/{sceneId} 查询详情。场景列表不使用快照中的 enabled 和 definitionType。manualTriggers 为自动化内手动触发入口的完整列表，其变化也触发 AUTOMATION_UPDATED。",
+                    "description": "自动化对象变化的轻量快照，不包含完整 config。通过 GET /automations/{automationId} 查询详情。manualTriggers 为旧自动化内手动触发入口的完整替换列表；独立场景使用 ScenePushSnapshot。删除使用上一次稳定合并基线。",
                     "required": [
                       "automationId",
                       "definitionType",
@@ -2746,7 +3190,7 @@ const aqaraLifeWebSocketSpecZh = {
                   },
                   {
                     "type": "object",
-                    "description": "自动化和独立场景变化通知沿用的轻量快照，不包含完整 config。事件字段 automationId 对于已知场景是 sceneId；按查询列表识别分类，分别通过 GET /automations/{automationI 或 GET /scenes/{sceneId} 查询详情。场景列表不使用快照中的 enabled 和 definitionType。manualTriggers 为自动化内手动触发入口的完整列表，其变化也触发 AUTOMATION_UPDATED。",
+                    "description": "自动化对象变化的轻量快照，不包含完整 config。通过 GET /automations/{automationId} 查询详情。manualTriggers 为旧自动化内手动触发入口的完整替换列表；独立场景使用 ScenePushSnapshot。删除使用上一次稳定合并基线。",
                     "required": [
                       "automationId",
                       "definitionType",
@@ -2804,7 +3248,7 @@ const aqaraLifeWebSocketSpecZh = {
                   },
                   {
                     "type": "object",
-                    "description": "自动化和独立场景变化通知沿用的轻量快照，不包含完整 config。事件字段 automationId 对于已知场景是 sceneId；按查询列表识别分类，分别通过 GET /automations/{automationI 或 GET /scenes/{sceneId} 查询详情。场景列表不使用快照中的 enabled 和 definitionType。manualTriggers 为自动化内手动触发入口的完整列表，其变化也触发 AUTOMATION_UPDATED。",
+                    "description": "自动化对象变化的轻量快照，不包含完整 config。通过 GET /automations/{automationId} 查询详情。manualTriggers 为旧自动化内手动触发入口的完整替换列表；独立场景使用 ScenePushSnapshot。删除使用上一次稳定合并基线。",
                     "required": [
                       "automationId",
                       "definitionType",
@@ -2864,8 +3308,8 @@ const aqaraLifeWebSocketSpecZh = {
                     "type": "object",
                     "required": [
                       "automationId",
-                      "oldSpaceId",
-                      "space"
+                      "oldSpaceIds",
+                      "spaces"
                     ],
                     "properties": {
                       "automationId": {
@@ -2877,7 +3321,7 @@ const aqaraLifeWebSocketSpecZh = {
                           "string",
                           "null"
                         ],
-                        "description": "变化前空间 ID；首次关联时为 null。"
+                        "description": "兼容字段，取 oldSpaceIds 第一项；无旧关联时为 null 或省略。"
                       },
                       "space": {
                         "anyOf": [
@@ -2918,14 +3362,709 @@ const aqaraLifeWebSocketSpecZh = {
                             "type": "null"
                           }
                         ],
-                        "description": "关系变化时的空间摘要；解除关联时为 null。空间 ID 读取 space.spaceId，后续名称、标记或父级变化由 SPACE_UPDATED 更新统一空间缓存；该关系也适用于独立场景。"
+                        "description": "兼容字段，取 spaces 第一项；无新关联时为 null 或省略。完整关系以 spaces 为准；独立场景使用 SCENE_SPACE_UPDATED。"
+                      },
+                      "oldSpaceIds": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "变更前的完整关联空间 ID 列表；无旧关联时为 []。"
+                      },
+                      "spaces": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "description": "空间最新摘要。客户端应按 spaceId 维护统一空间缓存，避免在设备或自动化关系数据中重复保存可能过期的名称、标记和父级；parentSpaceId 表示该摘要所属父空间，根空间为 null。",
+                          "required": [
+                            "spaceId",
+                            "name",
+                            "parentSpaceId"
+                          ],
+                          "properties": {
+                            "spaceId": {
+                              "type": "string",
+                              "description": "空间 ID。"
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "空间名称。"
+                            },
+                            "spatialMarking": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "空间标记；没有标记时为 null。"
+                            },
+                            "parentSpaceId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "空间所属父空间 ID；根空间为 null。SPACE_ADDED 和 SPACE_UPDATED 为事件后的父空间，SPACE_REMOVED 为删除前的父空间。"
+                            }
+                          }
+                        },
+                        "description": "变更后的完整空间摘要数组；无可解析关联时为 []。客户端整组替换关系；即使第一项不变，其余空间变化也会触发事件。名称、标记和父级变化通过 SPACE_UPDATED 更新统一空间缓存。"
                       }
                     },
                     "title": "AUTOMATION_SPACE_UPDATED"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "objectId",
+                      "name",
+                      "executionId",
+                      "triggeredAt",
+                      "actionOccurredAt",
+                      "executeMode",
+                      "resultCode",
+                      "actionKind",
+                      "actionTarget",
+                      "triggerSource",
+                      "spaces"
+                    ],
+                    "properties": {
+                      "objectId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "与外层 objectId 完全相同的自动化或场景公开 ID。"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "记录接收时的对象名称快照。"
+                      },
+                      "executionId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "不透明执行关联；不可靠时为 null，不能据此去重不同动作或判断整次结束。"
+                      },
+                      "triggeredAt": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "description": "可信原始执行链触发时间，Unix 毫秒；未知时为 null，嵌套场景可继承起因时间。"
+                      },
+                      "actionOccurredAt": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "description": "可信上游动作结果发生时间，Unix 毫秒；未提供时为 null，不填接收时间。"
+                      },
+                      "executeMode": {
+                        "type": "string",
+                        "enum": [
+                          "Studio",
+                          "Gateway"
+                        ],
+                        "description": "实际执行器。Studio 经网关控制设备仍是 Studio。"
+                      },
+                      "resultCode": {
+                        "type": "integer",
+                        "enum": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "description": "0=当前记录按既有业务规则成功或非失败，1=失败，2=未知。不表示整次执行汇总或物理动作完成。"
+                      },
+                      "actionKind": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "稳定动作类别，如 device_write、variable_set、flow_invoke、native_scene_recall；兼容未来未知类别。"
+                      },
+                      "actionTarget": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "required": [
+                              "type",
+                              "id",
+                              "name",
+                              "resourceId",
+                              "resourceName"
+                            ],
+                            "properties": {
+                              "type": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "name": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "resourceId": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "resourceName": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            },
+                            "description": "目标身份和默认语言名称摘要。资源仅在可可靠映射时提供；无权内容显式为空。客户端兼容新增目标类别。"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "triggerSource": {
+                        "type": "object",
+                        "required": [
+                          "sourceType",
+                          "triggerSubjectId",
+                          "triggerSubjectName",
+                          "triggerResourceId",
+                          "triggerResourceName"
+                        ],
+                        "properties": {
+                          "sourceType": {
+                            "type": "integer",
+                            "description": "沿用触发源协议来源码，不能单凭此码推断精细触发类别。"
+                          },
+                          "triggerSubjectId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "triggerSubjectName": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "triggerResourceId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "triggerResourceName": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        }
+                      },
+                      "spaces": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "description": "空间最新摘要。客户端应按 spaceId 维护统一空间缓存，避免在设备或自动化关系数据中重复保存可能过期的名称、标记和父级；parentSpaceId 表示该摘要所属父空间，根空间为 null。",
+                          "required": [
+                            "spaceId",
+                            "name",
+                            "parentSpaceId"
+                          ],
+                          "properties": {
+                            "spaceId": {
+                              "type": "string",
+                              "description": "空间 ID。"
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "空间名称。"
+                            },
+                            "spatialMarking": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "空间标记；没有标记时为 null。"
+                            },
+                            "parentSpaceId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "空间所属父空间 ID；根空间为 null。SPACE_ADDED 和 SPACE_UPDATED 为事件后的父空间，SPACE_REMOVED 为删除前的父空间。"
+                            }
+                          }
+                        },
+                        "description": "全部可提供的关联空间摘要；无关联为 []。"
+                      }
+                    },
+                    "description": "逐条有效动作记录的不可变业务载荷。声明可空的键始终存在并显式为 null；名称按 Studio 默认语言。",
+                    "title": "AUTOMATION_EXECUTION_RESULT"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "objectId",
+                      "name",
+                      "executionId",
+                      "triggeredAt",
+                      "actionOccurredAt",
+                      "executeMode",
+                      "resultCode",
+                      "actionKind",
+                      "actionTarget",
+                      "triggerSource",
+                      "spaces"
+                    ],
+                    "properties": {
+                      "objectId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "与外层 objectId 完全相同的自动化或场景公开 ID。"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "记录接收时的对象名称快照。"
+                      },
+                      "executionId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "不透明执行关联；不可靠时为 null，不能据此去重不同动作或判断整次结束。"
+                      },
+                      "triggeredAt": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "description": "可信原始执行链触发时间，Unix 毫秒；未知时为 null，嵌套场景可继承起因时间。"
+                      },
+                      "actionOccurredAt": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "description": "可信上游动作结果发生时间，Unix 毫秒；未提供时为 null，不填接收时间。"
+                      },
+                      "executeMode": {
+                        "type": "string",
+                        "enum": [
+                          "Studio",
+                          "Gateway"
+                        ],
+                        "description": "实际执行器。Studio 经网关控制设备仍是 Studio。"
+                      },
+                      "resultCode": {
+                        "type": "integer",
+                        "enum": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "description": "0=当前记录按既有业务规则成功或非失败，1=失败，2=未知。不表示整次执行汇总或物理动作完成。"
+                      },
+                      "actionKind": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "稳定动作类别，如 device_write、variable_set、flow_invoke、native_scene_recall；兼容未来未知类别。"
+                      },
+                      "actionTarget": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "required": [
+                              "type",
+                              "id",
+                              "name",
+                              "resourceId",
+                              "resourceName"
+                            ],
+                            "properties": {
+                              "type": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "name": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "resourceId": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "resourceName": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            },
+                            "description": "目标身份和默认语言名称摘要。资源仅在可可靠映射时提供；无权内容显式为空。客户端兼容新增目标类别。"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "triggerSource": {
+                        "type": "object",
+                        "required": [
+                          "sourceType",
+                          "triggerSubjectId",
+                          "triggerSubjectName",
+                          "triggerResourceId",
+                          "triggerResourceName"
+                        ],
+                        "properties": {
+                          "sourceType": {
+                            "type": "integer",
+                            "description": "沿用触发源协议来源码，不能单凭此码推断精细触发类别。"
+                          },
+                          "triggerSubjectId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "triggerSubjectName": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "triggerResourceId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "triggerResourceName": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        }
+                      },
+                      "spaces": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "description": "空间最新摘要。客户端应按 spaceId 维护统一空间缓存，避免在设备或自动化关系数据中重复保存可能过期的名称、标记和父级；parentSpaceId 表示该摘要所属父空间，根空间为 null。",
+                          "required": [
+                            "spaceId",
+                            "name",
+                            "parentSpaceId"
+                          ],
+                          "properties": {
+                            "spaceId": {
+                              "type": "string",
+                              "description": "空间 ID。"
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "空间名称。"
+                            },
+                            "spatialMarking": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "空间标记；没有标记时为 null。"
+                            },
+                            "parentSpaceId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "空间所属父空间 ID；根空间为 null。SPACE_ADDED 和 SPACE_UPDATED 为事件后的父空间，SPACE_REMOVED 为删除前的父空间。"
+                            }
+                          }
+                        },
+                        "description": "全部可提供的关联空间摘要；无关联为 []。"
+                      }
+                    },
+                    "description": "逐条有效动作记录的不可变业务载荷。声明可空的键始终存在并显式为 null；名称按 Studio 默认语言。",
+                    "title": "SCENE_EXECUTION_RESULT"
+                  },
+                  {
+                    "type": "object",
+                    "description": "独立场景轻量快照。objectId 与外层一致，是 scenes 查询返回的 sceneId（auto_ 前缀）。不包含 enabled、manualTriggers 或完整动作配置；删除使用上一次稳定合并基线。",
+                    "required": [
+                      "objectId",
+                      "name",
+                      "createTime",
+                      "spaces"
+                    ],
+                    "properties": {
+                      "objectId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "createTime": {
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "spaces": {
+                        "type": "array",
+                        "description": "完整有效空间摘要，包含继承计算结果；无有效关系时为空数组。",
+                        "items": {
+                          "type": "object",
+                          "description": "空间最新摘要。客户端应按 spaceId 维护统一空间缓存，避免在设备或自动化关系数据中重复保存可能过期的名称、标记和父级；parentSpaceId 表示该摘要所属父空间，根空间为 null。",
+                          "required": [
+                            "spaceId",
+                            "name",
+                            "parentSpaceId"
+                          ],
+                          "properties": {
+                            "spaceId": {
+                              "type": "string",
+                              "description": "空间 ID。"
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "空间名称。"
+                            },
+                            "spatialMarking": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "空间标记；没有标记时为 null。"
+                            },
+                            "parentSpaceId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "空间所属父空间 ID；根空间为 null。SPACE_ADDED 和 SPACE_UPDATED 为事件后的父空间，SPACE_REMOVED 为删除前的父空间。"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "title": "SCENE_ADDED"
+                  },
+                  {
+                    "type": "object",
+                    "description": "独立场景轻量快照。objectId 与外层一致，是 scenes 查询返回的 sceneId（auto_ 前缀）。不包含 enabled、manualTriggers 或完整动作配置；删除使用上一次稳定合并基线。",
+                    "required": [
+                      "objectId",
+                      "name",
+                      "createTime",
+                      "spaces"
+                    ],
+                    "properties": {
+                      "objectId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "createTime": {
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "spaces": {
+                        "type": "array",
+                        "description": "完整有效空间摘要，包含继承计算结果；无有效关系时为空数组。",
+                        "items": {
+                          "type": "object",
+                          "description": "空间最新摘要。客户端应按 spaceId 维护统一空间缓存，避免在设备或自动化关系数据中重复保存可能过期的名称、标记和父级；parentSpaceId 表示该摘要所属父空间，根空间为 null。",
+                          "required": [
+                            "spaceId",
+                            "name",
+                            "parentSpaceId"
+                          ],
+                          "properties": {
+                            "spaceId": {
+                              "type": "string",
+                              "description": "空间 ID。"
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "空间名称。"
+                            },
+                            "spatialMarking": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "空间标记；没有标记时为 null。"
+                            },
+                            "parentSpaceId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "空间所属父空间 ID；根空间为 null。SPACE_ADDED 和 SPACE_UPDATED 为事件后的父空间，SPACE_REMOVED 为删除前的父空间。"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "title": "SCENE_REMOVED"
+                  },
+                  {
+                    "type": "object",
+                    "description": "独立场景轻量快照。objectId 与外层一致，是 scenes 查询返回的 sceneId（auto_ 前缀）。不包含 enabled、manualTriggers 或完整动作配置；删除使用上一次稳定合并基线。",
+                    "required": [
+                      "objectId",
+                      "name",
+                      "createTime",
+                      "spaces"
+                    ],
+                    "properties": {
+                      "objectId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "createTime": {
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "spaces": {
+                        "type": "array",
+                        "description": "完整有效空间摘要，包含继承计算结果；无有效关系时为空数组。",
+                        "items": {
+                          "type": "object",
+                          "description": "空间最新摘要。客户端应按 spaceId 维护统一空间缓存，避免在设备或自动化关系数据中重复保存可能过期的名称、标记和父级；parentSpaceId 表示该摘要所属父空间，根空间为 null。",
+                          "required": [
+                            "spaceId",
+                            "name",
+                            "parentSpaceId"
+                          ],
+                          "properties": {
+                            "spaceId": {
+                              "type": "string",
+                              "description": "空间 ID。"
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "空间名称。"
+                            },
+                            "spatialMarking": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "空间标记；没有标记时为 null。"
+                            },
+                            "parentSpaceId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "空间所属父空间 ID；根空间为 null。SPACE_ADDED 和 SPACE_UPDATED 为事件后的父空间，SPACE_REMOVED 为删除前的父空间。"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "title": "SCENE_UPDATED"
+                  },
+                  {
+                    "type": "object",
+                    "description": "场景完整空间关系替换。不提供 oldSpaceId/space 兼容单值；清空直接关系后仍可能继承空间。",
+                    "required": [
+                      "objectId",
+                      "oldSpaceIds",
+                      "spaces"
+                    ],
+                    "properties": {
+                      "objectId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "oldSpaceIds": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "spaces": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "description": "空间最新摘要。客户端应按 spaceId 维护统一空间缓存，避免在设备或自动化关系数据中重复保存可能过期的名称、标记和父级；parentSpaceId 表示该摘要所属父空间，根空间为 null。",
+                          "required": [
+                            "spaceId",
+                            "name",
+                            "parentSpaceId"
+                          ],
+                          "properties": {
+                            "spaceId": {
+                              "type": "string",
+                              "description": "空间 ID。"
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "空间名称。"
+                            },
+                            "spatialMarking": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "空间标记；没有标记时为 null。"
+                            },
+                            "parentSpaceId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "空间所属父空间 ID；根空间为 null。SPACE_ADDED 和 SPACE_UPDATED 为事件后的父空间，SPACE_REMOVED 为删除前的父空间。"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "title": "SCENE_SPACE_UPDATED"
                   }
                 ]
               }
             }
+          },
+          "eventId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "本次逻辑通知的不透明字符串，至少包含一个非空白字符。原样保存和比较，不依赖格式。跨通道及 HTTP 重试保持不变；连续相同内容通知使用不同值。"
+          },
+          "studioId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "发布通知的 Studio 正式身份，至少包含一个非空白字符。不是网关身份或认证凭据。"
           },
           "code": {
             "type": "integer",
@@ -2938,6 +4077,37 @@ const aqaraLifeWebSocketSpecZh = {
               "null"
             ],
             "description": "处理结果描述。"
+          }
+        },
+        "if": {
+          "properties": {
+            "data": {
+              "properties": {
+                "eventType": {
+                  "enum": [
+                    "AUTOMATION_EXECUTION_RESULT",
+                    "SCENE_EXECUTION_RESULT",
+                    "SCENE_ADDED",
+                    "SCENE_REMOVED",
+                    "SCENE_UPDATED",
+                    "SCENE_SPACE_UPDATED"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "eventId",
+            "studioId"
+          ],
+          "properties": {
+            "studioId": {
+              "type": "string",
+              "minLength": 1,
+              "description": "发布通知的 Studio 正式身份，不是执行网关 ID。"
+            }
           }
         }
       }

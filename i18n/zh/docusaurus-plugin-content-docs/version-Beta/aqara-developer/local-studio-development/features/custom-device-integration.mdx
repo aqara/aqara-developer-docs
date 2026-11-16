@@ -1,0 +1,487 @@
+---
+title: "自定义设备接入"
+description: "通过 Studio 本地 API 创建一个自定义设备，并整合 Aqara Studio 内不同设备的多个功能点，实现更高效的设备统一管理与控制。"
+keywords: ["Aqara 文档", "Aqara Developer", "本地 Studio 开发", "红外设备接入", "infrared device integration"]
+---
+# 自定义设备创建
+
+本文描述如何通过 Studio 本地 API 创建一个自定义设备，并整合 Aqara Studio 内不同设备的多个功能点，实现更高效的设备统一管理与控制。
+
+## 1 创建自定义设备
+
+通过 Studio 本地 API [`POST` /open/api/v1/virtual-devices](./../../data-export-api/add-virtual-device.api.mdx) 接口，创建一个自定义设备，获取该自定义设备 ID。
+
+请求示例：
+```json
+{
+  "name": "Custom Virtual Device",
+  "virtualDeviceType": "virtual"
+}
+```
+
+响应示例：
+```json
+{
+  "type": "VirtualDeviceAddResponse",
+  "version": "v1",
+  "msgId": "1",
+  "data": {
+    "deviceId": "virtual.1790253917450"
+  },
+  "code": 0,
+  "message": "success"
+}
+```
+
+## 2 查询设备信息列表
+
+通过 Studio 本地 API [`GET` /open/api/v1/devices](./../../data-export-api/get-devices.api.mdx) 接口可获取 Aqara Studio 当前已接入的所有设备信息。在返回的设备列表中，您可以根据实际需求挑选一个或多个设备的 `deviceId`，作为功能点来源，后续将在自定义设备中整合这些设备的功能点。
+
+根据以下响应示例，您可以看到除了 M300 和上述刚创建的自定义设备外，还有其他 2 个设备，即 Smart Switch T1 和 Climate Sensor W100。
+
+```json {23-32, 35-46}
+{
+  "type": "GetDeviceInfoResponse",
+  "version": "v1",
+  "msgId": "2",
+  "data": {
+    "totalCount": 4,
+    "pageNum": 1,
+    "pageSize": 200,
+    "data": [
+      {
+        "deviceId": "lumi3.a2b91c7279d815d5",
+        "deviceName": "Edge Hub M300",
+        "deviceTypesList": [
+          "Hub",
+          "IRDevice"
+        ],
+        "createTime": 1790047450565,
+        "state": true,
+        "gatewayId": "lumi3.a2b91c7279d815d5",
+        "model": "lumi.models.4447_2059"
+      },
+      {
+        "deviceId": "lumi.54ef4410000d9618",
+        "deviceName": "Smart Switch T1",
+        "deviceTypesList": [
+          "Switch",
+          "Button"
+        ],
+        "createTime": 1790064137622,
+        "state": false,
+        "gatewayId": "lumi3.a2b91c7279d815d5",
+        "model": "lumi.switch.b2nacn01"
+      },
+      {
+        "deviceId": "matt.04692c7f67c43e582d",
+        "deviceName": "Climate Sensor W100",
+        "deviceTypesList": [
+          "TemperatureSensor",
+          "HumiditySensor",
+          "Button",
+          "ThermostatController"
+        ],
+        "createTime": 1790217559182,
+        "state": false,
+        "gatewayId": "lumi3.a2b91c7279d815d5",
+        "model": "aqara.matter.4447_8196"
+      },
+      {
+        "deviceId": "virtual.1790253917450",
+        "deviceName": "Custom Virtual Device",
+        "deviceTypesList": [],
+        "createTime": 1790244961237,
+        "state": false,
+        "model": ""
+      }
+    ]
+  },
+  "code": 0,
+  "message": "success"
+}
+```
+
+## 3 查询设备模型定义
+
+通过 Studio 本地 API [`GET` /open/api/v1/devices/definitions](./../../data-export-api/get-device-definitions.api.mdx) 接口，传入你想要的设备的 `deviceId`，查询其设备模型定义，以便获取后续操作所需的 **endpointId**、**functionCode**、**traitCode** 或 **commandCode**。
+
+以下是获取 Smart Switch T1 和 Climate Sensor W100 设备模型定义的响应示例（代码块高亮部分表示将整合到自定义设备中的功能点所需信息）：
+
+```json {7,17,22,25,43,71,139,151,156,159}
+{
+  "type": "GetDevicesResponse",
+  "version": "v1",
+  "msgId": "3",
+  "data": [
+    {
+      "deviceId": "lumi.54ef4410000d9618",
+      "name": "Smart Switch T1",
+      "gatewayId": "lumi3.a2b91c7279d815d5",
+      "deviceTypesList": [
+        "Switch",
+        "Button"
+      ],
+      "endpoints": [
+        ...
+        {
+          "endpointId": 2,
+          "endpointName": "Switch",
+          "deviceType": "Switch",
+          "functions": [
+            {
+              "functionCode": "Output",
+              "traits": [
+                {
+                  "traitCode": "OnOff",
+                  "parameter": {
+                    "type": "Bool",
+                    "readable": true,
+                    "writable": true,
+                    "subscribable": true,
+                    "unit": ""
+                  },
+                  "value": false,
+                  "time": 1790247705173,
+                  "pointName": "Left Switch - On/Off",
+                  "displayTags": [
+                    "0",
+                    "1",
+                    "96"
+                  ]
+                },
+                {
+                  "traitCode": "StartUpOnOff",
+                  "parameter": {
+                    "type": "Enum",
+                    "readable": true,
+                    "writable": true,
+                    "subscribable": true,
+                    "supportedValues": [
+                      {
+                        "key": "Off",
+                        "value": "0"
+                      },
+                      {
+                        "key": "Hold",
+                        "value": "3"
+                      }
+                    ],
+                    "unit": ""
+                  },
+                  "value": "0",
+                  "time": 1790247705273,
+                  "pointName": "Left Switch - Power on switch",
+                  "displayTags": [
+                    "2"
+                  ]
+                }
+              ],
+              "commands": [
+                {
+                  "commandCode": "Toggle",
+                  "fields": [],
+                  "description": "开/关",
+                  "pointName": "Left Switch - On/off",
+                  "displayTags": [
+                    "1"
+                  ]
+                }
+              ]
+            },
+            {
+              "functionCode": "Button",
+              "traits": [
+                {
+                  "traitCode": "ButtonEvent",
+                  "parameter": {
+                    "type": "Enum",
+                    "readable": false,
+                    "writable": false,
+                    "subscribable": true,
+                    "supportedValues": [
+                      {
+                        "key": "SinglePress",
+                        "value": "0"
+                      },
+                      {
+                        "key": "DoublePress",
+                        "value": "1"
+                      },
+                      {
+                        "key": "LongPress",
+                        "value": "2"
+                      }
+                    ],
+                    "unit": ""
+                  },
+                  "time": 0,
+                  "pointName": "Left Switch - Button Events",
+                  "displayTags": [
+                    "0",
+                    "1"
+                  ]
+                },
+                {
+                  "traitCode": "LocalControlDisabled",
+                  "parameter": {
+                    "type": "Bool",
+                    "readable": true,
+                    "writable": true,
+                    "subscribable": true,
+                    "unit": ""
+                  },
+                  "value": false,
+                  "time": 1790247705726,
+                  "pointName": "Left Switch - Whether the switch disables local control (Convert to wireless switch function)",
+                  "displayTags": [
+                    "2"
+                  ]
+                }
+              ],
+              "commands": []
+            }
+          ]
+        },
+        ...
+      ]
+    },
+    {
+      "deviceId": "matt.04692c7f67c43e582d",
+      "name": "Climate Sensor W100",
+      "gatewayId": "lumi3.a2b91c7279d815d5",
+      "deviceTypesList": [
+        "TemperatureSensor",
+        "HumiditySensor",
+        "Button",
+        "ThermostatController"
+      ],
+      "endpoints": [
+        ...
+        {
+          "endpointId": 2,
+          "endpointName": "Temperature Sensor",
+          "deviceType": "TemperatureSensor",
+          "functions": [
+            {
+              "functionCode": "Temperature",
+              "traits": [
+                {
+                  "traitCode": "CurrentTemperature",
+                  "parameter": {
+                    "type": "Float",
+                    "readable": true,
+                    "writable": false,
+                    "subscribable": true,
+                    "min": -40,
+                    "max": 125,
+                    "unit": "°C",
+                    "step": 0.01
+                  },
+                  "value": 25.59,
+                  "time": 0,
+                  "pointName": "Temperature Sensor - Temperature",
+                  "displayTags": [
+                    "0",
+                    "1",
+                    "96"
+                  ]
+                }
+              ],
+              "commands": []
+            }
+          ]
+        },
+        ...
+      ]
+    }
+  ],
+  "code": 0,
+  "message": "success"
+}
+```
+
+## 4 绑定功能点到自定义设备
+
+通过 Studio 本地 API [`POST` /open/api/v1/virtual-devices/points/bind](./../../data-export-api/bind-virtual-device-points.api.mdx) 接口，将上述选中的功能点绑定到您创建的自定义设备。
+
+以下请求示例展示了如何将 Smart Switch T1 的 2 个特征（trait）和 1 个命令（Command），以及 Climate Sensor W100 的 1 个特征，绑定到自定义设备上。
+
+```json
+{
+  "deviceId": "virtual.1790253917450",
+  "sourcePoints": [
+    {
+      "deviceId": "lumi.54ef4410000d9618",
+      "endpointId": 2,
+      "functionCode": "Output",
+      "traitCode": "OnOff"
+    },
+    {
+      "deviceId": "lumi.54ef4410000d9618",
+      "endpointId": 2,
+      "functionCode": "Output",
+      "traitCode": "StartUpOnOff"
+    },
+    {
+      "deviceId": "lumi.54ef4410000d9618",
+      "endpointId": 2,
+      "functionCode": "Output",
+      "commandCode": "Toggle"
+    },
+    {
+      "deviceId": "matt.04692c7f67c43e582d",
+      "endpointId": 2,
+      "functionCode": "Temperature",
+      "traitCode": "CurrentTemperature"
+    }
+  ]
+}
+```
+
+响应示例如下：
+```json
+{
+  "type": "VirtualDeviceBindPointsResponse",
+  "version": "v1",
+  "msgId": "4",
+  "data": "",
+  "code": 0,
+  "message": "success"
+}
+```
+
+## 5 从自定义设备解绑功能点
+
+如果您不需要某些功能点，可通过通过 Studio 本地 API [`POST /open/api/v1/virtual-devices/points/unbind`](./../../data-export-api/unbind-virtual-device-points.api.mdx) 接口，将这些功能点从自定义设备中解绑。
+
+以下请求示例展示了如何将 Smart Switch T1 的 `StartUpOnOff` 功能点从自定义设备上解绑：
+
+```json
+{
+  "deviceId": "virtual.1790253917450",
+  "sourcePoints": [
+    {
+      "deviceId": "lumi.54ef4410000d9618",
+      "endpointId": 2,
+      "functionCode": "Output",
+      "traitCode": "StartUpOnOff"
+    }
+  ]
+}
+```
+
+响应示例如下：
+```json
+{
+  "type": "VirtualDeviceUnbindPointsResponse",
+  "version": "v1",
+  "msgId": "5",
+  "data": "",
+  "code": 0,
+  "message": "success"
+}
+```
+
+## 6 查询自定义设备信息
+
+通过 Studio 本地 API [`GET` /open/api/v1/devices/definitions](./../../data-export-api/get-device-definitions.api.mdx) 接口，查询此自定义设备内的功能点列表，确认上述绑定和解绑操作是否成功。
+
+以下响应示例展示了自定义设备内的功能点列表，从代码块高亮部分可以看到，此定义设备拥有 `OnOff`（trait）、`Toggle`（command）、`CurrentTemperature`（trait）3 个功能点，没有了 `StartUpOnOff`（trait）功能点：
+
+```json {31, 51, 64}
+{
+  "type": "GetDevicesResponse",
+  "version": "v1",
+  "msgId": "6",
+  "data": [
+    {
+      "deviceId": "virtual.1790253917450",
+      "name": "Custom Virtual Device",
+      "deviceTypesList": [
+        "Switch",
+        "TemperatureSensor"
+      ],
+      "endpoints": [
+        {
+          "endpointId": 0,
+          "endpointName": "Root",
+          "deviceType": "Root",
+          "functions": [
+            ...
+          ]
+        },
+        {
+          "endpointId": 2,
+          "endpointName": "OBJ_1",
+          "deviceType": "Switch",
+          "functions": [
+            {
+              "functionCode": "Output",
+              "traits": [
+                {
+                  "traitCode": "OnOff",
+                  "parameter": {
+                    "type": "Bool",
+                    "readable": true,
+                    "writable": true,
+                    "subscribable": true,
+                    "unit": ""
+                  },
+                  "value": false,
+                  "time": 1790254058561,
+                  "pointName": "Left Switch - On/Off",
+                  "displayTags": [
+                    "0",
+                    "1",
+                    "96"
+                  ]
+                }
+              ],
+              "commands": [
+                {
+                  "commandCode": "Toggle",
+                  "fields": [],
+                  "pointName": "Left Switch - On/off",
+                  "displayTags": [
+                    "1"
+                  ]
+                }
+              ]
+            },
+            {
+              "functionCode": "Temperature",
+              "traits": [
+                {
+                  "traitCode": "CurrentTemperature",
+                  "parameter": {
+                    "type": "Float",
+                    "readable": true,
+                    "writable": false,
+                    "subscribable": true,
+                    "min": -40,
+                    "max": 125,
+                    "unit": "°C",
+                    "step": 0.01
+                  },
+                  "value": 26.03,
+                  "time": 1790254107189,
+                  "pointName": "Temperature Sensor - Temperature",
+                  "displayTags": [
+                    "0",
+                    "1",
+                    "96"
+                  ]
+                }
+              ],
+              "commands": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "code": 0,
+  "message": "success"
+}
+```

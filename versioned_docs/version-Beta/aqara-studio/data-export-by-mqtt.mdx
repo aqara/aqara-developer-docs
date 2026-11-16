@@ -13,9 +13,20 @@ This guide uses the MQTTX desktop app to show how to connect to MQTT and how to 
 
 ## What can you do with MQTT export?
 
-With MQTT export, you can send request messages through an MQTT Broker using publish/subscribe, and call the data export HTTP APIs that are already available. You can also keep the connection alive with a heartbeat, subscribe to or unsubscribe from device data, and receive device data changes and other object events.
+With MQTT export, you can call the JSON business APIs enabled for MQTT, subscribe to or unsubscribe from device data, and receive data changes and other events. The application-level `ping` renews subscriptions; it is separate from the MQTT protocol heartbeat that maintains the Broker connection.
 
 For the JSON objects used in the request and response bodies of these features, see Aqara Developer [Studio Local Development - MQTT](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx).
+
+## Local MQTT Broker and MQTT Export
+
+| Feature | Purpose | Requires the MQTT Export plugin |
+| --- | --- | --- |
+| Local MQTT Broker | Provides MQTT access for LAN devices and applications | No; managed independently on supported devices |
+| MQTT Export | Studio connects to the selected Broker as an MQTT client to handle API requests and push subscribed data | Yes |
+
+The two enable settings are saved separately. Enabling, disabling, or uninstalling MQTT Export does not start or stop the local service. The local service can run for LAN devices while export connects to a third-party Broker. One MQTT Export instance connects to one selected Broker at a time, rather than exporting through both Brokers simultaneously.
+
+The local service card appears only on devices with the required runtime installed. A typical Windows development environment without that service will not show the card. If you only need the local Broker for LAN clients, skip the plugin installation and export steps below.
 
 ## Install the Plugin
 
@@ -37,20 +48,25 @@ Refer to the [Plugin Market](./plugin-center.mdx) documentation:
 ## Choose a Broker
 
 Choose a Broker that fits your setup:
-- If you do not have your own MQTT Broker, [use the local Broker built into Aqara Studio](#use-the-local-broker).
-- If you do not want to use the Broker built into Aqara Studio, [use a third-party Broker](#use-a-third-party-broker).
+- Export through the [built-in Local MQTT Broker](#use-the-local-mqtt-broker).
+- If you have an existing MQTT Broker, [use a third-party Broker](#use-a-third-party-broker) while optionally keeping the local service running.
 
-### Use the Local Broker
+### Use the Local MQTT Broker
 
-To use the local Broker built into Aqara Studio, select **Local Broker**.
+1. Enable the separate **Developer → Local MQTT Broker** service and wait for **Running**. Studio confirms that the port shown on this card is reachable during startup before reporting Running. Use the displayed port; do not assume it is always `1893`.
+2. LAN clients connect using the card's **LAN address, port, username, and password**. These settings are managed by Studio and are read-only. Use the copy icons beside the username and password to copy their full values. Users with write permission can reveal the password while the service is running.
+3. To export Studio data, enable **MQTT Export** and select **Local MQTT Broker**. Connection settings are supplied automatically, and Studio connects once the local service is ready.
 
-Aqara Studio connects to this Broker by default.
+| Status | Meaning and action |
+| --- | --- |
+| Local service starting | Wait for startup and listener readiness |
+| Local service start or stop failed | Click **Retry** on the local service card to repeat the action matching its enable setting |
+| Export waiting for Local MQTT Broker | Export is enabled, but the local service is not ready; check its separate card |
+| Local service running, export connection failed | Click **Retry** in MQTT Export; service readiness and an authenticated MQTT connection are separate states |
 
-![Use the local Broker](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MQTTExport-SelectLocalBroker.png) 
+Stopping the local service disconnects all clients using it. Export through that service waits and connects automatically when the service starts again. Export through a separate third-party Broker is unaffected. Disabling MQTT Export leaves the local service available to other LAN clients.
 
-If the status is **Disconnected**, choose **... > Connect** to connect manually.
-
-![Connect manually](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MQTTExport-ConnectToLocalBroker.png) 
+The local enable setting and credentials survive Studio restarts. An enabled local service restarts, and enabled local export connects once the service is ready. **Running** reflects the startup listener check, rather than continuous MQTT health monitoring. Check both service and export status when investigating a connection problem.
 
 ### Use a Third-Party Broker
 
@@ -59,16 +75,16 @@ To use a third-party MQTT Broker:
 
     | Name | Description |
     |----------|----------------------------|
-    | HOST | Address of the third-party MQTT Broker. |
+    | HOST | Broker IP address or domain name, without a `mqtt://` or `mqtts://` scheme prefix. |
     | Port | Port number of the third-party MQTT Broker. |
     | Client ID | The **unique** client identifier Aqara Studio uses to connect to this Broker. |
     | Username | Username required to connect to the third-party MQTT Broker. |
     | Password | Password required to connect to the third-party MQTT Broker. |
-    | Enable TLS | Whether to use TLS for encrypted transport.<ul><li>On: the MQTT Broker address must use the MQTTS protocol.</li><li>Off: use the MQTT protocol.</li></ul> |
+    | Enable TLS | Whether to connect over TLS. Studio chooses the transport; HOST still contains only an IP address or domain name. |
 
-    ![Select a third-party Broker](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MQTTExport-SelectThirdPartyBroker.png) 
+    This **Client ID** identifies Studio's own connection. Do not reuse it for another device or MQTTX connection, because the Broker may disconnect the existing client. The third-party password is saved on blur and then masked with placeholder dots. Use the eye icon to read its full value; the dots are not the password. Credential copy buttons are provided on the local Broker card only.
 
-2. (**If TLS is enabled**) Provide the following, depending on whether you want one-way or mutual authentication:
+2. Configure TLS for the Broker's authentication method:
 
     <table>
         <thead>
@@ -82,15 +98,15 @@ To use a third-party MQTT Broker:
         <tbody>
             <tr>
                 <td>One-way</td>
-                <td>CA certificate</td>
-                <td><ul><li>.pem</li><li>.crt</li><li>.cer (X.509)</li></ul></td>
-                <td>Used only to verify the Broker's identity.</td>
+                <td>No certificate import on this page</td>
+                <td>—</td>
+                <td>Enable TLS to validate the Broker certificate using system-trusted CAs.</td>
             </tr>
             <tr>
-                <td rowspan="3">Mutual (two-way)</td>
+                <td rowSpan="3">Mutual (two-way)</td>
                 <td>CA certificate</td>
-                <td rowspan="2"><ul><li>.pem</li><li>.crt</li><li>.cer (X.509)</li></ul></td>
-                <td rowspan="3">In addition to one-way authentication, provide the client's own certificate and private key so the Broker can verify your identity.</td>
+                <td rowSpan="2"><ul><li>.pem</li><li>.crt</li><li>.cer (X.509)</li></ul></td>
+                <td rowSpan="3">Import all three files. The private key must be PKCS#8 PEM, beginning with BEGIN PRIVATE KEY or BEGIN ENCRYPTED PRIVATE KEY. Save the private key password for an encrypted key.</td>
             </tr>
             <tr>
                 <td>Client certificate</td>
@@ -103,15 +119,20 @@ To use a third-party MQTT Broker:
     </table>
     
     :::tip
+    - The current page does not support one-way authentication with only an imported custom CA. Imported certificate settings require a CA, client certificate, and client private key together; an incomplete set disables Connect. A complete set automatically uses TLS.
     - Clearing an imported certificate only removes the reference. It does not delete the certificate file.
     - If you upload a new certificate, disconnect and connect again for it to take effect.
     :::
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MQTTExport-UploadCertificates.png" alt="Upload certificates" /> 
 
-3. Click the *...* button to open the action menu, select **Connect**, and wait until the connection succeeds.
+3. If your platform requires fixed addresses, save both **Subscribe topic (Studio receives requests)** and **Publish topic (Studio responses and push messages)** under **Fixed Topics**. Set both fields or leave both blank. Configured names are used without appending a clientId. See [Fixed Topics for a Third-party Broker](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx#fixed-topics-for-a-third-party-broker). Changing and saving the pair disconnects the old connection; reconnect and resubscribe afterwards.
+
+4. Open the *...* menu and select **Connect**. Studio's account needs subscription access to the request topic and publication access to the response topic. A rejected subscription during connection setup also results in Connection Failed.
 
     ![Connect to a third-party Broker](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MQTTExport-ConnectToThirdPartyBroker.png) 
+
+Switching export targets disconnects the old connection and removes its subscriptions without changing the local service enable setting. Third-party configuration is retained. Switching back to third-party mode, editing connection parameters, restarting Studio, or losing the third-party connection requires manual **... > Connect**, followed by data resubscription.
 
 ## Test the MQTT Broker Connection
 
@@ -120,11 +141,9 @@ To use a third-party MQTT Broker:
 - The steps below use MQTTX as an example. For other MQTT clients, see their official documentation.
 :::
 
-1. On the **Developer** page in Aqara Studio, get everything you need to connect to MQTT (such as HOST, port, username, and password), as well as the request and response topic formats.
+1. For the local Broker, copy connection information from the separate **Local MQTT Broker** card. For a third-party Broker, use the credentials and unique Client ID assigned to your application by that platform. Application credentials may differ from Studio's; each account needs its own appropriate topic permissions.
 
-    The following figure uses the local Broker as an example:
-
-    ![Get the MQTT connection information](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MQTTExport-FindInfo.png) 
+    Check the active request and response topics at the bottom of **MQTT Export**.
 
 2. Follow the official MQTTX doc [Getting Started - Connect](https://mqttx.app/docs/get-started#connect), and use the information from the previous step to make the MQTT connection.
 
@@ -134,20 +153,14 @@ To use a third-party MQTT Broker:
 
     <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MQTTX-NewSubscription.png" alt="New subscription" style={{width: '60%'}} /> 
 
-    Use the **Response Topic Format** shown in Aqara Studio. Replace the ClientID in the topic with the actual ClientID automatically generated by MQTTX to subscribe to response messages.
+    In default mode, replace `{clientId}` in the response topic with this MQTTX connection's actual Client ID. In fixed mode, subscribe directly to the configured **Publish topic** without replacing placeholders or appending an ID.
 
     Set QoS to 1, then click **Confirm** to create the subscription.
 
-    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-3.png" alt="Subscribe to a response" style={{width: '60%'}} /> 
-
-4. In the subscription you just created, replace the ClientID in the **Request Topic Format** from Aqara Studio with the actual ClientID automatically generated by MQTTX, and enter it in the Topic field.
+4. In default mode, replace `{clientId}` in the request topic with the same MQTTX Client ID. In fixed mode, publish directly to the configured **Subscribe topic**. Use QoS 1 with Retain disabled. Subscribe to the response topic before sending requests.
     
     Write a JSON message using the request parameters for each API in Aqara Developer [Studio Local Development - MQTT](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx), then send it to get a response.
 
-    The following figure uses a [subscribe to all device data](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx#subscribe-to-all-or-specific-devices) request as an example:
+    Start with the [subscribe to all device data](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx#subscribe-to-all-or-specific-devices) example. Confirm that the response echoes the request `msgId` with `code: 0`, then check live pushes.
 
-    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-4.png" alt="Send a request" style={{width: '70%'}} /> 
-
-    The following is a sample response:
-
-    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/mqtt-export-5.png" alt="Receive a response" style={{width: '70%'}} /> 
+Only clients with active subscriptions need periodic application-level `ping`. Send it at least every 30 seconds when there are no other requests; receiving pushes does not renew the lease. Resubscribe after a connection loss or session expiration. See [Heartbeat and subscription lease renewal](./../aqara-developer/data-export-api/mqtt-api/mqtt-api.mdx#heartbeat-and-subscription-lease-renewal).

@@ -5,7 +5,6 @@
 - Overview: https://docs.aqara.com/docs/aqara-developer/introduction
 - Introduction: https://docs.aqara.com/docs/aqara-developer/aiot-api/introduction
 - Introduction: https://docs.aqara.com/docs/aqara-developer/data-export-api/introduction
-- Core Concepts: https://docs.aqara.com/docs/aqara-developer/aqara-data-model-specification/core-concepts
 
 ## All sidebar-listed docs
 - Overview: https://docs.aqara.com/docs/aqara-developer/introduction
@@ -80,6 +79,7 @@
 - WebSocket API Playground: https://docs.aqara.com/docs/aqara-developer/data-export-api/websocket-api/websocket-api
 - MQTT: https://docs.aqara.com/docs/aqara-developer/data-export-api/mqtt-api/mqtt-api
 - Infrared Device Integration: https://docs.aqara.com/docs/aqara-developer/local-studio-development/features/infrared-device-integration
+- Custom Device Integration: https://docs.aqara.com/docs/aqara-developer/local-studio-development/features/custom-device-integration
 - Introduction: https://docs.aqara.com/docs/aqara-developer/aiot-api/introduction
 - Getting Started with the AIOT API: https://docs.aqara.com/docs/aqara-developer/aiot-api/getting-started-with-the-aiot-api
 - Try API Online: https://docs.aqara.com/docs/aqara-developer/aiot-api/try-api-online
@@ -95,10 +95,4 @@
 - Query Trait Values: https://docs.aqara.com/docs/aqara-developer/aiot-api/get-trait-values
 - Control Devices by Commands: https://docs.aqara.com/docs/aqara-developer/aiot-api/execute-device-command
 - Aqara Data Model Tags: https://docs.aqara.com/docs/aqara-developer/aqara-data-model-specification/aqara-data-model-tags
-- Core Concepts: https://docs.aqara.com/docs/aqara-developer/aqara-data-model-specification/core-concepts
-- Device Types: https://docs.aqara.com/docs/aqara-developer/aqara-data-model-specification/device-types
-- Function Codes: https://docs.aqara.com/docs/aqara-developer/aqara-data-model-specification/function-codes
-- Trait Codes: https://docs.aqara.com/docs/aqara-developer/aqara-data-model-specification/trait-codes
-- Command Codes: https://docs.aqara.com/docs/aqara-developer/aqara-data-model-specification/command-codes
-- Data Types: https://docs.aqara.com/docs/aqara-developer/aqara-data-model-specification/data-types
 
