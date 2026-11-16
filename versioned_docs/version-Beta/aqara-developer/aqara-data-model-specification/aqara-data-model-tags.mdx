@@ -111343,18 +111343,6 @@ Provides Aqara ambient sensing configuration capabilities, covering zone managem
       <td>O</td>
     </tr>
     <tr>
-      <td>0x5187</td>
-      <td><a href="#ref_MinDetectionRange">MinDetectionRange</a></td>
-      <td>Minimum detection range</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5188</td>
-      <td><a href="#ref_MaxDetectionRange">MaxDetectionRange</a></td>
-      <td>Maximum detection range</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5189</td>
       <td><a href="#ref_DetectionRangeStep">DetectionRangeStep</a></td>
       <td>Detection range step</td>
@@ -111376,7 +111364,7 @@ Provides Aqara ambient sensing configuration capabilities, covering zone managem
       <td>0x511A</td>
       <td><a href="#ref_DetectionRangeTargetPosition">DetectionRangeTargetPosition</a></td>
       <td>Target position distance within detection range</td>
-      <td>O</td>
+      <td>M</td>
     </tr>
   </tbody>
 </table>
@@ -112171,16 +112159,6 @@ The parameter structure of the SubscribeAutoEdgeRecognitionData Command.
       <td>O</td>
     </tr>
     <tr>
-      <td>0x5187</td>
-      <td><a href="#ref_MinDetectionRange">MinDetectionRange</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5188</td>
-      <td><a href="#ref_MaxDetectionRange">MaxDetectionRange</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5189</td>
       <td><a href="#ref_DetectionRangeStep">DetectionRangeStep</a></td>
       <td>O</td>
@@ -112198,7 +112176,7 @@ The parameter structure of the SubscribeAutoEdgeRecognitionData Command.
     <tr>
       <td>0x511A</td>
       <td><a href="#ref_DetectionRangeTargetPosition">DetectionRangeTargetPosition</a></td>
-      <td>O</td>
+      <td>M</td>
     </tr>
   </tbody>
 </table>
@@ -114411,138 +114389,10 @@ When this Trait is NULL, it indicates that the detection range is not configured
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td>uint16</td>
-      <td></td>
+      <td>octetString</td>
+      <td>Can be NULL, up to 6 bytes</td>
       <td></td>
       <td>RVW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### MinDetectionRange Trait {#ref_MinDetectionRange}
-
-This Trait indicates the minimum detection distance supported by the device, in cm. A value of 0 means 0 cm.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5187</td>
-      <td>MinDetectionRange</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>0</td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0002</td>
-      <td>Maximum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>600</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0003</td>
-      <td>Minimum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>0</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### MaxDetectionRange Trait {#ref_MaxDetectionRange}
-
-This Trait indicates the maximum detection distance supported by the device, in cm. A value of 600 means 600 cm.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5188</td>
-      <td>MaxDetectionRange</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>600</td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0002</td>
-      <td>Maximum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>600</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0003</td>
-      <td>Minimum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>0</td>
-      <td>R</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -114786,17 +114636,17 @@ This Trait is used to report data related to target positions within the detecti
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td>characterString</td>
-      <td></td>
+      <td>uint16</td>
+      <td>MinDetectionRange to MaxDetectionRange</td>
       <td>0</td>
       <td>V</td>
-      <td>O</td>
+      <td>M</td>
     </tr>
     <tr>
       <td>0x0002</td>
       <td>Maximum Value</td>
-      <td>characterString</td>
-      <td></td>
+      <td>uint16</td>
+      <td>Provided by the Matter MaxDetectionRange attribute, in cm</td>
       <td>65535</td>
       <td>R</td>
       <td>O</td>
@@ -114804,8 +114654,8 @@ This Trait is used to report data related to target positions within the detecti
     <tr>
       <td>0x0003</td>
       <td>Minimum Value</td>
-      <td>characterString</td>
-      <td></td>
+      <td>uint16</td>
+      <td>Provided by the Matter MinDetectionRange attribute, in cm</td>
       <td>0</td>
       <td>R</td>
       <td>O</td>
