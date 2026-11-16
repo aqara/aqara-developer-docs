@@ -360,7 +360,7 @@ Parameter ID uses a 16-bit integer identifier, with a valid range of `0x0001` ~ 
       <td>Is Null</td>
       <td>PROP_IS_NULL</td>
       <td>RV</td>
-      <td>Boolean with values `true`/`false`; `true` indicates that `Present Value` currently has no valid data or is uninitialized, and its current payload SHOULD NOT be used as a valid business value.</td>
+      <td>Boolean with values `true`/`false`; `true` indicates that `Present Value` currently has no valid data or is uninitialized, and its current payload SHOULD NOT be used as a valid business value. For handling rules in automation logic blocks, see below.</td>
     </tr>
     <tr>
       <td>0x000E</td>
@@ -395,6 +395,13 @@ Frontends determine the read, write, and reporting capabilities of Parameters ba
 Frontends SHALL prefer explicit difference information applicable to the target device and the target Parameter; when no applicable difference information is provided, the default access in this table applies. `Present Value` access is still determined by the actual definition of the specific Trait and is not derived from the default access in this table. The above access information is used for frontend capability display and interaction control, and does not replace the device-side validation of actual access permissions.
 
 The range constraints in this table use `Minimum Value <= parameter value <= Maximum Value`, including both boundary values. When boundary parameters are not explicitly provided, the valid range and data type boundaries declared by the corresponding Trait apply. The magnitude relationship between a pair of upper and lower limit parameters is validated only when both are implemented together. For writable Parameters, the written value and parameter combinations MUST still satisfy the applicable constraints, and MUST NOT invalidate the upper/lower limit relationship by writing.
+
+### Is Null Handling in Automation Logic Blocks
+
+When an automation logic block evaluates a data point, it SHALL check the `Is Null` Parameter of the Trait corresponding to that data point (Parameter ID `0x000D`, if the Trait defines this Parameter):
+
+* If the `Is Null` Parameter exists and its value is `true` (`1`), the current value of the data point is invalid. The automation logic block SHALL NOT use that value for condition state evaluation, and SHALL NOT treat it as a condition transient trigger.
+* If the `Is Null` Parameter does not exist, or its value is `false` (`0`), `Is Null` is ignored and the automation logic block is evaluated according to the original logic.
 
 ### Numeric Boundary Parameters
 
@@ -1402,6 +1409,11 @@ This section summarizes all Function definitions in Aqara Spec. See the correspo
       <td><a href="#ref_Aqara_Spec_PowerGeneration">0x013E</a></td>
       <td>PowerGeneration</td>
       <td>Describes the rated power and operation status of power generation equipment, as well as energy, power and heat recovery data related to gas cogeneration.</td>
+    </tr>
+    <tr>
+      <td><a href="#ref_Aqara_Spec_TouchControl">0x013F</a></td>
+      <td>TouchControl</td>
+      <td>Describes the input control function domain of the device touch bar, covering touch bar gesture recognition and slide amount collection capabilities.</td>
     </tr>
   </tbody>
 </table>
@@ -11894,6 +11906,12 @@ This Function does not handle brightness control; brightness is provided by the 
       <td>Stop dynamic sequence</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x9DBF</td>
+      <td><a href="#ref_ConfigureLedMultipleSettings">ConfigureLedMultipleSettings</a></td>
+      <td>Configure multiple lamp bead settings</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -12024,7 +12042,7 @@ This structure defines the Present Value field layout of WhitePointXY.
 
 ##### XYToRGBMatrixPresentValueStructure Type {#ref_XYToRGBMatrixPresentValueStructure}
 
-This structure defines the Present Value field layout of XYToRGBMatrix. The coefficients are single-precision floating-point numbers and may be negative. The conversion relationship is: `Z = 1 - X - Y`, `R = RedA * X + RedB * Y + RedC * Z`, `G = GreenA * X + GreenB * Y + GreenC * Z`, `B = BlueA * X + BlueB * Y + BlueC * Z`.
+This structure defines the Present Value field layout of XYToRGBMatrix. The coefficients are single-precision floating-point numbers and may be negative. The conversion relationship is: `Z = 1 - X - Y`, `R = rA * X + rB * Y + rC * Z`, `G = gA * X + gB * Y + gC * Z`, `B = bA * X + bB * Y + bC * Z`.
 
 <table>
   <thead>
@@ -12039,63 +12057,63 @@ This structure defines the Present Value field layout of XYToRGBMatrix. The coef
   <tbody>
     <tr>
       <td>0</td>
-      <td>RedA</td>
+      <td>rA</td>
       <td>float</td>
       <td>M</td>
-      <td>Coefficient of the R channel with respect to the X tristimulus value of CIE XYZ.</td>
+      <td>Coefficient of the R channel with respect to the X tristimulus value of CIE XYZ; the default value is 3.240.</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>RedB</td>
+      <td>rB</td>
       <td>float</td>
       <td>M</td>
-      <td>Coefficient of the R channel with respect to the Y tristimulus value of CIE XYZ.</td>
+      <td>Coefficient of the R channel with respect to the Y tristimulus value of CIE XYZ; the default value is -1.537.</td>
     </tr>
     <tr>
       <td>2</td>
-      <td>RedC</td>
+      <td>rC</td>
       <td>float</td>
       <td>M</td>
-      <td>Coefficient of the R channel with respect to the Z tristimulus value of CIE XYZ.</td>
+      <td>Coefficient of the R channel with respect to the Z tristimulus value of CIE XYZ; the default value is -0.499.</td>
     </tr>
     <tr>
       <td>3</td>
-      <td>GreenA</td>
+      <td>gA</td>
       <td>float</td>
       <td>M</td>
-      <td>Coefficient of the G channel with respect to the X tristimulus value of CIE XYZ.</td>
+      <td>Coefficient of the G channel with respect to the X tristimulus value of CIE XYZ; the default value is -0.969.</td>
     </tr>
     <tr>
       <td>4</td>
-      <td>GreenB</td>
+      <td>gB</td>
       <td>float</td>
       <td>M</td>
-      <td>Coefficient of the G channel with respect to the Y tristimulus value of CIE XYZ.</td>
+      <td>Coefficient of the G channel with respect to the Y tristimulus value of CIE XYZ; the default value is 1.876.</td>
     </tr>
     <tr>
       <td>5</td>
-      <td>GreenC</td>
+      <td>gC</td>
       <td>float</td>
       <td>M</td>
-      <td>Coefficient of the G channel with respect to the Z tristimulus value of CIE XYZ.</td>
+      <td>Coefficient of the G channel with respect to the Z tristimulus value of CIE XYZ; the default value is 0.042.</td>
     </tr>
     <tr>
       <td>6</td>
-      <td>BlueA</td>
+      <td>bA</td>
       <td>float</td>
       <td>M</td>
-      <td>Coefficient of the B channel with respect to the X tristimulus value of CIE XYZ.</td>
+      <td>Coefficient of the B channel with respect to the X tristimulus value of CIE XYZ; the default value is 0.056.</td>
     </tr>
     <tr>
       <td>7</td>
-      <td>BlueB</td>
+      <td>bB</td>
       <td>float</td>
       <td>M</td>
-      <td>Coefficient of the B channel with respect to the Y tristimulus value of CIE XYZ.</td>
+      <td>Coefficient of the B channel with respect to the Y tristimulus value of CIE XYZ; the default value is -0.204.</td>
     </tr>
     <tr>
       <td>8</td>
-      <td>BlueC</td>
+      <td>bC</td>
       <td>float</td>
       <td>M</td>
       <td>Coefficient of the B channel with respect to the Z tristimulus value of CIE XYZ.</td>
@@ -12105,7 +12123,7 @@ This structure defines the Present Value field layout of XYToRGBMatrix. The coef
 
 ##### LEDICProtocolEnum8 Type {#ref_LEDICProtocolEnum8}
 
-This enumeration defines the valid values of the Present Value of the LEDICProtocol Trait.
+This enumeration defines the valid values of the Present Value of the LEDICProtocol Trait and of the LedProtocol parameter of the ConfigureLedMultipleSettings Command.
 
 <table>
   <thead>
@@ -12117,9 +12135,29 @@ This enumeration defines the valid values of the Present Value of the LEDICProto
   </thead>
   <tbody>
     <tr>
+      <td>0x00</td>
+      <td>WS2915</td>
+      <td>RGBIC_WS2915</td>
+    </tr>
+    <tr>
       <td>0x01</td>
-      <td>SID</td>
-      <td>Single-wire zero code</td>
+      <td>SM18635E</td>
+      <td>RGBIC_SM18635E</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>UCS7614L</td>
+      <td>RGBIC_UCS7614L</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>SM5206E</td>
+      <td>RGBIC_SM5206E</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>SM8605G</td>
+      <td>RGBIC_SM8605G</td>
     </tr>
   </tbody>
 </table>
@@ -12855,6 +12893,45 @@ Parameter structure of the StartDynamicColorSequence Command.
   </tbody>
 </table>
 
+##### ConfigureLedMultipleSettings Command Structure Type {#ref_ConfigureLedMultipleSettingsCommandStructure}
+
+Parameter structure of the ConfigureLedMultipleSettings Command. The length of the LEDQuantity array corresponds to the number of lighting control channels, and each element indicates the number of lamp beads on the corresponding channel; when LEDQuantity is not provided, the number of lamp beads is not changed.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>LEDType</td>
+      <td><a href="#ref_LEDTypeEnum8">LEDTypeEnum8</a></td>
+      <td>M</td>
+      <td>Lamp bead type; the default value is 0 (RGBW).</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>LedProtocol</td>
+      <td><a href="#ref_LEDICProtocolEnum8">LEDICProtocolEnum8</a></td>
+      <td>M</td>
+      <td>Lamp bead protocol; the default value is 0 (WS2915 / RGBIC_WS2915).</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>LEDQuantity</td>
+      <td>list[uint16]</td>
+      <td>O</td>
+      <td>Number of lamp beads on each channel; the array length corresponds to the number of channels, and each element indicates the number of lamp beads on the corresponding channel.</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### MoveToXYColorBrightness Command Structure Type {#ref_MoveToXYColorBrightnessCommandStructure}
 
 Parameter structure of the MoveToXYColorBrightness Command.
@@ -13572,9 +13649,9 @@ Color shift occurs when ColorXY is sent to the RS-485 light film, and it has bee
 The conversion relationship is:
 
 * `Z = 1 - X - Y`
-* `R = RedA * X + RedB * Y + RedC * Z`
-* `G = GreenA * X + GreenB * Y + GreenC * Z`
-* `B = BlueA * X + BlueB * Y + BlueC * Z`
+* `R = rA * X + rB * Y + rC * Z`
+* `G = gA * X + gB * Y + gC * Z`
+* `B = bA * X + bB * Y + bC * Z`
 
 The coefficients are single-precision floating-point numbers and may be negative. This Trait supports read and active reporting, but not write.
 
@@ -15425,6 +15502,11 @@ This Trait is used to report all dynamic sequence data information.
       <td><a href="#ref_StopDynamicColorSequence">StopDynamicColorSequence</a></td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x9DBF</td>
+      <td><a href="#ref_ConfigureLedMultipleSettings">ConfigureLedMultipleSettings</a></td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -15636,6 +15718,14 @@ This command is used to start the specified dynamic sequence.
 This command is used to stop dynamic sequence execution.
 
 This Command has no parameters.
+
+#### ConfigureLedMultipleSettings Command {#ref_ConfigureLedMultipleSettings}
+
+This command is used to configure the lamp bead type, the lamp bead protocol, and the number of lamp beads on each channel of a lighting control device at the same time. LEDQuantity is an optional parameter; its array length corresponds to the number of channels, and each element indicates the number of lamp beads on the corresponding channel; when it is not provided, the number of lamp beads is not changed.
+
+##### Parameters
+
+[ConfigureLedMultipleSettings Command Structure](#ref_ConfigureLedMultipleSettingsCommandStructure)
 
 ## Button {#ref_Aqara_Spec_Button}
 
@@ -56020,14 +56110,14 @@ This structure defines the Present Value field layout of the BitmaskRegionSettin
   <tbody>
     <tr>
       <td>0</td>
-      <td>detect_region</td>
+      <td>DetectRegion</td>
       <td>characterString</td>
       <td>M</td>
       <td>Bitmask in hexadecimal string form, where each bit corresponds to one grid cell.</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>effective_bits</td>
+      <td>EffectiveBits</td>
       <td>int32</td>
       <td>M</td>
       <td>The number of valid bits in the bitmask; bits beyond this count should be ignored.</td>
@@ -104529,6 +104619,37 @@ This enumeration defines the valid values of the Present Value of the FaceRecogn
   </tbody>
 </table>
 
+##### RegionUnitEnum8 Type {#ref_RegionUnitEnum8}
+
+This enumeration defines the unit type of the Unit parameter in RegionDimension.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>REGION_UNIT_UNSPECIFIED</td>
+      <td>Unspecified (reserved value)</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>GRID</td>
+      <td>Grid cell, for example a 24 &times; 24 grid</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>PIXEL</td>
+      <td>Pixel (absolute pixel coordinates)</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### RegionDimensionTraitPresentValueStructure Type {#ref_RegionDimensionTraitPresentValueStructure}
 
 This structure defines the Present Value field layout of the RegionDimension Trait.
@@ -104546,21 +104667,21 @@ This structure defines the Present Value field layout of the RegionDimension Tra
   <tbody>
     <tr>
       <td>0</td>
-      <td>unit</td>
-      <td>enum8</td>
+      <td>Unit</td>
+      <td><a href="#ref_RegionUnitEnum8">RegionUnitEnum8</a></td>
       <td>M</td>
-      <td>The unit of width and height, e.g., GRID or PIXEL.</td>
+      <td>The unit of width and height.</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>width</td>
+      <td>Width</td>
       <td>uint32</td>
       <td>M</td>
       <td>The total width of the region in the specified unit.</td>
     </tr>
     <tr>
       <td>2</td>
-      <td>height</td>
+      <td>Height</td>
       <td>uint32</td>
       <td>M</td>
       <td>The total height of the region in the specified unit.</td>
@@ -104594,7 +104715,7 @@ This enumeration defines the response status codes of the AddFace, DeleteFace an
     <tr>
       <td>0x02</td>
       <td>CONSTRAINT_ERROR</td>
-      <td>A parameter is invalid or the auxiliary validation does not match</td>
+      <td>A parameter is invalid</td>
     </tr>
     <tr>
       <td>0x03</td>
@@ -104611,7 +104732,7 @@ This enumeration defines the response status codes of the AddFace, DeleteFace an
 
 ##### FaceItemStructure Type {#ref_FaceItemStructure}
 
-A single face record in FaceList. At least one of `ImageData` and `ImageUrl` SHALL be provided; when both are provided, `ImageData` is the image data and `ImageUrl` is the access address of that image.
+A single face record in FaceList, containing the unique face identifier and the image access address.
 
 <table>
   <thead>
@@ -104629,28 +104750,14 @@ A single face record in FaceList. At least one of `ImageData` and `ImageUrl` SHA
       <td>FaceId</td>
       <td>uint64</td>
       <td>M</td>
-      <td>Unique face identifier assigned by the device.</td>
+      <td>Unique face identifier, specified by the AddFace request.</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>Name</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>Face name, up to 64 characters.</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>ImageData</td>
-      <td>octetString</td>
-      <td>O</td>
-      <td>Binary face image data, Base64-encoded in JSON. At least one of ImageData and ImageUrl SHALL be provided; maximum 512 KiB.</td>
-    </tr>
-    <tr>
-      <td>3</td>
       <td>ImageUrl</td>
       <td>characterString</td>
-      <td>O</td>
-      <td>Access address of the face image. At least one of ImageUrl and ImageData SHALL be provided.</td>
+      <td>M</td>
+      <td>Access address of the face image.</td>
     </tr>
   </tbody>
 </table>
@@ -104672,24 +104779,17 @@ Request parameter structure of the AddFace Command.
   <tbody>
     <tr>
       <td>0</td>
-      <td>Name</td>
-      <td>characterString</td>
+      <td>FaceId</td>
+      <td>uint64</td>
       <td>M</td>
-      <td>Face name, which MUST NOT be empty, up to 64 characters.</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>ImageData</td>
-      <td>octetString</td>
-      <td>M</td>
-      <td>Binary face image data, Base64-encoded in JSON. The image SHOULD be no larger than 512 KiB; JPG or PNG is recommended, and a resolution of at least 200 &times; 200 is recommended.</td>
+      <td>Unique face identifier specified by the requester; it MUST be unique within the device-local face library.</td>
     </tr>
   </tbody>
 </table>
 
 ##### AddFace Response Structure Type {#ref_AddFaceResponseStructure}
 
-Response structure of the AddFace Command. On success it returns the FaceId assigned by the device; `Success` SHALL be consistent with `Status`.
+Response structure of the AddFace Command. On success it returns the FaceId specified in the request; `Success` SHALL be consistent with `Status`.
 
 <table>
   <thead>
@@ -104714,7 +104814,7 @@ Response structure of the AddFace Command. On success it returns the FaceId assi
       <td>FaceId</td>
       <td>uint64</td>
       <td>C</td>
-      <td>Unique face identifier assigned and returned by the device when the addition succeeds; omitted on failure.</td>
+      <td>Unique face identifier specified by the requester, returned when the addition succeeds; omitted on failure.</td>
     </tr>
     <tr>
       <td>2</td>
@@ -104748,20 +104848,6 @@ Request parameter structure of the DeleteFace Command.
       <td>M</td>
       <td>Unique identifier of the face to delete; it MUST be a valid ID already assigned by the device.</td>
     </tr>
-    <tr>
-      <td>1</td>
-      <td>Name</td>
-      <td>characterString</td>
-      <td>O</td>
-      <td>Face name used as auxiliary validation, up to 64 characters; if it does not match the record of FaceId, CONSTRAINT_ERROR is returned.</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>ImageData</td>
-      <td>octetString</td>
-      <td>O</td>
-      <td>Face image used as auxiliary validation, Base64-encoded in JSON, maximum 512 KiB; if it does not match the record of FaceId, CONSTRAINT_ERROR is returned.</td>
-    </tr>
   </tbody>
 </table>
 
@@ -104792,7 +104878,7 @@ Response structure of the DeleteFace Command.
 
 ##### ModifyFace Command Structure Type {#ref_ModifyFaceCommandStructure}
 
-Request parameter structure of the ModifyFace Command. At least one of Name or ImageData SHALL be provided; fields not provided keep their original values.
+Request parameter structure of the ModifyFace Command, used to update the image access address of the specified face.
 
 <table>
   <thead>
@@ -104814,17 +104900,10 @@ Request parameter structure of the ModifyFace Command. At least one of Name or I
     </tr>
     <tr>
       <td>1</td>
-      <td>Name</td>
+      <td>ImageUrl</td>
       <td>characterString</td>
-      <td>O</td>
-      <td>New face name, up to 64 characters; keeps the original value when not provided.</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>ImageData</td>
-      <td>octetString</td>
-      <td>O</td>
-      <td>Binary data of the new face image, Base64-encoded in JSON, maximum 512 KiB; keeps the original value when not provided.</td>
+      <td>M</td>
+      <td>New access address of the face image.</td>
     </tr>
   </tbody>
 </table>
@@ -105624,7 +105703,7 @@ height (uint32): the total height of the region in the specified unit.
 
 #### FaceList Trait (Face List) {#ref_FaceList}
 
-Represents the list of face information in the device local face library. Each item contains the FaceId assigned by the device, the name, and either the image data or the image access address. This Trait is read-only and reportable, and is used by clients to obtain the face information stored locally on the device.
+Represents the list of face information in the device local face library. Each item contains the FaceId and the image access address. This Trait is read-only and reportable, and is used by clients to obtain the face information stored locally on the device.
 
 <table>
   <thead>
@@ -105660,7 +105739,7 @@ Represents the list of face information in the device local face library. Each i
       <td>0x0001</td>
       <td>Present Value</td>
       <td>list[<a href="#ref_FaceItemStructure">FaceItemStructure</a>]</td>
-      <td>Each item provides at least ImageData or ImageUrl</td>
+      <td>Each item MUST contain FaceId and ImageUrl</td>
       <td></td>
       <td>RV</td>
       <td>O</td>
@@ -105772,7 +105851,7 @@ Represents the maximum number of faces that the device local face library can ho
 
 #### AddFace Command {#ref_AddFace}
 
-Adds a face record and synchronizes it to the device local face library. On success the device SHALL assign a unique 64-bit unsigned FaceId and return it in the response. When the face library has reached FaceCountLimit, RESOURCE_EXHAUSTED is returned.
+Adds a face record and synchronizes it to the device local face library. The requester passes in a unique 64-bit unsigned FaceId, and the device creates the face record with that ID and returns it in the success response. When the face library has reached FaceCountLimit, RESOURCE_EXHAUSTED is returned.
 
 ##### Parameters
 
@@ -105800,7 +105879,7 @@ Adds a face record and synchronizes it to the device local face library. On succ
     </tr>
     <tr>
       <td>CONSTRAINT_ERROR</td>
-      <td>A parameter is invalid, for example the name is empty, the image format is unsupported, or the image exceeds the size limit</td>
+      <td>A parameter is invalid, for example the FaceId does not meet the requirements</td>
     </tr>
     <tr>
       <td>BUSY</td>
@@ -105811,7 +105890,7 @@ Adds a face record and synchronizes it to the device local face library. On succ
 
 #### DeleteFace Command {#ref_DeleteFace}
 
-Deletes the specified face record and synchronizes it to the device local face library. FaceId is the only primary key; Name and ImageData MAY be used as auxiliary validation. When FaceId does not exist, NOT_FOUND is returned.
+Deletes the specified face record and synchronizes it to the device local face library. FaceId is the only locating basis. When FaceId does not exist, NOT_FOUND is returned.
 
 ##### Parameters
 
@@ -105839,7 +105918,7 @@ Deletes the specified face record and synchronizes it to the device local face l
     </tr>
     <tr>
       <td>CONSTRAINT_ERROR</td>
-      <td>Auxiliary validation does not match, for example Name does not match the record of FaceId</td>
+      <td>The request parameter is invalid</td>
     </tr>
     <tr>
       <td>BUSY</td>
@@ -105850,7 +105929,7 @@ Deletes the specified face record and synchronizes it to the device local face l
 
 #### ModifyFace Command {#ref_ModifyFace}
 
-Modifies the specified face record and synchronizes it to the device local face library. The record is located by FaceId, and the name and/or image MAY be updated; fields not provided keep their original values. When FaceId does not exist, NOT_FOUND is returned.
+Modifies the specified face record and synchronizes it to the device local face library. The record is located by FaceId, and the image access address of the face is updated. When FaceId does not exist, NOT_FOUND is returned.
 
 ##### Parameters
 
@@ -105878,7 +105957,7 @@ Modifies the specified face record and synchronizes it to the device local face 
     </tr>
     <tr>
       <td>CONSTRAINT_ERROR</td>
-      <td>A parameter is invalid, for example no field to modify is provided or the image format is unsupported</td>
+      <td>A parameter is invalid, for example the ImageUrl is invalid</td>
     </tr>
     <tr>
       <td>BUSY</td>
@@ -137856,6 +137935,243 @@ This command triggers the device to wake the voice assistant so that it is ready
 ##### Parameters
 
 [TriggerVoiceAssistantWake Command Structure](#ref_TriggerVoiceAssistantWakeCommandStructure)
+
+## TouchControl (Touch Control) {#ref_Aqara_Spec_TouchControl}
+
+### Introduction
+
+Represents the input control function domain of the device touch bar, covering touch bar gesture recognition and slide amount collection capabilities.
+
+### Function Identifier
+
+<table>
+  <thead>
+    <tr>
+      <th>Function ID</th>
+      <th>Code</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x013F</td>
+      <td>TouchControl</td>
+      <td>Touch Control</td>
+    </tr>
+  </tbody>
+</table>
+
+### Trait
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5253</td>
+      <td><a href="#ref_TouchBarGesture">TouchBarGesture</a></td>
+      <td>Touch bar gesture</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5255</td>
+      <td><a href="#ref_SlideCumulativePercent">SlideCumulativePercent</a></td>
+      <td>Slide cumulative percent</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+### Command
+
+This Function does not contain any Commands.
+
+### Data Types
+
+##### TouchBarGestureEnum8 Type {#ref_TouchBarGestureEnum8}
+
+This enumeration defines the valid values of the Present Value of the TouchBarGesture Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>None</td>
+      <td>No action</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>SinglePress</td>
+      <td>Single press</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>DoublePress</td>
+      <td>Double press</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>LongPress</td>
+      <td>Long press</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>Swipe</td>
+      <td>Swipe</td>
+    </tr>
+  </tbody>
+</table>
+
+### Trait Definitions
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5253</td>
+      <td><a href="#ref_TouchBarGesture">TouchBarGesture</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5255</td>
+      <td><a href="#ref_SlideCumulativePercent">SlideCumulativePercent</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### TouchBarGesture Trait (Touch Bar Gesture) {#ref_TouchBarGesture}
+
+Represents the gesture events recognized by the device touch bar. The touch bar supports recognition of single press, double press, long press, and swipe; after a gesture is recognized, the device proactively reports the corresponding value. `None` (0) indicates no action.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5253</td>
+      <td>TouchBarGesture</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_TouchBarGestureEnum8">TouchBarGestureEnum8</a></td>
+      <td></td>
+      <td>0</td>
+      <td>V</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### SlideCumulativePercent Trait (Slide Cumulative Percent) {#ref_SlideCumulativePercent}
+
+Represents the cumulative slide percentage value, ranging from -100% to 100%, with a default value of 0%, in percent (%). Positive and negative values indicate two opposite slide directions (such as right/left or up/down), and the absolute value indicates the cumulative slide amount. It can be used in continuous control scenarios such as adjusting brightness or the curtain opening percentage. This Trait can be reported.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5255</td>
+      <td>SlideCumulativePercent</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>float</td>
+      <td>-100.0 ~ 100.0 (unit: %)</td>
+      <td>0</td>
+      <td>V</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>float</td>
+      <td></td>
+      <td>100.0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>float</td>
+      <td></td>
+      <td>-100.0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+### Command Definitions
+
+This Function does not contain any Commands.
 
 ## VoiceIntercom (Voice Intercom) {#ref_Aqara_Spec_VoiceIntercom}
 
