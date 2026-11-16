@@ -36730,6 +36730,12 @@ Provides media playback control capabilities, including play, pause, track switc
       <td>Favorite playlists</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5277</td>
+      <td><a href="#ref_CurrentPlaylist">ref_CurrentPlaylist</a></td>
+      <td>Current playlist</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -36809,6 +36815,36 @@ Provides media playback control capabilities, including play, pause, track switc
       <td>0x9DB6</td>
       <td><a href="#ref_PlayMediaURL">PlayMediaURL</a></td>
       <td>Play media by URL</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC1</td>
+      <td><a href="#ref_PlayLocalSong">ref_PlayLocalSong</a></td>
+      <td>Play local song</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC2</td>
+      <td><a href="#ref_PlaySelectedPlaylist">ref_PlaySelectedPlaylist</a></td>
+      <td>Play selected playlist</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC3</td>
+      <td><a href="#ref_PlayTextToSpeech">ref_PlayTextToSpeech</a></td>
+      <td>Text to speech</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC4</td>
+      <td><a href="#ref_PlaySemanticPlaylist">ref_PlaySemanticPlaylist</a></td>
+      <td>Play semantic playlist</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC5</td>
+      <td><a href="#ref_Search">ref_Search</a></td>
+      <td>Search</td>
       <td>O</td>
     </tr>
     <tr>
@@ -37220,6 +37256,91 @@ Parameter structure of the SearchAndPlay Command.
   </tbody>
 </table>
 
+##### Search Command Structure Type {#ref_SearchCommandStructure}
+
+Parameter structure of the Search Command.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Keyword</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Search keyword; fuzzy search is supported.</td>
+    </tr>
+  </tbody>
+</table>
+
+##### SearchResultStruct Type {#ref_SearchResultStruct}
+
+A single song search result returned by the Search Command.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Album</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>Album name.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Artist</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>Artist name.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Title</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Song title.</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Duration</td>
+      <td>uint32</td>
+      <td>O</td>
+      <td>Song duration, in seconds.</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Favorite</td>
+      <td>bool</td>
+      <td>O</td>
+      <td>Whether the song has been favorited.</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>ImageURL</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>Cover image URL of the song.</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### PlayMediaURL Command Structure Type {#ref_PlayMediaURLCommandStructure}
 
 Parameter structure of the PlayMediaURL Command.
@@ -37310,6 +37431,61 @@ Single playlist structure of the Playlists Trait.
       <td></td>
       <td></td>
       <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+##### CurrentPlaylistTraitPresentValueStructure Type {#ref_CurrentPlaylistTraitPresentValueStructure}
+
+Current playlist structure of the CurrentPlaylist Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Id</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Current playlist ID.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Name</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Current playlist name.</td>
+    </tr>
+  </tbody>
+</table>
+
+#### CurrentPlaylist Trait {#ref_CurrentPlaylist}
+
+Indicates the playlist currently being played. The data type is [CurrentPlaylistTraitPresentValueStructure](#ref_CurrentPlaylistTraitPresentValueStructure). This Trait defines no Parameters.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5277</td>
+      <td><a href="#ref_CurrentPlaylist">CurrentPlaylist</a></td>
+      <td>Current playlist</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -37447,6 +37623,106 @@ Parameter structure of the PlayFavorite Command.
   </tbody>
 </table>
 
+##### PlayLocalSong Command Structure Type {#ref_PlayLocalSongCommandStructure}
+
+Parameter structure of the PlayLocalSong Command.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>SongId</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Song ID selected from the local song list of the device.</td>
+    </tr>
+  </tbody>
+</table>
+
+##### PlaySelectedPlaylist Command Structure Type {#ref_PlaySelectedPlaylistCommandStructure}
+
+Parameter structure of the PlaySelectedPlaylist Command.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>PlaylistId</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Playlist ID selected from the local or online playlist list.</td>
+    </tr>
+  </tbody>
+</table>
+
+##### PlayTextToSpeech Command Structure Type {#ref_PlayTextToSpeechCommandStructure}
+
+Parameter structure of the PlayTextToSpeech Command.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Text</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Chinese text to be converted to speech and played.</td>
+    </tr>
+  </tbody>
+</table>
+
+##### PlaySemanticPlaylist Command Structure Type {#ref_PlaySemanticPlaylistCommandStructure}
+
+Parameter structure of the PlaySemanticPlaylist Command.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Query</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Chinese semantic description used to match a playlist from the cloud music library.</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait Definitions
 
 <table>
@@ -37506,6 +37782,11 @@ Parameter structure of the PlayFavorite Command.
     <tr>
       <td>0x80BB</td>
       <td><a href="#ref_PlaybackDuration">PlaybackDuration</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5277</td>
+      <td><a href="#ref_CurrentPlaylist">ref_CurrentPlaylist</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -38209,6 +38490,31 @@ Indicates the playback duration, in ms.
       <td>O</td>
     </tr>
     <tr>
+      <td>0x9DC1</td>
+      <td><a href="#ref_PlayLocalSong">ref_PlayLocalSong</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC2</td>
+      <td><a href="#ref_PlaySelectedPlaylist">ref_PlaySelectedPlaylist</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC3</td>
+      <td><a href="#ref_PlayTextToSpeech">ref_PlayTextToSpeech</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC4</td>
+      <td><a href="#ref_PlaySemanticPlaylist">ref_PlaySemanticPlaylist</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC5</td>
+      <td><a href="#ref_Search">ref_Search</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x811A</td>
       <td><a href="#ref_Off">Off</a></td>
       <td>O</td>
@@ -38288,6 +38594,14 @@ Searches music content by keywords, artist, song name and other criteria, and pl
 
 [SearchAndPlay Command Structure](#ref_SearchAndPlayCommandStructure)
 
+#### Search Command {#ref_Search}
+
+Performs a fuzzy search by keyword and returns a song list without starting playback automatically. Each search result is described by [SearchResultStruct](#ref_SearchResultStruct), including the album, artist, song title, duration, favorite status and cover image URL. The user can select a song from the results and then play it through a playback Command.
+
+##### Parameters
+
+[Search Command Structure](#ref_SearchCommandStructure)
+
 #### PlayMediaURL Command {#ref_PlayMediaURL}
 
 Plays the audio resource specified by `MediaURL` directly. This Command is used to play a direct link already known to the client and does not perform song search; to search by song name, artist or keyword, use `SearchAndPlay`. After the Command is executed, the device shall take the URL as the current playback item and start loading and playing it; if the resource pointed to by the URL is inaccessible, or its format or protocol is not supported by the device, the device shall not report it as playing and shall report a failure according to the Command execution mechanism. Supported URL protocols, audio formats and access conditions are determined by device capabilities, and the device implementation shall clearly define its supported scope. Resources requiring authentication can be played only when the device has the corresponding access credentials or authorization mechanism.
@@ -38297,6 +38611,38 @@ Plays the audio resource specified by `MediaURL` directly. This Command is used 
 ##### Parameters
 
 [PlayMediaURL Command Structure](#ref_PlayMediaURLCommandStructure)
+
+#### PlayLocalSong Command {#ref_PlayLocalSong}
+
+Queries the local song list of the device, and then plays the corresponding local song according to the selected song ID.
+
+##### Parameters
+
+[PlayLocalSong Command Structure](#ref_PlayLocalSongCommandStructure)
+
+#### PlaySelectedPlaylist Command {#ref_PlaySelectedPlaylist}
+
+Queries the local and online playlist lists, and then plays the corresponding playlist according to the selected playlist ID.
+
+##### Parameters
+
+[PlaySelectedPlaylist Command Structure](#ref_PlaySelectedPlaylistCommandStructure)
+
+#### PlayTextToSpeech Command {#ref_PlayTextToSpeech}
+
+Converts the input Chinese text to speech and plays it.
+
+##### Parameters
+
+[PlayTextToSpeech Command Structure](#ref_PlayTextToSpeechCommandStructure)
+
+#### PlaySemanticPlaylist Command {#ref_PlaySemanticPlaylist}
+
+Matches the corresponding playlist from the cloud music library according to the input Chinese semantic description, and plays it.
+
+##### Parameters
+
+[PlaySemanticPlaylist Command Structure](#ref_PlaySemanticPlaylistCommandStructure)
 
 #### PlayPlaylist Command {#ref_PlayPlaylist}
 
@@ -40323,6 +40669,12 @@ Provides core smart door lock capabilities, including lock state, user/credentia
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5234</td>
+      <td><a href="#ref_UWBOriginOffset">UWBOriginOffset</a></td>
+      <td>UWB sensing position offset distance</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x513C</td>
       <td><a href="#ref_CloseDoorAutoRelockEnabled">CloseDoorAutoRelockEnabled</a></td>
       <td>Auto relock on door close enable</td>
@@ -40431,6 +40783,48 @@ Provides core smart door lock capabilities, including lock state, user/credentia
       <td>O</td>
     </tr>
     <tr>
+      <td>0x526E</td>
+      <td><a href="#ref_NumberOfTotalAqaraUsersSupported">NumberOfTotalAqaraUsersSupported</a></td>
+      <td>Aqara total user count</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526F</td>
+      <td><a href="#ref_NumberOfTotalAqaraPINSupported">NumberOfTotalAqaraPINSupported</a></td>
+      <td>Aqara total PIN credential count</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5270</td>
+      <td><a href="#ref_NumberOfTotalAqaraNFCSupported">NumberOfTotalAqaraNFCSupported</a></td>
+      <td>Aqara total NFC credential count</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5271</td>
+      <td><a href="#ref_NumberOfTotalAqaraFingerPrintSupported">NumberOfTotalAqaraFingerPrintSupported</a></td>
+      <td>Aqara total fingerprint credential count</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5272</td>
+      <td><a href="#ref_NumberOfPINPerAqaraUsersSupported">NumberOfPINPerAqaraUsersSupported</a></td>
+      <td>PIN count supported per Aqara user</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5273</td>
+      <td><a href="#ref_NumberOfNFCPerAqaraUsersSupported">NumberOfNFCPerAqaraUsersSupported</a></td>
+      <td>NFC count supported per Aqara user</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5274</td>
+      <td><a href="#ref_NumberOfFingerPrintPerAqaraUsersSupported">NumberOfFingerPrintPerAqaraUsersSupported</a></td>
+      <td>Fingerprint count supported per Aqara user</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x8171</td>
       <td><a href="#ref_LockOperationError">LockOperationError</a></td>
       <td>Door lock operation (event) error report</td>
@@ -40515,6 +40909,12 @@ Provides core smart door lock capabilities, including lock state, user/credentia
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5275</td>
+      <td><a href="#ref_MaxAqaraPINCodeLength">MaxAqaraPINCodeLength</a></td>
+      <td>Max Aqara PIN code length</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x8128</td>
       <td><a href="#ref_MaxRFIDCodeLength">MaxRFIDCodeLength</a></td>
       <td>Max RFID length</td>
@@ -40524,6 +40924,12 @@ Provides core smart door lock capabilities, including lock state, user/credentia
       <td>0x8127</td>
       <td><a href="#ref_MinPINCodeLength">MinPINCodeLength</a></td>
       <td>Min PIN code length</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5276</td>
+      <td><a href="#ref_MinAqaraPINCodeLength">MinAqaraPINCodeLength</a></td>
+      <td>Min Aqara PIN code length</td>
       <td>O</td>
     </tr>
     <tr>
@@ -44614,6 +45020,11 @@ Parameter structure of the SetTravelCalibration Command.
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5234</td>
+      <td><a href="#ref_UWBOriginOffset">UWBOriginOffset</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x513C</td>
       <td><a href="#ref_CloseDoorAutoRelockEnabled">CloseDoorAutoRelockEnabled</a></td>
       <td>O</td>
@@ -44704,6 +45115,41 @@ Parameter structure of the SetTravelCalibration Command.
       <td>O</td>
     </tr>
     <tr>
+      <td>0x526E</td>
+      <td><a href="#ref_NumberOfTotalAqaraUsersSupported">NumberOfTotalAqaraUsersSupported</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526F</td>
+      <td><a href="#ref_NumberOfTotalAqaraPINSupported">NumberOfTotalAqaraPINSupported</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5270</td>
+      <td><a href="#ref_NumberOfTotalAqaraNFCSupported">NumberOfTotalAqaraNFCSupported</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5271</td>
+      <td><a href="#ref_NumberOfTotalAqaraFingerPrintSupported">NumberOfTotalAqaraFingerPrintSupported</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5272</td>
+      <td><a href="#ref_NumberOfPINPerAqaraUsersSupported">NumberOfPINPerAqaraUsersSupported</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5273</td>
+      <td><a href="#ref_NumberOfNFCPerAqaraUsersSupported">NumberOfNFCPerAqaraUsersSupported</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5274</td>
+      <td><a href="#ref_NumberOfFingerPrintPerAqaraUsersSupported">NumberOfFingerPrintPerAqaraUsersSupported</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x8171</td>
       <td><a href="#ref_LockOperationError">LockOperationError</a></td>
       <td>O</td>
@@ -44774,6 +45220,11 @@ Parameter structure of the SetTravelCalibration Command.
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5275</td>
+      <td><a href="#ref_MaxAqaraPINCodeLength">MaxAqaraPINCodeLength</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x8128</td>
       <td><a href="#ref_MaxRFIDCodeLength">MaxRFIDCodeLength</a></td>
       <td>O</td>
@@ -44781,6 +45232,11 @@ Parameter structure of the SetTravelCalibration Command.
     <tr>
       <td>0x8127</td>
       <td><a href="#ref_MinPINCodeLength">MinPINCodeLength</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5276</td>
+      <td><a href="#ref_MinAqaraPINCodeLength">MinAqaraPINCodeLength</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -46172,6 +46628,79 @@ This Trait is used to control whether the speed follow function of the door lock
 #### UWBMinUnlockDistance Trait {#ref_UWBMinUnlockDistance}
 
 This Trait indicates the UWB minimum unlock distance of the door lock, in mm.
+
+#### UWBOriginOffset Trait (UWB Sensing Position Offset Distance) {#ref_UWBOriginOffset}
+
+This Trait indicates the origin offset distance of the UWB sensing position, in mm.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5234</td>
+      <td>UWBOriginOffset</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>int16</td>
+      <td>-600..600</td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>int16</td>
+      <td></td>
+      <td>600</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>int16</td>
+      <td></td>
+      <td>-600</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>int16</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
 
 #### UWBEnabled Trait {#ref_UWBEnabled}
 
@@ -49028,6 +49557,517 @@ This Trait is used for access to and reporting of "total door lock user count" d
   </tbody>
 </table>
 
+#### NumberOfTotalAqaraUsersSupported Trait (Aqara Total User Count) {#ref_NumberOfTotalAqaraUsersSupported}
+
+This Trait is used for access to and reporting of "Aqara total user count" data.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x526E</td>
+      <td>NumberOfTotalAqaraUsersSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>65535</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfTotalAqaraPINSupported Trait (Aqara Total PIN Credential Count) {#ref_NumberOfTotalAqaraPINSupported}
+
+This Trait is used for access to and reporting of "Aqara total PIN credential count" data.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x526F</td>
+      <td>NumberOfTotalAqaraPINSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>65535</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfTotalAqaraNFCSupported Trait (Aqara Total NFC Credential Count) {#ref_NumberOfTotalAqaraNFCSupported}
+
+This Trait is used for access to and reporting of "Aqara total NFC credential count" data.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5270</td>
+      <td>NumberOfTotalAqaraNFCSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>65535</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfTotalAqaraFingerPrintSupported Trait (Aqara Total Fingerprint Credential Count) {#ref_NumberOfTotalAqaraFingerPrintSupported}
+
+This Trait is used for access to and reporting of "Aqara total fingerprint credential count" data.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5271</td>
+      <td>NumberOfTotalAqaraFingerPrintSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>65535</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfPINPerAqaraUsersSupported Trait (PIN Count Supported per Aqara User) {#ref_NumberOfPINPerAqaraUsersSupported}
+
+This Trait is used for access to and reporting of "PIN count supported per Aqara user" data.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5272</td>
+      <td>NumberOfPINPerAqaraUsersSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>255</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfNFCPerAqaraUsersSupported Trait (NFC Count Supported per Aqara User) {#ref_NumberOfNFCPerAqaraUsersSupported}
+
+This Trait is used for access to and reporting of "NFC count supported per Aqara user" data.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5273</td>
+      <td>NumberOfNFCPerAqaraUsersSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>255</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfFingerPrintPerAqaraUsersSupported Trait (Fingerprint Count Supported per Aqara User) {#ref_NumberOfFingerPrintPerAqaraUsersSupported}
+
+This Trait is used for access to and reporting of "fingerprint count supported per Aqara user" data.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5274</td>
+      <td>NumberOfFingerPrintPerAqaraUsersSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>255</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
 #### LockOperationError Trait {#ref_LockOperationError}
 
 When a door lock operation fails for various reasons, the door lock will emit a LockOperationError event.
@@ -49843,6 +50883,79 @@ This Trait is used for access to and reporting of "max PIN code length" data.
   </tbody>
 </table>
 
+#### MaxAqaraPINCodeLength Trait (Maximum Aqara PIN Code Length) {#ref_MaxAqaraPINCodeLength}
+
+This Trait is used for access to and reporting of "maximum Aqara PIN code length" data.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5275</td>
+      <td>MaxAqaraPINCodeLength</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>255</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>Step Value</td>
+      <td>uint32</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
 #### MaxRFIDCodeLength Trait {#ref_MaxRFIDCodeLength}
 
 This Trait is used for access to and reporting of "max RFID length" data.
@@ -49931,6 +51044,79 @@ This Trait is used for access to and reporting of "min PIN code length" data.
     <tr>
       <td>0x8127</td>
       <td>MinPINCodeLength</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>255</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>Step Value</td>
+      <td>uint32</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### MinAqaraPINCodeLength Trait (Minimum Aqara PIN Code Length) {#ref_MinAqaraPINCodeLength}
+
+This Trait is used for access to and reporting of "minimum Aqara PIN code length" data.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5276</td>
+      <td>MinAqaraPINCodeLength</td>
     </tr>
   </tbody>
 </table>

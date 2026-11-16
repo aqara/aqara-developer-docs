@@ -36730,6 +36730,12 @@ WindSetting 定义了风的类型.
       <td>收藏播放列表</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5277</td>
+      <td><a href="#ref_CurrentPlaylist">CurrentPlaylist</a></td>
+      <td>当前播放列表</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -36809,6 +36815,36 @@ WindSetting 定义了风的类型.
       <td>0x9DB6</td>
       <td><a href="#ref_PlayMediaURL">PlayMediaURL</a></td>
       <td>按链接播放媒体</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC1</td>
+      <td><a href="#ref_PlayLocalSong">PlayLocalSong</a></td>
+      <td>播放本地歌曲</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC2</td>
+      <td><a href="#ref_PlaySelectedPlaylist">PlaySelectedPlaylist</a></td>
+      <td>播放选定歌单</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC3</td>
+      <td><a href="#ref_PlayTextToSpeech">PlayTextToSpeech</a></td>
+      <td>播放指定文字</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC4</td>
+      <td><a href="#ref_PlaySemanticPlaylist">PlaySemanticPlaylist</a></td>
+      <td>播放语义歌单</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC5</td>
+      <td><a href="#ref_Search">Search</a></td>
+      <td>搜索</td>
       <td>O</td>
     </tr>
     <tr>
@@ -37220,6 +37256,91 @@ SearchAndPlay Command 的参数结构体。
   </tbody>
 </table>
 
+##### Search Command Structure Type {#ref_SearchCommandStructure}
+
+Search Command 的参数结构体。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Keyword</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>搜索关键词，支持模糊搜索。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### SearchResultStruct Type {#ref_SearchResultStruct}
+
+Search Command 返回的单条歌曲搜索结果。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Album</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>专辑名称。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Artist</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>歌手名称。</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Title</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>歌曲名称。</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Duration</td>
+      <td>uint32</td>
+      <td>O</td>
+      <td>歌曲时长，单位为秒。</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Favorite</td>
+      <td>bool</td>
+      <td>O</td>
+      <td>歌曲是否已收藏。</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>ImageURL</td>
+      <td>characterString</td>
+      <td>O</td>
+      <td>歌曲封面图片链接。</td>
+    </tr>
+  </tbody>
+</table>
+
 ##### PlayMediaURL Command Structure Type {#ref_PlayMediaURLCommandStructure}
 
 PlayMediaURL Command 的参数结构体。
@@ -37310,6 +37431,61 @@ Playlists Trait 单个播放列表结构体。
       <td></td>
       <td></td>
       <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+##### CurrentPlaylistTraitPresentValueStructure Type {#ref_CurrentPlaylistTraitPresentValueStructure}
+
+CurrentPlaylist Trait 的当前播放列表结构体。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Id</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>当前播放列表 ID。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Name</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>当前播放列表名称。</td>
+    </tr>
+  </tbody>
+</table>
+
+#### CurrentPlaylist Trait {#ref_CurrentPlaylist}
+
+表示当前正在播放的播放列表，数据类型为 [CurrentPlaylistTraitPresentValueStructure](#ref_CurrentPlaylistTraitPresentValueStructure)。本 Trait 不定义 Parameter。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+      <th>名称</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5277</td>
+      <td><a href="#ref_CurrentPlaylist">CurrentPlaylist</a></td>
+      <td>当前播放列表</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -37447,6 +37623,106 @@ PlayFavorite Command 的参数结构体。
   </tbody>
 </table>
 
+##### PlayLocalSong Command Structure Type {#ref_PlayLocalSongCommandStructure}
+
+PlayLocalSong Command 的参数结构体。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>SongId</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>从设备本地歌曲列表中选定的歌曲 ID。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### PlaySelectedPlaylist Command Structure Type {#ref_PlaySelectedPlaylistCommandStructure}
+
+PlaySelectedPlaylist Command 的参数结构体。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>PlaylistId</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>从本地或在线歌单列表中选定的歌单 ID。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### PlayTextToSpeech Command Structure Type {#ref_PlayTextToSpeechCommandStructure}
+
+PlayTextToSpeech Command 的参数结构体。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Text</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>待转换为语音并播放的中文文本。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### PlaySemanticPlaylist Command Structure Type {#ref_PlaySemanticPlaylistCommandStructure}
+
+PlaySemanticPlaylist Command 的参数结构体。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Query</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>用于从云端曲库匹配歌单的中文语义描述。</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait 定义
 
 <table>
@@ -37506,6 +37782,11 @@ PlayFavorite Command 的参数结构体。
     <tr>
       <td>0x80BB</td>
       <td><a href="#ref_PlaybackDuration">PlaybackDuration</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5277</td>
+      <td><a href="#ref_CurrentPlaylist">CurrentPlaylist</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -38209,6 +38490,31 @@ PlayFavorite Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x9DC1</td>
+      <td><a href="#ref_PlayLocalSong">PlayLocalSong</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC2</td>
+      <td><a href="#ref_PlaySelectedPlaylist">PlaySelectedPlaylist</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC3</td>
+      <td><a href="#ref_PlayTextToSpeech">PlayTextToSpeech</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC4</td>
+      <td><a href="#ref_PlaySemanticPlaylist">PlaySemanticPlaylist</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC5</td>
+      <td><a href="#ref_Search">Search</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x811A</td>
       <td><a href="#ref_Off">Off</a></td>
       <td>O</td>
@@ -38288,6 +38594,14 @@ MediaPlaybackCommand表示媒体播放命令，适用于多种类型的媒体（
 
 [SearchAndPlay Command Structure](#ref_SearchAndPlayCommandStructure)
 
+#### Search Command {#ref_Search}
+
+根据关键词执行模糊搜索并返回歌曲列表，不自动开始播放。每条搜索结果使用 [SearchResultStruct](#ref_SearchResultStruct) 描述，包含专辑、歌手、歌曲名称、时长、收藏状态及封面图片链接；用户可从结果中选择歌曲，再通过播放命令播放。
+
+##### 参数
+
+[Search Command Structure](#ref_SearchCommandStructure)
+
 #### PlayMediaURL Command {#ref_PlayMediaURL}
 
 直接播放 `MediaURL` 指定的音频资源。该命令用于播放客户端已知的直链，不执行歌曲搜索；需要按歌曲名、歌手或关键词查找内容时，应使用 `SearchAndPlay`。命令执行后，设备应以该 URL 作为当前播放项并开始加载、播放；URL 所指资源不可访问、格式或协议不受设备支持时，设备不得将其报告为正在播放，并应按命令执行机制报告失败。支持的 URL 协议、音频格式及访问条件由设备能力决定，设备实现应明确其支持范围。需要鉴权的资源仅在设备具备相应访问凭据或授权机制时可播放。
@@ -38297,6 +38611,38 @@ MediaPlaybackCommand表示媒体播放命令，适用于多种类型的媒体（
 ##### 参数
 
 [PlayMediaURL Command Structure](#ref_PlayMediaURLCommandStructure)
+
+#### PlayLocalSong Command {#ref_PlayLocalSong}
+
+查询设备本地歌曲列表后，根据选定的歌曲 ID 播放对应本地歌曲。
+
+##### 参数
+
+[PlayLocalSong Command Structure](#ref_PlayLocalSongCommandStructure)
+
+#### PlaySelectedPlaylist Command {#ref_PlaySelectedPlaylist}
+
+查询本地及在线歌单列表后，根据选定的歌单 ID 播放对应歌单。
+
+##### 参数
+
+[PlaySelectedPlaylist Command Structure](#ref_PlaySelectedPlaylistCommandStructure)
+
+#### PlayTextToSpeech Command {#ref_PlayTextToSpeech}
+
+将输入的中文文本转换为语音并播放。
+
+##### 参数
+
+[PlayTextToSpeech Command Structure](#ref_PlayTextToSpeechCommandStructure)
+
+#### PlaySemanticPlaylist Command {#ref_PlaySemanticPlaylist}
+
+根据输入的中文语义描述，从云端曲库匹配对应歌单并播放。
+
+##### 参数
+
+[PlaySemanticPlaylist Command Structure](#ref_PlaySemanticPlaylistCommandStructure)
 
 #### PlayPlaylist Command {#ref_PlayPlaylist}
 
@@ -40323,6 +40669,12 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5234</td>
+      <td><a href="#ref_UWBOriginOffset">UWBOriginOffset</a></td>
+      <td>UWB 感应位置偏移距离</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x513C</td>
       <td><a href="#ref_CloseDoorAutoRelockEnabled">CloseDoorAutoRelockEnabled</a></td>
       <td>关门自动上锁使能</td>
@@ -40431,6 +40783,48 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>O</td>
     </tr>
     <tr>
+      <td>0x526E</td>
+      <td><a href="#ref_NumberOfTotalAqaraUsersSupported">NumberOfTotalAqaraUsersSupported</a></td>
+      <td>Aqara用户总数</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526F</td>
+      <td><a href="#ref_NumberOfTotalAqaraPINSupported">NumberOfTotalAqaraPINSupported</a></td>
+      <td>Aqara PIN凭证总数</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5270</td>
+      <td><a href="#ref_NumberOfTotalAqaraNFCSupported">NumberOfTotalAqaraNFCSupported</a></td>
+      <td>Aqara NFC凭证总数</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5271</td>
+      <td><a href="#ref_NumberOfTotalAqaraFingerPrintSupported">NumberOfTotalAqaraFingerPrintSupported</a></td>
+      <td>Aqara指纹凭证总数</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5272</td>
+      <td><a href="#ref_NumberOfPINPerAqaraUsersSupported">NumberOfPINPerAqaraUsersSupported</a></td>
+      <td>每个Aqara用户支持的PIN数</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5273</td>
+      <td><a href="#ref_NumberOfNFCPerAqaraUsersSupported">NumberOfNFCPerAqaraUsersSupported</a></td>
+      <td>每个Aqara用户支持的NFC数</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5274</td>
+      <td><a href="#ref_NumberOfFingerPrintPerAqaraUsersSupported">NumberOfFingerPrintPerAqaraUsersSupported</a></td>
+      <td>每个Aqara用户支持的指纹数</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x8171</td>
       <td><a href="#ref_LockOperationError">LockOperationError</a></td>
       <td>门锁操作（事件）错误上报</td>
@@ -40515,6 +40909,12 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5275</td>
+      <td><a href="#ref_MaxAqaraPINCodeLength">MaxAqaraPINCodeLength</a></td>
+      <td>最大Aqara PIN码长度</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x8128</td>
       <td><a href="#ref_MaxRFIDCodeLength">MaxRFIDCodeLength</a></td>
       <td>最大RFID长度</td>
@@ -40524,6 +40924,12 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>0x8127</td>
       <td><a href="#ref_MinPINCodeLength">MinPINCodeLength</a></td>
       <td>最小PINCode长度</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5276</td>
+      <td><a href="#ref_MinAqaraPINCodeLength">MinAqaraPINCodeLength</a></td>
+      <td>最小Aqara PIN码长度</td>
       <td>O</td>
     </tr>
     <tr>
@@ -41519,15 +41925,15 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>2</td>
       <td>UserId</td>
       <td>uint16</td>
-      <td>M</td>
-      <td>变更涉及的用户 ID。</td>
+      <td>O</td>
+      <td>变更涉及的用户 ID；无关联用户时可为 null。</td>
     </tr>
     <tr>
       <td>3</td>
       <td>UserType</td>
       <td><a href="#ref_AqaraUserTypeEnum8">AqaraUserTypeEnum8</a></td>
-      <td>M</td>
-      <td>变更后用户的类型及访问权限等级。</td>
+      <td>O</td>
+      <td>变更后用户的类型及访问权限等级；无关联用户时可为 null。</td>
     </tr>
     <tr>
       <td>4</td>
@@ -44614,6 +45020,11 @@ SetTravelCalibration Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5234</td>
+      <td><a href="#ref_UWBOriginOffset">UWBOriginOffset</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x513C</td>
       <td><a href="#ref_CloseDoorAutoRelockEnabled">CloseDoorAutoRelockEnabled</a></td>
       <td>O</td>
@@ -44704,6 +45115,41 @@ SetTravelCalibration Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x526E</td>
+      <td><a href="#ref_NumberOfTotalAqaraUsersSupported">NumberOfTotalAqaraUsersSupported</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526F</td>
+      <td><a href="#ref_NumberOfTotalAqaraPINSupported">NumberOfTotalAqaraPINSupported</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5270</td>
+      <td><a href="#ref_NumberOfTotalAqaraNFCSupported">NumberOfTotalAqaraNFCSupported</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5271</td>
+      <td><a href="#ref_NumberOfTotalAqaraFingerPrintSupported">NumberOfTotalAqaraFingerPrintSupported</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5272</td>
+      <td><a href="#ref_NumberOfPINPerAqaraUsersSupported">NumberOfPINPerAqaraUsersSupported</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5273</td>
+      <td><a href="#ref_NumberOfNFCPerAqaraUsersSupported">NumberOfNFCPerAqaraUsersSupported</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5274</td>
+      <td><a href="#ref_NumberOfFingerPrintPerAqaraUsersSupported">NumberOfFingerPrintPerAqaraUsersSupported</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x8171</td>
       <td><a href="#ref_LockOperationError">LockOperationError</a></td>
       <td>O</td>
@@ -44774,6 +45220,11 @@ SetTravelCalibration Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5275</td>
+      <td><a href="#ref_MaxAqaraPINCodeLength">MaxAqaraPINCodeLength</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x8128</td>
       <td><a href="#ref_MaxRFIDCodeLength">MaxRFIDCodeLength</a></td>
       <td>O</td>
@@ -44781,6 +45232,11 @@ SetTravelCalibration Command 的参数结构体。
     <tr>
       <td>0x8127</td>
       <td><a href="#ref_MinPINCodeLength">MinPINCodeLength</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5276</td>
+      <td><a href="#ref_MinAqaraPINCodeLength">MinAqaraPINCodeLength</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -46172,6 +46628,79 @@ SetTravelCalibration Command 的参数结构体。
 #### UWBMinUnlockDistance Trait（UWB 最小开锁距离） {#ref_UWBMinUnlockDistance}
 
 该 Trait 指示门锁的 UWB 最小开锁距离，单位为 mm。
+
+#### UWBOriginOffset Trait（UWB 感应位置偏移距离） {#ref_UWBOriginOffset}
+
+该 Trait 指示 UWB 感应位置的原点偏移距离，单位为 mm。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5234</td>
+      <td>UWBOriginOffset</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>int16</td>
+      <td>-600..600</td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>int16</td>
+      <td></td>
+      <td>600</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>int16</td>
+      <td></td>
+      <td>-600</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>int16</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
 
 #### UWBEnabled Trait（UWB 功能使能） {#ref_UWBEnabled}
 
@@ -49028,6 +49557,517 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
   </tbody>
 </table>
 
+#### NumberOfTotalAqaraUsersSupported Trait（Aqara用户总数） {#ref_NumberOfTotalAqaraUsersSupported}
+
+该 Trait 用于「Aqara用户总数」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x526E</td>
+      <td>NumberOfTotalAqaraUsersSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>65535</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfTotalAqaraPINSupported Trait（Aqara PIN凭证总数） {#ref_NumberOfTotalAqaraPINSupported}
+
+该 Trait 用于「Aqara PIN凭证总数」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x526F</td>
+      <td>NumberOfTotalAqaraPINSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>65535</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfTotalAqaraNFCSupported Trait（Aqara NFC凭证总数） {#ref_NumberOfTotalAqaraNFCSupported}
+
+该 Trait 用于「Aqara NFC凭证总数」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5270</td>
+      <td>NumberOfTotalAqaraNFCSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>65535</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfTotalAqaraFingerPrintSupported Trait（Aqara指纹凭证总数） {#ref_NumberOfTotalAqaraFingerPrintSupported}
+
+该 Trait 用于「Aqara指纹凭证总数」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5271</td>
+      <td>NumberOfTotalAqaraFingerPrintSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>65535</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfPINPerAqaraUsersSupported Trait（每个Aqara用户支持的PIN数） {#ref_NumberOfPINPerAqaraUsersSupported}
+
+该 Trait 用于「每个Aqara用户支持的PIN数」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5272</td>
+      <td>NumberOfPINPerAqaraUsersSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>255</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfNFCPerAqaraUsersSupported Trait（每个Aqara用户支持的NFC数） {#ref_NumberOfNFCPerAqaraUsersSupported}
+
+该 Trait 用于「每个Aqara用户支持的NFC数」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5273</td>
+      <td>NumberOfNFCPerAqaraUsersSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>255</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfFingerPrintPerAqaraUsersSupported Trait（每个Aqara用户支持的指纹数） {#ref_NumberOfFingerPrintPerAqaraUsersSupported}
+
+该 Trait 用于「每个Aqara用户支持的指纹数」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5274</td>
+      <td>NumberOfFingerPrintPerAqaraUsersSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>255</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
 #### LockOperationError Trait（门锁操作（事件）错误上报） {#ref_LockOperationError}
 
 门锁操作因各种原因失败时，门锁将发出 LockOperationError 事件。
@@ -49843,6 +50883,79 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
   </tbody>
 </table>
 
+#### MaxAqaraPINCodeLength Trait（最大Aqara PIN码长度） {#ref_MaxAqaraPINCodeLength}
+
+该 Trait 用于「最大Aqara PIN码长度」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5275</td>
+      <td>MaxAqaraPINCodeLength</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>255</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>Step Value</td>
+      <td>uint32</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
 #### MaxRFIDCodeLength Trait（最大RFID长度） {#ref_MaxRFIDCodeLength}
 
 该 Trait 用于「最大RFID长度」相关数据的访问与上报。
@@ -49931,6 +51044,79 @@ InstallationOrientation 使用 InstallationOrientationEnum Type 指定锁体安�
     <tr>
       <td>0x8127</td>
       <td>MinPINCodeLength</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>255</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>Step Value</td>
+      <td>uint32</td>
+      <td></td>
+      <td>1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### MinAqaraPINCodeLength Trait（最小Aqara PIN码长度） {#ref_MinAqaraPINCodeLength}
+
+该 Trait 用于「最小Aqara PIN码长度」相关数据的访问与上报。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5276</td>
+      <td>MinAqaraPINCodeLength</td>
     </tr>
   </tbody>
 </table>
@@ -110157,18 +111343,6 @@ ResetPresence 命令用于重置设备或空间的当前存在检测状态。
       <td>O</td>
     </tr>
     <tr>
-      <td>0x5187</td>
-      <td><a href="#ref_MinDetectionRange">MinDetectionRange</a></td>
-      <td>最小侦测范围</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5188</td>
-      <td><a href="#ref_MaxDetectionRange">MaxDetectionRange</a></td>
-      <td>最大侦测范围</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5189</td>
       <td><a href="#ref_DetectionRangeStep">DetectionRangeStep</a></td>
       <td>侦测范围步进</td>
@@ -110190,7 +111364,7 @@ ResetPresence 命令用于重置设备或空间的当前存在检测状态。
       <td>0x511A</td>
       <td><a href="#ref_DetectionRangeTargetPosition">DetectionRangeTargetPosition</a></td>
       <td>检测范围内目标位置距离</td>
-      <td>O</td>
+      <td>M</td>
     </tr>
   </tbody>
 </table>
@@ -110985,16 +112159,6 @@ SubscribeAutoEdgeRecognitionData Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
-      <td>0x5187</td>
-      <td><a href="#ref_MinDetectionRange">MinDetectionRange</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5188</td>
-      <td><a href="#ref_MaxDetectionRange">MaxDetectionRange</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x5189</td>
       <td><a href="#ref_DetectionRangeStep">DetectionRangeStep</a></td>
       <td>O</td>
@@ -111012,7 +112176,7 @@ SubscribeAutoEdgeRecognitionData Command 的参数结构体。
     <tr>
       <td>0x511A</td>
       <td><a href="#ref_DetectionRangeTargetPosition">DetectionRangeTargetPosition</a></td>
-      <td>O</td>
+      <td>M</td>
     </tr>
   </tbody>
 </table>
@@ -113180,11 +114344,11 @@ SubscribeAutoEdgeRecognitionData Command 的参数结构体。
 
 #### DetectionRange Trait（侦测范围） {#ref_DetectionRange}
 
-该 Trait 用于将雷达检测范围配置为一组离散的检测范围单元。
+该 Trait 用于将雷达检测范围配置为一组离散的检测范围单元，对应 Matter `DetectionRangeBitmask` 属性。值为最多 6 字节的位掩码。
 
-`MinDetectionRange`、`MaxDetectionRange` 和 `DetectionRangeStep` 的距离单位均为 cm。服务端应确保 `(MaxDetectionRange - MinDetectionRange) / DetectionRangeStep` 始终为 8 的整数倍，使检测范围单元能够完整映射为字节而无需填充位。
+`MinDetectionRange`、`MaxDetectionRange` 和 `DetectionRangeStep` 的距离单位均为 cm。每个 bit 对应一个检测范围单元，位数为 `(MaxDetectionRange - MinDetectionRange) / DetectionRangeStep`，所需字节数为 `ceil(位数 / 8)`。
 
-该 Trait 的 bitmask 字节长度为 `(MaxDetectionRange - MinDetectionRange) / DetectionRangeStep / 8`。例如，最小范围为 0、最大范围为 600、步长为 25 cm 时，bitmask 长度为 `600 / 25 / 8 = 3` 字节，表示 24 个、每个 25 cm 的检测范围单元。
+例如，最小范围为 0、最大范围为 600、步长为 25 cm 时，bitmask 长度为 `ceil(24 / 8) = 3` 字节，表示 24 个、每个 25 cm 的检测范围单元。掩码长度不得超过 6 字节。
 
 image::../images/aqara_Ambient_configuration_cluster/detection_range_bitmask.svg[DetectionRangeBitmask 布局示例,780]
 
@@ -113225,8 +114389,8 @@ image::../images/aqara_Ambient_configuration_cluster/detection_range_bitmask.svg
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td>uint16</td>
-      <td></td>
+      <td>octetString</td>
+      <td>可为 NULL，最多 6 字节</td>
       <td></td>
       <td>RVW</td>
       <td>O</td>
@@ -113234,137 +114398,9 @@ image::../images/aqara_Ambient_configuration_cluster/detection_range_bitmask.svg
   </tbody>
 </table>
 
-#### MinDetectionRange Trait（最小侦测范围） {#ref_MinDetectionRange}
-
-该 Trait 指示设备支持的最小检测距离，单位为 cm。值为 0 表示 0 cm。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5187</td>
-      <td>MinDetectionRange</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>0</td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0002</td>
-      <td>Maximum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>600</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0003</td>
-      <td>Minimum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>0</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### MaxDetectionRange Trait（最大侦测范围） {#ref_MaxDetectionRange}
-
-该 Trait 指示设备支持的最大检测距离，单位为 cm。值为 600 表示 600 cm。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5188</td>
-      <td>MaxDetectionRange</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>600</td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0002</td>
-      <td>Maximum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>600</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0003</td>
-      <td>Minimum Value</td>
-      <td>uint16</td>
-      <td></td>
-      <td>0</td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
 #### DetectionRangeStep Trait（侦测范围步进） {#ref_DetectionRangeStep}
 
-该 Trait 指示每个检测范围单元的步长，单位为 cm。值为 25 表示 25 cm。客户端应结合 `MinDetectionRange` 和 `MaxDetectionRange`，使用该值确定 `DetectionRange` bitmask 的预期字节长度以及每个 bit 所表示的距离。
+该 Trait 指示每个检测范围单元的步长，单位为 cm，对应 Matter `DetectionRangeStep` 属性。客户端应结合 `MinDetectionRange` 和 `MaxDetectionRange`，使用该值确定 `DetectionRange` bitmask 的预期字节长度以及每个 bit 所表示的距离。
 
 <table>
   <thead>
@@ -113565,7 +114601,7 @@ image::../images/aqara_Ambient_configuration_cluster/detection_range_bitmask.svg
 
 #### DetectionRangeTargetPosition Trait（检测范围内目标位置距离） {#ref_DetectionRangeTargetPosition}
 
-该 Trait 用于上报检测范围内目标位置相关数据，便于可视化标定与范围校准。
+该 Trait 映射 Matter `DetectionRangeTargetPosition` 事件，用于上报配置检测范围内最近目标的距离。事件字段 `TargetDistance` 映射到本 Trait 的 `Present Value`，单位为 cm。服务端在每个活动上报窗口开始或重启时应先上报一次；之后仅在目标距离变化时上报。每个事件最多报告一个目标。
 
 <table>
   <thead>
@@ -113600,27 +114636,27 @@ image::../images/aqara_Ambient_configuration_cluster/detection_range_bitmask.svg
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td>characterString</td>
+      <td>uint16</td>
+      <td>MinDetectionRange 到 MaxDetectionRange</td>
       <td></td>
-      <td>0</td>
       <td>V</td>
-      <td>O</td>
+      <td>M</td>
     </tr>
     <tr>
       <td>0x0002</td>
       <td>Maximum Value</td>
-      <td>characterString</td>
+      <td>uint16</td>
+      <td>由 Matter MaxDetectionRange 属性提供，单位为 cm</td>
       <td></td>
-      <td>65535</td>
       <td>R</td>
       <td>O</td>
     </tr>
     <tr>
       <td>0x0003</td>
       <td>Minimum Value</td>
-      <td>characterString</td>
+      <td>uint16</td>
+      <td>由 Matter MinDetectionRange 属性提供，单位为 cm</td>
       <td></td>
-      <td>0</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -113746,7 +114782,7 @@ image::../images/aqara_Ambient_configuration_cluster/detection_range_bitmask.svg
 
 #### SubscribeDetectionRangeTargetPosition Command {#ref_SubscribeDetectionRangeTargetPosition}
 
-该 Command 用于执行「订阅检测范围目标位置」操作。
+该 Command 用于由客户端订阅检测范围内目标位置事件。服务端开始或重启该事件的活动上报窗口时应上报一次当前目标距离，后续仅在目标距离变化时上报。
 
 该 Command 无参数。
 
