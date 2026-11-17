@@ -294,6 +294,7 @@ components:
     TraitValueUpdate:
       name: TraitValueUpdate
       title: Trait Value Update
+      description: After subscribing to all traits of a specified device through SubscribeAllRequest or subscribing to a specified Trait of a specified device through SubscribeTraitValueRequest, when the value of the target Trait changes, Aqara Studio will push this message to you. For information on Aqara's existing Traits and their data types, see [Aqara Data Model Tags](https://docs.aqara.com/docs/aqara-developer/aqara-data-model-specification/aqara-data-model-tags/).
       payload:
         $ref: '#/components/schemas/PushTraitValueUpdateMessageV1'
       examples:

@@ -294,6 +294,7 @@ components:
     TraitValueUpdate:
       name: TraitValueUpdate
       title: Trait 功能值变化推送
+      description: 通过 SubscribeAllRequest 订阅了指定设备的全部 trait 或通过 SubscribeTraitValueRequest 订阅了指定设备的指定 Trait 后，当目标 Trait 值发生变化时，Aqara Studio 会向您推送此消息。如需了解 Aqara 现有 Trait 的含义与数据类型，请阅读 [Aqara 物模型标签](https://docs.aqara.com/zh/docs/aqara-developer/aqara-data-model-specification/aqara-data-model-tags/)。
       payload:
         $ref: '#/components/schemas/PushTraitValueUpdateMessageV1'
       examples:
