@@ -89,159 +89,6 @@ const aqaraLifeWebSocketSpecEn = {
     }
   ],
   "messages": {
-    "CommandReport": {
-      "name": "CommandReport",
-      "title": "Gateway command execution result",
-      "summary": "Sent with v1 device-level or full-device subscriptions, preserving the original gateway result without indicating that the device physical action has been completed.",
-      "examples": [
-        {
-          "name": "command_report",
-          "payload": {
-            "type": "CommandReport",
-            "version": "v1",
-            "msgId": "report-example",
-            "studioId": "studio-example",
-            "eventId": "449fd6f6-c52c-4488-a3a2-828db5f9ab6e",
-            "code": 0,
-            "message": "success",
-            "data": {
-              "deviceId": "device-1",
-              "sequence": 1,
-              "timestamp": 1793577600000,
-              "did": "gateway-device-example",
-              "reportTime": null,
-              "source": null,
-              "data": {
-                "2.148.33050.0": "0"
-              },
-              "content": {
-                "0": 0,
-                "2": 2
-              }
-            }
-          }
-        }
-      ],
-      "payloadSchema": {
-        "type": "object",
-        "description": "All business notifications now carry studioId/eventId pair; ordinary historical messages allow omission for compatibility with legacy producers. Ordinary request/response messages do not reference this structure. Execution results and the four new scene object events have additional identity constraints.",
-        "dependencies": {
-          "eventId": [
-            "studioId"
-          ],
-          "studioId": [
-            "eventId"
-          ]
-        },
-        "required": [
-          "type",
-          "version",
-          "msgId",
-          "data",
-          "code",
-          "message"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "CommandReport"
-            ]
-          },
-          "version": {
-            "type": "string",
-            "enum": [
-              "v1"
-            ]
-          },
-          "msgId": {
-            "type": "string",
-            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
-            "minLength": 1,
-            "maxLength": 64
-          },
-          "data": {
-            "type": "object",
-            "required": [
-              "deviceId",
-              "sequence",
-              "timestamp",
-              "did",
-              "reportTime",
-              "source",
-              "data",
-              "content"
-            ],
-            "properties": {
-              "deviceId": {
-                "type": "string",
-                "minLength": 1
-              },
-              "sequence": {
-                "type": "integer",
-                "minimum": 1
-              },
-              "timestamp": {
-                "type": "integer",
-                "minimum": 0,
-                "description": "Studio recorded time",
-                "Unix milliseconds": null
-              },
-              "did": {
-                "type": "string",
-                "minLength": 1
-              },
-              "reportTime": {
-                "type": [
-                  "integer",
-                  "null"
-                ],
-                "description": "Gateway original report time",
-                "null if not available": null
-              },
-              "source": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "data": {
-                "type": "object",
-                "additionalProperties": true
-              },
-              "content": {
-                "type": "object",
-                "additionalProperties": true
-              }
-            }
-          },
-          "eventId": {
-            "type": "string",
-            "minLength": 1,
-            "pattern": "\\S",
-            "description": "An opaque string for this logical notification. It must contain at least one non-whitespace character. Store and compare it as-is without relying on its format. It remains unchanged across channels and HTTP retries. Consecutive notifications with the same content use different values."
-          },
-          "studioId": {
-            "type": "string",
-            "minLength": 1,
-            "pattern": "\\S",
-            "description": "The official Studio identity that publishes the notification. It must contain at least one non-whitespace character. It is not a gateway identity or an authentication credential."
-          },
-          "code": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Processing result code. 0 indicates success, and any non-zero value indicates failure."
-          },
-          "message": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Processing result message."
-          }
-        }
-      }
-    },
     "AuthRequest": {
       "name": "AuthRequest",
       "title": "WebSocket authentication request",
@@ -256,7 +103,6 @@ const aqaraLifeWebSocketSpecEn = {
             "data": {
               "authType": "token",
               "token": "<accessToken>",
-              "deviceUniqueId": "<deviceUniqueId>",
               "clientId": "<clientId>"
             }
           }
@@ -867,6 +713,182 @@ const aqaraLifeWebSocketSpecEn = {
         }
       }
     },
+    "TraitValueUpdate": {
+      "name": "TraitValueUpdate",
+      "title": "Trait Value Update",
+      "examples": [
+        {
+          "name": "Device Online Status Changed",
+          "payload": {
+            "type": "TraitValueUpdate",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000001",
+            "studioId": "studio-example",
+            "version": "v1",
+            "msgId": "10810",
+            "data": [
+              {
+                "deviceId": "57190441014857",
+                "endpointId": 0,
+                "functionCode": "BasicInformation",
+                "traitCode": "Reachable",
+                "value": true,
+                "time": 1794637886352
+              }
+            ],
+            "code": 0,
+            "message": ""
+          }
+        },
+        {
+          "name": "Playback State Changed",
+          "payload": {
+            "type": "TraitValueUpdate",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000002",
+            "studioId": "studio-example",
+            "version": "v1",
+            "msgId": "10811",
+            "data": [
+              {
+                "deviceId": "57190441014857",
+                "endpointId": 3,
+                "functionCode": "MediaPlayback",
+                "traitCode": "TargetPlaybackState",
+                "value": "0",
+                "time": 1754469720110
+              }
+            ],
+            "code": 0,
+            "message": ""
+          }
+        },
+        {
+          "name": "Device Name Updated",
+          "payload": {
+            "type": "TraitValueUpdate",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000003",
+            "studioId": "studio-example",
+            "version": "v1",
+            "msgId": "10812",
+            "data": [
+              {
+                "deviceId": "device-1",
+                "endpointId": 0,
+                "functionCode": "EndpointLabel",
+                "traitCode": "EndpointName",
+                "value": "Living Room Light",
+                "time": 1789113600000
+              }
+            ],
+            "code": 0,
+            "message": ""
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "description": "All business notifications now carry studioId/eventId pair; ordinary historical messages allow omission for compatibility with legacy producers. Ordinary request/response messages do not reference this structure. Execution results and the four new scene object events have additional identity constraints.",
+        "dependencies": {
+          "eventId": [
+            "studioId"
+          ],
+          "studioId": [
+            "eventId"
+          ]
+        },
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data",
+          "code",
+          "message"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "TraitValueUpdate"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "deviceId",
+                "endpointId",
+                "functionCode",
+                "traitCode",
+                "time"
+              ],
+              "properties": {
+                "deviceId": {
+                  "type": "string",
+                  "description": "Device ID."
+                },
+                "endpointId": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Endpoint ID."
+                },
+                "functionCode": {
+                  "type": "string",
+                  "description": "Function code."
+                },
+                "traitCode": {
+                  "type": "string",
+                  "description": "Trait feature point code."
+                },
+                "value": {
+                  "description": "Trait feature point value. The actual type is determined by the specific feature point definition."
+                },
+                "time": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "Report timestamp in milliseconds."
+                }
+              }
+            }
+          },
+          "eventId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "An opaque string for this logical notification. It must contain at least one non-whitespace character. Store and compare it as-is without relying on its format. It remains unchanged across channels and HTTP retries. Consecutive notifications with the same content use different values."
+          },
+          "studioId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "The official Studio identity that publishes the notification. It must contain at least one non-whitespace character. It is not a gateway identity or an authentication credential."
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Processing result code. 0 indicates success, and any non-zero value indicates failure."
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Processing result message."
+          }
+        }
+      }
+    },
     "UnsubscribeTraitValueRequest": {
       "name": "UnsubscribeTraitValueRequest",
       "title": "Unsubscribe from specified Trait values request",
@@ -1116,131 +1138,6 @@ const aqaraLifeWebSocketSpecEn = {
         }
       }
     },
-    "UnsubscribeEventRequest": {
-      "name": "UnsubscribeEventRequest",
-      "title": "Unsubscribe Alarm Request",
-      "description": "Send after authentication. `data` must be a non-empty array of event types. Ordinary clients use `ALARM`. The subscription applies to the current session only, and repeated requests are idempotent. This does not affect device, Trait, or object event subscriptions.",
-      "examples": [
-        {
-          "name": "unsubscribeAlarmRequest",
-          "payload": {
-            "type": "UnsubscribeEventRequest",
-            "version": "v1",
-            "msgId": "alarm-unsubscribe-1",
-            "data": [
-              "ALARM"
-            ]
-          }
-        }
-      ],
-      "payloadSchema": {
-        "type": "object",
-        "required": [
-          "type",
-          "version",
-          "msgId",
-          "data"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "UnsubscribeEventRequest"
-            ]
-          },
-          "version": {
-            "type": "string",
-            "enum": [
-              "v1"
-            ]
-          },
-          "msgId": {
-            "type": "string",
-            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
-            "minLength": 1,
-            "maxLength": 64
-          },
-          "data": {
-            "type": "array",
-            "minItems": 1,
-            "items": {
-              "type": "string",
-              "enum": [
-                "ALARM"
-              ]
-            },
-            "description": "Use ALARM for alarms; do not accept empty arrays, wildcards, or object ID filters."
-          }
-        }
-      }
-    },
-    "UnsubscribeEventResponse": {
-      "name": "UnsubscribeEventResponse",
-      "title": "Unsubscribe Alarm Response",
-      "examples": [
-        {
-          "name": "unsubscribeAlarmResponse",
-          "payload": {
-            "type": "UnsubscribeEventResponse",
-            "version": "v1",
-            "msgId": "alarm-unsubscribe-1",
-            "data": "",
-            "code": 0,
-            "message": "success"
-          }
-        }
-      ],
-      "payloadSchema": {
-        "type": "object",
-        "required": [
-          "type",
-          "version",
-          "msgId",
-          "code",
-          "message",
-          "data"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "UnsubscribeEventResponse"
-            ]
-          },
-          "version": {
-            "type": "string",
-            "enum": [
-              "v1"
-            ]
-          },
-          "msgId": {
-            "type": "string",
-            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
-            "minLength": 1,
-            "maxLength": 64
-          },
-          "data": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "default": ""
-          },
-          "code": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Processing result code. 0 indicates success, and any non-zero value indicates failure."
-          },
-          "message": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Processing result message."
-          }
-        }
-      }
-    },
     "AlarmEvent": {
       "name": "AlarmEvent",
       "title": "Raw Alarm Push",
@@ -1439,6 +1336,131 @@ const aqaraLifeWebSocketSpecEn = {
         }
       }
     },
+    "UnsubscribeEventRequest": {
+      "name": "UnsubscribeEventRequest",
+      "title": "Unsubscribe Alarm Request",
+      "description": "Send after authentication. `data` must be a non-empty array of event types. Ordinary clients use `ALARM`. The subscription applies to the current session only, and repeated requests are idempotent. This does not affect device, Trait, or object event subscriptions.",
+      "examples": [
+        {
+          "name": "unsubscribeAlarmRequest",
+          "payload": {
+            "type": "UnsubscribeEventRequest",
+            "version": "v1",
+            "msgId": "alarm-unsubscribe-1",
+            "data": [
+              "ALARM"
+            ]
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "UnsubscribeEventRequest"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": [
+                "ALARM"
+              ]
+            },
+            "description": "Use ALARM for alarms; do not accept empty arrays, wildcards, or object ID filters."
+          }
+        }
+      }
+    },
+    "UnsubscribeEventResponse": {
+      "name": "UnsubscribeEventResponse",
+      "title": "Unsubscribe Alarm Response",
+      "examples": [
+        {
+          "name": "unsubscribeAlarmResponse",
+          "payload": {
+            "type": "UnsubscribeEventResponse",
+            "version": "v1",
+            "msgId": "alarm-unsubscribe-1",
+            "data": "",
+            "code": 0,
+            "message": "success"
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "code",
+          "message",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "UnsubscribeEventResponse"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": ""
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Processing result code. 0 indicates success, and any non-zero value indicates failure."
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Processing result message."
+          }
+        }
+      }
+    },
     "SubscribeObjectEventRequest": {
       "name": "SubscribeObjectEventRequest",
       "title": "Subscribe to space, device-space relationship, and automation object events",
@@ -1556,7 +1578,23 @@ const aqaraLifeWebSocketSpecEn = {
                       "SCENE_REMOVED",
                       "SCENE_UPDATED",
                       "SCENE_SPACE_UPDATED"
-                    ]
+                    ],
+                    "x-enum-descriptions": {
+                      "DEVICE_SPACE_UPDATED": "The device's space changed.",
+                      "SPACE_ADDED": "Space added.",
+                      "SPACE_REMOVED": "Space removed.",
+                      "SPACE_UPDATED": "Space updated.",
+                      "AUTOMATION_ADDED": "Automation added.",
+                      "AUTOMATION_REMOVED": "Automation removed.",
+                      "AUTOMATION_UPDATED": "Automation updated.",
+                      "AUTOMATION_SPACE_UPDATED": "The automation's space changed.",
+                      "AUTOMATION_EXECUTION_RESULT": "Automation execution result.",
+                      "SCENE_EXECUTION_RESULT": "Scene execution result.",
+                      "SCENE_ADDED": "Scene added.",
+                      "SCENE_REMOVED": "Scene removed.",
+                      "SCENE_UPDATED": "Scene updated.",
+                      "SCENE_SPACE_UPDATED": "The scene's space changed."
+                    }
                   }
                 },
                 "objectIds": {
@@ -1570,7 +1608,7 @@ const aqaraLifeWebSocketSpecEn = {
                     "type": "string",
                     "minLength": 1
                   },
-                  "description": "When subscribing, omitted, null, or empty objectIds means all objects within the current permission scope; when non-empty, only the specified objects are matched.\nWhen unsubscribing, omitted, null, or empty objectIds means clearing all rules for the corresponding eventTypes; when non-empty, only the specified objects are removed.\nWithin the same WebSocket session, at most 1000 distinct objectIds may be cumulatively subscribed under each eventType.\nWhen objectIds is non-empty, the eventTypes in the same item must belong to the same public ID family (device, space, automation/scene); SPACE_ADDED, AUTOMATION_ADDED, and SCENE_ADDED support only the all-objects semantic.\nThe protocol does not use a scope field; the all-objects semantic is represented uniformly through objectIds.\n"
+                  "description": "List of object IDs. Fill in device, space, automation, or scene IDs according to the event types.\n\nWhen subscribing, omitted, null, or empty objectIds means all objects within the current permission scope; when non-empty, only the specified objects are matched.\n\nWhen unsubscribing, omitted, null, or empty objectIds means clearing all rules for the corresponding eventTypes; when non-empty, only the specified objects are removed.\n\nWithin the same WebSocket session, at most 1000 distinct objectIds may be cumulatively subscribed under each eventType.\n\nWhen objectIds is non-empty, the eventTypes in the same item must belong to the same public ID family (device, space, automation/scene); SPACE_ADDED, AUTOMATION_ADDED, and SCENE_ADDED support only the all-objects semantic.\n"
                 }
               }
             },
@@ -1634,337 +1672,6 @@ const aqaraLifeWebSocketSpecEn = {
         }
       }
     },
-    "UnsubscribeObjectEventRequest": {
-      "name": "UnsubscribeObjectEventRequest",
-      "title": "Unsubscribe from space, device-space relationship, and automation object events",
-      "summary": "Removes specified object rules or clears specified event types for the current WebSocket session.",
-      "description": "When `objectIds` is non-empty, only the specified objects are removed; when omitted, null, or an empty array, all object rules for the corresponding `eventTypes` are cleared.\nAll-object subscriptions do not support excluding selected objects. To switch from all objects to specified objects, first clear the event type and then send a new specified-object subscription.\n",
-      "examples": [
-        {
-          "name": "unsubscribeSelectedObject",
-          "payload": {
-            "type": "UnsubscribeObjectEventRequest",
-            "version": "v1",
-            "msgId": "object-unsubscribe-1",
-            "data": [
-              {
-                "eventTypes": [
-                  "AUTOMATION_UPDATED"
-                ],
-                "objectIds": [
-                  "automation-1"
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "clearEventType",
-          "payload": {
-            "type": "UnsubscribeObjectEventRequest",
-            "version": "v1",
-            "msgId": "object-unsubscribe-2",
-            "data": [
-              {
-                "eventTypes": [
-                  "AUTOMATION_UPDATED"
-                ],
-                "objectIds": []
-              }
-            ]
-          }
-        }
-      ],
-      "payloadSchema": {
-        "type": "object",
-        "required": [
-          "type",
-          "version",
-          "msgId",
-          "data"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "UnsubscribeObjectEventRequest"
-            ]
-          },
-          "version": {
-            "type": "string",
-            "enum": [
-              "v1"
-            ]
-          },
-          "msgId": {
-            "type": "string",
-            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
-            "minLength": 1,
-            "maxLength": 64
-          },
-          "data": {
-            "type": "array",
-            "minItems": 1,
-            "maxItems": 100,
-            "items": {
-              "type": "object",
-              "required": [
-                "eventTypes"
-              ],
-              "properties": {
-                "eventTypes": {
-                  "type": "array",
-                  "minItems": 1,
-                  "uniqueItems": true,
-                  "items": {
-                    "type": "string",
-                    "enum": [
-                      "DEVICE_SPACE_UPDATED",
-                      "SPACE_ADDED",
-                      "SPACE_REMOVED",
-                      "SPACE_UPDATED",
-                      "AUTOMATION_ADDED",
-                      "AUTOMATION_REMOVED",
-                      "AUTOMATION_UPDATED",
-                      "AUTOMATION_SPACE_UPDATED",
-                      "AUTOMATION_EXECUTION_RESULT",
-                      "SCENE_EXECUTION_RESULT",
-                      "SCENE_ADDED",
-                      "SCENE_REMOVED",
-                      "SCENE_UPDATED",
-                      "SCENE_SPACE_UPDATED"
-                    ]
-                  }
-                },
-                "objectIds": {
-                  "type": [
-                    "array",
-                    "null"
-                  ],
-                  "maxItems": 1000,
-                  "uniqueItems": true,
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "description": "When subscribing, omitted, null, or empty objectIds means all objects within the current permission scope; when non-empty, only the specified objects are matched.\nWhen unsubscribing, omitted, null, or empty objectIds means clearing all rules for the corresponding eventTypes; when non-empty, only the specified objects are removed.\nWithin the same WebSocket session, at most 1000 distinct objectIds may be cumulatively subscribed under each eventType.\nWhen objectIds is non-empty, the eventTypes in the same item must belong to the same public ID family (device, space, automation/scene); SPACE_ADDED, AUTOMATION_ADDED, and SCENE_ADDED support only the all-objects semantic.\nThe protocol does not use a scope field; the all-objects semantic is represented uniformly through objectIds.\n"
-                }
-              }
-            },
-            "description": "Must contain 1 to 100 unsubscribe items; an empty array is a parameter error and does not mean unsubscribing from all event types.\nWhen objectIds is omitted, null, or an empty array, all object rules under the corresponding eventTypes for the current session are removed; when non-empty, only the specified objects are removed.\n"
-          }
-        }
-      }
-    },
-    "UnsubscribeObjectEventResponse": {
-      "name": "UnsubscribeObjectEventResponse",
-      "title": "Object-event unsubscription response",
-      "examples": [],
-      "payloadSchema": {
-        "type": "object",
-        "required": [
-          "type",
-          "version",
-          "msgId",
-          "code",
-          "message",
-          "data"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "UnsubscribeObjectEventResponse"
-            ]
-          },
-          "version": {
-            "type": "string",
-            "enum": [
-              "v1"
-            ]
-          },
-          "msgId": {
-            "type": "string",
-            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
-            "minLength": 1,
-            "maxLength": 64
-          },
-          "data": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "default": ""
-          },
-          "code": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Processing result code. 0 indicates success, and any non-zero value indicates failure."
-          },
-          "message": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Processing result message."
-          }
-        }
-      }
-    },
-    "TraitValueUpdate": {
-      "name": "TraitValueUpdate",
-      "title": "Trait value change push",
-      "examples": [
-        {
-          "name": "traitValueUpdate",
-          "payload": {
-            "type": "TraitValueUpdate",
-            "eventId": "449fd6f6-c52c-4488-a3a2-000000000002",
-            "studioId": "studio-example",
-            "version": "v1",
-            "msgId": "1754469720110",
-            "data": [
-              {
-                "deviceId": "57190441014857",
-                "endpointId": 3,
-                "functionCode": "MediaPlayback",
-                "traitCode": "TargetPlaybackState",
-                "value": "0",
-                "time": 1754469720110
-              }
-            ],
-            "code": 0,
-            "message": ""
-          }
-        },
-        {
-          "name": "deviceNameUpdated",
-          "payload": {
-            "type": "TraitValueUpdate",
-            "eventId": "449fd6f6-c52c-4488-a3a2-000000000003",
-            "studioId": "studio-example",
-            "version": "v1",
-            "msgId": "1789113600000",
-            "data": [
-              {
-                "deviceId": "device-1",
-                "endpointId": 0,
-                "functionCode": "EndpointLabel",
-                "traitCode": "EndpointName",
-                "value": "Living Room Light",
-                "time": 1789113600000
-              }
-            ],
-            "code": 0,
-            "message": ""
-          }
-        }
-      ],
-      "payloadSchema": {
-        "type": "object",
-        "description": "All business notifications now carry studioId/eventId pair; ordinary historical messages allow omission for compatibility with legacy producers. Ordinary request/response messages do not reference this structure. Execution results and the four new scene object events have additional identity constraints.",
-        "dependencies": {
-          "eventId": [
-            "studioId"
-          ],
-          "studioId": [
-            "eventId"
-          ]
-        },
-        "required": [
-          "type",
-          "version",
-          "msgId",
-          "data",
-          "code",
-          "message"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "TraitValueUpdate"
-            ]
-          },
-          "version": {
-            "type": "string",
-            "enum": [
-              "v1"
-            ]
-          },
-          "msgId": {
-            "type": "string",
-            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
-            "minLength": 1,
-            "maxLength": 64
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "required": [
-                "deviceId",
-                "endpointId",
-                "functionCode",
-                "traitCode",
-                "time"
-              ],
-              "properties": {
-                "deviceId": {
-                  "type": "string",
-                  "description": "Device ID."
-                },
-                "endpointId": {
-                  "type": "integer",
-                  "format": "int32",
-                  "description": "Endpoint ID."
-                },
-                "functionCode": {
-                  "type": "string",
-                  "description": "Function code."
-                },
-                "traitCode": {
-                  "type": "string",
-                  "description": "Trait feature point code."
-                },
-                "value": {
-                  "description": "Trait feature point value. The actual type is determined by the specific feature point definition."
-                },
-                "time": {
-                  "type": "integer",
-                  "format": "int64",
-                  "description": "Report timestamp in milliseconds."
-                }
-              }
-            }
-          },
-          "eventId": {
-            "type": "string",
-            "minLength": 1,
-            "pattern": "\\S",
-            "description": "An opaque string for this logical notification. It must contain at least one non-whitespace character. Store and compare it as-is without relying on its format. It remains unchanged across channels and HTTP retries. Consecutive notifications with the same content use different values."
-          },
-          "studioId": {
-            "type": "string",
-            "minLength": 1,
-            "pattern": "\\S",
-            "description": "The official Studio identity that publishes the notification. It must contain at least one non-whitespace character. It is not a gateway identity or an authentication credential."
-          },
-          "code": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Processing result code. 0 indicates success, and any non-zero value indicates failure."
-          },
-          "message": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Processing result message."
-          }
-        }
-      }
-    },
     "ObjectEvent": {
       "name": "objectEvent",
       "title": "Object event push",
@@ -1972,7 +1679,7 @@ const aqaraLifeWebSocketSpecEn = {
       "description": "DEVICE_ADDED and DEVICE_REMOVED are pushed by default after an authenticated connection is established.\n\nDEVICE_SPACE_UPDATED, the three SPACE_* changes, the four AUTOMATION_* changes, the four SCENE_* changes, and AUTOMATION_EXECUTION_RESULT and SCENE_EXECUTION_RESULT are delivered only to SubscribeObjectEventRequest sessions that match the eventType, objectId, and current permissions.\n\nDEVICE_ENDPOINT_* and DEVICE_TRAIT_PARAMETER_UPDATE continue to follow the existing device-data subscriptions.\n\nIndependent scenes are managed through `/scenes`, and change notifications use four `SCENE_*` event families, still using `AUTOMATION_*` for automation. Trustworthiness is determined by the server. No separate event is provided for count changes. Creating or deleting an automation sends only the corresponding lifecycle snapshot and does not additionally send a space-relationship event. For an existing object, `AUTOMATION_SPACE_UPDATED` is sent only when its space relationship changes. If both the content and the relationship change at the same time, both types of events may be received.\n\nIndependent scenes use `SCENE_ADDED/REMOVED/UPDATED/SPACE_UPDATED`, no longer sending `AUTOMATION_*`; the `sceneId` still uses the `auto_` prefix. Old automation manual entries still belong to automation. Scene definition comparison excludes space, and space and definition changes in the same batch generate two different `eventId` notifications.\n\nThe `manualTriggers` field in an automation snapshot contains `triggerNodeId` and `triggerName`. Adding, deleting, or renaming a manual trigger entry returns the full list through `AUTOMATION_UPDATED`. Replace the cache with the full list, and clear previous entries when the array is empty. No additional event subscription type is required.\n\nmsgId is used only for trace correlation. New business notifications are idempotent by `studioId` + `eventId`; old object changes without a common identity are idempotently handled based on object state, and should not be deduplicated solely by `objectId`, `eventType`, or `time`.\n\n\nThe new `AUTOMATION_EXECUTION_RESULT` and `SCENE_EXECUTION_RESULT` events notify per effective action record, for automations and scenes respectively. They are not completion events for an entire execution. Both Studio and Gateway are covered. A native optimization is notified once per native call. An unconfirmed result is unknown and is not expanded into per-device successes.\n\nThe two new events and the four independent scene changes must carry the common-layer `studioId` and `eventId`. The same notification identity is kept across channels and HTTP retries. The action results can be trimmed according to the receiver's permissions. They are idempotent by `studioId` + `eventId`. `executionId` only correlates an execution and is explicitly `null` when unavailable. A new subscription may receive records that the shared queue has not yet delivered. Historical replay is not provided.\n",
       "examples": [
         {
-          "name": "scene_added",
+          "name": "Scene Added",
           "payload": {
             "type": "objectEvent",
             "version": "v1",
@@ -1995,7 +1702,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "scene_removed",
+          "name": "Scene Removed",
           "payload": {
             "type": "objectEvent",
             "version": "v1",
@@ -2018,7 +1725,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "scene_updated",
+          "name": "Scene Updated",
           "payload": {
             "type": "objectEvent",
             "version": "v1",
@@ -2041,7 +1748,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "scene_space_updated",
+          "name": "Scene's Space Updated",
           "payload": {
             "type": "objectEvent",
             "version": "v1",
@@ -2071,7 +1778,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "deviceAdded",
+          "name": "Device Added",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000004",
@@ -2101,7 +1808,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "deviceSpaceUpdated",
+          "name": "Device's Space Updated",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000005",
@@ -2128,7 +1835,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "automationUpdated",
+          "name": "Automation Updated",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000006",
@@ -2158,7 +1865,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "automationSpaceUnassigned",
+          "name": "Automation's Space Unassigned",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000007",
@@ -2184,7 +1891,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "device_removed",
+          "name": "Device Removed",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000008",
@@ -2213,7 +1920,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "device_endpoint_added",
+          "name": "Device Endpoint Added",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000009",
@@ -2243,7 +1950,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "device_endpoint_removed",
+          "name": "Device Endpoint Removed",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-00000000000a",
@@ -2272,7 +1979,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "device_trait_parameter_update",
+          "name": "Device Trait Parameter Update",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-00000000000b",
@@ -2313,7 +2020,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "space_added",
+          "name": "Space Added",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-00000000000c",
@@ -2336,7 +2043,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "space_removed",
+          "name": "Space Removed",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-00000000000d",
@@ -2359,7 +2066,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "space_updated",
+          "name": "Space Updated",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-00000000000e",
@@ -2382,7 +2089,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "automation_added",
+          "name": "Automation Added",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-00000000000f",
@@ -2407,7 +2114,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "automation_removed",
+          "name": "Automation Removed",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000010",
@@ -2432,7 +2139,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "automationSpaceAssigned",
+          "name": "Automation Space Assigned",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000011",
@@ -2468,7 +2175,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "deviceSpaceUnassigned",
+          "name": "Device Space Unassigned",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000012",
@@ -2490,7 +2197,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "sceneActionResult",
+          "name": "Scene Action Result",
           "payload": {
             "type": "objectEvent",
             "version": "v1",
@@ -2538,7 +2245,7 @@ const aqaraLifeWebSocketSpecEn = {
           }
         },
         {
-          "name": "automationNativeInvocationUnknown",
+          "name": "Automation Native Invocation Unknown",
           "payload": {
             "type": "objectEvent",
             "version": "v1",
@@ -4115,6 +3822,352 @@ const aqaraLifeWebSocketSpecEn = {
               "minLength": 1,
               "description": "The Studio official identity for publishing the notification, not the executing gateway ID."
             }
+          }
+        }
+      }
+    },
+    "UnsubscribeObjectEventRequest": {
+      "name": "UnsubscribeObjectEventRequest",
+      "title": "Unsubscribe from space, device-space relationship, and automation object events",
+      "summary": "Removes specified object rules or clears specified event types for the current WebSocket session.",
+      "description": "When `objectIds` is non-empty, only the specified objects are removed; when omitted, null, or an empty array, all object rules for the corresponding `eventTypes` are cleared.\nAll-object subscriptions do not support excluding selected objects. To switch from all objects to specified objects, first clear the event type and then send a new specified-object subscription.\n",
+      "examples": [
+        {
+          "name": "unsubscribeSelectedObject",
+          "payload": {
+            "type": "UnsubscribeObjectEventRequest",
+            "version": "v1",
+            "msgId": "object-unsubscribe-1",
+            "data": [
+              {
+                "eventTypes": [
+                  "AUTOMATION_UPDATED"
+                ],
+                "objectIds": [
+                  "automation-1"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "clearEventType",
+          "payload": {
+            "type": "UnsubscribeObjectEventRequest",
+            "version": "v1",
+            "msgId": "object-unsubscribe-2",
+            "data": [
+              {
+                "eventTypes": [
+                  "AUTOMATION_UPDATED"
+                ],
+                "objectIds": []
+              }
+            ]
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "UnsubscribeObjectEventRequest"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "required": [
+                "eventTypes"
+              ],
+              "properties": {
+                "eventTypes": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "DEVICE_SPACE_UPDATED",
+                      "SPACE_ADDED",
+                      "SPACE_REMOVED",
+                      "SPACE_UPDATED",
+                      "AUTOMATION_ADDED",
+                      "AUTOMATION_REMOVED",
+                      "AUTOMATION_UPDATED",
+                      "AUTOMATION_SPACE_UPDATED",
+                      "AUTOMATION_EXECUTION_RESULT",
+                      "SCENE_EXECUTION_RESULT",
+                      "SCENE_ADDED",
+                      "SCENE_REMOVED",
+                      "SCENE_UPDATED",
+                      "SCENE_SPACE_UPDATED"
+                    ],
+                    "x-enum-descriptions": {
+                      "DEVICE_SPACE_UPDATED": "The device's space changed.",
+                      "SPACE_ADDED": "Space added.",
+                      "SPACE_REMOVED": "Space removed.",
+                      "SPACE_UPDATED": "Space updated.",
+                      "AUTOMATION_ADDED": "Automation added.",
+                      "AUTOMATION_REMOVED": "Automation removed.",
+                      "AUTOMATION_UPDATED": "Automation updated.",
+                      "AUTOMATION_SPACE_UPDATED": "The automation's space changed.",
+                      "AUTOMATION_EXECUTION_RESULT": "Automation execution result.",
+                      "SCENE_EXECUTION_RESULT": "Scene execution result.",
+                      "SCENE_ADDED": "Scene added.",
+                      "SCENE_REMOVED": "Scene removed.",
+                      "SCENE_UPDATED": "Scene updated.",
+                      "SCENE_SPACE_UPDATED": "The scene's space changed."
+                    }
+                  }
+                },
+                "objectIds": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "maxItems": 1000,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": "List of object IDs. Fill in device, space, automation, or scene IDs according to the event types.\n\nWhen subscribing, omitted, null, or empty objectIds means all objects within the current permission scope; when non-empty, only the specified objects are matched.\n\nWhen unsubscribing, omitted, null, or empty objectIds means clearing all rules for the corresponding eventTypes; when non-empty, only the specified objects are removed.\n\nWithin the same WebSocket session, at most 1000 distinct objectIds may be cumulatively subscribed under each eventType.\n\nWhen objectIds is non-empty, the eventTypes in the same item must belong to the same public ID family (device, space, automation/scene); SPACE_ADDED, AUTOMATION_ADDED, and SCENE_ADDED support only the all-objects semantic.\n"
+                }
+              }
+            },
+            "description": "Must contain 1 to 100 unsubscribe items; an empty array is a parameter error and does not mean unsubscribing from all event types.\nWhen objectIds is omitted, null, or an empty array, all object rules under the corresponding eventTypes for the current session are removed; when non-empty, only the specified objects are removed.\n"
+          }
+        }
+      }
+    },
+    "UnsubscribeObjectEventResponse": {
+      "name": "UnsubscribeObjectEventResponse",
+      "title": "Object-event unsubscription response",
+      "examples": [],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "code",
+          "message",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "UnsubscribeObjectEventResponse"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": ""
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Processing result code. 0 indicates success, and any non-zero value indicates failure."
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Processing result message."
+          }
+        }
+      }
+    },
+    "CommandReport": {
+      "name": "CommandReport",
+      "title": "Gateway command execution result",
+      "summary": "Sent with v1 device-level or full-device subscriptions, preserving the original gateway result without indicating that the device physical action has been completed.",
+      "examples": [
+        {
+          "name": "command_report",
+          "payload": {
+            "type": "CommandReport",
+            "version": "v1",
+            "msgId": "report-example",
+            "studioId": "studio-example",
+            "eventId": "449fd6f6-c52c-4488-a3a2-828db5f9ab6e",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "deviceId": "device-1",
+              "sequence": 1,
+              "timestamp": 1793577600000,
+              "did": "gateway-device-example",
+              "reportTime": null,
+              "source": null,
+              "data": {
+                "2.148.33050.0": "0"
+              },
+              "content": {
+                "0": 0,
+                "2": 2
+              }
+            }
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "description": "All business notifications now carry studioId/eventId pair; ordinary historical messages allow omission for compatibility with legacy producers. Ordinary request/response messages do not reference this structure. Execution results and the four new scene object events have additional identity constraints.",
+        "dependencies": {
+          "eventId": [
+            "studioId"
+          ],
+          "studioId": [
+            "eventId"
+          ]
+        },
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data",
+          "code",
+          "message"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "CommandReport"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "A non-empty identifier used by the request. It should remain unique at least among unfinished requests on the current connection. Normal responses correlate with the same msgId, while msgIds on server push messages are used only for link tracing, do not correspond to subscription request msgIds, and are not guaranteed to be globally unique.",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "object",
+            "required": [
+              "deviceId",
+              "sequence",
+              "timestamp",
+              "did",
+              "reportTime",
+              "source",
+              "data",
+              "content"
+            ],
+            "properties": {
+              "deviceId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sequence": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "timestamp": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Studio recorded time",
+                "Unix milliseconds": null
+              },
+              "did": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reportTime": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "Gateway original report time",
+                "null if not available": null
+              },
+              "source": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "data": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "content": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          },
+          "eventId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "An opaque string for this logical notification. It must contain at least one non-whitespace character. Store and compare it as-is without relying on its format. It remains unchanged across channels and HTTP retries. Consecutive notifications with the same content use different values."
+          },
+          "studioId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "The official Studio identity that publishes the notification. It must contain at least one non-whitespace character. It is not a gateway identity or an authentication credential."
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Processing result code. 0 indicates success, and any non-zero value indicates failure."
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Processing result message."
           }
         }
       }

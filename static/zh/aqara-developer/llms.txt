@@ -77,6 +77,7 @@
 - 查询空间能耗摘要: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-ems-summary-space
 - 查询多设备能耗摘要: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/get-ems-summary-devices
 - 在线体验 WebSocket API: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/websocket-api/websocket-api
+- 消息结构说明: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/websocket-api/message-structure
 - MQTT: https://docs.aqara.com/zh/docs/aqara-developer/data-export-api/mqtt-api/mqtt-api
 - 红外设备接入: https://docs.aqara.com/zh/docs/aqara-developer/local-studio-development/features/infrared-device-integration
 - 自定义设备接入: https://docs.aqara.com/zh/docs/aqara-developer/local-studio-development/features/custom-device-integration

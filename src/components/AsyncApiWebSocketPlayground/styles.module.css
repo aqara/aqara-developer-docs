@@ -142,6 +142,7 @@
 .stepFlow {
   display: grid;
   gap: 1rem;
+  min-width: 0;
 }
 
 .referenceCard {
@@ -340,12 +341,71 @@
 }
 
 .operationMessages,
-.exampleTabs,
 .messageButtons {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
   margin-top: 0.6rem;
+}
+
+.exampleTabsRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.exampleTabs {
+  display: flex;
+  flex: 1 1 0;
+  flex-wrap: nowrap;
+  gap: 0.6rem;
+  min-width: 0;
+  padding-block: 2px;
+  overflow: hidden;
+}
+
+.exampleTabsExpanded {
+  flex-wrap: wrap;
+  overflow: visible;
+}
+
+.exampleTabs .inlineTag {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.exampleTabs .inlineTag,
+.exampleTabs .inlineTag:hover,
+.exampleTabs .inlineTagActive {
+  transform: none;
+}
+
+.exampleTabsToggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.45rem 0.1rem;
+  border: 0;
+  background: transparent;
+  color: var(--ifm-font-color-base);
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.exampleTabsCaret {
+  display: block;
+  width: 0.7rem;
+  height: 0.45rem;
+}
+
+.exampleTabsCaretUp {
+  transform: rotate(180deg);
 }
 
 .inlineTag,

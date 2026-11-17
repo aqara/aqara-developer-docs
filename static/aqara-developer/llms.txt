@@ -77,6 +77,7 @@
 - Query Space Energy Consumption Summary: https://docs.aqara.com/docs/aqara-developer/data-export-api/get-ems-summary-space
 - Query Multi-Device Energy Consumption Summary: https://docs.aqara.com/docs/aqara-developer/data-export-api/get-ems-summary-devices
 - WebSocket API Playground: https://docs.aqara.com/docs/aqara-developer/data-export-api/websocket-api/websocket-api
+- Message Structure: https://docs.aqara.com/docs/aqara-developer/data-export-api/websocket-api/message-structure
 - MQTT: https://docs.aqara.com/docs/aqara-developer/data-export-api/mqtt-api/mqtt-api
 - Infrared Device Integration: https://docs.aqara.com/docs/aqara-developer/local-studio-development/features/infrared-device-integration
 - Custom Device Integration: https://docs.aqara.com/docs/aqara-developer/local-studio-development/features/custom-device-integration

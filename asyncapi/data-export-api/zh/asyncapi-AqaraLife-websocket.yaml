@@ -58,6 +58,8 @@ channels:
         $ref: '#/components/messages/SubscribeTraitValueRequest'
       SubscribeTraitValueResponse:
         $ref: '#/components/messages/SubscribeTraitValueResponse'
+      TraitValueUpdate:
+        $ref: '#/components/messages/TraitValueUpdate'
       UnsubscribeTraitValueRequest:
         $ref: '#/components/messages/UnsubscribeTraitValueRequest'
       UnsubscribeTraitValueResponse:
@@ -66,24 +68,24 @@ channels:
         $ref: '#/components/messages/SubscribeEventRequest'
       SubscribeEventResponse:
         $ref: '#/components/messages/SubscribeEventResponse'
+      AlarmEvent:
+        $ref: '#/components/messages/AlarmEvent'
       UnsubscribeEventRequest:
         $ref: '#/components/messages/UnsubscribeEventRequest'
       UnsubscribeEventResponse:
         $ref: '#/components/messages/UnsubscribeEventResponse'
-      AlarmEvent:
-        $ref: '#/components/messages/AlarmEvent'
       SubscribeObjectEventRequest:
         $ref: '#/components/messages/SubscribeObjectEventRequest'
       SubscribeObjectEventResponse:
         $ref: '#/components/messages/SubscribeObjectEventResponse'
+      ObjectEvent:
+        $ref: '#/components/messages/ObjectEvent'
       UnsubscribeObjectEventRequest:
         $ref: '#/components/messages/UnsubscribeObjectEventRequest'
       UnsubscribeObjectEventResponse:
         $ref: '#/components/messages/UnsubscribeObjectEventResponse'
-      TraitValueUpdate:
-        $ref: '#/components/messages/TraitValueUpdate'
-      ObjectEvent:
-        $ref: '#/components/messages/ObjectEvent'
+      CommandReport:
+        $ref: '#/components/messages/CommandReport'
       ErrorMessage:
         $ref: '#/components/messages/ErrorMessage'
 
@@ -151,6 +153,7 @@ operations:
       $ref: '#/channels/studioWebSocket'
     messages:
       - $ref: '#/channels/studioWebSocket/messages/TraitValueUpdate'
+      - $ref: '#/channels/studioWebSocket/messages/CommandReport'
       - $ref: '#/channels/studioWebSocket/messages/AlarmEvent'
       - $ref: '#/channels/studioWebSocket/messages/ObjectEvent'
       - $ref: '#/channels/studioWebSocket/messages/ErrorMessage'
@@ -172,7 +175,6 @@ components:
             data:
               authType: token
               token: '<accessToken>'
-              deviceUniqueId: '<deviceUniqueId>'
               clientId: '<clientId>'
     AuthResponse:
       name: AuthResponse
@@ -289,6 +291,60 @@ components:
         location: $message.payload#/msgId
       payload:
         $ref: '#/components/schemas/SubscribeTraitValueResponseMessage'
+    TraitValueUpdate:
+      name: TraitValueUpdate
+      title: Trait 功能值变化推送
+      payload:
+        $ref: '#/components/schemas/PushTraitValueUpdateMessageV1'
+      examples:
+        - name: 设备在线状态变化
+          payload:
+            type: TraitValueUpdate
+            eventId: 449fd6f6-c52c-4488-a3a2-000000000001
+            studioId: studio-example
+            version: v1
+            msgId: '10810'
+            data:
+              - deviceId: '57190441014857'
+                endpointId: 0
+                functionCode: BasicInformation
+                traitCode: Reachable
+                value: true
+                time: 1794637886352
+            code: 0
+            message: ''
+        - name: 目标播放状态变化
+          payload:
+            type: TraitValueUpdate
+            eventId: 449fd6f6-c52c-4488-a3a2-000000000002
+            studioId: studio-example
+            version: v1
+            msgId: '10811'
+            data:
+              - deviceId: '57190441014857'
+                endpointId: 3
+                functionCode: MediaPlayback
+                traitCode: TargetPlaybackState
+                value: '0'
+                time: 1754469720110
+            code: 0
+            message: ''
+        - name: 设备名称更新
+          payload:
+            type: TraitValueUpdate
+            eventId: 449fd6f6-c52c-4488-a3a2-000000000003
+            studioId: studio-example
+            version: v1
+            msgId: '10812'
+            data:
+              - deviceId: device-1
+                endpointId: 0
+                functionCode: EndpointLabel
+                traitCode: EndpointName
+                value: 客厅灯
+                time: 1789113600000
+            code: 0
+            message: ''    
     UnsubscribeTraitValueRequest:
       name: UnsubscribeTraitValueRequest
       title: 取消订阅指定 Trait 功能值
@@ -331,36 +387,6 @@ components:
           data: ''
           code: 0
           message: success
-    UnsubscribeEventRequest:
-      name: UnsubscribeEventRequest
-      title: 取消订阅告警请求
-      payload:
-        $ref: '#/components/schemas/UnsubscribeEventRequestMessage'
-      description: 鉴权后发送，data 必须是非空事件类型数组，普通客户端使用 ALARM。订阅以当前会话为单位，重复操作幂等；不影响设备、Trait 和对象事件订阅。
-      examples:
-      - name: unsubscribeAlarmRequest
-        payload:
-          type: UnsubscribeEventRequest
-          version: v1
-          msgId: alarm-unsubscribe-1
-          data:
-          - ALARM
-    UnsubscribeEventResponse:
-      name: UnsubscribeEventResponse
-      title: 取消订阅告警响应
-      payload:
-        $ref: '#/components/schemas/UnsubscribeEventResponseMessage'
-      correlationId:
-        location: $message.payload#/msgId
-      examples:
-      - name: unsubscribeAlarmResponse
-        payload:
-          type: UnsubscribeEventResponse
-          version: v1
-          msgId: alarm-unsubscribe-1
-          data: ''
-          code: 0
-          message: success
     AlarmEvent:
       name: AlarmEvent
       title: 原始告警推送
@@ -397,6 +423,36 @@ components:
                 alarmValue: 'On'
                 sourceStateText: Triggered
           code: 0
+          message: success    
+    UnsubscribeEventRequest:
+      name: UnsubscribeEventRequest
+      title: 取消订阅告警请求
+      payload:
+        $ref: '#/components/schemas/UnsubscribeEventRequestMessage'
+      description: 鉴权后发送，data 必须是非空事件类型数组，普通客户端使用 ALARM。订阅以当前会话为单位，重复操作幂等；不影响设备、Trait 和对象事件订阅。
+      examples:
+      - name: unsubscribeAlarmRequest
+        payload:
+          type: UnsubscribeEventRequest
+          version: v1
+          msgId: alarm-unsubscribe-1
+          data:
+          - ALARM
+    UnsubscribeEventResponse:
+      name: UnsubscribeEventResponse
+      title: 取消订阅告警响应
+      payload:
+        $ref: '#/components/schemas/UnsubscribeEventResponseMessage'
+      correlationId:
+        location: $message.payload#/msgId
+      examples:
+      - name: unsubscribeAlarmResponse
+        payload:
+          type: UnsubscribeEventResponse
+          version: v1
+          msgId: alarm-unsubscribe-1
+          data: ''
+          code: 0
           message: success
     SubscribeObjectEventRequest:
       name: SubscribeObjectEventRequest
@@ -409,7 +465,7 @@ components:
       payload:
         $ref: '#/components/schemas/SubscribeObjectEventRequestMessage'
       examples:
-        - name: subscribeAllPreciseObjectEvents
+        - name: 订阅全部精确对象事件
           payload:
             type: SubscribeObjectEventRequest
             version: v1
@@ -425,7 +481,7 @@ components:
                   - AUTOMATION_SPACE_UPDATED
                   - DEVICE_SPACE_UPDATED
                 objectIds: []
-        - name: subscribeSelectedObjects
+        - name: 订阅指定对象
           payload:
             type: SubscribeObjectEventRequest
             version: v1
@@ -449,6 +505,493 @@ components:
         location: $message.payload#/msgId
       payload:
         $ref: '#/components/schemas/SubscribeObjectEventResponseMessage'
+    ObjectEvent:
+      name: objectEvent
+      title: 对象事件推送
+      summary: 设备增删默认推送；空间、自动化、独立场景及空间关联变化按精确对象订阅投递。当前 19 类对象事件均提供示例。
+      description: |
+        DEVICE_ADDED、DEVICE_REMOVED 在认证连接建立后默认推送。
+        
+        DEVICE_SPACE_UPDATED、三类空间变化、四类自动化变化、四类场景变化以及 AUTOMATION_EXECUTION_RESULT、SCENE_EXECUTION_RESULT，均只投递给命中 eventType、objectId 和当前权限的 SubscribeObjectEventRequest 会话。
+        
+        DEVICE_ENDPOINT_*、DEVICE_TRAIT_PARAMETER_UPDATE 继续跟随现有设备数据订阅。
+
+        独立场景通过 /scenes 管理，变化通知使用四类 SCENE_* 事件，自动化仍使用 AUTOMATION_*；可信类别由服务端判断。数量变化不提供独立事件。新增、删除自动化只发送对应生命周期快照，不额外发送空间关系事件；已有对象仅空间关系变化时发送 AUTOMATION_SPACE_UPDATED，内容与关系同时变化时两类事件都可能收到。
+
+        独立场景使用 SCENE_ADDED/REMOVED/UPDATED/SPACE_UPDATED，不再双发 AUTOMATION_*；sceneId 仍是 auto_ 前缀。旧自动化手动入口仍归自动化。场景定义比较排除空间，空间与定义同批变化产生两条不同 eventId 的通知。
+
+        自动化快照的 manualTriggers 包含 triggerNodeId 和 triggerName；手动触发入口添加、删除或重命名通过 AUTOMATION_UPDATED 返回完整列表。按完整列表替换缓存，空数组清空旧入口；无需新增事件订阅类型。
+
+        msgId 只用于链路追踪。新版业务通知按 studioId + eventId 幂等；旧对象变化缺少公共身份时按对象状态幂等处理，不应仅按 objectId、eventType 或 time 去重。
+
+        新增 AUTOMATION_EXECUTION_RESULT 和 SCENE_EXECUTION_RESULT 按有效动作记录通知，分别表示自动化与场景；不是整次执行完成事件。Studio 与 Gateway 均覆盖，原生优化按一次原生调用通知，未确认结果为未知，不展开为逐设备成功。
+
+        两类动作结果及四类独立场景变化都必须携带公共层 studioId 和 eventId。同一逻辑通知跨通道和 HTTP 重试保留身份；动作结果可按接收者权限裁剪字段。按 studioId + eventId 幂等；executionId 仅关联执行，不可用时显式为 null。新订阅可能收到公共队列尚未分发的记录，不提供历史回放。
+      payload:
+        $ref: '#/components/schemas/PushObjectEventMessageV1'
+      examples:
+        - name: 场景新增
+          payload:
+            type: "objectEvent"
+            version: "v1"
+            msgId: "trace-scene_added"
+            eventId: "449fd6f6-c52c-4488-a3a2-000000000020"
+            studioId: "studio-example"
+            code: 0
+            message: "success"
+            data:
+              eventType: "SCENE_ADDED"
+              objectId: "auto_scene001"
+              time: 1793836800123
+              data:
+                objectId: "auto_scene001"
+                name: "电影场景"
+                createTime: 1793836800000
+                spaces: []
+        - name: 场景移除
+          payload:
+            type: "objectEvent"
+            version: "v1"
+            msgId: "trace-scene_removed"
+            eventId: "449fd6f6-c52c-4488-a3a2-000000000021"
+            studioId: "studio-example"
+            code: 0
+            message: "success"
+            data:
+              eventType: "SCENE_REMOVED"
+              objectId: "auto_scene001"
+              time: 1793836800123
+              data:
+                objectId: "auto_scene001"
+                name: "电影场景"
+                createTime: 1793836800000
+                spaces: []
+        - name: 场景更新
+          payload:
+            type: "objectEvent"
+            version: "v1"
+            msgId: "trace-scene_updated"
+            eventId: "449fd6f6-c52c-4488-a3a2-000000000022"
+            studioId: "studio-example"
+            code: 0
+            message: "success"
+            data:
+              eventType: "SCENE_UPDATED"
+              objectId: "auto_scene001"
+              time: 1793836800123
+              data:
+                objectId: "auto_scene001"
+                name: "电影场景"
+                createTime: 1793836800000
+                spaces: []
+        - name: 场景所属空间更新
+          payload:
+            type: "objectEvent"
+            version: "v1"
+            msgId: "trace-scene_space_updated"
+            eventId: "449fd6f6-c52c-4488-a3a2-000000000023"
+            studioId: "studio-example"
+            code: 0
+            message: "success"
+            data:
+              eventType: "SCENE_SPACE_UPDATED"
+              objectId: "auto_scene001"
+              time: 1793836800123
+              data:
+                objectId: "auto_scene001"
+                oldSpaceIds: ["space-old"]
+                spaces: [{"spaceId": "space-new", "name": "会议室", "parentSpaceId": null}]
+        - name: 设备新增
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-000000000004
+            studioId: studio-example
+            version: v1
+            msgId: '2'
+            data:
+              eventType: DEVICE_ADDED
+              objectId: 14d3b91
+              time: 1754469720110
+              data:
+                deviceId: 14d3b91
+                name: ''
+                deviceTypesList:
+                  - Light
+                endpointIds:
+                  - 0
+                  - 2
+                  - 3
+                time: 1754469720110
+            code: 0
+            message: success
+        - name: 设备所属空间更新
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-000000000005
+            studioId: studio-example
+            version: v1
+            msgId: object-event-1
+            data:
+              eventType: DEVICE_SPACE_UPDATED
+              objectId: device-1
+              time: 1789113600000
+              data:
+                deviceId: device-1
+                oldSpaceId: space-1
+                space:
+                  spaceId: space-2
+                  name: 卧室
+                  spatialMarking: room
+                  parentSpaceId: home-1
+            code: 0
+            message: success
+        - name: 自动化更新
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-000000000006
+            studioId: studio-example
+            version: v1
+            msgId: object-event-2
+            data:
+              eventType: AUTOMATION_UPDATED
+              objectId: automation-1
+              time: 1789113600000
+              data:
+                automationId: automation-1
+                definitionType: SCRIPT_JSON
+                name: 回家模式
+                enabled: true
+                createTime: 1789000000000
+                manualTriggers:
+                  - triggerNodeId: trigger-1
+                    triggerName: 手动回家
+            code: 0
+            message: success
+        - name: 自动化所属空间更新
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-000000000007
+            studioId: studio-example
+            version: v1
+            msgId: object-event-3
+            data:
+              eventType: AUTOMATION_SPACE_UPDATED
+              objectId: automation-1
+              time: 1789113600000
+              data:
+                automationId: automation-1
+                oldSpaceId: space-2
+                oldSpaceIds: [space-2, space-3]
+                spaces: []
+            code: 0
+            message: success
+        - name: 设备移除
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-000000000008
+            studioId: studio-example
+            version: v1
+            msgId: example-device_removed
+            data:
+              eventType: DEVICE_REMOVED
+              objectId: device-1
+              time: 1793577600000
+              data:
+                deviceId: device-1
+                name: 客厅灯
+                deviceTypesList:
+                - Light
+                endpointIds:
+                - 0
+                - 2
+                time: 1793577600000
+            code: 0
+            message: success
+        - name: 设备端点新增
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-000000000009
+            studioId: studio-example
+            version: v1
+            msgId: example-device_endpoint_added
+            data:
+              eventType: DEVICE_ENDPOINT_ADDED
+              objectId: device-1
+              time: 1793577600000
+              data:
+                deviceId: device-1
+                name: 客厅灯
+                deviceTypesList:
+                - Light
+                endpointIds:
+                - 0
+                - 2
+                - 3
+                time: 1793577600000
+            code: 0
+            message: success
+        - name: 设备端点移除
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-00000000000a
+            studioId: studio-example
+            version: v1
+            msgId: example-device_endpoint_removed
+            data:
+              eventType: DEVICE_ENDPOINT_REMOVED
+              objectId: device-1
+              time: 1793577600000
+              data:
+                deviceId: device-1
+                name: 客厅灯
+                deviceTypesList:
+                - Light
+                endpointIds:
+                - 0
+                - 2
+                time: 1793577600000
+            code: 0
+            message: success
+        - name: 设备 Trait 参数更新
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-00000000000b
+            studioId: studio-example
+            version: v1
+            msgId: example-device_trait_parameter_update
+            data:
+              eventType: DEVICE_TRAIT_PARAMETER_UPDATE
+              objectId: device-1
+              time: 1793577600000
+              data:
+                deviceId: device-1
+                endpointId: 2
+                functionCode: LevelControl
+                traitCode: CurrentLevel
+                oldValue:
+                  endpointId: 2
+                  functionCode: LevelControl
+                  traitCode: CurrentLevel
+                  min: 1.0
+                  max: 100.0
+                  step: 1.0
+                  unit: '%'
+                newValue:
+                  endpointId: 2
+                  functionCode: LevelControl
+                  traitCode: CurrentLevel
+                  min: 1.0
+                  max: 100.0
+                  step: 2.0
+                  unit: '%'
+            code: 0
+            message: success
+        - name: 空间新增
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-00000000000c
+            studioId: studio-example
+            version: v1
+            msgId: example-space_added
+            data:
+              eventType: SPACE_ADDED
+              objectId: space-2
+              time: 1793577600000
+              data:
+                spaceId: space-2
+                name: 卧室
+                spatialMarking: room
+                parentSpaceId: home-1
+            code: 0
+            message: success
+        - name: 空间移除
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-00000000000d
+            studioId: studio-example
+            version: v1
+            msgId: example-space_removed
+            data:
+              eventType: SPACE_REMOVED
+              objectId: space-2
+              time: 1793577600000
+              data:
+                spaceId: space-2
+                name: 卧室
+                spatialMarking: room
+                parentSpaceId: home-1
+            code: 0
+            message: success
+        - name: 空间更新
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-00000000000e
+            studioId: studio-example
+            version: v1
+            msgId: example-space_updated
+            data:
+              eventType: SPACE_UPDATED
+              objectId: space-2
+              time: 1793577600000
+              data:
+                spaceId: space-2
+                name: 主卧
+                spatialMarking: room
+                parentSpaceId: home-1
+            code: 0
+            message: success
+        - name: 自动化新增
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-00000000000f
+            studioId: studio-example
+            version: v1
+            msgId: example-automation_added
+            data:
+              eventType: AUTOMATION_ADDED
+              objectId: automation-1
+              time: 1793577600000
+              data:
+                automationId: automation-1
+                definitionType: WHEN_IF_THEN
+                name: 回家模式
+                enabled: true
+                createTime: 1793491200000
+                manualTriggers: []
+            code: 0
+            message: success
+        - name: 自动化移除
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-000000000010
+            studioId: studio-example
+            version: v1
+            msgId: example-automation_removed
+            data:
+              eventType: AUTOMATION_REMOVED
+              objectId: automation-1
+              time: 1793577600000
+              data:
+                automationId: automation-1
+                definitionType: WHEN_IF_THEN
+                name: 回家模式
+                enabled: true
+                createTime: 1793491200000
+                manualTriggers: []
+            code: 0
+            message: success
+        - name: 自动化所属空间更新
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-000000000011
+            studioId: studio-example
+            version: v1
+            msgId: example-automation_space_updated
+            data:
+              eventType: AUTOMATION_SPACE_UPDATED
+              objectId: automation-1
+              time: 1793577600000
+              data:
+                automationId: automation-1
+                oldSpaceId: null
+                space:
+                  spaceId: space-2
+                  name: 卧室
+                  spatialMarking: room
+                  parentSpaceId: home-1
+                oldSpaceIds: []
+                spaces:
+                  - spaceId: space-2
+                    name: 卧室
+                    spatialMarking: room
+                    parentSpaceId: home-1
+            code: 0
+            message: success
+        - name: 设备所属空间清除
+          payload:
+            type: objectEvent
+            eventId: 449fd6f6-c52c-4488-a3a2-000000000012
+            studioId: studio-example
+            version: v1
+            msgId: example-device_space_updated
+            data:
+              eventType: DEVICE_SPACE_UPDATED
+              objectId: device-1
+              time: 1793577600000
+              data:
+                deviceId: device-1
+                oldSpaceId: space-2
+                space: null
+            code: 0
+            message: success
+        - name: 场景动作执行结果
+          payload:
+            type: objectEvent
+            version: v1
+            msgId: trace-example
+            eventId: 449fd6f6-c52c-4488-a3a2-828db5f9ab6e
+            studioId: studio-example
+            code: 0
+            message: success
+            data:
+              eventType: SCENE_EXECUTION_RESULT
+              objectId: auto_scene001
+              time: 1793664000123
+              data:
+                objectId: auto_scene001
+                name: 回家场景
+                executionId: opaque-run-example
+                triggeredAt: 1793664000000
+                actionOccurredAt: null
+                executeMode: Gateway
+                resultCode: 0
+                actionKind: device_write
+                actionTarget:
+                  type: device
+                  id: device-example
+                  name: 客厅灯
+                  resourceId: 4.1.85
+                  resourceName: 开关
+                triggerSource:
+                  sourceType: 60
+                  triggerSubjectId: null
+                  triggerSubjectName: null
+                  triggerResourceId: null
+                  triggerResourceName: null
+                spaces:
+                - spaceId: space-example
+                  name: 客厅
+                  parentSpaceId: null
+        - name: 自动化原生调用结果未知
+          payload:
+            type: objectEvent
+            version: v1
+            msgId: trace-native-example
+            eventId: 6f913a2c-9484-42d5-bfa9-00b0b1fd23ee
+            studioId: studio-example
+            code: 0
+            message: success
+            data:
+              eventType: AUTOMATION_EXECUTION_RESULT
+              objectId: auto_automation001
+              time: 1793664000123
+              data:
+                objectId: auto_automation001
+                name: 离家自动化
+                executionId: opaque-run-example
+                triggeredAt: 1793664000000
+                actionOccurredAt: null
+                executeMode: Studio
+                resultCode: 2
+                actionKind: native_scene_recall
+                actionTarget: null
+                triggerSource:
+                  sourceType: 51
+                  triggerSubjectId: null
+                  triggerSubjectName: null
+                  triggerResourceId: null
+                  triggerResourceName: null
+                spaces: []    
     UnsubscribeObjectEventRequest:
       name: UnsubscribeObjectEventRequest
       title: 取消空间、设备空间关系和自动化对象事件订阅
@@ -485,345 +1028,32 @@ components:
         location: $message.payload#/msgId
       payload:
         $ref: '#/components/schemas/UnsubscribeObjectEventResponseMessage'
-    TraitValueUpdate:
-      name: TraitValueUpdate
-      title: Trait 功能值变化推送
+    CommandReport:
+      name: CommandReport
+      title: 网关命令执行结果
+      summary: 随 v1 设备级或全量设备订阅发送，保留原网关结果，不表示设备物理动作已完成。
       payload:
-        $ref: '#/components/schemas/PushTraitValueUpdateMessageV1'
+        $ref: '#/components/schemas/PushCommandReportMessageV1'
       examples:
-        - name: traitValueUpdate
+        - name: command_report
           payload:
-            type: TraitValueUpdate
+            type: CommandReport
             version: v1
-            msgId: '1754469720110'
-            data:
-              - deviceId: '57190441014857'
-                endpointId: 3
-                functionCode: MediaPlayback
-                traitCode: TargetPlaybackState
-                value: '0'
-                time: 1754469720110
+            msgId: report-example
+            studioId: studio-example
+            eventId: 449fd6f6-c52c-4488-a3a2-828db5f9ab6e
             code: 0
-            message: ''
-        - name: deviceNameUpdated
-          payload:
-            type: TraitValueUpdate
-            version: v1
-            msgId: '1789113600000'
+            message: success
             data:
-              - deviceId: device-1
-                endpointId: 0
-                functionCode: EndpointLabel
-                traitCode: EndpointName
-                value: 客厅灯
-                time: 1789113600000
-            code: 0
-            message: ''
-    ObjectEvent:
-      name: objectEvent
-      title: 对象事件推送
-      summary: 设备增删默认推送；空间、自动化和空间关联变化按精确对象订阅投递。当前 13 类对象事件均提供示例。
-      description: |
-        DEVICE_ADDED、DEVICE_REMOVED 在认证连接建立后默认推送。
-        
-        SPACE_*、AUTOMATION_*、DEVICE_SPACE_UPDATED 仅投递给命中 eventType、objectId 和当前权限的 SubscribeObjectEventRequest 会话。
-        
-        DEVICE_ENDPOINT_*、DEVICE_TRAIT_PARAMETER_UPDATE 继续跟随现有设备数据订阅。
+              deviceId: device-1
+              sequence: 1
+              timestamp: 1793577600000
+              did: gateway-device-example
+              reportTime: null
+              source: null
+              data: { '2.148.33050.0': '0' }
+              content: { '0': 0, '2': 2 }
 
-        独立场景通过 /scenes 管理，变化通知沿用 AUTOMATION_* 事件族；对象分类以 /automations 和 /scenes 查询结果为准。数量变化不提供独立事件。新增、删除自动化只发送对应生命周期快照，不额外发送空间关系事件；已有对象仅空间关系变化时发送 AUTOMATION_SPACE_UPDATED，内容与关系同时变化时两类事件都可能收到。
-
-        自动化快照的 manualTriggers 包含 triggerNodeId 和 triggerName；手动触发入口添加、删除或重命名通过 AUTOMATION_UPDATED 返回完整列表。按完整列表替换缓存，空数组清空旧入口；无需新增事件订阅类型。
-
-        协议不提供全局唯一的事件 ID；推送 msgId 只用于链路追踪，调用端应按对象状态幂等处理，不应仅按 objectId、eventType、time 去重。
-      payload:
-        $ref: '#/components/schemas/PushObjectEventMessageV1'
-      examples:
-        - name: deviceAdded
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: '2'
-            data:
-              eventType: DEVICE_ADDED
-              objectId: 14d3b91
-              time: 1754469720110
-              data:
-                deviceId: 14d3b91
-                name: ''
-                deviceTypesList:
-                  - Light
-                endpointIds:
-                  - 0
-                  - 2
-                  - 3
-                time: 1754469720110
-            code: 0
-            message: success
-        - name: deviceSpaceUpdated
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: object-event-1
-            data:
-              eventType: DEVICE_SPACE_UPDATED
-              objectId: device-1
-              time: 1789113600000
-              data:
-                deviceId: device-1
-                oldSpaceId: space-1
-                space:
-                  spaceId: space-2
-                  name: 卧室
-                  spatialMarking: room
-                  parentSpaceId: home-1
-            code: 0
-            message: success
-        - name: automationUpdated
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: object-event-2
-            data:
-              eventType: AUTOMATION_UPDATED
-              objectId: automation-1
-              time: 1789113600000
-              data:
-                automationId: automation-1
-                definitionType: SCRIPT_JSON
-                name: 回家模式
-                enabled: true
-                createTime: 1789000000000
-                manualTriggers:
-                  - triggerNodeId: trigger-1
-                    triggerName: 手动回家
-            code: 0
-            message: success
-        - name: automationSpaceUnassigned
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: object-event-3
-            data:
-              eventType: AUTOMATION_SPACE_UPDATED
-              objectId: automation-1
-              time: 1789113600000
-              data:
-                automationId: automation-1
-                oldSpaceId: space-2
-                space: null
-            code: 0
-            message: success
-        - name: device_removed
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: example-device_removed
-            data:
-              eventType: DEVICE_REMOVED
-              objectId: device-1
-              time: 1793577600000
-              data:
-                deviceId: device-1
-                name: 客厅灯
-                deviceTypesList:
-                - Light
-                endpointIds:
-                - 0
-                - 2
-                time: 1793577600000
-            code: 0
-            message: success
-        - name: device_endpoint_added
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: example-device_endpoint_added
-            data:
-              eventType: DEVICE_ENDPOINT_ADDED
-              objectId: device-1
-              time: 1793577600000
-              data:
-                deviceId: device-1
-                name: 客厅灯
-                deviceTypesList:
-                - Light
-                endpointIds:
-                - 0
-                - 2
-                - 3
-                time: 1793577600000
-            code: 0
-            message: success
-        - name: device_endpoint_removed
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: example-device_endpoint_removed
-            data:
-              eventType: DEVICE_ENDPOINT_REMOVED
-              objectId: device-1
-              time: 1793577600000
-              data:
-                deviceId: device-1
-                name: 客厅灯
-                deviceTypesList:
-                - Light
-                endpointIds:
-                - 0
-                - 2
-                time: 1793577600000
-            code: 0
-            message: success
-        - name: device_trait_parameter_update
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: example-device_trait_parameter_update
-            data:
-              eventType: DEVICE_TRAIT_PARAMETER_UPDATE
-              objectId: device-1
-              time: 1793577600000
-              data:
-                deviceId: device-1
-                endpointId: 2
-                functionCode: LevelControl
-                traitCode: CurrentLevel
-                oldValue:
-                  endpointId: 2
-                  functionCode: LevelControl
-                  traitCode: CurrentLevel
-                  min: 1.0
-                  max: 100.0
-                  step: 1.0
-                  unit: '%'
-                newValue:
-                  endpointId: 2
-                  functionCode: LevelControl
-                  traitCode: CurrentLevel
-                  min: 1.0
-                  max: 100.0
-                  step: 2.0
-                  unit: '%'
-            code: 0
-            message: success
-        - name: space_added
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: example-space_added
-            data:
-              eventType: SPACE_ADDED
-              objectId: space-2
-              time: 1793577600000
-              data:
-                spaceId: space-2
-                name: 卧室
-                spatialMarking: room
-                parentSpaceId: home-1
-            code: 0
-            message: success
-        - name: space_removed
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: example-space_removed
-            data:
-              eventType: SPACE_REMOVED
-              objectId: space-2
-              time: 1793577600000
-              data:
-                spaceId: space-2
-                name: 卧室
-                spatialMarking: room
-                parentSpaceId: home-1
-            code: 0
-            message: success
-        - name: space_updated
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: example-space_updated
-            data:
-              eventType: SPACE_UPDATED
-              objectId: space-2
-              time: 1793577600000
-              data:
-                spaceId: space-2
-                name: 主卧
-                spatialMarking: room
-                parentSpaceId: home-1
-            code: 0
-            message: success
-        - name: automation_added
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: example-automation_added
-            data:
-              eventType: AUTOMATION_ADDED
-              objectId: automation-1
-              time: 1793577600000
-              data:
-                automationId: automation-1
-                definitionType: WHEN_IF_THEN
-                name: 回家模式
-                enabled: true
-                createTime: 1793491200000
-                manualTriggers: []
-            code: 0
-            message: success
-        - name: automation_removed
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: example-automation_removed
-            data:
-              eventType: AUTOMATION_REMOVED
-              objectId: automation-1
-              time: 1793577600000
-              data:
-                automationId: automation-1
-                definitionType: WHEN_IF_THEN
-                name: 回家模式
-                enabled: true
-                createTime: 1793491200000
-                manualTriggers: []
-            code: 0
-            message: success
-        - name: automationSpaceAssigned
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: example-automation_space_updated
-            data:
-              eventType: AUTOMATION_SPACE_UPDATED
-              objectId: automation-1
-              time: 1793577600000
-              data:
-                automationId: automation-1
-                oldSpaceId: null
-                space:
-                  spaceId: space-2
-                  name: 卧室
-                  spatialMarking: room
-                  parentSpaceId: home-1
-            code: 0
-            message: success
-        - name: deviceSpaceUnassigned
-          payload:
-            type: objectEvent
-            version: v1
-            msgId: example-device_space_updated
-            data:
-              eventType: DEVICE_SPACE_UPDATED
-              objectId: device-1
-              time: 1793577600000
-              data:
-                deviceId: device-1
-                oldSpaceId: space-2
-                space: null
-            code: 0
-            message: success
     ErrorMessage:
       name: ErrorMessage
       title: 错误响应
@@ -856,6 +1086,7 @@ components:
         - UnsubscribeAllResponse
         - SubscribeTraitValueRequest
         - SubscribeTraitValueResponse
+        - TraitValueUpdate
         - UnsubscribeTraitValueRequest
         - UnsubscribeTraitValueResponse
         - SubscribeEventRequest
@@ -866,7 +1097,7 @@ components:
         - SubscribeObjectEventResponse
         - UnsubscribeObjectEventRequest
         - UnsubscribeObjectEventResponse
-        - TraitValueUpdate
+        - CommandReport
         - objectEvent
         - AlarmEvent
         - ErrorMessage
@@ -994,6 +1225,10 @@ components:
           description: 处理结果描述。
     BasePushMessage:
       type: object
+      description: 新版所有业务通知成对携带 studioId/eventId；普通历史报文允许缺省以兼容旧生产者。普通请求响应不引用本结构。执行结果与四类新场景对象事件另有强制身份约束。
+      dependencies:
+        eventId: [studioId]
+        studioId: [eventId]
       required:
         - type
         - version
@@ -1010,6 +1245,16 @@ components:
           $ref: '#/components/schemas/MsgId'
         data:
           description: 推送业务数据。
+        eventId:
+          type: string
+          minLength: 1
+          pattern: '\S'
+          description: 本次逻辑通知的不透明字符串，至少包含一个非空白字符。原样保存和比较，不依赖格式。跨通道及 HTTP 重试保持不变；连续相同内容通知使用不同值。
+        studioId:
+          type: string
+          minLength: 1
+          pattern: '\S'
+          description: 发布通知的 Studio 正式身份，至少包含一个非空白字符。不是网关身份或认证凭据。
         code:
           type: integer
           format: int32
@@ -1321,6 +1566,27 @@ components:
         - AUTOMATION_REMOVED
         - AUTOMATION_UPDATED
         - AUTOMATION_SPACE_UPDATED
+        - AUTOMATION_EXECUTION_RESULT
+        - SCENE_EXECUTION_RESULT
+        - SCENE_ADDED
+        - SCENE_REMOVED
+        - SCENE_UPDATED
+        - SCENE_SPACE_UPDATED
+      x-enum-descriptions:
+        DEVICE_SPACE_UPDATED: 设备所属空间发生变化。
+        SPACE_ADDED: 空间新增。
+        SPACE_REMOVED: 空间删除。
+        SPACE_UPDATED: 空间更新。
+        AUTOMATION_ADDED: 自动化新增。
+        AUTOMATION_REMOVED: 自动化删除。
+        AUTOMATION_UPDATED: 自动化更新。
+        AUTOMATION_SPACE_UPDATED: 自动化所属空间变化。
+        AUTOMATION_EXECUTION_RESULT: 自动化执行结果。
+        SCENE_EXECUTION_RESULT: 场景执行结果。
+        SCENE_ADDED: 场景新增。
+        SCENE_REMOVED: 场景删除。
+        SCENE_UPDATED: 场景更新。
+        SCENE_SPACE_UPDATED: 场景所属空间变化。
     ObjectEventSubscriptionItem:
       type: object
       required:
@@ -1342,11 +1608,16 @@ components:
             type: string
             minLength: 1
           description: |
+            对象 ID 列表。按事件类型填写设备、空间、自动化或场景 ID。 
+
             订阅时，不传、null 或空数组表示当前权限范围内全部对象；非空时只匹配指定对象。
+
             取消订阅时，不传、null 或空数组表示清空对应 eventTypes，非空时只移除指定对象。
+
             同一 WebSocket 会话在每个 eventType 下最多累计订阅 1000 个不同 objectId。
-            objectIds 非空时，同一项的 eventTypes 必须属于同一种对象类型；SPACE_ADDED、AUTOMATION_ADDED 只支持全部对象语义。
-            协议不使用 scope 字段；全部对象语义统一由 objectIds 表示。
+            
+            objectIds 非空时，同一项的 eventTypes 必须属于同一公开 ID 家族（设备、空间、自动化/场景）；SPACE_ADDED、AUTOMATION_ADDED、SCENE_ADDED 只支持全部对象语义。
+
     SubscribeObjectEventRequestMessage:
       allOf:
         - $ref: '#/components/schemas/BaseRequest'
@@ -1366,7 +1637,7 @@ components:
                 $ref: '#/components/schemas/ObjectEventSubscriptionItem'
               description: |
                 必须包含 1 至 100 个订阅项。请求按会话增量合并，重复订阅幂等。
-                SPACE_ADDED、AUTOMATION_ADDED 只允许 objectIds 为全部对象语义。
+                SPACE_ADDED、AUTOMATION_ADDED、SCENE_ADDED 只允许 objectIds 为全部对象语义。
     UnsubscribeObjectEventRequestMessage:
       allOf:
         - $ref: '#/components/schemas/BaseRequest'
@@ -1430,6 +1701,27 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/PushTraitValueUpdateItem'
+    PushCommandReportMessageV1:
+      allOf:
+        - $ref: '#/components/schemas/BasePushMessage'
+        - type: object
+          properties:
+            type:
+              type: string
+              enum: [CommandReport]
+            data:
+              type: object
+              required: [deviceId, sequence, timestamp, did, reportTime, source, data, content]
+              properties:
+                deviceId: {type: string, minLength: 1}
+                sequence: {type: integer, minimum: 1}
+                timestamp: {type: integer, minimum: 0, description: Studio 记录时间，Unix 毫秒}
+                did: {type: string, minLength: 1}
+                reportTime: {type: [integer, 'null'], description: 网关原上报时间，无法提供时为 null}
+                source: {type: [string, 'null']}
+                data: {type: object, additionalProperties: true}
+                content: {type: object, additionalProperties: true}
+
     PushObjectEventDeviceData:
       type: object
       required:
@@ -1579,7 +1871,7 @@ components:
           description: 空间所属父空间 ID；根空间为 null。SPACE_ADDED 和 SPACE_UPDATED 为事件后的父空间，SPACE_REMOVED 为删除前的父空间。
     AutomationPushSnapshot:
       type: object
-      description: 自动化和独立场景变化通知沿用的轻量快照，不包含完整 config。事件字段 automationId 对于已知场景是 sceneId；按查询列表识别分类，分别通过 GET /automations/{automationI 或 GET /scenes/{sceneId} 查询详情。场景列表不使用快照中的 enabled 和 definitionType。manualTriggers 为自动化内手动触发入口的完整列表，其变化也触发 AUTOMATION_UPDATED。
+      description: 自动化对象变化的轻量快照，不包含完整 config。通过 GET /automations/{automationId} 查询详情。manualTriggers 为旧自动化内手动触发入口的完整替换列表；独立场景使用 ScenePushSnapshot。删除使用上一次稳定合并基线。
       required:
         - automationId
         - definitionType
@@ -1628,8 +1920,8 @@ components:
       type: object
       required:
       - automationId
-      - oldSpaceId
-      - space
+      - oldSpaceIds
+      - spaces
       properties:
         automationId:
           type: string
@@ -1638,12 +1930,58 @@ components:
           type:
           - string
           - 'null'
-          description: 变化前空间 ID；首次关联时为 null。
+          description: 兼容字段，取 oldSpaceIds 第一项；无旧关联时为 null 或省略。
         space:
           anyOf:
           - $ref: '#/components/schemas/SpaceEventData'
           - type: 'null'
-          description: 关系变化时的空间摘要；解除关联时为 null。空间 ID 读取 space.spaceId，后续名称、标记或父级变化由 SPACE_UPDATED 更新统一空间缓存；该关系也适用于独立场景。
+          description: 兼容字段，取 spaces 第一项；无新关联时为 null 或省略。完整关系以 spaces 为准；独立场景使用 SCENE_SPACE_UPDATED。
+        oldSpaceIds:
+          type: array
+          items:
+            type: string
+          description: 变更前的完整关联空间 ID 列表；无旧关联时为 []。
+        spaces:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpaceEventData'
+          description: 变更后的完整空间摘要数组；无可解析关联时为 []。客户端整组替换关系；即使第一项不变，其余空间变化也会触发事件。名称、标记和父级变化通过 SPACE_UPDATED 更新统一空间缓存。
+
+    ScenePushSnapshot:
+      type: object
+      description: 独立场景轻量快照。objectId 与外层一致，是 scenes 查询返回的 sceneId（auto_ 前缀）。不包含 enabled、manualTriggers 或完整动作配置；删除使用上一次稳定合并基线。
+      required: [objectId, name, createTime, spaces]
+      properties:
+        objectId:
+          type: string
+          minLength: 1
+        name:
+          type: string
+        createTime:
+          type: integer
+          format: int64
+        spaces:
+          type: array
+          description: 完整有效空间摘要，包含继承计算结果；无有效关系时为空数组。
+          items:
+            $ref: '#/components/schemas/SpaceEventData'
+    SceneSpaceUpdateEventData:
+      type: object
+      description: 场景完整空间关系替换。不提供 oldSpaceId/space 兼容单值；清空直接关系后仍可能继承空间。
+      required: [objectId, oldSpaceIds, spaces]
+      properties:
+        objectId:
+          type: string
+          minLength: 1
+        oldSpaceIds:
+          type: array
+          items:
+            type: string
+        spaces:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpaceEventData'
+
     KnownPushObjectEventType:
       type: string
       description: 当前版本已知的推送对象事件；用于校验已知事件的 data，不将推送侧 eventType 封闭为枚举。
@@ -1661,6 +1999,12 @@ components:
         - AUTOMATION_REMOVED
         - AUTOMATION_UPDATED
         - AUTOMATION_SPACE_UPDATED
+        - AUTOMATION_EXECUTION_RESULT
+        - SCENE_EXECUTION_RESULT
+        - SCENE_ADDED
+        - SCENE_REMOVED
+        - SCENE_UPDATED
+        - SCENE_SPACE_UPDATED
     PushObjectEventData:
       type: object
       description: |
@@ -1677,7 +2021,7 @@ components:
           description: 可扩展的对象事件类型；当前已知值见 KnownPushObjectEventType。
         objectId:
           type: string
-          description: 对象 ID；按事件类型分别为设备、空间或自动化 ID。
+          description: 对象 ID；按事件类型分别为设备、空间、自动化或场景 ID。场景值仍为 auto_<节点ID>，不能通过 ID 前缀判断分类。
         time:
           type: integer
           format: int64
@@ -1687,8 +2031,7 @@ components:
             - object
             - 'null'
           description: |
-            根据 eventType 判断具体结构。当前结构分别见 PushObjectEventDeviceData、PushObjectEventTraitParameterData、
-            DeviceSpaceUpdateEventData、SpaceEventData、AutomationPushSnapshot 和 AutomationSpaceUpdateEventData。
+            根据 eventType 判断具体结构。当前结构分别见 PushObjectEventDeviceData、PushObjectEventTraitParameterData、DeviceSpaceUpdateEventData、SpaceEventData、AutomationPushSnapshot、AutomationSpaceUpdateEventData、ScenePushSnapshot、SceneSpaceUpdateEventData 和 ExecutionResultData。
             推送侧允许后续新增结构；订阅请求中的 PreciseObjectEventType 仍是当前版本的严格枚举。
       allOf:
         - if:
@@ -1745,6 +2088,33 @@ components:
             properties:
               data:
                 $ref: '#/components/schemas/AutomationSpaceUpdateEventData'
+        - if:
+            properties:
+              eventType:
+                enum: [AUTOMATION_EXECUTION_RESULT, SCENE_EXECUTION_RESULT]
+          then:
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/ExecutionResultData'
+        - if:
+            properties:
+              eventType:
+                enum: [SCENE_ADDED, SCENE_REMOVED, SCENE_UPDATED]
+          then:
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/ScenePushSnapshot'
+        - if:
+            properties:
+              eventType:
+                enum: [SCENE_SPACE_UPDATED]
+          then:
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/SceneSpaceUpdateEventData'
     PushObjectEventMessageV1:
       allOf:
         - $ref: '#/components/schemas/BasePushMessage'
@@ -1758,6 +2128,19 @@ components:
                 - objectEvent
             data:
               $ref: '#/components/schemas/PushObjectEventData'
+        - if:
+            properties:
+              data:
+                properties:
+                  eventType:
+                    enum: [AUTOMATION_EXECUTION_RESULT, SCENE_EXECUTION_RESULT, SCENE_ADDED, SCENE_REMOVED, SCENE_UPDATED, SCENE_SPACE_UPDATED]
+          then:
+            required: [eventId, studioId]
+            properties:
+              studioId:
+                type: string
+                minLength: 1
+                description: 发布通知的 Studio 正式身份，不是执行网关 ID。
     ErrorMessageV1:
       type: object
       required:
@@ -1789,3 +2172,118 @@ components:
             - string
             - 'null'
           description: 错误说明。
+
+    ExecutionActionTarget:
+      type: object
+      required:
+      - type
+      - id
+      - name
+      - resourceId
+      - resourceName
+      properties:
+        type:
+          type: &id001
+          - string
+          - 'null'
+        id:
+          type: *id001
+        name:
+          type: *id001
+        resourceId:
+          type: *id001
+        resourceName:
+          type: *id001
+      description: 目标身份和默认语言名称摘要。资源仅在可可靠映射时提供；无权内容显式为空。客户端兼容新增目标类别。
+    ExecutionTriggerSource:
+      type: object
+      required:
+      - sourceType
+      - triggerSubjectId
+      - triggerSubjectName
+      - triggerResourceId
+      - triggerResourceName
+      properties:
+        sourceType:
+          type: integer
+          description: 沿用触发源协议来源码，不能单凭此码推断精细触发类别。
+        triggerSubjectId:
+          type: *id001
+        triggerSubjectName:
+          type: *id001
+        triggerResourceId:
+          type: *id001
+        triggerResourceName:
+          type: *id001
+    ExecutionResultSpace:
+      allOf:
+      - $ref: '#/components/schemas/SpaceEventData'
+      - type: object
+        required:
+        - spaceId
+        - name
+        - parentSpaceId
+    ExecutionResultData:
+      type: object
+      required:
+      - objectId
+      - name
+      - executionId
+      - triggeredAt
+      - actionOccurredAt
+      - executeMode
+      - resultCode
+      - actionKind
+      - actionTarget
+      - triggerSource
+      - spaces
+      properties:
+        objectId:
+          type: string
+          minLength: 1
+          description: 与外层 objectId 完全相同的自动化或场景公开 ID。
+        name:
+          type: string
+          description: 记录接收时的对象名称快照。
+        executionId:
+          type: *id001
+          description: 不透明执行关联；不可靠时为 null，不能据此去重不同动作或判断整次结束。
+        triggeredAt:
+          type:
+          - integer
+          - 'null'
+          description: 可信原始执行链触发时间，Unix 毫秒；未知时为 null，嵌套场景可继承起因时间。
+        actionOccurredAt:
+          type:
+          - integer
+          - 'null'
+          description: 可信上游动作结果发生时间，Unix 毫秒；未提供时为 null，不填接收时间。
+        executeMode:
+          type: string
+          enum:
+          - Studio
+          - Gateway
+          description: 实际执行器。Studio 经网关控制设备仍是 Studio。
+        resultCode:
+          type: integer
+          enum:
+          - 0
+          - 1
+          - 2
+          description: 0=当前记录按既有业务规则成功或非失败，1=失败，2=未知。不表示整次执行汇总或物理动作完成。
+        actionKind:
+          type: string
+          minLength: 1
+          description: 稳定动作类别，如 device_write、variable_set、flow_invoke、native_scene_recall；兼容未来未知类别。
+        actionTarget:
+          anyOf:
+          - $ref: '#/components/schemas/ExecutionActionTarget'
+          - type: 'null'
+        triggerSource:
+          $ref: '#/components/schemas/ExecutionTriggerSource'
+        spaces:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutionResultSpace'
+          description: 全部可提供的关联空间摘要；无关联为 []。
+      description: 逐条有效动作记录的不可变业务载荷。声明可空的键始终存在并显式为 null；名称按 Studio 默认语言。
