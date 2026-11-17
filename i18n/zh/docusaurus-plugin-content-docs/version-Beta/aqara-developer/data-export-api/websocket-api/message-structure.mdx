@@ -313,6 +313,8 @@ Studio 自身域名地址和局域网 Studio 环境的首包认证方式；生�
 
 **Trait 功能值变化推送**
 
+通过 SubscribeAllRequest 订阅了指定设备的全部 trait 或通过 SubscribeTraitValueRequest 订阅了指定设备的指定 Trait 后，当目标 Trait 值发生变化时，Aqara Studio 会向您推送此消息。如需了解 Aqara 现有 Trait 的含义与数据类型，请阅读 [Aqara 物模型标签](https://docs.aqara.com/zh/docs/aqara-developer/aqara-data-model-specification/aqara-data-model-tags/)。
+
 新版所有业务通知成对携带 studioId/eventId；普通历史报文允许缺省以兼容旧生产者。普通请求响应不引用本结构。执行结果与四类新场景对象事件另有强制身份约束。
 
 ### 参数

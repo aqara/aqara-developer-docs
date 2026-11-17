@@ -36,8 +36,25 @@
   color: var(--ifm-color-emphasis-700);
 }
 
-.description {
-  white-space: pre-line;
+.markdownText :global(p) {
+  margin: 0.35rem 0;
+}
+
+.markdownText :global(p:first-child) {
+  margin-top: 0;
+}
+
+.markdownText :global(p:last-child) {
+  margin-bottom: 0;
+}
+
+.markdownText :global(ul),
+.markdownText :global(ol) {
+  margin: 0.35rem 0 0.35rem 1.25rem;
+}
+
+.markdownText :global(a) {
+  text-decoration: underline;
 }
 
 .statusPanel {

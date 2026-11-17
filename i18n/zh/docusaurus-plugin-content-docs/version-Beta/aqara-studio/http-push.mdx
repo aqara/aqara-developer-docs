@@ -260,7 +260,7 @@ HTTP Push 请求消息的通用字段如下：
 | `type` | 消息类型，当前支持 `WebhookVerification`、`TraitValueUpdate`、`objectEvent` 和 `AlarmEvent`。如需了解各类型消息的发送条件，清参考 [消息类型](#支持的消息类型) 的说明。 |
 | `version` | 当前仅支持 `v1` |
 | `msgId` | 消息标识，用于链路追踪 |
-| `data` | 业务数据主体，根据 Type 不同，数据结构不同。<ul><li>若 type 为 `WebhookVerification`，`data` 内为 `challenge` 字段，示例请见 [接收 WebhookVerification 消息](#接收-webhookverification-消息)。</li><li>若 `type` 为其他，data 内结构复用了 [WebSocket 同名响应的 data 结构](./../aqara-developer/data-export-api/websocket-api/index.mdx)。<ul><li>若 type 为 `objectEvent`，您需要通过 `data.eventType` 确定具体事件类型。</li></ul></li></ul> |
+| `data` | 业务数据，结构随 `type` 变化：<ul><li>`WebhookVerification`：`data` 含 `challenge` 字段，示例见 [接收 WebhookVerification 消息](#接收-webhookverification-消息)。</li><li>`TraitValueUpdate`、`objectEvent`、`AlarmEvent`：`data` 与 WebSocket 同名消息一致，见 [TraitValueUpdate](./../aqara-developer/data-export-api/websocket-api/message-structure.mdx#traitvalueupdate)、[objectEvent](./../aqara-developer/data-export-api/websocket-api/message-structure.mdx#objectevent)、[AlarmEvent](./../aqara-developer/data-export-api/websocket-api/message-structure.mdx#alarmevent)。</li><li>`objectEvent` 还需通过 `data.eventType` 判断具体事件。</li></ul> |
 | `code` | 处理结果码，`0` 表示成功 |
 | `message` | 处理结果描述 |
 

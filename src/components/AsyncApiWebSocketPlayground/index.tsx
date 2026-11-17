@@ -2,6 +2,7 @@ import BrowserOnly from "@docusaurus/BrowserOnly";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import clsx from "clsx";
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import Markdown from "@theme/Markdown";
 import OpenApiSchema from "@theme/Schema";
 
 import CloseEyeIcon from "@site/src/icons/CloseEye.svg";
@@ -663,6 +664,24 @@ function SchemaReference({
   );
 }
 
+function MarkdownText({
+  text,
+  className,
+}: {
+  text?: string;
+  className?: string;
+}) {
+  if (!text) {
+    return null;
+  }
+
+  return (
+    <div className={clsx(styles.markdownText, className)}>
+      <Markdown>{text}</Markdown>
+    </div>
+  );
+}
+
 type AuthDraft = {
   token: string;
 };
@@ -1038,7 +1057,7 @@ function PlaygroundClient({ className }: ClientProps) {
         <div>
           <p className={styles.eyebrow}>WebSocket Playground</p>
           <h2 className={styles.title}>{spec.title}</h2>
-          <p className={styles.description}>{spec.description}</p>
+          <MarkdownText className={styles.description} text={spec.description} />
         </div>
         <div className={styles.statusPanel}>
           <span
@@ -1243,16 +1262,14 @@ function PlaygroundClient({ className }: ClientProps) {
                 <p className={styles.muted}>
                   {spec.messages[selectedSendMessage].title}
                 </p>
-                {spec.messages[selectedSendMessage].summary ? (
-                  <p className={styles.messageSummary}>
-                    {spec.messages[selectedSendMessage].summary}
-                  </p>
-                ) : null}
-                {spec.messages[selectedSendMessage].description ? (
-                  <p className={styles.messageSummary}>
-                    {spec.messages[selectedSendMessage].description}
-                  </p>
-                ) : null}
+                <MarkdownText
+                  className={styles.messageSummary}
+                  text={spec.messages[selectedSendMessage].summary}
+                />
+                <MarkdownText
+                  className={styles.messageSummary}
+                  text={spec.messages[selectedSendMessage].description}
+                />
                 <SchemaReference
                   schema={spec.messages[selectedSendMessage].payloadSchema}
                   schemaType="request"
@@ -1318,16 +1335,14 @@ function PlaygroundClient({ className }: ClientProps) {
                 <p className={styles.muted}>
                   {spec.messages[selectedReceiveMessage].title}
                 </p>
-                {spec.messages[selectedReceiveMessage].summary ? (
-                  <p className={styles.messageSummary}>
-                    {spec.messages[selectedReceiveMessage].summary}
-                  </p>
-                ) : null}
-                {spec.messages[selectedReceiveMessage].description ? (
-                  <p className={styles.messageSummary}>
-                    {spec.messages[selectedReceiveMessage].description}
-                  </p>
-                ) : null}
+                <MarkdownText
+                  className={styles.messageSummary}
+                  text={spec.messages[selectedReceiveMessage].summary}
+                />
+                <MarkdownText
+                  className={styles.messageSummary}
+                  text={spec.messages[selectedReceiveMessage].description}
+                />
                 <SchemaReference
                   schema={spec.messages[selectedReceiveMessage].payloadSchema}
                   schemaType="response"

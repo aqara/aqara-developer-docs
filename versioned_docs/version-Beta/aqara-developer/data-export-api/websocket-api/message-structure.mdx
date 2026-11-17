@@ -313,6 +313,8 @@ It does not clear standalone event subscriptions or precise object-event subscri
 
 **Trait Value Update**
 
+After subscribing to all traits of a specified device through SubscribeAllRequest or subscribing to a specified Trait of a specified device through SubscribeTraitValueRequest, when the value of the target Trait changes, Aqara Studio will push this message to you. For information on Aqara's existing Traits and their data types, see [Aqara Data Model Tags](https://docs.aqara.com/docs/aqara-developer/aqara-data-model-specification/aqara-data-model-tags/).
+
 All business notifications now carry studioId/eventId pair; ordinary historical messages allow omission for compatibility with legacy producers. Ordinary request/response messages do not reference this structure. Execution results and the four new scene object events have additional identity constraints.
 
 ### Parameters
