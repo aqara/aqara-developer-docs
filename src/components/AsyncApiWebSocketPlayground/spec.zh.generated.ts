@@ -89,157 +89,6 @@ const aqaraLifeWebSocketSpecZh = {
     }
   ],
   "messages": {
-    "CommandReport": {
-      "name": "CommandReport",
-      "title": "网关命令执行结果",
-      "summary": "随 v1 设备级或全量设备订阅发送，保留原网关结果，不表示设备物理动作已完成。",
-      "examples": [
-        {
-          "name": "command_report",
-          "payload": {
-            "type": "CommandReport",
-            "version": "v1",
-            "msgId": "report-example",
-            "studioId": "studio-example",
-            "eventId": "449fd6f6-c52c-4488-a3a2-828db5f9ab6e",
-            "code": 0,
-            "message": "success",
-            "data": {
-              "deviceId": "device-1",
-              "sequence": 1,
-              "timestamp": 1793577600000,
-              "did": "gateway-device-example",
-              "reportTime": null,
-              "source": null,
-              "data": {
-                "2.148.33050.0": "0"
-              },
-              "content": {
-                "0": 0,
-                "2": 2
-              }
-            }
-          }
-        }
-      ],
-      "payloadSchema": {
-        "type": "object",
-        "description": "新版所有业务通知成对携带 studioId/eventId；普通历史报文允许缺省以兼容旧生产者。普通请求响应不引用本结构。执行结果与四类新场景对象事件另有强制身份约束。",
-        "dependencies": {
-          "eventId": [
-            "studioId"
-          ],
-          "studioId": [
-            "eventId"
-          ]
-        },
-        "required": [
-          "type",
-          "version",
-          "msgId",
-          "data",
-          "code",
-          "message"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "CommandReport"
-            ]
-          },
-          "version": {
-            "type": "string",
-            "enum": [
-              "v1"
-            ]
-          },
-          "msgId": {
-            "type": "string",
-            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
-            "minLength": 1,
-            "maxLength": 64
-          },
-          "data": {
-            "type": "object",
-            "required": [
-              "deviceId",
-              "sequence",
-              "timestamp",
-              "did",
-              "reportTime",
-              "source",
-              "data",
-              "content"
-            ],
-            "properties": {
-              "deviceId": {
-                "type": "string",
-                "minLength": 1
-              },
-              "sequence": {
-                "type": "integer",
-                "minimum": 1
-              },
-              "timestamp": {
-                "type": "integer",
-                "minimum": 0,
-                "description": "Studio 记录时间，Unix 毫秒"
-              },
-              "did": {
-                "type": "string",
-                "minLength": 1
-              },
-              "reportTime": {
-                "type": [
-                  "integer",
-                  "null"
-                ],
-                "description": "网关原上报时间，无法提供时为 null"
-              },
-              "source": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "data": {
-                "type": "object",
-                "additionalProperties": true
-              },
-              "content": {
-                "type": "object",
-                "additionalProperties": true
-              }
-            }
-          },
-          "eventId": {
-            "type": "string",
-            "minLength": 1,
-            "pattern": "\\S",
-            "description": "本次逻辑通知的不透明字符串，至少包含一个非空白字符。原样保存和比较，不依赖格式。跨通道及 HTTP 重试保持不变；连续相同内容通知使用不同值。"
-          },
-          "studioId": {
-            "type": "string",
-            "minLength": 1,
-            "pattern": "\\S",
-            "description": "发布通知的 Studio 正式身份，至少包含一个非空白字符。不是网关身份或认证凭据。"
-          },
-          "code": {
-            "type": "integer",
-            "format": "int32",
-            "description": "处理结果码，0 表示成功，非 0 表示失败。"
-          },
-          "message": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "处理结果描述。"
-          }
-        }
-      }
-    },
     "AuthRequest": {
       "name": "AuthRequest",
       "title": "WebSocket 鉴权请求",
@@ -254,7 +103,6 @@ const aqaraLifeWebSocketSpecZh = {
             "data": {
               "authType": "token",
               "token": "<accessToken>",
-              "deviceUniqueId": "<deviceUniqueId>",
               "clientId": "<clientId>"
             }
           }
@@ -865,6 +713,182 @@ const aqaraLifeWebSocketSpecZh = {
         }
       }
     },
+    "TraitValueUpdate": {
+      "name": "TraitValueUpdate",
+      "title": "Trait 功能值变化推送",
+      "examples": [
+        {
+          "name": "设备在线状态变化",
+          "payload": {
+            "type": "TraitValueUpdate",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000001",
+            "studioId": "studio-example",
+            "version": "v1",
+            "msgId": "10810",
+            "data": [
+              {
+                "deviceId": "57190441014857",
+                "endpointId": 0,
+                "functionCode": "BasicInformation",
+                "traitCode": "Reachable",
+                "value": true,
+                "time": 1794637886352
+              }
+            ],
+            "code": 0,
+            "message": ""
+          }
+        },
+        {
+          "name": "目标播放状态变化",
+          "payload": {
+            "type": "TraitValueUpdate",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000002",
+            "studioId": "studio-example",
+            "version": "v1",
+            "msgId": "10811",
+            "data": [
+              {
+                "deviceId": "57190441014857",
+                "endpointId": 3,
+                "functionCode": "MediaPlayback",
+                "traitCode": "TargetPlaybackState",
+                "value": "0",
+                "time": 1754469720110
+              }
+            ],
+            "code": 0,
+            "message": ""
+          }
+        },
+        {
+          "name": "设备名称更新",
+          "payload": {
+            "type": "TraitValueUpdate",
+            "eventId": "449fd6f6-c52c-4488-a3a2-000000000003",
+            "studioId": "studio-example",
+            "version": "v1",
+            "msgId": "10812",
+            "data": [
+              {
+                "deviceId": "device-1",
+                "endpointId": 0,
+                "functionCode": "EndpointLabel",
+                "traitCode": "EndpointName",
+                "value": "客厅灯",
+                "time": 1789113600000
+              }
+            ],
+            "code": 0,
+            "message": ""
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "description": "新版所有业务通知成对携带 studioId/eventId；普通历史报文允许缺省以兼容旧生产者。普通请求响应不引用本结构。执行结果与四类新场景对象事件另有强制身份约束。",
+        "dependencies": {
+          "eventId": [
+            "studioId"
+          ],
+          "studioId": [
+            "eventId"
+          ]
+        },
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data",
+          "code",
+          "message"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "TraitValueUpdate"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "deviceId",
+                "endpointId",
+                "functionCode",
+                "traitCode",
+                "time"
+              ],
+              "properties": {
+                "deviceId": {
+                  "type": "string",
+                  "description": "设备 ID。"
+                },
+                "endpointId": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "端点 ID。"
+                },
+                "functionCode": {
+                  "type": "string",
+                  "description": "功能代码。"
+                },
+                "traitCode": {
+                  "type": "string",
+                  "description": "Trait 功能点代码。"
+                },
+                "value": {
+                  "description": "Trait 功能点值，类型由具体功能点定义决定。"
+                },
+                "time": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "上报时间戳，单位毫秒。"
+                }
+              }
+            }
+          },
+          "eventId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "本次逻辑通知的不透明字符串，至少包含一个非空白字符。原样保存和比较，不依赖格式。跨通道及 HTTP 重试保持不变；连续相同内容通知使用不同值。"
+          },
+          "studioId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "发布通知的 Studio 正式身份，至少包含一个非空白字符。不是网关身份或认证凭据。"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "处理结果码，0 表示成功，非 0 表示失败。"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "处理结果描述。"
+          }
+        }
+      }
+    },
     "UnsubscribeTraitValueRequest": {
       "name": "UnsubscribeTraitValueRequest",
       "title": "取消订阅指定 Trait 功能值",
@@ -1114,131 +1138,6 @@ const aqaraLifeWebSocketSpecZh = {
         }
       }
     },
-    "UnsubscribeEventRequest": {
-      "name": "UnsubscribeEventRequest",
-      "title": "取消订阅告警请求",
-      "description": "鉴权后发送，data 必须是非空事件类型数组，普通客户端使用 ALARM。订阅以当前会话为单位，重复操作幂等；不影响设备、Trait 和对象事件订阅。",
-      "examples": [
-        {
-          "name": "unsubscribeAlarmRequest",
-          "payload": {
-            "type": "UnsubscribeEventRequest",
-            "version": "v1",
-            "msgId": "alarm-unsubscribe-1",
-            "data": [
-              "ALARM"
-            ]
-          }
-        }
-      ],
-      "payloadSchema": {
-        "type": "object",
-        "required": [
-          "type",
-          "version",
-          "msgId",
-          "data"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "UnsubscribeEventRequest"
-            ]
-          },
-          "version": {
-            "type": "string",
-            "enum": [
-              "v1"
-            ]
-          },
-          "msgId": {
-            "type": "string",
-            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
-            "minLength": 1,
-            "maxLength": 64
-          },
-          "data": {
-            "type": "array",
-            "minItems": 1,
-            "items": {
-              "type": "string",
-              "enum": [
-                "ALARM"
-              ]
-            },
-            "description": "告警使用 ALARM；不接受空数组、通配符或对象 ID 过滤。"
-          }
-        }
-      }
-    },
-    "UnsubscribeEventResponse": {
-      "name": "UnsubscribeEventResponse",
-      "title": "取消订阅告警响应",
-      "examples": [
-        {
-          "name": "unsubscribeAlarmResponse",
-          "payload": {
-            "type": "UnsubscribeEventResponse",
-            "version": "v1",
-            "msgId": "alarm-unsubscribe-1",
-            "data": "",
-            "code": 0,
-            "message": "success"
-          }
-        }
-      ],
-      "payloadSchema": {
-        "type": "object",
-        "required": [
-          "type",
-          "version",
-          "msgId",
-          "code",
-          "message",
-          "data"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "UnsubscribeEventResponse"
-            ]
-          },
-          "version": {
-            "type": "string",
-            "enum": [
-              "v1"
-            ]
-          },
-          "msgId": {
-            "type": "string",
-            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
-            "minLength": 1,
-            "maxLength": 64
-          },
-          "data": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "default": ""
-          },
-          "code": {
-            "type": "integer",
-            "format": "int32",
-            "description": "处理结果码，0 表示成功，非 0 表示失败。"
-          },
-          "message": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "处理结果描述。"
-          }
-        }
-      }
-    },
     "AlarmEvent": {
       "name": "AlarmEvent",
       "title": "原始告警推送",
@@ -1437,6 +1336,131 @@ const aqaraLifeWebSocketSpecZh = {
         }
       }
     },
+    "UnsubscribeEventRequest": {
+      "name": "UnsubscribeEventRequest",
+      "title": "取消订阅告警请求",
+      "description": "鉴权后发送，data 必须是非空事件类型数组，普通客户端使用 ALARM。订阅以当前会话为单位，重复操作幂等；不影响设备、Trait 和对象事件订阅。",
+      "examples": [
+        {
+          "name": "unsubscribeAlarmRequest",
+          "payload": {
+            "type": "UnsubscribeEventRequest",
+            "version": "v1",
+            "msgId": "alarm-unsubscribe-1",
+            "data": [
+              "ALARM"
+            ]
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "UnsubscribeEventRequest"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": [
+                "ALARM"
+              ]
+            },
+            "description": "告警使用 ALARM；不接受空数组、通配符或对象 ID 过滤。"
+          }
+        }
+      }
+    },
+    "UnsubscribeEventResponse": {
+      "name": "UnsubscribeEventResponse",
+      "title": "取消订阅告警响应",
+      "examples": [
+        {
+          "name": "unsubscribeAlarmResponse",
+          "payload": {
+            "type": "UnsubscribeEventResponse",
+            "version": "v1",
+            "msgId": "alarm-unsubscribe-1",
+            "data": "",
+            "code": 0,
+            "message": "success"
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "code",
+          "message",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "UnsubscribeEventResponse"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": ""
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "处理结果码，0 表示成功，非 0 表示失败。"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "处理结果描述。"
+          }
+        }
+      }
+    },
     "SubscribeObjectEventRequest": {
       "name": "SubscribeObjectEventRequest",
       "title": "订阅空间、设备空间关系和自动化对象事件",
@@ -1444,7 +1468,7 @@ const aqaraLifeWebSocketSpecZh = {
       "description": "objectIds 不传、为 null 或空数组时订阅对应 eventTypes 下当前可访问的全部对象；非空时订阅指定对象。\n后续订阅请求与已有规则合并，不会覆盖之前的指定对象规则。订阅全部对象会覆盖同一事件类型已有的 ID 列表。\nApp 可使用全部对象订阅维护完整列表；带屏设备和第三方服务通常按业务范围订阅指定对象。\n",
       "examples": [
         {
-          "name": "subscribeAllPreciseObjectEvents",
+          "name": "订阅全部精确对象事件",
           "payload": {
             "type": "SubscribeObjectEventRequest",
             "version": "v1",
@@ -1467,7 +1491,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "subscribeSelectedObjects",
+          "name": "订阅指定对象",
           "payload": {
             "type": "SubscribeObjectEventRequest",
             "version": "v1",
@@ -1554,7 +1578,23 @@ const aqaraLifeWebSocketSpecZh = {
                       "SCENE_REMOVED",
                       "SCENE_UPDATED",
                       "SCENE_SPACE_UPDATED"
-                    ]
+                    ],
+                    "x-enum-descriptions": {
+                      "DEVICE_SPACE_UPDATED": "设备所属空间发生变化。",
+                      "SPACE_ADDED": "空间新增。",
+                      "SPACE_REMOVED": "空间删除。",
+                      "SPACE_UPDATED": "空间更新。",
+                      "AUTOMATION_ADDED": "自动化新增。",
+                      "AUTOMATION_REMOVED": "自动化删除。",
+                      "AUTOMATION_UPDATED": "自动化更新。",
+                      "AUTOMATION_SPACE_UPDATED": "自动化所属空间变化。",
+                      "AUTOMATION_EXECUTION_RESULT": "自动化执行结果。",
+                      "SCENE_EXECUTION_RESULT": "场景执行结果。",
+                      "SCENE_ADDED": "场景新增。",
+                      "SCENE_REMOVED": "场景删除。",
+                      "SCENE_UPDATED": "场景更新。",
+                      "SCENE_SPACE_UPDATED": "场景所属空间变化。"
+                    }
                   }
                 },
                 "objectIds": {
@@ -1568,7 +1608,7 @@ const aqaraLifeWebSocketSpecZh = {
                     "type": "string",
                     "minLength": 1
                   },
-                  "description": "订阅时，不传、null 或空数组表示当前权限范围内全部对象；非空时只匹配指定对象。\n取消订阅时，不传、null 或空数组表示清空对应 eventTypes，非空时只移除指定对象。\n同一 WebSocket 会话在每个 eventType 下最多累计订阅 1000 个不同 objectId。\nobjectIds 非空时，同一项的 eventTypes 必须属于同一公开 ID 家族（设备、空间、自动化/场景）；SPACE_ADDED、AUTOMATION_ADDED、SCENE_ADDED 只支持全部对象语义。\n协议不使用 scope 字段；全部对象语义统一由 objectIds 表示。\n"
+                  "description": "对象 ID 列表。按事件类型填写设备、空间、自动化或场景 ID。 \n\n订阅时，不传、null 或空数组表示当前权限范围内全部对象；非空时只匹配指定对象。\n\n取消订阅时，不传、null 或空数组表示清空对应 eventTypes，非空时只移除指定对象。\n\n同一 WebSocket 会话在每个 eventType 下最多累计订阅 1000 个不同 objectId。\n\nobjectIds 非空时，同一项的 eventTypes 必须属于同一公开 ID 家族（设备、空间、自动化/场景）；SPACE_ADDED、AUTOMATION_ADDED、SCENE_ADDED 只支持全部对象语义。\n"
                 }
               }
             },
@@ -1632,337 +1672,6 @@ const aqaraLifeWebSocketSpecZh = {
         }
       }
     },
-    "UnsubscribeObjectEventRequest": {
-      "name": "UnsubscribeObjectEventRequest",
-      "title": "取消空间、设备空间关系和自动化对象事件订阅",
-      "summary": "按当前 WebSocket 会话移除指定对象规则或清空指定事件类型。",
-      "description": "objectIds 非空时只移除指定对象；不传、为 null 或空数组时清空对应 eventTypes 的全部对象规则。\n全量订阅不支持排除部分对象；要从全量切换为指定对象，应先清空事件类型，再发送新的指定对象订阅。\n",
-      "examples": [
-        {
-          "name": "unsubscribeSelectedObject",
-          "payload": {
-            "type": "UnsubscribeObjectEventRequest",
-            "version": "v1",
-            "msgId": "object-unsubscribe-1",
-            "data": [
-              {
-                "eventTypes": [
-                  "AUTOMATION_UPDATED"
-                ],
-                "objectIds": [
-                  "automation-1"
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "clearEventType",
-          "payload": {
-            "type": "UnsubscribeObjectEventRequest",
-            "version": "v1",
-            "msgId": "object-unsubscribe-2",
-            "data": [
-              {
-                "eventTypes": [
-                  "AUTOMATION_UPDATED"
-                ],
-                "objectIds": []
-              }
-            ]
-          }
-        }
-      ],
-      "payloadSchema": {
-        "type": "object",
-        "required": [
-          "type",
-          "version",
-          "msgId",
-          "data"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "UnsubscribeObjectEventRequest"
-            ]
-          },
-          "version": {
-            "type": "string",
-            "enum": [
-              "v1"
-            ]
-          },
-          "msgId": {
-            "type": "string",
-            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
-            "minLength": 1,
-            "maxLength": 64
-          },
-          "data": {
-            "type": "array",
-            "minItems": 1,
-            "maxItems": 100,
-            "items": {
-              "type": "object",
-              "required": [
-                "eventTypes"
-              ],
-              "properties": {
-                "eventTypes": {
-                  "type": "array",
-                  "minItems": 1,
-                  "uniqueItems": true,
-                  "items": {
-                    "type": "string",
-                    "enum": [
-                      "DEVICE_SPACE_UPDATED",
-                      "SPACE_ADDED",
-                      "SPACE_REMOVED",
-                      "SPACE_UPDATED",
-                      "AUTOMATION_ADDED",
-                      "AUTOMATION_REMOVED",
-                      "AUTOMATION_UPDATED",
-                      "AUTOMATION_SPACE_UPDATED",
-                      "AUTOMATION_EXECUTION_RESULT",
-                      "SCENE_EXECUTION_RESULT",
-                      "SCENE_ADDED",
-                      "SCENE_REMOVED",
-                      "SCENE_UPDATED",
-                      "SCENE_SPACE_UPDATED"
-                    ]
-                  }
-                },
-                "objectIds": {
-                  "type": [
-                    "array",
-                    "null"
-                  ],
-                  "maxItems": 1000,
-                  "uniqueItems": true,
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "description": "订阅时，不传、null 或空数组表示当前权限范围内全部对象；非空时只匹配指定对象。\n取消订阅时，不传、null 或空数组表示清空对应 eventTypes，非空时只移除指定对象。\n同一 WebSocket 会话在每个 eventType 下最多累计订阅 1000 个不同 objectId。\nobjectIds 非空时，同一项的 eventTypes 必须属于同一公开 ID 家族（设备、空间、自动化/场景）；SPACE_ADDED、AUTOMATION_ADDED、SCENE_ADDED 只支持全部对象语义。\n协议不使用 scope 字段；全部对象语义统一由 objectIds 表示。\n"
-                }
-              }
-            },
-            "description": "必须包含 1 至 100 个取消项；空数组是参数错误，不表示取消全部事件类型。\nobjectIds 不传、null 或空数组时，清除对应 eventTypes 下当前会话的全部对象规则；非空时只移除指定对象。\n"
-          }
-        }
-      }
-    },
-    "UnsubscribeObjectEventResponse": {
-      "name": "UnsubscribeObjectEventResponse",
-      "title": "取消对象事件订阅响应",
-      "examples": [],
-      "payloadSchema": {
-        "type": "object",
-        "required": [
-          "type",
-          "version",
-          "msgId",
-          "code",
-          "message",
-          "data"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "UnsubscribeObjectEventResponse"
-            ]
-          },
-          "version": {
-            "type": "string",
-            "enum": [
-              "v1"
-            ]
-          },
-          "msgId": {
-            "type": "string",
-            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
-            "minLength": 1,
-            "maxLength": 64
-          },
-          "data": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "default": ""
-          },
-          "code": {
-            "type": "integer",
-            "format": "int32",
-            "description": "处理结果码，0 表示成功，非 0 表示失败。"
-          },
-          "message": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "处理结果描述。"
-          }
-        }
-      }
-    },
-    "TraitValueUpdate": {
-      "name": "TraitValueUpdate",
-      "title": "Trait 功能值变化推送",
-      "examples": [
-        {
-          "name": "traitValueUpdate",
-          "payload": {
-            "type": "TraitValueUpdate",
-            "eventId": "449fd6f6-c52c-4488-a3a2-000000000002",
-            "studioId": "studio-example",
-            "version": "v1",
-            "msgId": "1754469720110",
-            "data": [
-              {
-                "deviceId": "57190441014857",
-                "endpointId": 3,
-                "functionCode": "MediaPlayback",
-                "traitCode": "TargetPlaybackState",
-                "value": "0",
-                "time": 1754469720110
-              }
-            ],
-            "code": 0,
-            "message": ""
-          }
-        },
-        {
-          "name": "deviceNameUpdated",
-          "payload": {
-            "type": "TraitValueUpdate",
-            "eventId": "449fd6f6-c52c-4488-a3a2-000000000003",
-            "studioId": "studio-example",
-            "version": "v1",
-            "msgId": "1789113600000",
-            "data": [
-              {
-                "deviceId": "device-1",
-                "endpointId": 0,
-                "functionCode": "EndpointLabel",
-                "traitCode": "EndpointName",
-                "value": "客厅灯",
-                "time": 1789113600000
-              }
-            ],
-            "code": 0,
-            "message": ""
-          }
-        }
-      ],
-      "payloadSchema": {
-        "type": "object",
-        "description": "新版所有业务通知成对携带 studioId/eventId；普通历史报文允许缺省以兼容旧生产者。普通请求响应不引用本结构。执行结果与四类新场景对象事件另有强制身份约束。",
-        "dependencies": {
-          "eventId": [
-            "studioId"
-          ],
-          "studioId": [
-            "eventId"
-          ]
-        },
-        "required": [
-          "type",
-          "version",
-          "msgId",
-          "data",
-          "code",
-          "message"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "TraitValueUpdate"
-            ]
-          },
-          "version": {
-            "type": "string",
-            "enum": [
-              "v1"
-            ]
-          },
-          "msgId": {
-            "type": "string",
-            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
-            "minLength": 1,
-            "maxLength": 64
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "required": [
-                "deviceId",
-                "endpointId",
-                "functionCode",
-                "traitCode",
-                "time"
-              ],
-              "properties": {
-                "deviceId": {
-                  "type": "string",
-                  "description": "设备 ID。"
-                },
-                "endpointId": {
-                  "type": "integer",
-                  "format": "int32",
-                  "description": "端点 ID。"
-                },
-                "functionCode": {
-                  "type": "string",
-                  "description": "功能代码。"
-                },
-                "traitCode": {
-                  "type": "string",
-                  "description": "Trait 功能点代码。"
-                },
-                "value": {
-                  "description": "Trait 功能点值，类型由具体功能点定义决定。"
-                },
-                "time": {
-                  "type": "integer",
-                  "format": "int64",
-                  "description": "上报时间戳，单位毫秒。"
-                }
-              }
-            }
-          },
-          "eventId": {
-            "type": "string",
-            "minLength": 1,
-            "pattern": "\\S",
-            "description": "本次逻辑通知的不透明字符串，至少包含一个非空白字符。原样保存和比较，不依赖格式。跨通道及 HTTP 重试保持不变；连续相同内容通知使用不同值。"
-          },
-          "studioId": {
-            "type": "string",
-            "minLength": 1,
-            "pattern": "\\S",
-            "description": "发布通知的 Studio 正式身份，至少包含一个非空白字符。不是网关身份或认证凭据。"
-          },
-          "code": {
-            "type": "integer",
-            "format": "int32",
-            "description": "处理结果码，0 表示成功，非 0 表示失败。"
-          },
-          "message": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "处理结果描述。"
-          }
-        }
-      }
-    },
     "ObjectEvent": {
       "name": "objectEvent",
       "title": "对象事件推送",
@@ -1970,7 +1679,7 @@ const aqaraLifeWebSocketSpecZh = {
       "description": "DEVICE_ADDED、DEVICE_REMOVED 在认证连接建立后默认推送。\n\nDEVICE_SPACE_UPDATED、三类空间变化、四类自动化变化、四类场景变化以及 AUTOMATION_EXECUTION_RESULT、SCENE_EXECUTION_RESULT，均只投递给命中 eventType、objectId 和当前权限的 SubscribeObjectEventRequest 会话。\n\nDEVICE_ENDPOINT_*、DEVICE_TRAIT_PARAMETER_UPDATE 继续跟随现有设备数据订阅。\n\n独立场景通过 /scenes 管理，变化通知使用四类 SCENE_* 事件，自动化仍使用 AUTOMATION_*；可信类别由服务端判断。数量变化不提供独立事件。新增、删除自动化只发送对应生命周期快照，不额外发送空间关系事件；已有对象仅空间关系变化时发送 AUTOMATION_SPACE_UPDATED，内容与关系同时变化时两类事件都可能收到。\n\n独立场景使用 SCENE_ADDED/REMOVED/UPDATED/SPACE_UPDATED，不再双发 AUTOMATION_*；sceneId 仍是 auto_ 前缀。旧自动化手动入口仍归自动化。场景定义比较排除空间，空间与定义同批变化产生两条不同 eventId 的通知。\n\n自动化快照的 manualTriggers 包含 triggerNodeId 和 triggerName；手动触发入口添加、删除或重命名通过 AUTOMATION_UPDATED 返回完整列表。按完整列表替换缓存，空数组清空旧入口；无需新增事件订阅类型。\n\nmsgId 只用于链路追踪。新版业务通知按 studioId + eventId 幂等；旧对象变化缺少公共身份时按对象状态幂等处理，不应仅按 objectId、eventType 或 time 去重。\n\n新增 AUTOMATION_EXECUTION_RESULT 和 SCENE_EXECUTION_RESULT 按有效动作记录通知，分别表示自动化与场景；不是整次执行完成事件。Studio 与 Gateway 均覆盖，原生优化按一次原生调用通知，未确认结果为未知，不展开为逐设备成功。\n\n两类动作结果及四类独立场景变化都必须携带公共层 studioId 和 eventId。同一逻辑通知跨通道和 HTTP 重试保留身份；动作结果可按接收者权限裁剪字段。按 studioId + eventId 幂等；executionId 仅关联执行，不可用时显式为 null。新订阅可能收到公共队列尚未分发的记录，不提供历史回放。\n",
       "examples": [
         {
-          "name": "scene_added",
+          "name": "场景新增",
           "payload": {
             "type": "objectEvent",
             "version": "v1",
@@ -1993,7 +1702,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "scene_removed",
+          "name": "场景移除",
           "payload": {
             "type": "objectEvent",
             "version": "v1",
@@ -2016,7 +1725,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "scene_updated",
+          "name": "场景更新",
           "payload": {
             "type": "objectEvent",
             "version": "v1",
@@ -2039,7 +1748,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "scene_space_updated",
+          "name": "场景所属空间更新",
           "payload": {
             "type": "objectEvent",
             "version": "v1",
@@ -2069,7 +1778,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "deviceAdded",
+          "name": "设备新增",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000004",
@@ -2099,7 +1808,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "deviceSpaceUpdated",
+          "name": "设备所属空间更新",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000005",
@@ -2126,7 +1835,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "automationUpdated",
+          "name": "自动化更新",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000006",
@@ -2156,7 +1865,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "automationSpaceUnassigned",
+          "name": "自动化所属空间更新",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000007",
@@ -2182,7 +1891,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "device_removed",
+          "name": "设备移除",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000008",
@@ -2211,7 +1920,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "device_endpoint_added",
+          "name": "设备端点新增",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000009",
@@ -2241,7 +1950,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "device_endpoint_removed",
+          "name": "设备端点移除",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-00000000000a",
@@ -2270,7 +1979,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "device_trait_parameter_update",
+          "name": "设备 Trait 参数更新",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-00000000000b",
@@ -2311,7 +2020,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "space_added",
+          "name": "空间新增",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-00000000000c",
@@ -2334,7 +2043,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "space_removed",
+          "name": "空间移除",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-00000000000d",
@@ -2357,7 +2066,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "space_updated",
+          "name": "空间更新",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-00000000000e",
@@ -2380,7 +2089,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "automation_added",
+          "name": "自动化新增",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-00000000000f",
@@ -2405,7 +2114,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "automation_removed",
+          "name": "自动化移除",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000010",
@@ -2430,7 +2139,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "automationSpaceAssigned",
+          "name": "自动化所属空间更新",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000011",
@@ -2466,7 +2175,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "deviceSpaceUnassigned",
+          "name": "设备所属空间清除",
           "payload": {
             "type": "objectEvent",
             "eventId": "449fd6f6-c52c-4488-a3a2-000000000012",
@@ -2488,7 +2197,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "sceneActionResult",
+          "name": "场景动作执行结果",
           "payload": {
             "type": "objectEvent",
             "version": "v1",
@@ -2536,7 +2245,7 @@ const aqaraLifeWebSocketSpecZh = {
           }
         },
         {
-          "name": "automationNativeInvocationUnknown",
+          "name": "自动化原生调用结果未知",
           "payload": {
             "type": "objectEvent",
             "version": "v1",
@@ -4108,6 +3817,350 @@ const aqaraLifeWebSocketSpecZh = {
               "minLength": 1,
               "description": "发布通知的 Studio 正式身份，不是执行网关 ID。"
             }
+          }
+        }
+      }
+    },
+    "UnsubscribeObjectEventRequest": {
+      "name": "UnsubscribeObjectEventRequest",
+      "title": "取消空间、设备空间关系和自动化对象事件订阅",
+      "summary": "按当前 WebSocket 会话移除指定对象规则或清空指定事件类型。",
+      "description": "objectIds 非空时只移除指定对象；不传、为 null 或空数组时清空对应 eventTypes 的全部对象规则。\n全量订阅不支持排除部分对象；要从全量切换为指定对象，应先清空事件类型，再发送新的指定对象订阅。\n",
+      "examples": [
+        {
+          "name": "unsubscribeSelectedObject",
+          "payload": {
+            "type": "UnsubscribeObjectEventRequest",
+            "version": "v1",
+            "msgId": "object-unsubscribe-1",
+            "data": [
+              {
+                "eventTypes": [
+                  "AUTOMATION_UPDATED"
+                ],
+                "objectIds": [
+                  "automation-1"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "clearEventType",
+          "payload": {
+            "type": "UnsubscribeObjectEventRequest",
+            "version": "v1",
+            "msgId": "object-unsubscribe-2",
+            "data": [
+              {
+                "eventTypes": [
+                  "AUTOMATION_UPDATED"
+                ],
+                "objectIds": []
+              }
+            ]
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "UnsubscribeObjectEventRequest"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "required": [
+                "eventTypes"
+              ],
+              "properties": {
+                "eventTypes": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "DEVICE_SPACE_UPDATED",
+                      "SPACE_ADDED",
+                      "SPACE_REMOVED",
+                      "SPACE_UPDATED",
+                      "AUTOMATION_ADDED",
+                      "AUTOMATION_REMOVED",
+                      "AUTOMATION_UPDATED",
+                      "AUTOMATION_SPACE_UPDATED",
+                      "AUTOMATION_EXECUTION_RESULT",
+                      "SCENE_EXECUTION_RESULT",
+                      "SCENE_ADDED",
+                      "SCENE_REMOVED",
+                      "SCENE_UPDATED",
+                      "SCENE_SPACE_UPDATED"
+                    ],
+                    "x-enum-descriptions": {
+                      "DEVICE_SPACE_UPDATED": "设备所属空间发生变化。",
+                      "SPACE_ADDED": "空间新增。",
+                      "SPACE_REMOVED": "空间删除。",
+                      "SPACE_UPDATED": "空间更新。",
+                      "AUTOMATION_ADDED": "自动化新增。",
+                      "AUTOMATION_REMOVED": "自动化删除。",
+                      "AUTOMATION_UPDATED": "自动化更新。",
+                      "AUTOMATION_SPACE_UPDATED": "自动化所属空间变化。",
+                      "AUTOMATION_EXECUTION_RESULT": "自动化执行结果。",
+                      "SCENE_EXECUTION_RESULT": "场景执行结果。",
+                      "SCENE_ADDED": "场景新增。",
+                      "SCENE_REMOVED": "场景删除。",
+                      "SCENE_UPDATED": "场景更新。",
+                      "SCENE_SPACE_UPDATED": "场景所属空间变化。"
+                    }
+                  }
+                },
+                "objectIds": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "maxItems": 1000,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": "对象 ID 列表。按事件类型填写设备、空间、自动化或场景 ID。 \n\n订阅时，不传、null 或空数组表示当前权限范围内全部对象；非空时只匹配指定对象。\n\n取消订阅时，不传、null 或空数组表示清空对应 eventTypes，非空时只移除指定对象。\n\n同一 WebSocket 会话在每个 eventType 下最多累计订阅 1000 个不同 objectId。\n\nobjectIds 非空时，同一项的 eventTypes 必须属于同一公开 ID 家族（设备、空间、自动化/场景）；SPACE_ADDED、AUTOMATION_ADDED、SCENE_ADDED 只支持全部对象语义。\n"
+                }
+              }
+            },
+            "description": "必须包含 1 至 100 个取消项；空数组是参数错误，不表示取消全部事件类型。\nobjectIds 不传、null 或空数组时，清除对应 eventTypes 下当前会话的全部对象规则；非空时只移除指定对象。\n"
+          }
+        }
+      }
+    },
+    "UnsubscribeObjectEventResponse": {
+      "name": "UnsubscribeObjectEventResponse",
+      "title": "取消对象事件订阅响应",
+      "examples": [],
+      "payloadSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "code",
+          "message",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "UnsubscribeObjectEventResponse"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": ""
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "处理结果码，0 表示成功，非 0 表示失败。"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "处理结果描述。"
+          }
+        }
+      }
+    },
+    "CommandReport": {
+      "name": "CommandReport",
+      "title": "网关命令执行结果",
+      "summary": "随 v1 设备级或全量设备订阅发送，保留原网关结果，不表示设备物理动作已完成。",
+      "examples": [
+        {
+          "name": "command_report",
+          "payload": {
+            "type": "CommandReport",
+            "version": "v1",
+            "msgId": "report-example",
+            "studioId": "studio-example",
+            "eventId": "449fd6f6-c52c-4488-a3a2-828db5f9ab6e",
+            "code": 0,
+            "message": "success",
+            "data": {
+              "deviceId": "device-1",
+              "sequence": 1,
+              "timestamp": 1793577600000,
+              "did": "gateway-device-example",
+              "reportTime": null,
+              "source": null,
+              "data": {
+                "2.148.33050.0": "0"
+              },
+              "content": {
+                "0": 0,
+                "2": 2
+              }
+            }
+          }
+        }
+      ],
+      "payloadSchema": {
+        "type": "object",
+        "description": "新版所有业务通知成对携带 studioId/eventId；普通历史报文允许缺省以兼容旧生产者。普通请求响应不引用本结构。执行结果与四类新场景对象事件另有强制身份约束。",
+        "dependencies": {
+          "eventId": [
+            "studioId"
+          ],
+          "studioId": [
+            "eventId"
+          ]
+        },
+        "required": [
+          "type",
+          "version",
+          "msgId",
+          "data",
+          "code",
+          "message"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "CommandReport"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "msgId": {
+            "type": "string",
+            "description": "请求使用的非空标识，应至少在当前连接尚未完成的请求中保持唯一；正常响应使用相同 msgId 关联，服务端推送的 msgId 仅用于链路追踪，不等同于订阅请求 msgId，也不保证全局唯一。",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "data": {
+            "type": "object",
+            "required": [
+              "deviceId",
+              "sequence",
+              "timestamp",
+              "did",
+              "reportTime",
+              "source",
+              "data",
+              "content"
+            ],
+            "properties": {
+              "deviceId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sequence": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "timestamp": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Studio 记录时间，Unix 毫秒"
+              },
+              "did": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reportTime": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "网关原上报时间，无法提供时为 null"
+              },
+              "source": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "data": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "content": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          },
+          "eventId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "本次逻辑通知的不透明字符串，至少包含一个非空白字符。原样保存和比较，不依赖格式。跨通道及 HTTP 重试保持不变；连续相同内容通知使用不同值。"
+          },
+          "studioId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "发布通知的 Studio 正式身份，至少包含一个非空白字符。不是网关身份或认证凭据。"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "处理结果码，0 表示成功，非 0 表示失败。"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "处理结果描述。"
           }
         }
       }

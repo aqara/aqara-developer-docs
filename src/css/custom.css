@@ -343,3 +343,30 @@
  .aqara-features-table th {
    overflow: visible;
  }
+
+.markdown details.message-structure-details.alert--info {
+  --ifm-alert-background-color: #f6f7f8;
+  --ifm-alert-border-color: #e3e5e8;
+  --ifm-alert-foreground-color: var(--ifm-font-color-base);
+  --docusaurus-details-decoration-color: #c8cdd3;
+  background-color: #f6f7f8;
+  border-color: #e3e5e8;
+  color: var(--ifm-font-color-base);
+}
+
+[data-theme='dark'] .markdown details.message-structure-details.alert--info {
+  --ifm-alert-background-color: #2a2d31;
+  --ifm-alert-border-color: #3d4148;
+  --docusaurus-details-decoration-color: #5c6370;
+  background-color: #2a2d31;
+  border-color: #3d4148;
+}
+
+.markdown td .enum-list {
+  margin: 0.35rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.markdown td .enum-list li {
+  margin: 0.1rem 0;
+}

@@ -15,6 +15,7 @@
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
     "gen-asyncapi-playground-specs": "node scripts/generate-asyncapi-playground-specs.mjs",
+    "gen-websocket-message-structure": "node scripts/generate-websocket-message-structure.mjs",
     "typecheck": "tsc"
   },
   "dependencies": {

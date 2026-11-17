@@ -1,7 +1,7 @@
 import BrowserOnly from "@docusaurus/BrowserOnly";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import clsx from "clsx";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import OpenApiSchema from "@theme/Schema";
 
 import CloseEyeIcon from "@site/src/icons/CloseEye.svg";
@@ -65,6 +65,8 @@ type UiCopy = {
   autoPing: string;
   parameters: string;
   examples: string;
+  expandExamples: string;
+  collapseExamples: string;
   sendCurrentMessage: string;
   serverReturnPush: string;
   realtimeLogs: string;
@@ -127,6 +129,8 @@ const uiCopy: Record<"zh" | "en", UiCopy> = {
     autoPing: "每 30 秒自动发送 PingRequest",
     parameters: "参数",
     examples: "示例",
+    expandExamples: "展开",
+    collapseExamples: "折叠",
     sendCurrentMessage: "发送当前消息",
     serverReturnPush: "服务端返回 / 推送",
     realtimeLogs: "实时日志",
@@ -204,6 +208,8 @@ const uiCopy: Record<"zh" | "en", UiCopy> = {
     autoPing: "Automatically send PingRequest every 30 seconds",
     parameters: "Parameters",
     examples: "Examples",
+    expandExamples: "Show all",
+    collapseExamples: "Collapse",
     sendCurrentMessage: "Send Current Message",
     serverReturnPush: "Server Responses / Push Messages",
     realtimeLogs: "Realtime Logs",
@@ -547,6 +553,100 @@ function toOpenApiSchema(schema?: JsonSchema): Record<string, unknown> {
   }
 
   return converted;
+}
+
+function exampleChipsOverflow(list: HTMLElement) {
+  const items = Array.from(list.querySelectorAll<HTMLElement>("button"));
+  if (items.length === 0) {
+    return false;
+  }
+  const gap = Number.parseFloat(getComputedStyle(list).columnGap) || 0;
+  const total = items.reduce(
+    (sum, item, index) => sum + item.getBoundingClientRect().width + (index > 0 ? gap : 0),
+    0,
+  );
+  return total > list.clientWidth + 1;
+}
+
+function ExamplePicker({
+  examples,
+  selectedName,
+  expandLabel,
+  collapseLabel,
+  onSelect,
+}: {
+  examples: {name: string}[];
+  selectedName: string;
+  expandLabel: string;
+  collapseLabel: string;
+  onSelect: (name: string) => void;
+}) {
+  const listRef = useRef<HTMLDivElement>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [overflowing, setOverflowing] = useState(false);
+
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!list) {
+      return undefined;
+    }
+    const measure = () => setOverflowing(exampleChipsOverflow(list));
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(list);
+    return () => observer.disconnect();
+  }, [examples]);
+
+  useLayoutEffect(() => {
+    setExpanded(false);
+  }, [examples]);
+
+  useLayoutEffect(() => {
+    if (!overflowing) {
+      setExpanded(false);
+    }
+  }, [overflowing]);
+
+  const showToggle = overflowing || expanded;
+
+  return (
+    <div className={styles.exampleTabsRow}>
+      <div
+        ref={listRef}
+        className={clsx(styles.exampleTabs, expanded && styles.exampleTabsExpanded)}
+      >
+        {examples.map((example) => (
+          <button
+            key={example.name}
+            className={clsx(styles.inlineTag, {
+              [styles.inlineTagActive]: selectedName === example.name,
+            })}
+            type="button"
+            onClick={() => onSelect(example.name)}
+          >
+            {example.name}
+          </button>
+        ))}
+      </div>
+      {showToggle ? (
+        <button
+          type="button"
+          className={styles.exampleTabsToggle}
+          aria-expanded={expanded}
+          onClick={() => setExpanded((current) => !current)}
+        >
+          <svg
+            className={clsx(styles.exampleTabsCaret, expanded && styles.exampleTabsCaretUp)}
+            viewBox="0 0 12 8"
+            aria-hidden="true"
+          >
+            <path d="M1 1h10L6 7z" fill="currentColor" />
+          </svg>
+          {expanded ? collapseLabel : expandLabel}
+        </button>
+      ) : null}
+    </div>
+  );
 }
 
 function SchemaReference({
@@ -1153,32 +1253,23 @@ function PlaygroundClient({ className }: ClientProps) {
                     {spec.messages[selectedSendMessage].description}
                   </p>
                 ) : null}
-                {spec.messages[selectedSendMessage].examples.length ? (
-                  <>
-                    <p className={styles.groupTitle}>{ui.examples}</p>
-                    <div className={styles.exampleTabs}>
-                      {spec.messages[selectedSendMessage].examples.map((example) => (
-                        <button
-                          key={`${selectedSendMessage}-${example.name}`}
-                          className={clsx(styles.inlineTag, {
-                            [styles.inlineTagActive]: selectedSendExampleName === example.name,
-                          })}
-                          type="button"
-                          onClick={() =>
-                            loadSendMessageDraft(selectedSendMessage, example.name)
-                          }
-                        >
-                          {example.name}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                ) : null}
                 <SchemaReference
                   schema={spec.messages[selectedSendMessage].payloadSchema}
                   schemaType="request"
                 />
               </section>
+              {spec.messages[selectedSendMessage].examples.length ? (
+                <>
+                  <p className={styles.groupTitle}>{ui.examples}</p>
+                  <ExamplePicker
+                    examples={spec.messages[selectedSendMessage].examples}
+                    selectedName={selectedSendExampleName}
+                    expandLabel={ui.expandExamples}
+                    collapseLabel={ui.collapseExamples}
+                    onSelect={(name) => loadSendMessageDraft(selectedSendMessage, name)}
+                  />
+                </>
+              ) : null}
               <textarea
                 ref={sendEditorRef}
                 className={styles.editor}
@@ -1237,32 +1328,23 @@ function PlaygroundClient({ className }: ClientProps) {
                     {spec.messages[selectedReceiveMessage].description}
                   </p>
                 ) : null}
-                {spec.messages[selectedReceiveMessage].examples.length ? (
-                  <>
-                    <p className={styles.groupTitle}>{ui.examples}</p>
-                    <div className={styles.exampleTabs}>
-                      {spec.messages[selectedReceiveMessage].examples.map((example) => (
-                        <button
-                          key={`${selectedReceiveMessage}-${example.name}`}
-                          className={clsx(styles.inlineTag, {
-                            [styles.inlineTagActive]: selectedReceiveExampleName === example.name,
-                          })}
-                          type="button"
-                          onClick={() =>
-                            loadReceiveMessagePreview(selectedReceiveMessage, example.name)
-                          }
-                        >
-                          {example.name}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                ) : null}
                 <SchemaReference
                   schema={spec.messages[selectedReceiveMessage].payloadSchema}
                   schemaType="response"
                 />
               </section>
+              {spec.messages[selectedReceiveMessage].examples.length ? (
+                <>
+                  <p className={styles.groupTitle}>{ui.examples}</p>
+                  <ExamplePicker
+                    examples={spec.messages[selectedReceiveMessage].examples}
+                    selectedName={selectedReceiveExampleName}
+                    expandLabel={ui.expandExamples}
+                    collapseLabel={ui.collapseExamples}
+                    onSelect={(name) => loadReceiveMessagePreview(selectedReceiveMessage, name)}
+                  />
+                </>
+              ) : null}
               <pre className={styles.receivePreview}>
                 <code>{receivePreview}</code>
               </pre>
