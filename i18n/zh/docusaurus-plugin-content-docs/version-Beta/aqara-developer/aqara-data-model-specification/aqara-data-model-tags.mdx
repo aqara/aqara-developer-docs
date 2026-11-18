@@ -10784,10 +10784,10 @@ StepBrightnessWithOnOff Command 的参数结构体。
     </tr>
     <tr>
       <td>1</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>1000000</code>，步进值统一为 <code>500 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
   </tbody>
 </table>
@@ -10816,10 +10816,10 @@ SetBrightnessWithOnOff Command 的参数结构体。
     </tr>
     <tr>
       <td>1</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>1000000</code>，步进值统一为 <code>500 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
   </tbody>
 </table>
@@ -10848,10 +10848,10 @@ SetBrightness Command 的参数结构体。
     </tr>
     <tr>
       <td>1</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>1000000</code>，步进值统一为 <code>500 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>2</td>
@@ -10887,10 +10887,10 @@ StepBrightness Command 的参数结构体。
     </tr>
     <tr>
       <td>1</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>1000000</code>，步进值统一为 <code>500 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>2</td>
@@ -11274,7 +11274,7 @@ StepBrightness Command 的参数结构体。
       <td>Maximum Value</td>
       <td>int32</td>
       <td></td>
-      <td>10000</td>
+      <td>20000</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -11292,7 +11292,7 @@ StepBrightness Command 的参数结构体。
       <td>Step Value</td>
       <td>uint32</td>
       <td></td>
-      <td>500</td>
+      <td>100</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -11362,7 +11362,7 @@ StepBrightness Command 的参数结构体。
       <td>Maximum Value</td>
       <td>int32</td>
       <td></td>
-      <td>10000</td>
+      <td>20000</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -11380,7 +11380,7 @@ StepBrightness Command 的参数结构体。
       <td>Step Value</td>
       <td>uint32</td>
       <td></td>
-      <td>500</td>
+      <td>100</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -11546,8 +11546,8 @@ StepBrightness Command 的参数结构体。
 
 设备接收该命令后，应先按 `SetBrightness` 的语义，从当前亮度连续过渡到目标亮度。
 
-* 过渡时长优先使用命令中的 `Time`。
-* 当 `Time` 为空时，应使用设备过渡时长配置；若无可用配置，则应以设备可实现的最快速度完成过渡。
+* 过渡时长优先使用命令中的 `TransitionTime`。
+* 当 `TransitionTime` 为空时，应使用设备过渡时长配置；若无可用配置，则应以设备可实现的最快速度完成过渡。
 
 在上述行为基础上，本命令还应执行与开关联动：
 
@@ -11566,8 +11566,8 @@ StepBrightness Command 的参数结构体。
 
 设备接收该命令后，应从当前亮度连续过渡到 `Level` 指定目标值。
 
-* 过渡时长优先使用命令中的 `Time`。
-* 当 `Time` 为空时，应使用设备过渡时长配置；若无可用配置，则应以设备可实现的最快速度完成过渡。
+* 过渡时长优先使用命令中的 `TransitionTime`。
+* 当 `TransitionTime` 为空时，应使用设备过渡时长配置；若无可用配置，则应以设备可实现的最快速度完成过渡。
 
 若设备不支持可变速率过渡，可忽略过渡时长字段。
 
@@ -12970,10 +12970,10 @@ MoveToXYColorBrightness Command 的参数结构体。
     </tr>
     <tr>
       <td>3</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>1000000</code>，步进值统一为 <code>500 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>4</td>
@@ -13016,10 +13016,10 @@ MoveToColorTemperatureBrightness Command 的参数结构体。
     </tr>
     <tr>
       <td>2</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>1000000</code>，步进值统一为 <code>500 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>3</td>
@@ -13069,10 +13069,10 @@ MoveToHueSaturationBrightness Command 的参数结构体。
     </tr>
     <tr>
       <td>3</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>1000000</code>，步进值统一为 <code>500 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>4</td>
@@ -13115,10 +13115,10 @@ MoveToXYColor Command 的参数结构体。
     </tr>
     <tr>
       <td>2</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>1000000</code>，步进值统一为 <code>500 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>3</td>
@@ -13161,10 +13161,10 @@ MoveToHueAndSaturation Command 的参数结构体。
     </tr>
     <tr>
       <td>2</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>1000000</code>，步进值统一为 <code>500 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>3</td>
@@ -13200,10 +13200,10 @@ MoveToColorTemperature Command 的参数结构体。
     </tr>
     <tr>
       <td>1</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>1000000</code>，步进值统一为 <code>500 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>2</td>
@@ -13239,10 +13239,10 @@ StepColorTemperature Command 的参数结构体。
     </tr>
     <tr>
       <td>1</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>1000000</code>，步进值统一为 <code>500 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>2</td>
@@ -13285,10 +13285,10 @@ MoveToHue Command 的参数结构体。
     </tr>
     <tr>
       <td>2</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>uint16</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>1000000</code>，步进值统一为 <code>500 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>3</td>
@@ -13324,10 +13324,10 @@ MoveToSaturation Command 的参数结构体。
     </tr>
     <tr>
       <td>1</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>uint16</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>1000000</code>，步进值统一为 <code>500 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>2</td>
@@ -15582,7 +15582,7 @@ ColorRGB表示RGB颜色空间中的24位颜色值，按 `0xRRGGBB` 打包，不�
 
 设备接收该命令后，应将 ColorMode（若实现）设置为 XY 模式，并从当前颜色连续过渡到 `ColorX/ColorY` 指定的目标颜色。
 
-过渡时长应与 `Time` 字段一致。颜色空间过渡路径未强制规定，建议采用 CIE xyY 空间中的最短路径（可视为"直线"路径）。
+过渡时长应与 `TransitionTime` 字段一致。颜色空间过渡路径未强制规定，建议采用 CIE xyY 空间中的最短路径（可视为"直线"路径）。
 
 ##### 参数
 
@@ -15598,7 +15598,7 @@ ColorRGB表示RGB颜色空间中的24位颜色值，按 `0xRRGGBB` 打包，不�
 
 设备接收该命令后，应将 ColorMode 切换为 HSV 模式，并从当前 Hue/Saturation 连续过渡到目标 Hue/Saturation。
 
-过渡时长应与 `Time` 字段一致。过渡路径未强制规定，建议采用颜色空间中的最短路径。
+过渡时长应与 `TransitionTime` 字段一致。过渡路径未强制规定，建议采用颜色空间中的最短路径。
 
 ##### 参数
 
@@ -15614,7 +15614,7 @@ ColorRGB表示RGB颜色空间中的24位颜色值，按 `0xRRGGBB` 打包，不�
 
 设备接收该命令后，应将 ColorMode（若实现）设置为 ColorTemperature 模式，并从当前色温连续过渡到目标色温。
 
-过渡时长应与 `Time` 字段一致。按该模式定义，色温过渡路径沿黑体轨迹（Black Body Line）变化。
+过渡时长应与 `TransitionTime` 字段一致。按该模式定义，色温过渡路径沿黑体轨迹（Black Body Line）变化。
 
 若目标值小于设备物理最小色温（Mired）或大于设备物理最大色温（Mired），应分别截断到物理最小/最大值作为最终目标。
 
@@ -15649,7 +15649,7 @@ ColorRGB表示RGB颜色空间中的24位颜色值，按 `0xRRGGBB` 打包，不�
 
 设备接收该命令后，应将 ColorMode 切换为 HSV 模式，并从当前 Hue 连续过渡到目标 Hue。
 
-过渡时长应与 `Time` 字段一致；方向由 `Direction` 字段决定：
+过渡时长应与 `TransitionTime` 字段一致；方向由 `Direction` 字段决定：
 
 * 最短路径：沿色相环最短方向移动。
 * 最长路径：沿色相环最长方向移动（常用于彩虹效果）。
@@ -15667,7 +15667,7 @@ ColorRGB表示RGB颜色空间中的24位颜色值，按 `0xRRGGBB` 打包，不�
 
 设备接收该命令后，应将 ColorMode 切换为 HSV 模式，并从当前 Saturation 连续过渡到目标 Saturation。
 
-过渡时长应与 `Time` 字段一致。
+过渡时长应与 `TransitionTime` 字段一致。
 
 ##### 参数
 
