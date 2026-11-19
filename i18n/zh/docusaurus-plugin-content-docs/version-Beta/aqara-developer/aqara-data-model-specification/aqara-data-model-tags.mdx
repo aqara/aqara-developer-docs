@@ -828,7 +828,7 @@ Present Value 不设默认读写权限，按具体 Trait 参数表的 `Access` �
     <tr>
       <td><a href="#ref_Aqara_Spec_ScreenDisplay">0x00BB</a></td>
       <td>ScreenDisplay</td>
-      <td>管理屏幕显示相关硬件属性，如分辨率、亮度、背光及显示状态。</td>
+      <td>管理屏幕开关、显示、待机、屏保及暗屏配置。</td>
     </tr>
     <tr>
       <td><a href="#ref_Aqara_Spec_ValveControl">0x00BC</a></td>
@@ -908,7 +908,7 @@ Present Value 不设默认读写权限，按具体 Trait 参数表的 `Access` �
     <tr>
       <td><a href="#ref_Aqara_Spec_ThemePack">0x00CB</a></td>
       <td>ThemePack</td>
-      <td>管理设备主题包资源，包括主题下载、切换及版本信息。</td>
+      <td>管理设备主题包资源，包括主题切换、版本信息及已安装主题列表。</td>
     </tr>
     <tr>
       <td><a href="#ref_Aqara_Spec_WiFiNetworkDiagnostics">0x00CC</a></td>
@@ -1173,7 +1173,7 @@ Present Value 不设默认读写权限，按具体 Trait 参数表的 `Access` �
     <tr>
       <td><a href="#ref_Aqara_Spec_ScreenUIConfig">0x00FF</a></td>
       <td>ScreenUIConfig</td>
-      <td>提供屏端统一 UI 配置，包括页面布局、主题、卡片数量及多页面信息管理。</td>
+      <td>提供屏端 UI 配置，包括标签显示、页面展示与轮播、等级图标及多页面信息管理。</td>
     </tr>
     <tr>
       <td><a href="#ref_Aqara_Spec_Ringtone">0x0100</a></td>
@@ -2417,6 +2417,20 @@ AirConditioner 与 SingleSetpointAC 都实现 `Output` 和 `HeaterCooler`，区�
       <td>0x0039</td>
       <td>Panel（面板）</td>
       <td>ScreenDisplay</td>
+      <td>O</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>0x0039</td>
+      <td>Panel（面板）</td>
+      <td>ScreenUIConfig</td>
+      <td>O</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>0x0039</td>
+      <td>Panel（面板）</td>
+      <td>ThemePack</td>
       <td>O</td>
       <td></td>
     </tr>
@@ -4813,8 +4827,19 @@ AirConditioner 与 SingleSetpointAC 都实现 `Output` 和 `HeaterCooler`，区�
       <td>AirConditioner</td>
       <td>0x000D</td>
     </tr>
+    <tr>
+      <td>18</td>
+      <td>In-Home Display</td>
+      <td>0x0502</td>
+      <td>Panel</td>
+      <td>0x0039</td>
+    </tr>
   </tbody>
 </table>
+
+:::note
+Zigbee In-Home Display 的 Aqara Keypad Screen Configuration Cluster 映射到 ScreenUIConfig、ScreenDisplay 和 ThemePack；该 Zigbee Device Type 要求实现 ScreenUIConfig。通用 Panel 仍可按自身能力选择是否实现 ScreenUIConfig。
+:::
 
 ## Binding（绑定） {#ref_Aqara_Spec_Binding}
 
@@ -11652,7 +11677,7 @@ StepBrightness Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
-      <td>0x524E</td>
+      <td>0x5254</td>
       <td><a href="#ref_XYToRGBMatrix">XYToRGBMatrix</a></td>
       <td>XY转RGB矩阵系数</td>
       <td>O</td>
@@ -12179,6 +12204,11 @@ StepBrightness Command 的参数结构体。
       <td>0x00</td>
       <td>RGBW</td>
       <td>RGBW淡彩灯珠</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>RGBWFullColor</td>
+      <td>RGBW全彩灯珠</td>
     </tr>
   </tbody>
 </table>
@@ -13366,7 +13396,7 @@ MoveToSaturation Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
-      <td>0x524E</td>
+      <td>0x5254</td>
       <td><a href="#ref_XYToRGBMatrix">XYToRGBMatrix</a></td>
       <td>O</td>
     </tr>
@@ -13664,7 +13694,7 @@ RS-485 灯膜下发 ColorXY 时出现偏色，已用标定算法修正。Studio 
   </thead>
   <tbody>
     <tr>
-      <td>0x524E</td>
+      <td>0x5254</td>
       <td>XYToRGBMatrix</td>
     </tr>
   </tbody>
@@ -19661,7 +19691,7 @@ ThirdPartySnapshotTrigger Command 的参数结构体。该 Command 由第三方�
 
 #### CloudRecordingEnable Trait（录制云端视频总使能） {#ref_CloudRecordingEnable}
 
-启用或禁用事件云端录像的总开关。
+用户可设置的云端视频上传总开关。关闭时，所有录像均不上传至云端，包括事件录像和本地延时摄影视频。
 
 <table>
   <thead>
@@ -36730,12 +36760,6 @@ WindSetting 定义了风的类型.
       <td>收藏播放列表</td>
       <td>O</td>
     </tr>
-    <tr>
-      <td>0x5277</td>
-      <td><a href="#ref_CurrentPlaylist">CurrentPlaylist</a></td>
-      <td>当前播放列表</td>
-      <td>O</td>
-    </tr>
   </tbody>
 </table>
 
@@ -36815,36 +36839,6 @@ WindSetting 定义了风的类型.
       <td>0x9DB6</td>
       <td><a href="#ref_PlayMediaURL">PlayMediaURL</a></td>
       <td>按链接播放媒体</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC1</td>
-      <td><a href="#ref_PlayLocalSong">PlayLocalSong</a></td>
-      <td>播放本地歌曲</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC2</td>
-      <td><a href="#ref_PlaySelectedPlaylist">PlaySelectedPlaylist</a></td>
-      <td>播放选定歌单</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC3</td>
-      <td><a href="#ref_PlayTextToSpeech">PlayTextToSpeech</a></td>
-      <td>播放指定文字</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC4</td>
-      <td><a href="#ref_PlaySemanticPlaylist">PlaySemanticPlaylist</a></td>
-      <td>播放语义歌单</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC5</td>
-      <td><a href="#ref_Search">Search</a></td>
-      <td>搜索</td>
       <td>O</td>
     </tr>
     <tr>
@@ -37256,91 +37250,6 @@ SearchAndPlay Command 的参数结构体。
   </tbody>
 </table>
 
-##### Search Command Structure Type {#ref_SearchCommandStructure}
-
-Search Command 的参数结构体。
-
-<table>
-  <thead>
-    <tr>
-      <th>结构体成员序号</th>
-      <th>字段名</th>
-      <th>类型</th>
-      <th>必须</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Keyword</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>搜索关键词，支持模糊搜索。</td>
-    </tr>
-  </tbody>
-</table>
-
-##### SearchResultStruct Type {#ref_SearchResultStruct}
-
-Search Command 返回的单条歌曲搜索结果。
-
-<table>
-  <thead>
-    <tr>
-      <th>结构体成员序号</th>
-      <th>字段名</th>
-      <th>类型</th>
-      <th>必须</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Album</td>
-      <td>characterString</td>
-      <td>O</td>
-      <td>专辑名称。</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>Artist</td>
-      <td>characterString</td>
-      <td>O</td>
-      <td>歌手名称。</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>Title</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>歌曲名称。</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>Duration</td>
-      <td>uint32</td>
-      <td>O</td>
-      <td>歌曲时长，单位为秒。</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>Favorite</td>
-      <td>bool</td>
-      <td>O</td>
-      <td>歌曲是否已收藏。</td>
-    </tr>
-    <tr>
-      <td>5</td>
-      <td>ImageURL</td>
-      <td>characterString</td>
-      <td>O</td>
-      <td>歌曲封面图片链接。</td>
-    </tr>
-  </tbody>
-</table>
-
 ##### PlayMediaURL Command Structure Type {#ref_PlayMediaURLCommandStructure}
 
 PlayMediaURL Command 的参数结构体。
@@ -37431,61 +37340,6 @@ Playlists Trait 单个播放列表结构体。
       <td></td>
       <td></td>
       <td>RV</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-##### CurrentPlaylistTraitPresentValueStructure Type {#ref_CurrentPlaylistTraitPresentValueStructure}
-
-CurrentPlaylist Trait 的当前播放列表结构体。
-
-<table>
-  <thead>
-    <tr>
-      <th>结构体成员序号</th>
-      <th>字段名</th>
-      <th>类型</th>
-      <th>必须</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Id</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>当前播放列表 ID。</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>Name</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>当前播放列表名称。</td>
-    </tr>
-  </tbody>
-</table>
-
-#### CurrentPlaylist Trait {#ref_CurrentPlaylist}
-
-表示当前正在播放的播放列表，数据类型为 [CurrentPlaylistTraitPresentValueStructure](#ref_CurrentPlaylistTraitPresentValueStructure)。本 Trait 不定义 Parameter。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-      <th>名称</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5277</td>
-      <td><a href="#ref_CurrentPlaylist">CurrentPlaylist</a></td>
-      <td>当前播放列表</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -37623,106 +37477,6 @@ PlayFavorite Command 的参数结构体。
   </tbody>
 </table>
 
-##### PlayLocalSong Command Structure Type {#ref_PlayLocalSongCommandStructure}
-
-PlayLocalSong Command 的参数结构体。
-
-<table>
-  <thead>
-    <tr>
-      <th>结构体成员序号</th>
-      <th>字段名</th>
-      <th>类型</th>
-      <th>必须</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>SongId</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>从设备本地歌曲列表中选定的歌曲 ID。</td>
-    </tr>
-  </tbody>
-</table>
-
-##### PlaySelectedPlaylist Command Structure Type {#ref_PlaySelectedPlaylistCommandStructure}
-
-PlaySelectedPlaylist Command 的参数结构体。
-
-<table>
-  <thead>
-    <tr>
-      <th>结构体成员序号</th>
-      <th>字段名</th>
-      <th>类型</th>
-      <th>必须</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>PlaylistId</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>从本地或在线歌单列表中选定的歌单 ID。</td>
-    </tr>
-  </tbody>
-</table>
-
-##### PlayTextToSpeech Command Structure Type {#ref_PlayTextToSpeechCommandStructure}
-
-PlayTextToSpeech Command 的参数结构体。
-
-<table>
-  <thead>
-    <tr>
-      <th>结构体成员序号</th>
-      <th>字段名</th>
-      <th>类型</th>
-      <th>必须</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Text</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>待转换为语音并播放的中文文本。</td>
-    </tr>
-  </tbody>
-</table>
-
-##### PlaySemanticPlaylist Command Structure Type {#ref_PlaySemanticPlaylistCommandStructure}
-
-PlaySemanticPlaylist Command 的参数结构体。
-
-<table>
-  <thead>
-    <tr>
-      <th>结构体成员序号</th>
-      <th>字段名</th>
-      <th>类型</th>
-      <th>必须</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Query</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>用于从云端曲库匹配歌单的中文语义描述。</td>
-    </tr>
-  </tbody>
-</table>
-
 ### Trait 定义
 
 <table>
@@ -37782,11 +37536,6 @@ PlaySemanticPlaylist Command 的参数结构体。
     <tr>
       <td>0x80BB</td>
       <td><a href="#ref_PlaybackDuration">PlaybackDuration</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5277</td>
-      <td><a href="#ref_CurrentPlaylist">CurrentPlaylist</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -38490,31 +38239,6 @@ PlaySemanticPlaylist Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
-      <td>0x9DC1</td>
-      <td><a href="#ref_PlayLocalSong">PlayLocalSong</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC2</td>
-      <td><a href="#ref_PlaySelectedPlaylist">PlaySelectedPlaylist</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC3</td>
-      <td><a href="#ref_PlayTextToSpeech">PlayTextToSpeech</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC4</td>
-      <td><a href="#ref_PlaySemanticPlaylist">PlaySemanticPlaylist</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC5</td>
-      <td><a href="#ref_Search">Search</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x811A</td>
       <td><a href="#ref_Off">Off</a></td>
       <td>O</td>
@@ -38594,14 +38318,6 @@ MediaPlaybackCommand表示媒体播放命令，适用于多种类型的媒体（
 
 [SearchAndPlay Command Structure](#ref_SearchAndPlayCommandStructure)
 
-#### Search Command {#ref_Search}
-
-根据关键词执行模糊搜索并返回歌曲列表，不自动开始播放。每条搜索结果使用 [SearchResultStruct](#ref_SearchResultStruct) 描述，包含专辑、歌手、歌曲名称、时长、收藏状态及封面图片链接；用户可从结果中选择歌曲，再通过播放命令播放。
-
-##### 参数
-
-[Search Command Structure](#ref_SearchCommandStructure)
-
 #### PlayMediaURL Command {#ref_PlayMediaURL}
 
 直接播放 `MediaURL` 指定的音频资源。该命令用于播放客户端已知的直链，不执行歌曲搜索；需要按歌曲名、歌手或关键词查找内容时，应使用 `SearchAndPlay`。命令执行后，设备应以该 URL 作为当前播放项并开始加载、播放；URL 所指资源不可访问、格式或协议不受设备支持时，设备不得将其报告为正在播放，并应按命令执行机制报告失败。支持的 URL 协议、音频格式及访问条件由设备能力决定，设备实现应明确其支持范围。需要鉴权的资源仅在设备具备相应访问凭据或授权机制时可播放。
@@ -38611,38 +38327,6 @@ MediaPlaybackCommand表示媒体播放命令，适用于多种类型的媒体（
 ##### 参数
 
 [PlayMediaURL Command Structure](#ref_PlayMediaURLCommandStructure)
-
-#### PlayLocalSong Command {#ref_PlayLocalSong}
-
-查询设备本地歌曲列表后，根据选定的歌曲 ID 播放对应本地歌曲。
-
-##### 参数
-
-[PlayLocalSong Command Structure](#ref_PlayLocalSongCommandStructure)
-
-#### PlaySelectedPlaylist Command {#ref_PlaySelectedPlaylist}
-
-查询本地及在线歌单列表后，根据选定的歌单 ID 播放对应歌单。
-
-##### 参数
-
-[PlaySelectedPlaylist Command Structure](#ref_PlaySelectedPlaylistCommandStructure)
-
-#### PlayTextToSpeech Command {#ref_PlayTextToSpeech}
-
-将输入的中文文本转换为语音并播放。
-
-##### 参数
-
-[PlayTextToSpeech Command Structure](#ref_PlayTextToSpeechCommandStructure)
-
-#### PlaySemanticPlaylist Command {#ref_PlaySemanticPlaylist}
-
-根据输入的中文语义描述，从云端曲库匹配对应歌单并播放。
-
-##### 参数
-
-[PlaySemanticPlaylist Command Structure](#ref_PlaySemanticPlaylistCommandStructure)
 
 #### PlayPlaylist Command {#ref_PlayPlaylist}
 
@@ -54800,6 +54484,12 @@ AirQuality表示空气质量等级.
       <td>M</td>
     </tr>
     <tr>
+      <td>0x51DF</td>
+      <td><a href="#ref_SmokeHardwareFault">SmokeHardwareFault</a></td>
+      <td>烟雾传感器异常</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4F86</td>
       <td><a href="#ref_SmokeChamberContamination">SmokeChamberContamination</a></td>
       <td>烟室污染状态</td>
@@ -55157,6 +54847,11 @@ TriggerWarning Command 的参数结构体。
       <td>M</td>
     </tr>
     <tr>
+      <td>0x51DF</td>
+      <td><a href="#ref_SmokeHardwareFault">SmokeHardwareFault</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4F86</td>
       <td><a href="#ref_SmokeChamberContamination">SmokeChamberContamination</a></td>
       <td>O</td>
@@ -55266,6 +54961,52 @@ TriggerWarning Command 的参数结构体。
       <td>0</td>
       <td>RV</td>
       <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### SmokeHardwareFault Trait（烟雾传感器异常） {#ref_SmokeHardwareFault}
+
+指示烟雾传感器是否存在异常。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x51DF</td>
+      <td>SmokeHardwareFault</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
     </tr>
   </tbody>
 </table>
@@ -69302,6 +69043,12 @@ OpenMatterCommissioningWindow Command 的参数结构体。
   </thead>
   <tbody>
     <tr>
+      <td>0x524E</td>
+      <td><a href="#ref_ACMateWorkMode">ACMateWorkMode</a></td>
+      <td>空调伴侣工作模式</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5250</td>
       <td><a href="#ref_SpecialHandlingPoints">SpecialHandlingPoints</a></td>
       <td>特殊处理数据点列表</td>
@@ -69554,6 +69301,47 @@ OpenMatterCommissioningWindow Command 的参数结构体。
 </table>
 
 ### 数据类型
+
+#### ACMateWorkModeEnum8 Type {#ref_ACMateWorkModeEnum8}
+
+该枚举定义 ACMateWorkMode Trait 的 Present Value 有效取值，底层数据类型为 uint8。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Unconfigured</td>
+      <td>未配置模式</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>ACPluggedIn</td>
+      <td>空调插插座模式</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>ACNotPluggedIn</td>
+      <td>空调不插插座模式</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>IRWaterHeater</td>
+      <td>红外热水器模式</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>Socket16A</td>
+      <td>16A插座模式</td>
+    </tr>
+  </tbody>
+</table>
 
 #### SpecialHandlingTypeEnum8 Type {#ref_SpecialHandlingTypeEnum8}
 
@@ -70795,6 +70583,11 @@ WakeupDevice Command 的参数结构体。Server 下发该 Command，用于将�
   </thead>
   <tbody>
     <tr>
+      <td>0x524E</td>
+      <td><a href="#ref_ACMateWorkMode">ACMateWorkMode</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5250</td>
       <td><a href="#ref_SpecialHandlingPoints">SpecialHandlingPoints</a></td>
       <td>O</td>
@@ -70982,6 +70775,61 @@ WakeupDevice Command 的参数结构体。Server 下发该 Command，用于将�
     <tr>
       <td>0x51ED</td>
       <td><a href="#ref_VibrationIntensity">VibrationIntensity</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ACMateWorkMode Trait（空调伴侣工作模式） {#ref_ACMateWorkMode}
+
+表示空调伴侣当前的工作模式，用于区分设备所接入或模拟的设备类型及安装方式。取值为 0 表示未配置模式，1 表示空调插插座模式，2 表示空调不插插座模式，3 表示红外热水器模式，4 表示 16A 插座模式。该 Trait 可读、可写、可上报，默认值为 0（未配置模式）。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x524E</td>
+      <td>ACMateWorkMode</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_ACMateWorkModeEnum8">ACMateWorkModeEnum8</a></td>
+      <td>0..4</td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_ACMateWorkModeEnum8">ACMateWorkModeEnum8</a></td>
+      <td>0..4</td>
+      <td>0</td>
+      <td>RW</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -82023,7 +81871,9 @@ Zoom：目标光学变焦倍率。1.0 为最宽视野。
 
 ### 简介
 
-管理屏幕显示相关硬件属性，如分辨率、亮度、背光及显示状态。
+管理屏幕显示相关硬件属性，如分辨率、亮度、背光、待机、屏保及显示状态。
+
+本 Function 还承载 Aqara Keypad Screen Configuration Cluster 的待机、屏保和暗屏配置。Function 中的 `O` 表示该能力可选；当 Zigbee 集群支持对应的 `STBY`、`SCRN` 或 `DARK` Feature 时，集群属性仍须满足设备端规范中的强制要求。集群 `StandbyTime` 属性复用 `StandbyTimeout` Trait，`0xFFFFFFFF` 映射为该 Trait 的 `0`（永不自动待机）；`DarkScreenOff` 属性复用 `DarkScreenOffEnable` Trait。键盘屏保样式复用 `ScreensaverStyle` Trait，枚举映射为 `General`、`Clock`、`Weather` 和 `Environment`，其中 `General` 和 `Clock` 为该 Trait 增补的枚举值。
 
 ### Function 标识
 
@@ -82164,6 +82014,30 @@ Zoom：目标光学变焦倍率。1.0 为最宽视野。
       <td>屏保样式</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x525B</td>
+      <td><a href="#ref_KeypadStandbyMode">KeypadStandbyMode</a></td>
+      <td>键盘屏幕待机模式</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x4EE3</td>
+      <td><a href="#ref_StandbyBrightness">StandbyBrightness</a></td>
+      <td>屏待机亮度</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x525E</td>
+      <td><a href="#ref_IndoorEnvironmentTarget">IndoorEnvironmentTarget</a></td>
+      <td>室内环境屏保关联设备</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526C</td>
+      <td><a href="#ref_DarkScreenOffLuxThreshold">DarkScreenOffLuxThreshold</a></td>
+      <td>暗屏照度阈值</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -82289,8 +82163,20 @@ Zoom：目标光学变焦倍率。1.0 为最宽视野。
       <td>ColorNumbers</td>
       <td>彩色数字</td>
     </tr>
+    <tr>
+      <td>0x0A</td>
+      <td>General</td>
+      <td>通用待机样式</td>
+    </tr>
+    <tr>
+      <td>0x0B</td>
+      <td>Clock</td>
+      <td>时钟</td>
+    </tr>
   </tbody>
 </table>
+
+键盘屏保枚举映射为：`General` -> `General`（0x0A）、`Clock` -> `Clock`（0x0B）、`Weather` -> `Weather`（0x04）、`IndoorEnvironment` -> `Environment`（0x06）。
 
 ##### WakeDistanceSettingEnum32 Type {#ref_WakeDistanceSettingEnum32}
 
@@ -82726,6 +82612,69 @@ TriggerWeatherUpdate Command 的参数结构体。
   </tbody>
 </table>
 
+#### Keypad Screen Display Data Types {#ref_KeypadScreenDisplayDataTypes}
+
+##### KeypadStandbyModeEnum8 Type {#ref_KeypadStandbyModeEnum8}
+
+定义待机时间到期后的屏幕行为。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>ScreenOff</td>
+      <td>Turn the screen off</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Screensaver</td>
+      <td>Enter the screensaver</td>
+    </tr>
+  </tbody>
+</table>
+
+##### KeypadAssociatedTargetDeviceStruct Type {#ref_KeypadAssociatedTargetDeviceStruct}
+
+该 Zigbee 结构用于标识室内环境屏保关联的目标设备。
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>DeviceDid</td>
+      <td>string</td>
+      <td>目标设备标识符</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>ResourceID</td>
+      <td>string</td>
+      <td>BACnet 格式的目标资源标识符</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>SubscribeRecordId</td>
+      <td>uint32</td>
+      <td>订阅记录标识符</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait 定义
 
 <table>
@@ -82825,6 +82774,26 @@ TriggerWeatherUpdate Command 的参数结构体。
     <tr>
       <td>0x4EE2</td>
       <td><a href="#ref_ScreensaverStyle">ScreensaverStyle</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x525B</td>
+      <td><a href="#ref_KeypadStandbyMode">KeypadStandbyMode</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x4EE3</td>
+      <td><a href="#ref_StandbyBrightness">StandbyBrightness</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x525E</td>
+      <td><a href="#ref_IndoorEnvironmentTarget">IndoorEnvironmentTarget</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526C</td>
+      <td><a href="#ref_DarkScreenOffLuxThreshold">DarkScreenOffLuxThreshold</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -84858,6 +84827,158 @@ TriggerWeatherUpdate Command 的参数结构体。
       <td>uint32</td>
       <td></td>
       <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### KeypadStandbyMode Trait (0x525B)（键盘屏幕待机模式） {#ref_KeypadStandbyMode}
+
+设置待机时间到期后的行为：熄灭屏幕或进入屏保。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_KeypadStandbyModeEnum8">KeypadStandbyModeEnum8</a></td>
+      <td></td>
+      <td>ScreenOff</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_KeypadStandbyModeEnum8">KeypadStandbyModeEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_KeypadStandbyModeEnum8">KeypadStandbyModeEnum8</a></td>
+      <td></td>
+      <td>ScreenOff</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### StandbyBrightness Trait (0x4EE3)（屏待机亮度） {#ref_StandbyBrightness}
+
+设置屏待机亮度。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td>0-100 (%)</td>
+      <td>10</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint8</td>
+      <td>0-100 (%)</td>
+      <td>10</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### IndoorEnvironmentTarget Trait (0x525E)（室内环境屏保关联设备） {#ref_IndoorEnvironmentTarget}
+
+列出室内环境屏保关联的目标设备。空值表示尚未配置关联。该 Zigbee 专用结构通过完整列表写入。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_KeypadAssociatedTargetDeviceStruct">KeypadAssociatedTargetDeviceStruct</a>]</td>
+      <td></td>
+      <td>null</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DarkScreenOffLuxThreshold Trait (0x526C)（暗屏照度阈值） {#ref_DarkScreenOffLuxThreshold}
+
+设置暗屏关闭阈值，单位为 lux。启用暗屏关闭后，当测得的照度低于该值时，设备关闭屏幕。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td>lux</td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint16</td>
+      <td>lux</td>
+      <td></td>
       <td>RW</td>
       <td>O</td>
     </tr>
@@ -93014,7 +93135,9 @@ Thread 接口是否启用。
 
 ### 简介
 
-管理设备主题包资源，包括主题下载、切换及版本信息。
+管理设备主题包资源，包括主题下载、切换、版本信息及已安装主题列表。
+
+本 Function 还承载 Aqara Keypad Screen Configuration Cluster 的主题选择和已安装主题目录；相关属性适用于集群的 `THEME` Feature。设备端 `ActiveThemeID` 复用本 Function 已有的 `ThemeID` Trait，其 Present Value 扩展为 uint32；`NumberOfThemes` 和 `Themes` 分别映射到 `NumberOfThemes` 和 `InstalledThemes`。Function 中的 `O` 表示该能力可选，Feature 启用后的集群属性要求以设备端规范为准。
 
 ### Function 标识
 
@@ -93059,6 +93182,18 @@ Thread 接口是否启用。
       <td>主题版本</td>
       <td>M</td>
     </tr>
+    <tr>
+      <td>0x5260</td>
+      <td><a href="#ref_NumberOfThemes">NumberOfThemes</a></td>
+      <td>支持的主题槽位数</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5261</td>
+      <td><a href="#ref_InstalledThemes">InstalledThemes</a></td>
+      <td>已安装主题列表</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -93068,7 +93203,36 @@ Thread 接口是否启用。
 
 ### 数据类型
 
-本 Function 无自定义数据类型。
+##### InstalledThemeInfoStruct Type {#ref_InstalledThemeInfoStruct}
+
+描述设备上已安装的一个主题。
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Name</th>
+      <th>Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Slot</td>
+      <td>uint8</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>ThemeID</td>
+      <td>uint32</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Version</td>
+      <td>uint32</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Trait 定义
 
@@ -93091,12 +93255,22 @@ Thread 接口是否启用。
       <td><a href="#ref_ThemeVersion">ThemeVersion</a></td>
       <td>M</td>
     </tr>
+    <tr>
+      <td>0x5260</td>
+      <td><a href="#ref_NumberOfThemes">NumberOfThemes</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5261</td>
+      <td><a href="#ref_InstalledThemes">InstalledThemes</a></td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
 #### ThemeID Trait（主题ID） {#ref_ThemeID}
 
-该 Trait 用于「主题ID」相关数据的访问与上报。
+该 Trait 用于主题 ID 的读取、设置和上报；Present Value 使用 uint32 以支持设备端主题目录中的完整标识范围。
 
 <table>
   <thead>
@@ -93131,25 +93305,25 @@ Thread 接口是否启用。
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
       <td>1</td>
-      <td>RV</td>
+      <td>RVW</td>
       <td>M</td>
     </tr>
     <tr>
       <td>0x0002</td>
       <td>Maximum Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
-      <td>65535</td>
+      <td>4294967295</td>
       <td>R</td>
       <td>O</td>
     </tr>
     <tr>
       <td>0x0003</td>
       <td>Minimum Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
       <td>1</td>
       <td>R</td>
@@ -93158,7 +93332,7 @@ Thread 接口是否启用。
     <tr>
       <td>0x0007</td>
       <td>Default Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
       <td>1</td>
       <td>RW</td>
@@ -93244,6 +93418,64 @@ Thread 接口是否启用。
       <td></td>
       <td>1</td>
       <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfThemes Trait (0x5260)（支持的主题槽位数） {#ref_NumberOfThemes}
+
+表示设备支持的最大主题槽位数。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### InstalledThemes Trait (0x5261)（已安装主题列表） {#ref_InstalledThemes}
+
+列出设备上已安装的主题。列表条目数不得超过 `NumberOfThemes`。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_InstalledThemeInfoStruct">InstalledThemeInfoStruct</a>]</td>
+      <td>Maximum length is NumberOfThemes</td>
+      <td></td>
+      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -100181,7 +100413,7 @@ RemovePage Command 的参数结构体。
 
 #### ThemeID Trait（主题ID） {#ref_ThemeID}
 
-该 Trait 用于「主题ID」相关数据的访问与上报。
+该 Trait 用于主题 ID 的读取、设置和上报。Present Value 使用 uint32，以支持主题目录中的完整主题标识。
 
 <table>
   <thead>
@@ -100216,10 +100448,10 @@ RemovePage Command 的参数结构体。
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
       <td>1</td>
-      <td>RV</td>
+      <td>RVW</td>
       <td>M</td>
     </tr>
   </tbody>
@@ -111343,6 +111575,18 @@ ResetPresence 命令用于重置设备或空间的当前存在检测状态。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5187</td>
+      <td><a href="#ref_MinDetectionRange">MinDetectionRange</a></td>
+      <td>最小侦测范围</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5188</td>
+      <td><a href="#ref_MaxDetectionRange">MaxDetectionRange</a></td>
+      <td>最大侦测范围</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5189</td>
       <td><a href="#ref_DetectionRangeStep">DetectionRangeStep</a></td>
       <td>侦测范围步进</td>
@@ -112156,6 +112400,16 @@ SubscribeAutoEdgeRecognitionData Command 的参数结构体。
     <tr>
       <td>0x5117</td>
       <td><a href="#ref_DetectionRange">DetectionRange</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5187</td>
+      <td><a href="#ref_MinDetectionRange">MinDetectionRange</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5188</td>
+      <td><a href="#ref_MaxDetectionRange">MaxDetectionRange</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -114398,6 +114652,134 @@ image::../images/aqara_Ambient_configuration_cluster/detection_range_bitmask.svg
   </tbody>
 </table>
 
+#### MinDetectionRange Trait（最小侦测范围） {#ref_MinDetectionRange}
+
+该 Trait 指示设备支持的最小检测距离，单位为 cm，对应 Matter `MinDetectionRange` 属性。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5187</td>
+      <td>MinDetectionRange</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>600</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### MaxDetectionRange Trait（最大侦测范围） {#ref_MaxDetectionRange}
+
+该 Trait 指示设备支持的最大检测距离，单位为 cm，对应 Matter `MaxDetectionRange` 属性。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5188</td>
+      <td>MaxDetectionRange</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>600</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>600</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
 #### DetectionRangeStep Trait（侦测范围步进） {#ref_DetectionRangeStep}
 
 该 Trait 指示每个检测范围单元的步长，单位为 cm，对应 Matter `DetectionRangeStep` 属性。客户端应结合 `MinDetectionRange` 和 `MaxDetectionRange`，使用该值确定 `DetectionRange` bitmask 的预期字节长度以及每个 bit 所表示的距离。
@@ -114646,8 +115028,8 @@ image::../images/aqara_Ambient_configuration_cluster/detection_range_bitmask.svg
       <td>0x0002</td>
       <td>Maximum Value</td>
       <td>uint16</td>
-      <td>由 Matter MaxDetectionRange 属性提供，单位为 cm</td>
       <td></td>
+      <td>65535</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -114655,8 +115037,8 @@ image::../images/aqara_Ambient_configuration_cluster/detection_range_bitmask.svg
       <td>0x0003</td>
       <td>Minimum Value</td>
       <td>uint16</td>
-      <td>由 Matter MinDetectionRange 属性提供，单位为 cm</td>
       <td></td>
+      <td>0</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -131026,7 +131408,9 @@ Total:   23 bytes
 
 ### 简介
 
-提供屏端统一 UI 配置，包括页面布局、主题、卡片数量及多页面信息管理。
+提供屏端统一 UI 配置，包括页面布局、标签展示、页面轮播、等级图标及多页面信息管理。
+
+本 Function 还承载 Aqara Keypad Screen Configuration Cluster 的标签、页面展示和等级图标配置。对应集群 Feature 分别为 `LABEL`、`PRES` 和 `LVIC`；Function 中的 `O` 表示能力可选，Feature 启用后的属性要求以设备端集群规范为准。集群存在时，`KeypadEndpointList` 为强制属性。`HomePageIndex`、`MaxPageNum` 和 `ThemeID` 复用已有 Trait；设备端 `NumberOfPages` 映射到 `MaxPageNum`，其 uint8 值无损扩展为 uint16；`ActiveThemeID` 映射到 `ThemeID`。设备端 `LABEL` Feature 使用布尔型 `ElderMode` 控制长者模式，不再使用字体大小枚举。
 
 ### Function 标识
 
@@ -131155,6 +131539,96 @@ Total:   23 bytes
       <td>所有页面信息</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x525A</td>
+      <td><a href="#ref_KeypadEndpointList">KeypadEndpointList</a></td>
+      <td>屏幕集群代表的端点列表</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526D</td>
+      <td><a href="#ref_HideBackground">HideBackground</a></td>
+      <td>隐藏主题背景</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5256</td>
+      <td><a href="#ref_ElderMode">ElderMode</a></td>
+      <td>长者模式</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5257</td>
+      <td><a href="#ref_KeypadDisplayStyle">KeypadDisplayStyle</a></td>
+      <td>标签显示样式</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5258</td>
+      <td><a href="#ref_KeypadLabelAlignment">KeypadLabelAlignment</a></td>
+      <td>标签对齐方式</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5259</td>
+      <td><a href="#ref_KeypadLabelContentColors">KeypadLabelContentColors</a></td>
+      <td>标签文字颜色</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5262</td>
+      <td><a href="#ref_KeypadPresentationMode">KeypadPresentationMode</a></td>
+      <td>页面展示模式</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5264</td>
+      <td><a href="#ref_KeypadHomePageReturnTime">KeypadHomePageReturnTime</a></td>
+      <td>返回首页等待时间</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5265</td>
+      <td><a href="#ref_KeypadCarouselList">KeypadCarouselList</a></td>
+      <td>轮播页面配置</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5266</td>
+      <td><a href="#ref_EnableSmartReminder">EnableSmartReminder</a></td>
+      <td>智能提醒使能</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5267</td>
+      <td><a href="#ref_NumberOfLevelIcons">NumberOfLevelIcons</a></td>
+      <td>支持的等级图标数量</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5268</td>
+      <td><a href="#ref_NumberOfLevels">NumberOfLevels</a></td>
+      <td>等级数量</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5269</td>
+      <td><a href="#ref_LevelIconReminders">LevelIconReminders</a></td>
+      <td>等级提醒展示配置</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526A</td>
+      <td><a href="#ref_LevelIconGradings">LevelIconGradings</a></td>
+      <td>等级图标分级阈值</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526B</td>
+      <td><a href="#ref_LevelIconPages">LevelIconPages</a></td>
+      <td>页面等级图标布局</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -131268,6 +131742,341 @@ SetOnePageInfo Command 的参数结构体。
   </tbody>
 </table>
 
+#### 键盘屏幕 UI 配置数据类型 {#ref_KeypadScreenUIConfigTypes}
+
+##### ScreenLabelDisplayModeEnum8 Type {#ref_ScreenLabelDisplayModeEnum8}
+
+定义屏幕标签显示方式。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>IconAndText</td>
+      <td>同时显示图标和文字</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>IconOnly</td>
+      <td>仅显示图标</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>TextOnly</td>
+      <td>仅显示文字</td>
+    </tr>
+  </tbody>
+</table>
+
+##### ScreenLabelAlignmentEnum8 Type {#ref_ScreenLabelAlignmentEnum8}
+
+定义屏幕标签对齐方式。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Center</td>
+      <td>居中对齐</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Left</td>
+      <td>左对齐</td>
+    </tr>
+  </tbody>
+</table>
+
+##### KeypadRgbColor Type {#ref_KeypadRgbColor}
+
+该类型由 uint32 派生，以 `0x00RRGGBB` 编码颜色。bit 31-24 为保留位且必须为零；bit 23-16、15-8 和 7-0 分别表示红、绿、蓝分量。
+
+<table>
+  <thead>
+    <tr>
+      <th>Bits</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>31-24</td>
+      <td>Reserved</td>
+      <td>保留，必须为零</td>
+    </tr>
+    <tr>
+      <td>23-16</td>
+      <td>Red</td>
+      <td>红色分量，0-255</td>
+    </tr>
+    <tr>
+      <td>15-8</td>
+      <td>Green</td>
+      <td>绿色分量，0-255</td>
+    </tr>
+    <tr>
+      <td>7-0</td>
+      <td>Blue</td>
+      <td>蓝色分量，0-255</td>
+    </tr>
+  </tbody>
+</table>
+
+##### KeypadPresentationModeEnum8 Type {#ref_KeypadPresentationModeEnum8}
+
+定义页面展示模式。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>HomePrimary</td>
+      <td>超时后返回首页</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Manual</td>
+      <td>通过按键切换已配置页面</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Carousel</td>
+      <td>按轮播计划切换页面</td>
+    </tr>
+  </tbody>
+</table>
+
+##### KeypadEnvLevelEnum8 Type {#ref_KeypadEnvLevelEnum8}
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>EnvLevelUnknown</td>
+      <td>等级未知</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>EnvLevelLow</td>
+      <td>低</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>EnvLevelMedium</td>
+      <td>中</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>EnvLevelHigh</td>
+      <td>高</td>
+    </tr>
+  </tbody>
+</table>
+
+##### KeypadValuePresentationEnum8 Type {#ref_KeypadValuePresentationEnum8}
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Steady</td>
+      <td>数值常亮</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Blink</td>
+      <td>数值闪烁</td>
+    </tr>
+  </tbody>
+</table>
+
+##### KeypadLevelIconPresentationEnum8 Type {#ref_KeypadLevelIconPresentationEnum8}
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Steady</td>
+      <td>图标常亮</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Blink</td>
+      <td>图标闪烁</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Hidden</td>
+      <td>隐藏图标</td>
+    </tr>
+  </tbody>
+</table>
+
+该结构体定义轮播列表中的页面及其展示时长。
+
+##### KeypadCarouselPageStruct Type {#ref_KeypadCarouselPageStruct}
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>PageIndex</td>
+      <td>uint8</td>
+      <td>0 to MaxPageNum - 1</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Duration</td>
+      <td>uint16</td>
+      <td>1 to 65535 seconds</td>
+    </tr>
+  </tbody>
+</table>
+
+该结构体定义环境等级对应的数值与图标展示方式。
+
+##### KeypadEnvLevelReminderStruct Type {#ref_KeypadEnvLevelReminderStruct}
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Level</td>
+      <td><a href="#ref_KeypadEnvLevelEnum8">KeypadEnvLevelEnum8</a></td>
+      <td>0x01 to NumberOfLevels</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>ValueMode</td>
+      <td><a href="#ref_KeypadValuePresentationEnum8">KeypadValuePresentationEnum8</a></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>IconMode</td>
+      <td><a href="#ref_KeypadLevelIconPresentationEnum8">KeypadLevelIconPresentationEnum8</a></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+该结构体定义等级图标的分级上限。
+
+##### KeypadLevelIconGradingStruct Type {#ref_KeypadLevelIconGradingStruct}
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>IconIndex</td>
+      <td>uint8</td>
+      <td>0 to NumberOfLevelIcons - 1</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>UpperBounds</td>
+      <td>list[int32]</td>
+      <td>NumberOfLevels - 1 strictly increasing boundaries</td>
+    </tr>
+  </tbody>
+</table>
+
+该结构体定义各页面的等级图标槽位布局。
+
+##### KeypadLevelIconPageStruct Type {#ref_KeypadLevelIconPageStruct}
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>PageIndex</td>
+      <td>uint8</td>
+      <td>0 to MaxPageNum - 1</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>SlotIcons</td>
+      <td>list[uint8]</td>
+      <td>Unique icon indexes in the page&#x27;s slot order</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait 定义
 
 <table>
@@ -131357,6 +132166,81 @@ SetOnePageInfo Command 的参数结构体。
     <tr>
       <td>0x4F8F</td>
       <td><a href="#ref_AllPagesInfo">AllPagesInfo</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x525A</td>
+      <td><a href="#ref_KeypadEndpointList">KeypadEndpointList</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526D</td>
+      <td><a href="#ref_HideBackground">HideBackground</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5256</td>
+      <td><a href="#ref_ElderMode">ElderMode</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5257</td>
+      <td><a href="#ref_KeypadDisplayStyle">KeypadDisplayStyle</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5258</td>
+      <td><a href="#ref_KeypadLabelAlignment">KeypadLabelAlignment</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5259</td>
+      <td><a href="#ref_KeypadLabelContentColors">KeypadLabelContentColors</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5262</td>
+      <td><a href="#ref_KeypadPresentationMode">KeypadPresentationMode</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5264</td>
+      <td><a href="#ref_KeypadHomePageReturnTime">KeypadHomePageReturnTime</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5265</td>
+      <td><a href="#ref_KeypadCarouselList">KeypadCarouselList</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5266</td>
+      <td><a href="#ref_EnableSmartReminder">EnableSmartReminder</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5267</td>
+      <td><a href="#ref_NumberOfLevelIcons">NumberOfLevelIcons</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5268</td>
+      <td><a href="#ref_NumberOfLevels">NumberOfLevels</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5269</td>
+      <td><a href="#ref_LevelIconReminders">LevelIconReminders</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526A</td>
+      <td><a href="#ref_LevelIconGradings">LevelIconGradings</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526B</td>
+      <td><a href="#ref_LevelIconPages">LevelIconPages</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -132038,6 +132922,531 @@ SetOnePageInfo Command 的参数结构体。
   </tbody>
 </table>
 
+#### KeypadEndpointList Trait (0x525A)（屏幕集群代表的端点列表） {#ref_KeypadEndpointList}
+
+Lists the endpoints represented by the keypad screen configuration instance. An empty list means the instance represents the entire node; a non-empty list includes the hosting endpoint and may include other represented endpoints.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[uint16]</td>
+      <td>Endpoint IDs</td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### HideBackground Trait (0x526D)（隐藏主题背景） {#ref_HideBackground}
+
+Controls whether the theme background is hidden.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>false</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>false</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ElderMode Trait (0x5256)（长者模式） {#ref_ElderMode}
+
+对应设备端 Aqara Keypad Screen Configuration Cluster 的 `ElderMode` 属性（Zigbee 属性 ID `0x0010`）。指示是否启用长者模式；启用后设备以更大的字号显示屏幕标签。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>false</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>false</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### KeypadDisplayStyle Trait (0x5257)（标签显示样式） {#ref_KeypadDisplayStyle}
+
+设置屏幕显示文字、图标或两者。当前值必须包含在支持值列表中。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_ScreenLabelDisplayModeEnum8">ScreenLabelDisplayModeEnum8</a></td>
+      <td></td>
+      <td>TextOnly</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_ScreenLabelDisplayModeEnum8">ScreenLabelDisplayModeEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_ScreenLabelDisplayModeEnum8">ScreenLabelDisplayModeEnum8</a></td>
+      <td></td>
+      <td>TextOnly</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### KeypadLabelAlignment Trait (0x5258)（标签对齐方式） {#ref_KeypadLabelAlignment}
+
+设置屏幕标签的水平对齐方式。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_ScreenLabelAlignmentEnum8">ScreenLabelAlignmentEnum8</a></td>
+      <td></td>
+      <td>Center</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_ScreenLabelAlignmentEnum8">ScreenLabelAlignmentEnum8</a></td>
+      <td></td>
+      <td>Center</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### KeypadLabelContentColors Trait (0x5259)（标签文字颜色） {#ref_KeypadLabelContentColors}
+
+设置标签文字颜色，编码为 `0x00RRGGBB`，高字节保留且必须为零。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_KeypadRgbColor">KeypadRgbColor</a></td>
+      <td>0x00000000-0x00FFFFFF</td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### KeypadPresentationMode Trait (0x5262)（页面展示模式） {#ref_KeypadPresentationMode}
+
+设置页面展示模式。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_KeypadPresentationModeEnum8">KeypadPresentationModeEnum8</a></td>
+      <td></td>
+      <td>HomePrimary</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_KeypadPresentationModeEnum8">KeypadPresentationModeEnum8</a></td>
+      <td></td>
+      <td>HomePrimary</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### KeypadHomePageReturnTime Trait (0x5264)（返回首页等待时间） {#ref_KeypadHomePageReturnTime}
+
+设置 `HomePrimary` 模式下设备返回首页前的等待时间，单位为秒。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td>Minimum Value to Maximum Value</td>
+      <td>15</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>15</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### KeypadCarouselList Trait (0x5265)（轮播页面配置） {#ref_KeypadCarouselList}
+
+提供 `Carousel` 模式使用的有序页面及停留时长列表。列表为空时不切换页面。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_KeypadCarouselPageStruct">KeypadCarouselPageStruct</a>]</td>
+      <td>PageIndex is within MaxPageNum</td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### EnableSmartReminder Trait (0x5266)（智能提醒使能） {#ref_EnableSmartReminder}
+
+启用或禁用优先展示主要参数环境等级较高的页面。`EnvLevelUnknown` 不参与等级比较。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>false</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>false</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfLevelIcons Trait (0x5267)（支持的等级图标数量） {#ref_NumberOfLevelIcons}
+
+表示设备支持的等级图标数量。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfLevels Trait (0x5268)（等级数量） {#ref_NumberOfLevels}
+
+表示设备实现的分级数量，取值范围为 1 到 3。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td>1-3</td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### LevelIconReminders Trait (0x5269)（等级提醒展示配置） {#ref_LevelIconReminders}
+
+配置各环境等级对应的数值和图标显示方式。列表长度必须等于 `NumberOfLevels`，每个有效等级必须且只能出现一次；不包含 `EnvLevelUnknown`。默认情况下最高等级的图标闪烁，其他等级的图标常亮；未知等级的数值常亮且图标隐藏。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_KeypadEnvLevelReminderStruct">KeypadEnvLevelReminderStruct</a>]</td>
+      <td>Length equals NumberOfLevels</td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### LevelIconGradings Trait (0x526A)（等级图标分级阈值） {#ref_LevelIconGradings}
+
+配置各等级图标严格递增的分级上限；同一图标索引不得重复，`UpperBounds` 的长度必须为 `NumberOfLevels - 1`。未配置的图标不进行分级，空列表表示当前没有图标参与分级；此配置不会改变测量集群的上报阈值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_KeypadLevelIconGradingStruct">KeypadLevelIconGradingStruct</a>]</td>
+      <td>Unique IconIndex; UpperBounds length equals NumberOfLevels - 1</td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### LevelIconPages Trait (0x526B)（页面等级图标布局） {#ref_LevelIconPages}
+
+配置每个页面的等级图标槽位。每个页面最多出现一次，页面索引和图标索引必须处于支持范围内，且同一页面内图标索引不得重复。未配置页面使用产品默认布局；空列表表示所有页面均使用默认布局。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_KeypadLevelIconPageStruct">KeypadLevelIconPageStruct</a>]</td>
+      <td></td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
 #### ScreenHeight Trait（屏幕高度） {#ref_ScreenHeight}
 
 该 Trait 用于「屏幕高度」相关数据的访问与上报。
@@ -132259,7 +133668,7 @@ SetOnePageInfo Command 的参数结构体。
 
 #### ThemeID Trait（主题ID） {#ref_ThemeID}
 
-该 Trait 用于「主题ID」相关数据的访问与上报。
+该 Trait 用于主题 ID 的读取、设置和上报。为兼容主题目录中的 uint32 主题标识，Present Value 扩展为 uint32。
 
 <table>
   <thead>
@@ -132294,25 +133703,25 @@ SetOnePageInfo Command 的参数结构体。
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
       <td>1</td>
-      <td>RV</td>
+      <td>RVW</td>
       <td>M</td>
     </tr>
     <tr>
       <td>0x0002</td>
       <td>Maximum Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
-      <td>65535</td>
+      <td>4294967295</td>
       <td>R</td>
       <td>O</td>
     </tr>
     <tr>
       <td>0x0003</td>
       <td>Minimum Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
       <td>1</td>
       <td>R</td>
@@ -132321,7 +133730,7 @@ SetOnePageInfo Command 的参数结构体。
     <tr>
       <td>0x0007</td>
       <td>Default Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
       <td>1</td>
       <td>RW</td>
@@ -143069,6 +144478,12 @@ label `aqara.download` 上一次只传一个 `FileDescriptor`，前一个结束�
       <td>录制云端视频总使能</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5278</td>
+      <td><a href="#ref_FreeCloudRecordingUploadAllowed">FreeCloudRecordingUploadAllowed</a></td>
+      <td>是否允许免费上传云录像</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -143096,12 +144511,17 @@ label `aqara.download` 上一次只传一个 `FileDescriptor`，前一个结束�
       <td><a href="#ref_CloudRecordingEnable">CloudRecordingEnable</a></td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5278</td>
+      <td><a href="#ref_FreeCloudRecordingUploadAllowed">FreeCloudRecordingUploadAllowed</a></td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
 #### CloudRecordingEnable Trait（录制云端视频总使能） {#ref_CloudRecordingEnable}
 
-启用或禁用事件云端录像的总开关。
+用户可设置的云端视频上传总开关。关闭时，所有录像均不上传至云端，包括事件录像和本地延时摄影视频。
 
 <table>
   <thead>
@@ -143114,6 +144534,63 @@ label `aqara.download` 上一次只传一个 `FileDescriptor`，前一个结束�
     <tr>
       <td>0x5026</td>
       <td>CloudRecordingEnable</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### FreeCloudRecordingUploadAllowed Trait（是否允许免费上传云录像） {#ref_FreeCloudRecordingUploadAllowed}
+
+表示设备当前是否被允许免费上传云端事件录像。该值由云端根据设备模型值及用户付费状态判断后下发至设备；设备需开通增值服务后才允许上传云录像。
+
+取值为 0（False）表示不允许免费上传云端事件录像；取值为 1（True）表示允许免费上传云端事件录像。本 Trait 不控制本地延时摄影等其他视频的上传。[CloudRecordingEnable](#ref_CloudRecordingEnable) 为用户可设置的上传总开关，关闭时所有录像均不上传至云端，不受本 Trait 取值影响。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5278</td>
+      <td>FreeCloudRecordingUploadAllowed</td>
     </tr>
   </tbody>
 </table>
@@ -146167,6 +147644,12 @@ WhiteLightToggle Command 的参数结构体。
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5277</td>
+      <td><a href="#ref_AutoWakeupInterval">AutoWakeupInterval</a></td>
+      <td>自动唤醒间隔</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4FD8</td>
       <td><a href="#ref_CamWorkMode">CamWorkMode</a></td>
       <td>摄像机工作模式</td>
@@ -146243,6 +147726,11 @@ WhiteLightToggle Command 的参数结构体。
     <tr>
       <td>0x4FD9</td>
       <td><a href="#ref_ActiveWakeupInterval">ActiveWakeupInterval</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5277</td>
+      <td><a href="#ref_AutoWakeupInterval">AutoWakeupInterval</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -146339,6 +147827,61 @@ WhiteLightToggle Command 的参数结构体。
       <td>uint32</td>
       <td></td>
       <td>3</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### AutoWakeupInterval Trait（自动唤醒间隔） {#ref_AutoWakeupInterval}
+
+表示设备的主动唤醒间隔是否采用自动模式。取值为 1（True）时，设备根据自身唤醒能力、运行状态或策略动态决定主动唤醒间隔，而不是使用固定的时间间隔；取值为 0（False）时，设备使用 [ActiveWakeupInterval](#ref_ActiveWakeupInterval) 配置的固定唤醒间隔。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5277</td>
+      <td>AutoWakeupInterval</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
       <td>RW</td>
       <td>O</td>
     </tr>
