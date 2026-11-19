@@ -17,9 +17,10 @@ By configuring different types of condition blocks, you can flexibly achieve dat
 
 In Flow, you can perform condition checks on the following:
 - [Device](#device): Checks whether the current status or some data of a device meets the set condition, such as "Is the light on?" or "Is the temperature above the threshold?"
-- [Logic](#logic): Supports fundamental logical operations such as AND, OR, XOR, and NOT, allowing flexible combinations of multiple boolean conditions for complex branching. It also supports data comparisons such as equal to, not equal to, greater than, less than, greater than or equal to, and less than or equal to, providing precise judgments between any two data points.
+- [Trigger Value](#trigger-value): Reads the trigger value carried by the selected [device trigger block](./trigger.mdx#device) in the current automation, compares it with the value set on this block, and continues from the met or not-met branch.
+- [Logic](#logic): Combines multiple yes/no conditions with AND, OR, XOR, and NOT. It can also compare any two values using equal to, not equal to, greater than, less than, greater than or equal to, or less than or equal to. After the check, the flow continues from the met or not-met branch.
 - [Time](#time): Checks whether the current time is within a specified range (e.g., "Is it between 10:00 and 12:00 on Monday?") to implement time-based automation branches.
-- [Flow Check](#flow-check): Checks whether another Flow is enabled.
+- [Automation](#automation): Checks whether the selected automation is currently enabled or disabled, then continues from the met or not-met branch. This checks the enabled state, not whether the flow is running or whether this run succeeded.
 
 ## Condition Block Outputs
 
@@ -31,7 +32,7 @@ For example, you can perform certain actions when the device status meets the cr
 
 ## Device
 
-Device-based condition blocks can be used to check the current status or data of a device, serving as branch points in the automation process. For example, you can determine whether a specific light is on or whether temperature and humidity exceed a given threshold.
+When the automation reaches this card, check whether a device property satisfies the comparison (e.g., "Is the light on?" or "Is the temperature above the threshold?"), optionally for a required duration. The automation continues from the true or false branch.
 
 You can configure the device, its corresponding datapoint, status, or value, and set the relevant condition (such as equal to, not equal to, greater than, less than, etc.) to accurately determine the device state.
 
@@ -49,6 +50,36 @@ You can configure the device, its corresponding datapoint, status, or value, and
 
 4. After configuring the above, make sure that at least one output (True or False) of the condition block is connected to another block ([condition block](./condition.mdx) or [action block](./action.mdx)).
 
+## Trigger Value
+
+This condition block reads the trigger value carried by a [device trigger block](./trigger.mdx#device) already added to the current automation, compares it with the value set on this block, and checks whether the condition is met.
+
+This condition block does not query the device's current state again.
+
+### Prerequisites
+
+Add a [device trigger block](./trigger.mdx#device) to the automation before using its trigger value in a condition.
+
+### How to Use
+
+1. In the left sidebar, click **+**. Under **Condition**, select **Trigger Value**, then choose a [device trigger block](./trigger.mdx#device) you have already added.
+
+    ![Select an event source](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/TriggerValue-SelectAnEventSource.png)
+
+2. Click a trigger value condition to add it to the canvas.
+
+    ![Click to add the trigger value condition](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/TriggerValue-ClickToAddTriggerValueCondition.png)
+
+3. On the block, set the first parameter to the comparison, such as equal to, not equal to, greater than, or less than.
+
+    ![Set the comparison condition](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/TriggerValue-SetComparisonCondition.png)
+
+4. Set the second parameter to the value to compare against.
+
+    ![Set the compared parameter](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/TriggerValue-SetComparedParameter.png)
+
+5. Connect at least one output (True or False) to another [condition block](./condition.mdx) or [action block](./action.mdx).
+
 ## Logic
 
 There are two main types of logic-related condition blocks: [Comparison](#comparison) and [Logic Operation](#logic-operation).  
@@ -59,7 +90,7 @@ You can flexibly use these blocks to build various logical conditions as needed.
 
 ### Comparison
 
-Comparison is commonly used to compare the relationship between two sets of data (such as device data and variables) in a condition block. In Flow, comparison blocks typically support equal to, not equal to, greater than, less than, greater than or equal to, and less than or equal to, among other comparison modes.
+A comparison checks two values, such as device data, a variable, trigger data, or a custom value. It can test whether they are equal, compare their size, or check whether a number rises or falls past a threshold. The flow then continues from the met or not-met branch.
 
 #### How to Use
 
@@ -74,7 +105,7 @@ Comparison is commonly used to compare the relationship between two sets of data
 
 ### Logic Operation
 
-Logic operation blocks are used to find out the logical relationships between multiple input boolean values. In Flow, logic operation blocks are provided for AND, OR, XOR, and NOT, the four basic logical operations.
+A logic operation combines multiple yes/no conditions using AND, OR, XOR, or NOT. AND requires all true, OR requires at least one true, XOR requires an odd number of true values, and NOT negates only the first condition. The flow then continues from the met or not-met branch.
 
 #### How to Use
 
@@ -87,12 +118,14 @@ Logic operation blocks are used to find out the logical relationships between mu
 
 ## Time
 
-Among condition blocks, there are two main time-related types: **Periodic Check** and **Scheduled Check**.
+Among condition blocks, there are four main time-related types: **Periodic Check**, **Date Type Condition**, **Annual Date Range Check**, and **Scheduled Check**.
 
 | Type | Description | Example |
 | -- | -- |--|
-| **Periodic Check**     | Checks if the current time falls within a recurring time range (such as certain days or periods each week), suitable for regular scenarios like "workdays" or "weekends", allowing for periodic time condition checks | 09:00-18:00, Monday to Friday |
-| **Scheduled Check**    | Checks if the current time falls within a specific period, suitable for one-time time checks | 2026/01/01 12:00:00 - 2026/01/02 13:00:00    |
+| **Periodic Check**     | Check whether the current time falls within the configured time range on selected weekdays, including ranges across midnight, then continue through the true or false branch. Times can be fixed or based on sunrise/sunset and offsets at the configured location. | Monday to Friday, 09:00-18:00 |
+| **Date Type Condition**    | Check whether today's date matches the selected type in the China calendar, using the system time zone. Evaluation fails when calendar data is unavailable and resumes after an update. | Workday (including make-up workdays)    |
+| **Annual Date Range Check**    | Check whether today's date is within the annual range, including both endpoints. The range can cross into the next year. | Every year from November 19th to December 20th |
+| **Scheduled Check**    | Check whether the current time falls between the configured start and end date/time, including the boundaries, then continue through the true or false branch. Times can be fixed or based on sunrise/sunset and offsets at the configured location. | 2026/01/01 12:00:00 - 2026/01/02 13:00:00    |
 
 
 ### How to Use
@@ -103,20 +136,39 @@ Among condition blocks, there are two main time-related types: **Periodic Check*
         - Click the first parameter on the block to select which weekdays to check (multi-select supported).
         - Click the second and third parameters to set the start and end times, respectively.
 
+    - For **Date Type Condition**:
+        - Click the parameter on the block and select a date type: workday, statutory holiday, or rest day.
+
+    - For **Annual Date Range Check**:
+        - Click the first parameter and select the start date (month/day).
+        - Click the second parameter and select the end date (month/day).
+
     - For **Scheduled Check**:
         - Click the start parameter to set the specific start date and time.
         - Click the end parameter to set the specific end date and time.
         
 3. After configuring, make sure that at least one output (True or False) of the condition block is connected to another block ([condition block](./condition.mdx) or [action block](./action.mdx)).
 
-## Flow Check
+## Automation
 
-A Flow Check block is used to determine whether another Flow is currently enabled. By referencing and checking the target Flow's enable state, you can enable automation interconnections between Flows.
+This block checks whether the selected automation is currently enabled or disabled, then continues from the met or not-met branch.
 
-For example, when a specific Flow is enabled, the Flow Check block outputs True, and you can decide whether to continue subsequent actions in the current process based on its output.
+:::tip
+This checks whether the automation is enabled, not whether the flow is running or whether the automation run succeeded.
+:::
 
 ### How to Use
 
-1. In the left sidebar of the canvas, under **Condition**, select **Flow**, and add a "Flow Check" block.
-2. Click the parameter on the block to select an existing Flow to monitor. As long as the selected Flow is enabled, the process will proceed from the True output of this **Flow Check** block; otherwise, it continues from the False output.
-3. After configuring, make sure that at least one output (True or False) of the condition block is connected to another block ([condition block](./condition.mdx) or [action block](./action.mdx)).
+1. In the left sidebar, click **+**. Under **Condition**, click **Automation** to add an automation condition block to the canvas.
+
+    ![Add an automation condition block](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/AutomationCondition-AddABlock.png)
+
+2. Select the automation whose enabled state you want to check.
+
+    ![Select an automation](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/AutomationCondition-SelectAnAutomation.png)
+
+3. On the block, set the state to match: `Enabled` or `Disabled`.
+
+    ![Select an automation state](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/AutomationCondition-SelectAnStatus.png)
+
+4. Connect at least one output (True or False) to another [condition block](./condition.mdx) or [action block](./action.mdx).
