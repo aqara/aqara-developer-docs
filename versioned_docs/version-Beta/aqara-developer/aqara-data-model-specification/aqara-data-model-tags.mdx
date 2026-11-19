@@ -2421,6 +2421,20 @@ AirConditioner and SingleSetpointAC both implement `Output` and `HeaterCooler`; 
       <td></td>
     </tr>
     <tr>
+      <td>0x0039</td>
+      <td>Panel</td>
+      <td>ScreenUIConfig</td>
+      <td>O</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>0x0039</td>
+      <td>Panel</td>
+      <td>ThemePack</td>
+      <td>O</td>
+      <td></td>
+    </tr>
+    <tr>
       <td>0x003A</td>
       <td>VideoDoorbell (Video Doorbell)</td>
       <td>Camera</td>
@@ -4813,8 +4827,19 @@ This appendix defines the correspondence between Matter Device Types, Zigbee Dev
       <td>AirConditioner</td>
       <td>0x000D</td>
     </tr>
+    <tr>
+      <td>18</td>
+      <td>In-Home Display</td>
+      <td>0x0502</td>
+      <td>Panel</td>
+      <td>0x0039</td>
+    </tr>
   </tbody>
 </table>
+
+:::note
+The Aqara Keypad Screen Configuration Cluster of the Zigbee In-Home Display maps to ScreenUIConfig, ScreenDisplay, and ThemePack; this Zigbee Device Type is required to implement ScreenUIConfig. A general Panel may still choose whether to implement ScreenUIConfig based on its own capabilities.
+:::
 
 ## Binding {#ref_Aqara_Spec_Binding}
 
@@ -10784,7 +10809,7 @@ Parameter structure of the StepBrightnessWithOnOff Command.
     </tr>
     <tr>
       <td>1</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
       <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
@@ -10816,7 +10841,7 @@ Parameter structure of the SetBrightnessWithOnOff Command.
     </tr>
     <tr>
       <td>1</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
       <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
@@ -10848,7 +10873,7 @@ Parameter structure of the SetBrightness Command.
     </tr>
     <tr>
       <td>1</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
       <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
@@ -10887,7 +10912,7 @@ Parameter structure of the StepBrightness Command.
     </tr>
     <tr>
       <td>1</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
       <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
@@ -11274,7 +11299,7 @@ When this Trait is not implemented, or the Present Value is null, the device sho
       <td>Maximum Value</td>
       <td>int32</td>
       <td></td>
-      <td>10000</td>
+      <td>20000</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -11292,7 +11317,7 @@ When this Trait is not implemented, or the Present Value is null, the device sho
       <td>Step Value</td>
       <td>uint32</td>
       <td></td>
-      <td>500</td>
+      <td>100</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -11362,7 +11387,7 @@ When this Trait is not implemented, or the Present Value is null, the device sho
       <td>Maximum Value</td>
       <td>int32</td>
       <td></td>
-      <td>10000</td>
+      <td>20000</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -11380,7 +11405,7 @@ When this Trait is not implemented, or the Present Value is null, the device sho
       <td>Step Value</td>
       <td>uint32</td>
       <td></td>
-      <td>500</td>
+      <td>100</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -11538,21 +11563,21 @@ On top of the above behavior, this command should also perform switch linkage:
 
 #### SetBrightnessWithOnOff Command {#ref_SetBrightnessWithOnOff}
 
-This command is used to perform target brightness setting with switch linkage.
+This command is used to set the target brightness with OnOff linkage.
 
-Compared with `SetBrightness`, this command supports affecting the switch state while setting the brightness.
+Compared with `SetBrightness`, this command also affects the OnOff state while setting the brightness.
 
 ##### Effect on Receipt
 
-After receiving this command, the device should first, according to the semantics of `SetBrightness`, continuously transition from the current brightness to the target brightness.
+After receiving this command, the device shall first follow the semantics of `SetBrightness` and transition continuously from the current brightness to the target brightness.
 
-* The transition duration preferentially uses the `Time` in the command.
-* When `Time` is empty, the device transition duration configuration should be used; if no configuration is available, the transition should be completed as fast as the device can achieve.
+* The transition duration prioritizes the `TransitionTime` in the command.
+* When `TransitionTime` is empty, the device transition duration configuration shall be used; if no configuration is available, the transition shall be completed at the fastest speed the device can achieve.
 
-On top of the above behavior, this command should also perform switch linkage:
+On top of the behavior above, this command shall also perform the OnOff linkage:
 
-* If the command effect would make CurrentLevel higher than the device minimum level, the OnOff of the same endpoint should be set to `TRUE` (On).
-* If the command effect would make CurrentLevel reach the device minimum level, the OnOff of the same endpoint should be set to `FALSE` (Off).
+* If the command effect would make CurrentLevel higher than the device minimum level, the OnOff on the same endpoint shall be set to `TRUE` (On).
+* If the command effect would make CurrentLevel reach the device minimum level, the OnOff on the same endpoint shall be set to `FALSE` (Off).
 
 ##### Parameters
 
@@ -11560,14 +11585,14 @@ On top of the above behavior, this command should also perform switch linkage:
 
 #### SetBrightness Command {#ref_SetBrightness}
 
-This command is used to set the target brightness without changing the on/off state of the light.
+This command is used to set the target brightness without changing the OnOff state of the light.
 
 ##### Effect on Receipt
 
-After receiving this command, the device should continuously transition from the current brightness to the target value specified by `Level`.
+After receiving this command, the device shall transition continuously from the current brightness to the target value specified by `Level`.
 
-* The transition duration preferentially uses the `Time` in the command.
-* When `Time` is empty, the device transition duration configuration should be used; if no configuration is available, the transition should be completed as fast as the device can achieve.
+* The transition duration prioritizes the `TransitionTime` in the command.
+* When `TransitionTime` is empty, the device transition duration configuration shall be used; if no configuration is available, the transition shall be completed at the fastest speed the device can achieve.
 
 If the device does not support variable-rate transition, the transition duration field may be ignored.
 
@@ -11652,7 +11677,7 @@ This Function does not handle brightness control; brightness is provided by the 
       <td>O</td>
     </tr>
     <tr>
-      <td>0x524E</td>
+      <td>0x5254</td>
       <td><a href="#ref_XYToRGBMatrix">XYToRGBMatrix</a></td>
       <td>XY to RGB matrix coefficients</td>
       <td>O</td>
@@ -12179,6 +12204,11 @@ This enumeration defines the valid values of the Present Value of the LEDType Tr
       <td>0x00</td>
       <td>RGBW</td>
       <td>RGBW light-color LED bead</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>RGBWFullColor</td>
+      <td>RGBW full-color LED bead</td>
     </tr>
   </tbody>
 </table>
@@ -12970,7 +13000,7 @@ Parameter structure of the MoveToXYColorBrightness Command.
     </tr>
     <tr>
       <td>3</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
       <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
@@ -13016,7 +13046,7 @@ Parameter structure of the MoveToColorTemperatureBrightness Command.
     </tr>
     <tr>
       <td>2</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
       <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
@@ -13069,7 +13099,7 @@ Parameter structure of the MoveToHueSaturationBrightness Command.
     </tr>
     <tr>
       <td>3</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
       <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
@@ -13115,7 +13145,7 @@ Parameter structure of the MoveToXYColor Command.
     </tr>
     <tr>
       <td>2</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
       <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
@@ -13161,7 +13191,7 @@ Parameter structure of the MoveToHueAndSaturation Command.
     </tr>
     <tr>
       <td>2</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
       <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
@@ -13200,7 +13230,7 @@ Parameter structure of the MoveToColorTemperature Command.
     </tr>
     <tr>
       <td>1</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
       <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
@@ -13239,7 +13269,7 @@ Parameter structure of the StepColorTemperature Command.
     </tr>
     <tr>
       <td>1</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
       <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
@@ -13285,7 +13315,7 @@ Parameter structure of the MoveToHue Command.
     </tr>
     <tr>
       <td>2</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>uint16</td>
       <td>O</td>
       <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
@@ -13324,7 +13354,7 @@ Parameter structure of the MoveToSaturation Command.
     </tr>
     <tr>
       <td>1</td>
-      <td>Time</td>
+      <td>TransitionTime</td>
       <td>uint16</td>
       <td>O</td>
       <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
@@ -13366,7 +13396,7 @@ Parameter structure of the MoveToSaturation Command.
       <td>O</td>
     </tr>
     <tr>
-      <td>0x524E</td>
+      <td>0x5254</td>
       <td><a href="#ref_XYToRGBMatrix">XYToRGBMatrix</a></td>
       <td>O</td>
     </tr>
@@ -13664,7 +13694,7 @@ The coefficients are single-precision floating-point numbers and may be negative
   </thead>
   <tbody>
     <tr>
-      <td>0x524E</td>
+      <td>0x5254</td>
       <td>XYToRGBMatrix</td>
     </tr>
   </tbody>
@@ -15576,13 +15606,13 @@ After receiving this command, the device should first switch ColorMode to HSV, a
 
 This command is used to set the XY color.
 
-After execution, the device should switch ColorMode to XY mode.
+After execution, the device shall switch ColorMode to XY mode.
 
 ##### Effect on Receipt
 
-After receiving this command, the device should set ColorMode (if implemented) to XY mode and transition continuously from the current color to the target color specified by `ColorX/ColorY`.
+After receiving this command, the device shall set ColorMode (if implemented) to XY mode and transition continuously from the current color to the target color specified by `ColorX/ColorY`.
 
-The transition duration should be consistent with the `Time` field. The color space transition path is not mandated; the shortest path in the CIE xyY space (which can be regarded as a "straight line" path) is recommended.
+The transition duration shall be consistent with the `TransitionTime` field. The color space transition path is not mandated; the shortest path in the CIE xyY space (regarded as a "straight line") is recommended.
 
 ##### Parameters
 
@@ -15592,13 +15622,13 @@ The transition duration should be consistent with the `Time` field. The color sp
 
 This command is used to set Hue and Saturation.
 
-After execution, the device should switch ColorMode to HSV mode.
+After execution, the device shall switch ColorMode to HSV mode.
 
 ##### Effect on Receipt
 
-After receiving this command, the device should switch ColorMode to HSV mode and transition continuously from the current Hue/Saturation to the target Hue/Saturation.
+After receiving this command, the device shall switch ColorMode to HSV mode and transition continuously from the current Hue/Saturation to the target Hue/Saturation.
 
-The transition duration should be consistent with the `Time` field. The transition path is not mandated; the shortest path in the color space is recommended.
+The transition duration shall be consistent with the `TransitionTime` field. The transition path is not mandated; the shortest path in the color space is recommended.
 
 ##### Parameters
 
@@ -15608,15 +15638,15 @@ The transition duration should be consistent with the `Time` field. The transiti
 
 This command is used to set the color temperature.
 
-After execution, the device should switch ColorMode to ColorTemperature mode.
+After execution, the device shall switch ColorMode to ColorTemperature mode.
 
 ##### Effect on Receipt
 
-After receiving this command, the device should set ColorMode (if implemented) to ColorTemperature mode and transition continuously from the current color temperature to the target color temperature.
+After receiving this command, the device shall set ColorMode (if implemented) to ColorTemperature mode and transition continuously from the current color temperature to the target color temperature.
 
-The transition duration should be consistent with the `Time` field. According to this mode definition, the color temperature transition path changes along the Black Body Line.
+The transition duration shall be consistent with the `TransitionTime` field. As defined by this mode, the color temperature transition path follows the Black Body Line.
 
-If the target value is less than the device's physical minimum color temperature (Mired) or greater than the device's physical maximum color temperature (Mired), it should be clamped to the physical minimum/maximum value respectively as the final target.
+If the target value is lower than the physical minimum color temperature (Mired) or higher than the physical maximum color temperature (Mired) of the device, it shall be clipped to the physical minimum/maximum value respectively as the final target.
 
 ##### Parameters
 
@@ -15647,13 +15677,13 @@ This command is used to set the target Hue (optionally with direction and time).
 
 ##### Effect on Receipt
 
-After receiving this command, the device should switch ColorMode to HSV mode and transition continuously from the current Hue to the target Hue.
+After receiving this command, the device shall switch ColorMode to HSV mode and transition continuously from the current Hue to the target Hue.
 
-The transition duration should be consistent with the `Time` field; the direction is determined by the `Direction` field:
+The transition duration shall be consistent with the `TransitionTime` field; the direction is determined by the `Direction` field:
 
-* Shortest path: move along the shortest direction of the hue ring.
-* Longest path: move along the longest direction of the hue ring (commonly used for rainbow effects).
-* When the two directions are equal in distance, the Up direction should be used.
+* Shortest path: move along the shortest direction of the hue wheel.
+* Longest path: move along the longest direction of the hue wheel (commonly used for rainbow effects).
+* When the distances in both directions are equal, the Up direction shall be used.
 
 ##### Parameters
 
@@ -15665,9 +15695,9 @@ This command is used to set the target Saturation (optionally with time).
 
 ##### Effect on Receipt
 
-After receiving this command, the device should switch ColorMode to HSV mode and transition continuously from the current Saturation to the target Saturation.
+After receiving this command, the device shall switch ColorMode to HSV mode and transition continuously from the current Saturation to the target Saturation.
 
-The transition duration should be consistent with the `Time` field.
+The transition duration shall be consistent with the `TransitionTime` field.
 
 ##### Parameters
 
@@ -19661,7 +19691,7 @@ Enables or disables periodic snapshot upload to the cloud. When [PeriodicSnapsho
 
 #### CloudRecordingEnable Trait {#ref_CloudRecordingEnable}
 
-Enables or disables the master switch for event cloud recording.
+User-settable master switch for cloud video upload. When disabled, no recordings are uploaded to the cloud, including event recordings and local time-lapse videos.
 
 <table>
   <thead>
@@ -28937,39 +28967,39 @@ This section explains common concepts and their boundaries in energy data, helpi
   <tbody>
     <tr>
       <td>Power</td>
-      <td>The rate at which energy is transferred or consumed at a given moment</td>
-      <td>W / kW</td>
-      <td>Instantaneous measurement; energy is obtained by integrating power over time.</td>
+      <td>Rate of energy transfer or consumption at a given moment</td>
+      <td>W, kW</td>
+      <td>Instantaneous measurement; power integrated over time gives energy.</td>
     </tr>
     <tr>
       <td>Energy</td>
       <td>Energy transferred or consumed over a period of time</td>
-      <td>Wh / kWh</td>
-      <td>Cumulative energy is usually a non-negative counter; import and export should be accumulated separately and should not cancel each other out.</td>
+      <td>W&middot;h, kWh</td>
+      <td>Cumulative energy is usually a non-negative counter; import and export should be accumulated separately and must not offset each other.</td>
     </tr>
     <tr>
       <td>Import</td>
       <td>Energy flows from the grid to the user side</td>
-      <td>W / Wh</td>
-      <td>Import power/energy at the point of common coupling, used to represent electricity purchased from the grid.</td>
+      <td>W, W&middot;h</td>
+      <td>Import power/energy at the grid connection point, indicating electricity purchased from the grid.</td>
     </tr>
     <tr>
       <td>Export</td>
       <td>Energy flows from the user side to the grid</td>
-      <td>W / Wh</td>
-      <td>Export power/energy at the point of common coupling, used to represent electricity fed back to the grid.</td>
+      <td>W, W&middot;h</td>
+      <td>Export power/energy at the grid connection point, indicating electricity fed back to the grid.</td>
     </tr>
     <tr>
       <td>Generation</td>
-      <td>Electric energy output by generating equipment</td>
-      <td>W / Wh</td>
-      <td>The total PV generation includes on-site self-consumption and grid export; it is not equal to the energy fed back to the grid.</td>
+      <td>Energy output from generating equipment</td>
+      <td>W, W&middot;h</td>
+      <td>Total PV generation includes on-site consumption and grid export, and is not equal to the energy fed back to the grid.</td>
     </tr>
     <tr>
       <td>Charge/Discharge</td>
-      <td>Energy flowing into/out of the storage battery respectively</td>
-      <td>W / Wh</td>
-      <td>Should be metered separately at the battery-side boundary; charge and discharge use independent non-negative values.</td>
+      <td>Energy flows into/out of the storage battery respectively</td>
+      <td>W, W&middot;h</td>
+      <td>Meter separately at the battery-side boundary; charging and discharging use independent non-negative values.</td>
     </tr>
     <tr>
       <td>SOC</td>
@@ -28980,8 +29010,8 @@ This section explains common concepts and their boundaries in energy data, helpi
     <tr>
       <td>Demand</td>
       <td>Average power over a specified integration period</td>
-      <td>W / kW</td>
-      <td>Maximum demand is the maximum of the average power of each demand interval in a billing period, not the instantaneous power peak.</td>
+      <td>W, kW</td>
+      <td>Maximum demand is the maximum average power among demand intervals within the billing period, not the instantaneous power peak.</td>
     </tr>
   </tbody>
 </table>
@@ -29040,7 +29070,7 @@ When a cumulative value is a member of a structure list, each independent counte
     <tr>
       <td>PV inverter/generating equipment</td>
       <td><code>EnergyManagement</code></td>
-      <td><code>GeneratedActivePower</code>, <code>CumulativeGeneratedActiveEnergy</code></td>
+      <td><code>GeneratedActivePower</code>,<code>CumulativeGeneratedActiveEnergy</code></td>
       <td>Total generation is different from the PCC export energy; self-consumed energy is not counted in the export register.</td>
     </tr>
     <tr>
@@ -36730,12 +36760,6 @@ Provides media playback control capabilities, including play, pause, track switc
       <td>Favorite playlists</td>
       <td>O</td>
     </tr>
-    <tr>
-      <td>0x5277</td>
-      <td><a href="#ref_CurrentPlaylist">ref_CurrentPlaylist</a></td>
-      <td>Current playlist</td>
-      <td>O</td>
-    </tr>
   </tbody>
 </table>
 
@@ -36818,63 +36842,33 @@ Provides media playback control capabilities, including play, pause, track switc
       <td>O</td>
     </tr>
     <tr>
-      <td>0x9DC1</td>
-      <td><a href="#ref_PlayLocalSong">ref_PlayLocalSong</a></td>
-      <td>Play local song</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC2</td>
-      <td><a href="#ref_PlaySelectedPlaylist">ref_PlaySelectedPlaylist</a></td>
-      <td>Play selected playlist</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC3</td>
-      <td><a href="#ref_PlayTextToSpeech">ref_PlayTextToSpeech</a></td>
-      <td>Text to speech</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC4</td>
-      <td><a href="#ref_PlaySemanticPlaylist">ref_PlaySemanticPlaylist</a></td>
-      <td>Play semantic playlist</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC5</td>
-      <td><a href="#ref_Search">ref_Search</a></td>
-      <td>Search</td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x811A</td>
       <td><a href="#ref_Off">Off</a></td>
-      <td>Close</td>
+      <td>Play local song</td>
       <td>O</td>
     </tr>
     <tr>
       <td>0x8119</td>
       <td><a href="#ref_On">On</a></td>
-      <td>Open</td>
+      <td>Play selected playlist</td>
       <td>O</td>
     </tr>
     <tr>
       <td>0x80C8</td>
       <td><a href="#ref_Next">Next</a></td>
-      <td>Next</td>
+      <td>Text to speech</td>
       <td>O</td>
     </tr>
     <tr>
       <td>0x80C7</td>
       <td><a href="#ref_Previous">Previous</a></td>
-      <td>Previous</td>
+      <td>Play semantic playlist</td>
       <td>O</td>
     </tr>
     <tr>
       <td>0x80C6</td>
       <td><a href="#ref_StartOver">StartOver</a></td>
-      <td>Replay</td>
+      <td>Search</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -37256,91 +37250,6 @@ Parameter structure of the SearchAndPlay Command.
   </tbody>
 </table>
 
-##### Search Command Structure Type {#ref_SearchCommandStructure}
-
-Parameter structure of the Search Command.
-
-<table>
-  <thead>
-    <tr>
-      <th>Struct Member No.</th>
-      <th>Field Name</th>
-      <th>Type</th>
-      <th>Mandatory</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Keyword</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>Search keyword; fuzzy search is supported.</td>
-    </tr>
-  </tbody>
-</table>
-
-##### SearchResultStruct Type {#ref_SearchResultStruct}
-
-A single song search result returned by the Search Command.
-
-<table>
-  <thead>
-    <tr>
-      <th>Struct Member No.</th>
-      <th>Field Name</th>
-      <th>Type</th>
-      <th>Mandatory</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Album</td>
-      <td>characterString</td>
-      <td>O</td>
-      <td>Album name.</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>Artist</td>
-      <td>characterString</td>
-      <td>O</td>
-      <td>Artist name.</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>Title</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>Song title.</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>Duration</td>
-      <td>uint32</td>
-      <td>O</td>
-      <td>Song duration, in seconds.</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>Favorite</td>
-      <td>bool</td>
-      <td>O</td>
-      <td>Whether the song has been favorited.</td>
-    </tr>
-    <tr>
-      <td>5</td>
-      <td>ImageURL</td>
-      <td>characterString</td>
-      <td>O</td>
-      <td>Cover image URL of the song.</td>
-    </tr>
-  </tbody>
-</table>
-
 ##### PlayMediaURL Command Structure Type {#ref_PlayMediaURLCommandStructure}
 
 Parameter structure of the PlayMediaURL Command.
@@ -37431,61 +37340,6 @@ Single playlist structure of the Playlists Trait.
       <td></td>
       <td></td>
       <td>RV</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-##### CurrentPlaylistTraitPresentValueStructure Type {#ref_CurrentPlaylistTraitPresentValueStructure}
-
-Current playlist structure of the CurrentPlaylist Trait.
-
-<table>
-  <thead>
-    <tr>
-      <th>Struct Member No.</th>
-      <th>Field Name</th>
-      <th>Type</th>
-      <th>Mandatory</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Id</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>Current playlist ID.</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>Name</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>Current playlist name.</td>
-    </tr>
-  </tbody>
-</table>
-
-#### CurrentPlaylist Trait {#ref_CurrentPlaylist}
-
-Indicates the playlist currently being played. The data type is [CurrentPlaylistTraitPresentValueStructure](#ref_CurrentPlaylistTraitPresentValueStructure). This Trait defines no Parameters.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-      <th>Name</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5277</td>
-      <td><a href="#ref_CurrentPlaylist">CurrentPlaylist</a></td>
-      <td>Current playlist</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -37623,106 +37477,6 @@ Parameter structure of the PlayFavorite Command.
   </tbody>
 </table>
 
-##### PlayLocalSong Command Structure Type {#ref_PlayLocalSongCommandStructure}
-
-Parameter structure of the PlayLocalSong Command.
-
-<table>
-  <thead>
-    <tr>
-      <th>Struct Member No.</th>
-      <th>Field Name</th>
-      <th>Type</th>
-      <th>Mandatory</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>SongId</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>Song ID selected from the local song list of the device.</td>
-    </tr>
-  </tbody>
-</table>
-
-##### PlaySelectedPlaylist Command Structure Type {#ref_PlaySelectedPlaylistCommandStructure}
-
-Parameter structure of the PlaySelectedPlaylist Command.
-
-<table>
-  <thead>
-    <tr>
-      <th>Struct Member No.</th>
-      <th>Field Name</th>
-      <th>Type</th>
-      <th>Mandatory</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>PlaylistId</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>Playlist ID selected from the local or online playlist list.</td>
-    </tr>
-  </tbody>
-</table>
-
-##### PlayTextToSpeech Command Structure Type {#ref_PlayTextToSpeechCommandStructure}
-
-Parameter structure of the PlayTextToSpeech Command.
-
-<table>
-  <thead>
-    <tr>
-      <th>Struct Member No.</th>
-      <th>Field Name</th>
-      <th>Type</th>
-      <th>Mandatory</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Text</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>Chinese text to be converted to speech and played.</td>
-    </tr>
-  </tbody>
-</table>
-
-##### PlaySemanticPlaylist Command Structure Type {#ref_PlaySemanticPlaylistCommandStructure}
-
-Parameter structure of the PlaySemanticPlaylist Command.
-
-<table>
-  <thead>
-    <tr>
-      <th>Struct Member No.</th>
-      <th>Field Name</th>
-      <th>Type</th>
-      <th>Mandatory</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Query</td>
-      <td>characterString</td>
-      <td>M</td>
-      <td>Chinese semantic description used to match a playlist from the cloud music library.</td>
-    </tr>
-  </tbody>
-</table>
-
 ### Trait Definitions
 
 <table>
@@ -37782,11 +37536,6 @@ Parameter structure of the PlaySemanticPlaylist Command.
     <tr>
       <td>0x80BB</td>
       <td><a href="#ref_PlaybackDuration">PlaybackDuration</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5277</td>
-      <td><a href="#ref_CurrentPlaylist">ref_CurrentPlaylist</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -38490,31 +38239,6 @@ Indicates the playback duration, in ms.
       <td>O</td>
     </tr>
     <tr>
-      <td>0x9DC1</td>
-      <td><a href="#ref_PlayLocalSong">ref_PlayLocalSong</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC2</td>
-      <td><a href="#ref_PlaySelectedPlaylist">ref_PlaySelectedPlaylist</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC3</td>
-      <td><a href="#ref_PlayTextToSpeech">ref_PlayTextToSpeech</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC4</td>
-      <td><a href="#ref_PlaySemanticPlaylist">ref_PlaySemanticPlaylist</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x9DC5</td>
-      <td><a href="#ref_Search">ref_Search</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
       <td>0x811A</td>
       <td><a href="#ref_Off">Off</a></td>
       <td>O</td>
@@ -38594,14 +38318,6 @@ Searches music content by keywords, artist, song name and other criteria, and pl
 
 [SearchAndPlay Command Structure](#ref_SearchAndPlayCommandStructure)
 
-#### Search Command {#ref_Search}
-
-Performs a fuzzy search by keyword and returns a song list without starting playback automatically. Each search result is described by [SearchResultStruct](#ref_SearchResultStruct), including the album, artist, song title, duration, favorite status and cover image URL. The user can select a song from the results and then play it through a playback Command.
-
-##### Parameters
-
-[Search Command Structure](#ref_SearchCommandStructure)
-
 #### PlayMediaURL Command {#ref_PlayMediaURL}
 
 Plays the audio resource specified by `MediaURL` directly. This Command is used to play a direct link already known to the client and does not perform song search; to search by song name, artist or keyword, use `SearchAndPlay`. After the Command is executed, the device shall take the URL as the current playback item and start loading and playing it; if the resource pointed to by the URL is inaccessible, or its format or protocol is not supported by the device, the device shall not report it as playing and shall report a failure according to the Command execution mechanism. Supported URL protocols, audio formats and access conditions are determined by device capabilities, and the device implementation shall clearly define its supported scope. Resources requiring authentication can be played only when the device has the corresponding access credentials or authorization mechanism.
@@ -38611,38 +38327,6 @@ Plays the audio resource specified by `MediaURL` directly. This Command is used 
 ##### Parameters
 
 [PlayMediaURL Command Structure](#ref_PlayMediaURLCommandStructure)
-
-#### PlayLocalSong Command {#ref_PlayLocalSong}
-
-Queries the local song list of the device, and then plays the corresponding local song according to the selected song ID.
-
-##### Parameters
-
-[PlayLocalSong Command Structure](#ref_PlayLocalSongCommandStructure)
-
-#### PlaySelectedPlaylist Command {#ref_PlaySelectedPlaylist}
-
-Queries the local and online playlist lists, and then plays the corresponding playlist according to the selected playlist ID.
-
-##### Parameters
-
-[PlaySelectedPlaylist Command Structure](#ref_PlaySelectedPlaylistCommandStructure)
-
-#### PlayTextToSpeech Command {#ref_PlayTextToSpeech}
-
-Converts the input Chinese text to speech and plays it.
-
-##### Parameters
-
-[PlayTextToSpeech Command Structure](#ref_PlayTextToSpeechCommandStructure)
-
-#### PlaySemanticPlaylist Command {#ref_PlaySemanticPlaylist}
-
-Matches the corresponding playlist from the cloud music library according to the input Chinese semantic description, and plays it.
-
-##### Parameters
-
-[PlaySemanticPlaylist Command Structure](#ref_PlaySemanticPlaylistCommandStructure)
 
 #### PlayPlaylist Command {#ref_PlayPlaylist}
 
@@ -54800,6 +54484,12 @@ Detects smoke and reports alarm events, supporting related configurations such a
       <td>M</td>
     </tr>
     <tr>
+      <td>0x51DF</td>
+      <td><a href="#ref_SmokeHardwareFault">SmokeHardwareFault</a></td>
+      <td>Smoke sensor fault</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4F86</td>
       <td><a href="#ref_SmokeChamberContamination">SmokeChamberContamination</a></td>
       <td>Smoke chamber contamination state</td>
@@ -55157,6 +54847,11 @@ Parameter structure of the TriggerWarning Command.
       <td>M</td>
     </tr>
     <tr>
+      <td>0x51DF</td>
+      <td><a href="#ref_SmokeHardwareFault">SmokeHardwareFault</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4F86</td>
       <td><a href="#ref_SmokeChamberContamination">SmokeChamberContamination</a></td>
       <td>O</td>
@@ -55266,6 +54961,52 @@ This Trait is used for access to and reporting of "smoke detection state" data.
       <td>0</td>
       <td>RV</td>
       <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### SmokeHardwareFault Trait {#ref_SmokeHardwareFault}
+
+Indicates whether the smoke sensor is faulty.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x51DF</td>
+      <td>SmokeHardwareFault</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
     </tr>
   </tbody>
 </table>
@@ -57296,14 +57037,14 @@ This structure defines the Present Value field layout of the BitmaskRegionSettin
   <tbody>
     <tr>
       <td>0</td>
-      <td>DetectRegion</td>
+      <td>detect_region</td>
       <td>characterString</td>
       <td>M</td>
       <td>Bitmask in hexadecimal string form, where each bit corresponds to one grid cell.</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>EffectiveBits</td>
+      <td>effective_bits</td>
       <td>int32</td>
       <td>M</td>
       <td>The number of valid bits in the bitmask; bits beyond this count should be ignored.</td>
@@ -69302,6 +69043,12 @@ Provides general device configuration items, such as sensitivity, delay, default
   </thead>
   <tbody>
     <tr>
+      <td>0x524E</td>
+      <td><a href="#ref_ACMateWorkMode">ACMateWorkMode</a></td>
+      <td>AC mate work mode</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5250</td>
       <td><a href="#ref_SpecialHandlingPoints">SpecialHandlingPoints</a></td>
       <td>Special handling data point list</td>
@@ -69554,6 +69301,47 @@ Provides general device configuration items, such as sensitivity, delay, default
 </table>
 
 ### Data Types
+
+#### ACMateWorkModeEnum8 Type {#ref_ACMateWorkModeEnum8}
+
+This enumeration defines the valid values of the Present Value of the ACMateWorkMode Trait; the underlying data type is uint8.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Unconfigured</td>
+      <td>Unconfigured mode</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>ACPluggedIn</td>
+      <td>AC plugged-in mode</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>ACNotPluggedIn</td>
+      <td>AC not plugged-in mode</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>IRWaterHeater</td>
+      <td>IR water heater mode</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>Socket16A</td>
+      <td>16A socket mode</td>
+    </tr>
+  </tbody>
+</table>
 
 #### SpecialHandlingTypeEnum8 Type {#ref_SpecialHandlingTypeEnum8}
 
@@ -70795,6 +70583,11 @@ This enumeration defines the valid values of the Present Value of the PublicCapO
   </thead>
   <tbody>
     <tr>
+      <td>0x524E</td>
+      <td><a href="#ref_ACMateWorkMode">ACMateWorkMode</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5250</td>
       <td><a href="#ref_SpecialHandlingPoints">SpecialHandlingPoints</a></td>
       <td>O</td>
@@ -70982,6 +70775,61 @@ This enumeration defines the valid values of the Present Value of the PublicCapO
     <tr>
       <td>0x51ED</td>
       <td><a href="#ref_VibrationIntensity">VibrationIntensity</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ACMateWorkMode Trait {#ref_ACMateWorkMode}
+
+Indicates the current working mode of the AC companion, used to distinguish the device type and installation method that the device is connected to or emulates. A value of 0 indicates unconfigured mode, 1 indicates AC plugged-in mode, 2 indicates AC not plugged-in mode, 3 indicates IR water heater mode, and 4 indicates 16A socket mode. This Trait supports reading, writing, and reporting; its default value is 0 (unconfigured mode).
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x524E</td>
+      <td>ACMateWorkMode</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_ACMateWorkModeEnum8">ACMateWorkModeEnum8</a></td>
+      <td>0..4</td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_ACMateWorkModeEnum8">ACMateWorkModeEnum8</a></td>
+      <td>0..4</td>
+      <td>0</td>
+      <td>RW</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -82023,7 +81871,9 @@ This Function does not contain Commands.
 
 ### Introduction
 
-Manages screen display related hardware properties, such as resolution, brightness, backlight and display state.
+Manages screen display-related hardware attributes, such as resolution, brightness, backlight, standby, screensaver, and display state.
+
+This Function also carries the standby, screensaver and dark screen configuration of the Aqara Keypad Screen Configuration Cluster. `O` in the Function indicates that the capability is optional; when the Zigbee cluster supports the corresponding `STBY`, `SCRN` or `DARK` Feature, the cluster attributes shall still meet the mandatory requirements in the device-side specification. The cluster `StandbyTime` attribute reuses the `StandbyTimeout` Trait, and `0xFFFFFFFF` maps to `0` of this Trait (never enter standby automatically); the `DarkScreenOff` attribute reuses the `DarkScreenOffEnable` Trait. The keypad screensaver style reuses the `ScreensaverStyle` Trait, with the enumerations mapped to `General`, `Clock`, `Weather` and `Environment`, where `General` and `Clock` are enumeration values added for this Trait.
 
 ### Function Identification
 
@@ -82077,7 +81927,7 @@ Manages screen display related hardware properties, such as resolution, brightne
     <tr>
       <td>0x8139</td>
       <td><a href="#ref_DNDTimePeriod">DNDTimePeriod</a></td>
-      <td>Do Not Disturb time period</td>
+      <td>Do not disturb time period</td>
       <td>O</td>
     </tr>
     <tr>
@@ -82162,6 +82012,30 @@ Manages screen display related hardware properties, such as resolution, brightne
       <td>0x4EE2</td>
       <td><a href="#ref_ScreensaverStyle">ScreensaverStyle</a></td>
       <td>Screensaver style</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x525B</td>
+      <td><a href="#ref_KeypadStandbyMode">KeypadStandbyMode</a></td>
+      <td>Keypad screen standby mode</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x4EE3</td>
+      <td><a href="#ref_StandbyBrightness">StandbyBrightness</a></td>
+      <td>Screen standby brightness</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x525E</td>
+      <td><a href="#ref_IndoorEnvironmentTarget">IndoorEnvironmentTarget</a></td>
+      <td>Linked device for indoor environment screensaver</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526C</td>
+      <td><a href="#ref_DarkScreenOffLuxThreshold">DarkScreenOffLuxThreshold</a></td>
+      <td>Lux threshold for screen off</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -82289,8 +82163,20 @@ This enumeration defines the valid values of the Present Value of the Screensave
       <td>ColorNumbers</td>
       <td>Colorful digits</td>
     </tr>
+    <tr>
+      <td>0x0A</td>
+      <td>General</td>
+      <td>General standby style</td>
+    </tr>
+    <tr>
+      <td>0x0B</td>
+      <td>Clock</td>
+      <td>Clock</td>
+    </tr>
   </tbody>
 </table>
+
+The keypad screensaver enumeration maps as follows: `General` -> `General` (0x0A), `Clock` -> `Clock` (0x0B), `Weather` -> `Weather` (0x04), `IndoorEnvironment` -> `Environment` (0x06).
 
 ##### WakeDistanceSettingEnum32 Type {#ref_WakeDistanceSettingEnum32}
 
@@ -82726,6 +82612,69 @@ Parameter structure of the TriggerWeatherUpdate Command.
   </tbody>
 </table>
 
+#### Keypad Screen Display Data Types {#ref_KeypadScreenDisplayDataTypes}
+
+##### KeypadStandbyModeEnum8 Type {#ref_KeypadStandbyModeEnum8}
+
+Defines the screen behavior after the standby time expires.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>ScreenOff</td>
+      <td>Turn the screen off</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Screensaver</td>
+      <td>Enter the screensaver</td>
+    </tr>
+  </tbody>
+</table>
+
+##### KeypadAssociatedTargetDeviceStruct Type {#ref_KeypadAssociatedTargetDeviceStruct}
+
+This Zigbee structure is used to identify the target device associated with the indoor environment screensaver.
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>DeviceDid</td>
+      <td>string</td>
+      <td>Target device identifier</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>ResourceID</td>
+      <td>string</td>
+      <td>Target resource identifier in BACnet format</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>SubscribeRecordId</td>
+      <td>uint32</td>
+      <td>Subscription record identifier</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait Definitions
 
 <table>
@@ -82825,6 +82774,26 @@ Parameter structure of the TriggerWeatherUpdate Command.
     <tr>
       <td>0x4EE2</td>
       <td><a href="#ref_ScreensaverStyle">ScreensaverStyle</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x525B</td>
+      <td><a href="#ref_KeypadStandbyMode">KeypadStandbyMode</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x4EE3</td>
+      <td><a href="#ref_StandbyBrightness">StandbyBrightness</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x525E</td>
+      <td><a href="#ref_IndoorEnvironmentTarget">IndoorEnvironmentTarget</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526C</td>
+      <td><a href="#ref_DarkScreenOffLuxThreshold">DarkScreenOffLuxThreshold</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -84858,6 +84827,158 @@ This Trait is used for access to and reporting of "screensaver style" data.
       <td>uint32</td>
       <td></td>
       <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### KeypadStandbyMode Trait (0x525B) {#ref_KeypadStandbyMode}
+
+Sets the behavior after the standby time expires: turn off the screen or enter the screensaver.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_KeypadStandbyModeEnum8">KeypadStandbyModeEnum8</a></td>
+      <td></td>
+      <td>ScreenOff</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_KeypadStandbyModeEnum8">KeypadStandbyModeEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_KeypadStandbyModeEnum8">KeypadStandbyModeEnum8</a></td>
+      <td></td>
+      <td>ScreenOff</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### StandbyBrightness Trait (0x4EE3) {#ref_StandbyBrightness}
+
+Sets the screen standby brightness.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td>0-100 (%)</td>
+      <td>10</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint8</td>
+      <td>0-100 (%)</td>
+      <td>10</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### IndoorEnvironmentTarget Trait (0x525E) {#ref_IndoorEnvironmentTarget}
+
+Lists the target devices associated with the indoor environment screensaver. A null value indicates that no association has been configured. This Zigbee-specific structure is written as a complete list.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_KeypadAssociatedTargetDeviceStruct">KeypadAssociatedTargetDeviceStruct</a>]</td>
+      <td></td>
+      <td>null</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DarkScreenOffLuxThreshold Trait (0x526C) {#ref_DarkScreenOffLuxThreshold}
+
+Sets the dark-screen off threshold in lux. After dark-screen off is enabled, the device turns off the screen when the measured illuminance falls below this value.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td>lux</td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint16</td>
+      <td>lux</td>
+      <td></td>
       <td>RW</td>
       <td>O</td>
     </tr>
@@ -93014,7 +93135,9 @@ This Command is used to perform the "set Pending dataset request" operation.
 
 ### Introduction
 
-Manages device theme pack resources, including theme download, switching and version information.
+Manages device theme pack resources, including theme download, switching, version information, and the installed theme list.
+
+This Function also carries the theme selection and installed theme catalog of the Aqara Keypad Screen Configuration Cluster; the related attributes apply to the `THEME` Feature of the cluster. The device-side `ActiveThemeID` reuses the existing `ThemeID` Trait of this Function, whose Present Value is extended to uint32; `NumberOfThemes` and `Themes` are mapped to `NumberOfThemes` and `InstalledThemes` respectively. `O` in the Function indicates that the capability is optional, and the cluster attribute requirements after the Feature is enabled are subject to the device-side specification.
 
 ### Function Identification
 
@@ -93059,6 +93182,18 @@ Manages device theme pack resources, including theme download, switching and ver
       <td>Theme version</td>
       <td>M</td>
     </tr>
+    <tr>
+      <td>0x5260</td>
+      <td><a href="#ref_NumberOfThemes">NumberOfThemes</a></td>
+      <td><a href="#ref_ThemeID">ThemeID</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5261</td>
+      <td><a href="#ref_InstalledThemes">InstalledThemes</a></td>
+      <td>M</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -93068,7 +93203,36 @@ This Function does not contain Commands.
 
 ### Data Types
 
-This Function has no custom data types.
+##### InstalledThemeInfoStruct Type {#ref_InstalledThemeInfoStruct}
+
+Describes a theme installed on the device.
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Name</th>
+      <th>Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Slot</td>
+      <td>uint8</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>ThemeID</td>
+      <td>uint32</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Version</td>
+      <td>uint32</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Trait Definitions
 
@@ -93091,12 +93255,22 @@ This Function has no custom data types.
       <td><a href="#ref_ThemeVersion">ThemeVersion</a></td>
       <td>M</td>
     </tr>
+    <tr>
+      <td>0x5260</td>
+      <td><a href="#ref_NumberOfThemes">NumberOfThemes</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5261</td>
+      <td><a href="#ref_InstalledThemes">InstalledThemes</a></td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
 #### ThemeID Trait {#ref_ThemeID}
 
-This Trait is used for access to and reporting of "theme ID" data.
+This Trait is used for reading, setting and reporting the theme ID; the Present Value uses uint32 to support the full identifier range of the device-side theme catalog.
 
 <table>
   <thead>
@@ -93131,25 +93305,25 @@ This Trait is used for access to and reporting of "theme ID" data.
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
       <td>1</td>
-      <td>RV</td>
+      <td>RVW</td>
       <td>M</td>
     </tr>
     <tr>
       <td>0x0002</td>
       <td>Maximum Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
-      <td>65535</td>
+      <td>4294967295</td>
       <td>R</td>
       <td>O</td>
     </tr>
     <tr>
       <td>0x0003</td>
       <td>Minimum Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
       <td>1</td>
       <td>R</td>
@@ -93158,7 +93332,7 @@ This Trait is used for access to and reporting of "theme ID" data.
     <tr>
       <td>0x0007</td>
       <td>Default Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
       <td>1</td>
       <td>RW</td>
@@ -93244,6 +93418,64 @@ Theme version.
       <td></td>
       <td>1</td>
       <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfThemes Trait (0x5260) {#ref_NumberOfThemes}
+
+Indicates the maximum number of theme slots supported by the device.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### InstalledThemes Trait (0x5261) {#ref_InstalledThemes}
+
+Lists the themes installed on the device. The number of list entries must not exceed `NumberOfThemes`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_InstalledThemeInfoStruct">InstalledThemeInfoStruct</a>]</td>
+      <td>Maximum length is NumberOfThemes</td>
+      <td></td>
+      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -100181,7 +100413,7 @@ Theme version.
 
 #### ThemeID Trait {#ref_ThemeID}
 
-This Trait is used for access to and reporting of "theme ID" data.
+This Trait is used for reading, setting and reporting the theme ID. The Present Value uses uint32 to support the full theme identifier in the theme catalog.
 
 <table>
   <thead>
@@ -100216,10 +100448,10 @@ This Trait is used for access to and reporting of "theme ID" data.
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
       <td>1</td>
-      <td>RV</td>
+      <td>RVW</td>
       <td>M</td>
     </tr>
   </tbody>
@@ -105759,14 +105991,14 @@ This structure defines the Present Value field layout of the BitmaskRegionSettin
   <tbody>
     <tr>
       <td>0</td>
-      <td>detect_region</td>
+      <td>DetectRegion</td>
       <td>characterString</td>
       <td>M</td>
       <td>A bitmask in hexadecimal string form, where each bit corresponds to a grid cell.</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>effective_bits</td>
+      <td>EffectiveBits</td>
       <td>int32</td>
       <td>M</td>
       <td>The number of valid bits in the bitmask; bits beyond this count should be ignored.</td>
@@ -111123,7 +111355,7 @@ Provides Aqara ambient sensing configuration capabilities, covering zone managem
     <tr>
       <td>0x4F19</td>
       <td><a href="#ref_Zones">Zones</a></td>
-      <td>Zones</td>
+      <td>Zone</td>
       <td>M</td>
     </tr>
     <tr>
@@ -111340,6 +111572,18 @@ Provides Aqara ambient sensing configuration capabilities, covering zone managem
       <td>0x5117</td>
       <td><a href="#ref_DetectionRange">DetectionRange</a></td>
       <td>Detection range</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5187</td>
+      <td><a href="#ref_MinDetectionRange">MinDetectionRange</a></td>
+      <td>Minimum detection range</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5188</td>
+      <td><a href="#ref_MaxDetectionRange">MaxDetectionRange</a></td>
+      <td>Maximum detection range</td>
       <td>O</td>
     </tr>
     <tr>
@@ -112156,6 +112400,16 @@ The parameter structure of the SubscribeAutoEdgeRecognitionData Command.
     <tr>
       <td>0x5117</td>
       <td><a href="#ref_DetectionRange">DetectionRange</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5187</td>
+      <td><a href="#ref_MinDetectionRange">MinDetectionRange</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5188</td>
+      <td><a href="#ref_MaxDetectionRange">MaxDetectionRange</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -114398,9 +114652,137 @@ When this Trait is NULL, it indicates that the detection range is not configured
   </tbody>
 </table>
 
+#### MinDetectionRange Trait {#ref_MinDetectionRange}
+
+This Trait indicates the minimum detection distance supported by the device, in cm; it corresponds to the Matter `MinDetectionRange` attribute.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5187</td>
+      <td>MinDetectionRange</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>600</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### MaxDetectionRange Trait {#ref_MaxDetectionRange}
+
+This Trait indicates the maximum detection distance supported by the device, in cm; it corresponds to the Matter `MaxDetectionRange` attribute.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5188</td>
+      <td>MaxDetectionRange</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>600</td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>600</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
 #### DetectionRangeStep Trait {#ref_DetectionRangeStep}
 
-This Trait indicates the step of each detection range unit, in cm, corresponding to the Matter `DetectionRangeStep` attribute. The client should use this value in combination with `MinDetectionRange` and `MaxDetectionRange` to determine the expected byte length of the `DetectionRange` bitmask and the distance represented by each bit.
+This Trait indicates the step size of each detection range unit in cm, corresponding to the Matter `DetectionRangeStep` attribute. Together with `MinDetectionRange` and `MaxDetectionRange`, the client shall use this value to determine the expected byte length of the `DetectionRange` bitmask and the distance represented by each bit.
 
 <table>
   <thead>
@@ -114638,7 +115020,7 @@ This Trait maps the Matter `DetectionRangeTargetPosition` event and is used to r
       <td>Present Value</td>
       <td>uint16</td>
       <td>MinDetectionRange to MaxDetectionRange</td>
-      <td>0</td>
+      <td></td>
       <td>V</td>
       <td>M</td>
     </tr>
@@ -114646,7 +115028,7 @@ This Trait maps the Matter `DetectionRangeTargetPosition` event and is used to r
       <td>0x0002</td>
       <td>Maximum Value</td>
       <td>uint16</td>
-      <td>Provided by the Matter MaxDetectionRange attribute, in cm</td>
+      <td></td>
       <td>65535</td>
       <td>R</td>
       <td>O</td>
@@ -114655,7 +115037,7 @@ This Trait maps the Matter `DetectionRangeTargetPosition` event and is used to r
       <td>0x0003</td>
       <td>Minimum Value</td>
       <td>uint16</td>
-      <td>Provided by the Matter MinDetectionRange attribute, in cm</td>
+      <td></td>
       <td>0</td>
       <td>R</td>
       <td>O</td>
@@ -131026,7 +131408,9 @@ Total:   23 bytes
 
 ### Introduction
 
-Provides unified UI configuration for screens, including page layouts, themes, card counts, and multi-page information management.
+Provides unified UI configuration for the screen, including page layout, label display, page carousel, level icons, and multi-page information management.
+
+This Function also carries the label, page presentation and level icon configuration of the Aqara Keypad Screen Configuration Cluster. The corresponding cluster Features are `LABEL`, `PRES` and `LVIC` respectively; `O` in the Function indicates that the capability is optional, and the attribute requirements after the Feature is enabled are subject to the device-side cluster specification. When the cluster is present, `KeypadEndpointList` is a mandatory attribute. `HomePageIndex`, `MaxPageNum` and `ThemeID` reuse existing Traits; the device-side `NumberOfPages` is mapped to `MaxPageNum`, whose uint8 value is losslessly extended to uint16; `ActiveThemeID` is mapped to `ThemeID`. The device-side `LABEL` Feature uses the boolean `ElderMode` to control elder mode and no longer uses the font size enumeration.
 
 ### Function Identifier
 
@@ -131098,7 +131482,7 @@ Provides unified UI configuration for screens, including page layouts, themes, c
     <tr>
       <td>0x4ED3</td>
       <td><a href="#ref_MaxWidgetNum">MaxWidgetNum</a></td>
-      <td>Maximum card count</td>
+      <td>Maximum number of cards</td>
       <td>M</td>
     </tr>
     <tr>
@@ -131134,7 +131518,7 @@ Provides unified UI configuration for screens, including page layouts, themes, c
     <tr>
       <td>0x4EBA</td>
       <td><a href="#ref_MaxPageNum">MaxPageNum</a></td>
-      <td>Maximum page count</td>
+      <td>Maximum number of pages</td>
       <td>M</td>
     </tr>
     <tr>
@@ -131153,6 +131537,96 @@ Provides unified UI configuration for screens, including page layouts, themes, c
       <td>0x4F8F</td>
       <td><a href="#ref_AllPagesInfo">AllPagesInfo</a></td>
       <td>All pages information</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x525A</td>
+      <td><a href="#ref_KeypadEndpointList">KeypadEndpointList</a></td>
+      <td>List of endpoints represented by the screen cluster</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526D</td>
+      <td><a href="#ref_HideBackground">HideBackground</a></td>
+      <td>Hide theme background</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5256</td>
+      <td><a href="#ref_ElderMode">ElderMode</a></td>
+      <td>Elder mode</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5257</td>
+      <td><a href="#ref_KeypadDisplayStyle">KeypadDisplayStyle</a></td>
+      <td>Label display style</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5258</td>
+      <td><a href="#ref_KeypadLabelAlignment">KeypadLabelAlignment</a></td>
+      <td>Label alignment</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5259</td>
+      <td><a href="#ref_KeypadLabelContentColors">KeypadLabelContentColors</a></td>
+      <td>Label text color</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5262</td>
+      <td><a href="#ref_KeypadPresentationMode">KeypadPresentationMode</a></td>
+      <td>Page presentation mode</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5264</td>
+      <td><a href="#ref_KeypadHomePageReturnTime">KeypadHomePageReturnTime</a></td>
+      <td>Wait time before returning to the home page</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5265</td>
+      <td><a href="#ref_KeypadCarouselList">KeypadCarouselList</a></td>
+      <td>Carousel page configuration</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5266</td>
+      <td><a href="#ref_EnableSmartReminder">EnableSmartReminder</a></td>
+      <td>Smart reminder enable</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5267</td>
+      <td><a href="#ref_NumberOfLevelIcons">NumberOfLevelIcons</a></td>
+      <td>Number of supported level icons</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5268</td>
+      <td><a href="#ref_NumberOfLevels">NumberOfLevels</a></td>
+      <td>Number of levels</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5269</td>
+      <td><a href="#ref_LevelIconReminders">LevelIconReminders</a></td>
+      <td>Level reminder display configuration</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526A</td>
+      <td><a href="#ref_LevelIconGradings">LevelIconGradings</a></td>
+      <td>Level icon grading thresholds</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526B</td>
+      <td><a href="#ref_LevelIconPages">LevelIconPages</a></td>
+      <td>Level icon layout per page</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -131268,6 +131742,341 @@ Parameter structure of the SetOnePageInfo Command.
   </tbody>
 </table>
 
+#### Keypad Screen UI Configuration Data Types {#ref_KeypadScreenUIConfigTypes}
+
+##### ScreenLabelDisplayModeEnum8 Type {#ref_ScreenLabelDisplayModeEnum8}
+
+Defines how screen labels are displayed.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>IconAndText</td>
+      <td>Both icon and text</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>IconOnly</td>
+      <td>Icon only</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>TextOnly</td>
+      <td>Text only</td>
+    </tr>
+  </tbody>
+</table>
+
+##### ScreenLabelAlignmentEnum8 Type {#ref_ScreenLabelAlignmentEnum8}
+
+Defines the alignment of screen labels.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Center</td>
+      <td>Center-aligned</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Left</td>
+      <td>Left-aligned</td>
+    </tr>
+  </tbody>
+</table>
+
+##### KeypadRgbColor Type {#ref_KeypadRgbColor}
+
+This type is derived from uint32 and encodes color as `0x00RRGGBB`. Bits 31-24 are reserved and must be zero; bits 23-16, 15-8, and 7-0 represent the red, green, and blue components respectively.
+
+<table>
+  <thead>
+    <tr>
+      <th>Bits</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>31-24</td>
+      <td>Reserved</td>
+      <td>Reserved, must be zero</td>
+    </tr>
+    <tr>
+      <td>23-16</td>
+      <td>Red</td>
+      <td>Red component, 0-255</td>
+    </tr>
+    <tr>
+      <td>15-8</td>
+      <td>Green</td>
+      <td>Green component, 0-255</td>
+    </tr>
+    <tr>
+      <td>7-0</td>
+      <td>Blue</td>
+      <td>Blue component, 0-255</td>
+    </tr>
+  </tbody>
+</table>
+
+##### KeypadPresentationModeEnum8 Type {#ref_KeypadPresentationModeEnum8}
+
+Defines the page presentation mode.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>HomePrimary</td>
+      <td>Return to the home page after timeout</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Manual</td>
+      <td>Switch between configured pages by key press</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Carousel</td>
+      <td>Switch pages according to the carousel schedule</td>
+    </tr>
+  </tbody>
+</table>
+
+##### KeypadEnvLevelEnum8 Type {#ref_KeypadEnvLevelEnum8}
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>EnvLevelUnknown</td>
+      <td>Level unknown</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>EnvLevelLow</td>
+      <td>Low</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>EnvLevelMedium</td>
+      <td>Medium</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>EnvLevelHigh</td>
+      <td>High</td>
+    </tr>
+  </tbody>
+</table>
+
+##### KeypadValuePresentationEnum8 Type {#ref_KeypadValuePresentationEnum8}
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Steady</td>
+      <td>Numeric value steady on</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Blink</td>
+      <td>Numeric value blinking</td>
+    </tr>
+  </tbody>
+</table>
+
+##### KeypadLevelIconPresentationEnum8 Type {#ref_KeypadLevelIconPresentationEnum8}
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>Steady</td>
+      <td>Icon steady on</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>Blink</td>
+      <td>Icon blinking</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Hidden</td>
+      <td>Icon hidden</td>
+    </tr>
+  </tbody>
+</table>
+
+This structure defines a page in the carousel list and its display duration.
+
+##### KeypadCarouselPageStruct Type {#ref_KeypadCarouselPageStruct}
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>PageIndex</td>
+      <td>uint8</td>
+      <td>0 to MaxPageNum - 1</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Duration</td>
+      <td>uint16</td>
+      <td>1 to 65535 seconds</td>
+    </tr>
+  </tbody>
+</table>
+
+This structure defines the numeric value and icon display mode for an ambient level.
+
+##### KeypadEnvLevelReminderStruct Type {#ref_KeypadEnvLevelReminderStruct}
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Level</td>
+      <td><a href="#ref_KeypadEnvLevelEnum8">KeypadEnvLevelEnum8</a></td>
+      <td>0x01 to NumberOfLevels</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>ValueMode</td>
+      <td><a href="#ref_KeypadValuePresentationEnum8">KeypadValuePresentationEnum8</a></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>IconMode</td>
+      <td><a href="#ref_KeypadLevelIconPresentationEnum8">KeypadLevelIconPresentationEnum8</a></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+This structure defines the grading upper bounds of level icons.
+
+##### KeypadLevelIconGradingStruct Type {#ref_KeypadLevelIconGradingStruct}
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>IconIndex</td>
+      <td>uint8</td>
+      <td>0 to NumberOfLevelIcons - 1</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>UpperBounds</td>
+      <td>list[int32]</td>
+      <td>NumberOfLevels - 1 strictly increasing boundaries</td>
+    </tr>
+  </tbody>
+</table>
+
+This structure defines the level icon slot layout for each page.
+
+##### KeypadLevelIconPageStruct Type {#ref_KeypadLevelIconPageStruct}
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>PageIndex</td>
+      <td>uint8</td>
+      <td>0 to MaxPageNum - 1</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>SlotIcons</td>
+      <td>list[uint8]</td>
+      <td>Unique icon indexes in the page&#x27;s slot order</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait Definitions
 
 <table>
@@ -131357,6 +132166,81 @@ Parameter structure of the SetOnePageInfo Command.
     <tr>
       <td>0x4F8F</td>
       <td><a href="#ref_AllPagesInfo">AllPagesInfo</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x525A</td>
+      <td><a href="#ref_KeypadEndpointList">KeypadEndpointList</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526D</td>
+      <td><a href="#ref_HideBackground">HideBackground</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5256</td>
+      <td><a href="#ref_ElderMode">ElderMode</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5257</td>
+      <td><a href="#ref_KeypadDisplayStyle">KeypadDisplayStyle</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5258</td>
+      <td><a href="#ref_KeypadLabelAlignment">KeypadLabelAlignment</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5259</td>
+      <td><a href="#ref_KeypadLabelContentColors">KeypadLabelContentColors</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5262</td>
+      <td><a href="#ref_KeypadPresentationMode">KeypadPresentationMode</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5264</td>
+      <td><a href="#ref_KeypadHomePageReturnTime">KeypadHomePageReturnTime</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5265</td>
+      <td><a href="#ref_KeypadCarouselList">KeypadCarouselList</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5266</td>
+      <td><a href="#ref_EnableSmartReminder">EnableSmartReminder</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5267</td>
+      <td><a href="#ref_NumberOfLevelIcons">NumberOfLevelIcons</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5268</td>
+      <td><a href="#ref_NumberOfLevels">NumberOfLevels</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5269</td>
+      <td><a href="#ref_LevelIconReminders">LevelIconReminders</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526A</td>
+      <td><a href="#ref_LevelIconGradings">LevelIconGradings</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x526B</td>
+      <td><a href="#ref_LevelIconPages">LevelIconPages</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -132038,6 +132922,531 @@ This Trait is used for the access and reporting of data related to "Home Page In
   </tbody>
 </table>
 
+#### KeypadEndpointList Trait (0x525A) {#ref_KeypadEndpointList}
+
+Lists the endpoints represented by the keypad screen configuration instance. An empty list means the instance represents the entire node; a non-empty list includes the hosting endpoint and may include other represented endpoints.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[uint16]</td>
+      <td>Endpoint IDs</td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### HideBackground Trait (0x526D) {#ref_HideBackground}
+
+Controls whether the theme background is hidden.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>false</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>false</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ElderMode Trait (0x5256) {#ref_ElderMode}
+
+Corresponds to the `ElderMode` attribute of the Aqara Keypad Screen Configuration Cluster on the device side (Zigbee attribute ID `0x0010`). Indicates whether elder mode is enabled; when enabled, the device displays screen labels in a larger font size.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>false</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>false</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### KeypadDisplayStyle Trait (0x5257) {#ref_KeypadDisplayStyle}
+
+Sets whether the screen displays text, icons, or both. The current value must be included in the supported value list.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_ScreenLabelDisplayModeEnum8">ScreenLabelDisplayModeEnum8</a></td>
+      <td></td>
+      <td>TextOnly</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_ScreenLabelDisplayModeEnum8">ScreenLabelDisplayModeEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_ScreenLabelDisplayModeEnum8">ScreenLabelDisplayModeEnum8</a></td>
+      <td></td>
+      <td>TextOnly</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### KeypadLabelAlignment Trait (0x5258) {#ref_KeypadLabelAlignment}
+
+Sets the horizontal alignment of screen labels.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_ScreenLabelAlignmentEnum8">ScreenLabelAlignmentEnum8</a></td>
+      <td></td>
+      <td>Center</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_ScreenLabelAlignmentEnum8">ScreenLabelAlignmentEnum8</a></td>
+      <td></td>
+      <td>Center</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### KeypadLabelContentColors Trait (0x5259) {#ref_KeypadLabelContentColors}
+
+Sets the label text color, encoded as `0x00RRGGBB`; the high byte is reserved and must be zero.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_KeypadRgbColor">KeypadRgbColor</a></td>
+      <td>0x00000000-0x00FFFFFF</td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### KeypadPresentationMode Trait (0x5262) {#ref_KeypadPresentationMode}
+
+Sets the page presentation mode.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_KeypadPresentationModeEnum8">KeypadPresentationModeEnum8</a></td>
+      <td></td>
+      <td>HomePrimary</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_KeypadPresentationModeEnum8">KeypadPresentationModeEnum8</a></td>
+      <td></td>
+      <td>HomePrimary</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### KeypadHomePageReturnTime Trait (0x5264) {#ref_KeypadHomePageReturnTime}
+
+Sets the waiting time before the device returns to the home page in `HomePrimary` mode, in seconds.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint16</td>
+      <td>Minimum Value to Maximum Value</td>
+      <td>15</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>uint16</td>
+      <td></td>
+      <td>15</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### KeypadCarouselList Trait (0x5265) {#ref_KeypadCarouselList}
+
+Provides the ordered page list and dwell durations used in `Carousel` mode. An empty list means that pages are not switched.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_KeypadCarouselPageStruct">KeypadCarouselPageStruct</a>]</td>
+      <td>PageIndex is within MaxPageNum</td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### EnableSmartReminder Trait (0x5266) {#ref_EnableSmartReminder}
+
+Enables or disables prioritizing pages whose primary parameter ambient level is higher. `EnvLevelUnknown` does not participate in level comparison.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>false</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>false</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfLevelIcons Trait (0x5267) {#ref_NumberOfLevelIcons}
+
+Indicates the number of level icons supported by the device.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### NumberOfLevels Trait (0x5268) {#ref_NumberOfLevels}
+
+Indicates the number of levels implemented by the device, ranging from 1 to 3.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td>1-3</td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### LevelIconReminders Trait (0x5269) {#ref_LevelIconReminders}
+
+Configures the numeric value and icon display mode for each ambient level. The list length must equal `NumberOfLevels`, and each valid level must appear exactly once; `EnvLevelUnknown` must not be included. By default, the icon of the highest level blinks and the icons of the other levels are steady on; for the unknown level, the numeric value is steady on and the icon is hidden.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_KeypadEnvLevelReminderStruct">KeypadEnvLevelReminderStruct</a>]</td>
+      <td>Length equals NumberOfLevels</td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### LevelIconGradings Trait (0x526A) {#ref_LevelIconGradings}
+
+Configures the strictly increasing grading upper bounds of each level icon; the same icon index must not be repeated, and the length of `UpperBounds` must be `NumberOfLevels - 1`. Unconfigured icons are not graded, and an empty list indicates that no icon currently participates in grading; this configuration does not change the reporting thresholds of the measurement cluster.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_KeypadLevelIconGradingStruct">KeypadLevelIconGradingStruct</a>]</td>
+      <td>Unique IconIndex; UpperBounds length equals NumberOfLevels - 1</td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### LevelIconPages Trait (0x526B) {#ref_LevelIconPages}
+
+Configures the level icon slots of each page. Each page may appear at most once, the page index and icon index must be within the supported range, and icon indexes within the same page must not be repeated. Unconfigured pages use the product default layout; an empty list indicates that all pages use the default layout.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_KeypadLevelIconPageStruct">KeypadLevelIconPageStruct</a>]</td>
+      <td></td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
 #### ScreenHeight Trait (Screen Height) {#ref_ScreenHeight}
 
 This Trait is used for the access and reporting of data related to "Screen Height".
@@ -132259,7 +133668,7 @@ This Trait is used for the access and reporting of data related to "Maximum Page
 
 #### ThemeID Trait (Theme ID) {#ref_ThemeID}
 
-This Trait is used for the access and reporting of data related to "Theme ID".
+This Trait is used for reading, setting and reporting the theme ID. To be compatible with the uint32 theme identifier in the theme catalog, the Present Value is extended to uint32.
 
 <table>
   <thead>
@@ -132294,25 +133703,25 @@ This Trait is used for the access and reporting of data related to "Theme ID".
     <tr>
       <td>0x0001</td>
       <td>Present Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
       <td>1</td>
-      <td>RV</td>
+      <td>RVW</td>
       <td>M</td>
     </tr>
     <tr>
       <td>0x0002</td>
       <td>Maximum Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
-      <td>65535</td>
+      <td>4294967295</td>
       <td>R</td>
       <td>O</td>
     </tr>
     <tr>
       <td>0x0003</td>
       <td>Minimum Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
       <td>1</td>
       <td>R</td>
@@ -132321,7 +133730,7 @@ This Trait is used for the access and reporting of data related to "Theme ID".
     <tr>
       <td>0x0007</td>
       <td>Default Value</td>
-      <td>uint16</td>
+      <td>uint32</td>
       <td></td>
       <td>1</td>
       <td>RW</td>
@@ -142597,11 +144006,11 @@ The file descriptor required by the file transfer business interaction protocol 
   <thead>
     <tr>
       <th>Struct Member Index</th>
-<th>Field Name</th>
-<th>Type</th>
-<th>Mandatory</th>
-<th>Description</th>
-</tr>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
   </thead>
   <tbody>
     <tr>
@@ -142902,7 +144311,7 @@ Playback status and playback position.
   </tbody>
 </table>
 
-Reporting timing: when the status changes. When reporting on `aqara.control`, `SessionId` is omitted; when reporting via COIP or reading, `SessionId` is included.
+Reporting timing: when the status changes. When reporting on `aqara.control`, `SessionId` is omitted; when reporting or reading via COIP, `SessionId` is carried.
 
 ### Command Definitions
 
@@ -142930,7 +144339,7 @@ Reporting timing: when the status changes. When reporting on `aqara.control`, `S
 
 #### LocalPlaybackControl Command (Local Playback Control) {#ref_LocalPlaybackControl}
 
-Playback control of the local SD card playback session (`StreamUsage=LocalPlayback`).
+Playback control for a local SD card playback session (`StreamUsage=LocalPlayback`).
 
 ##### Parameters
 
@@ -142938,7 +144347,7 @@ Playback control of the local SD card playback session (`StreamUsage=LocalPlayba
 
 ##### Response
 
-[LocalPlaybackControlResponse Command Structure](#ref_LocalPlaybackControlResponseCommandStructure), with `Status` values:
+[LocalPlaybackControlResponse Command Structure](#ref_LocalPlaybackControlResponseCommandStructure), `Status` values:
 
 <table>
   <thead>
@@ -142969,18 +144378,18 @@ Playback control of the local SD card playback session (`StreamUsage=LocalPlayba
 
 ##### Processing
 
-* When arriving from `aqara.control`, `SessionId` is omitted and the session is the playback session to which that channel belongs. Carrying an inconsistent `SessionId` -> return `NOT_FOUND`. When arriving from COIP, `SessionId` SHALL be carried; if omitted -> return `INVALID_COMMAND`.
-* `Pause` and `Play` belong to one category, and only the last one of the same category is kept; `Seek` is one category; `Speed` is one category. Overwritten commands are no longer reported, but each command has its own response.
-* After `Op=Seek` takes effect, SHALL send a key frame from the new position.
+* When the command arrives from `aqara.control`, `SessionId` is omitted and the session is the playback session to which that channel belongs. If an inconsistent `SessionId` is carried -> return `NOT_FOUND`. When it arrives from COIP, `SessionId` SHALL be carried; if omitted -> return `INVALID_COMMAND`.
+* `Pause` and `Play` are grouped into one class, and only the last one in the class is retained; `Seek` is one class; `Speed` is one class. Overridden commands are no longer reported, but each command has its own response.
+* After `Op=Seek` takes effect, the key frame SHALL be sent from the new position.
 
 #### LocalRecordQuery Command (Local Recording Query) {#ref_LocalRecordQuery}
 
-Queries the local recording index and resolves the `timestamp` values in the index into recording file descriptors. This Command belongs to the Playback Function and is exchanged via `InvokeCommand` on the `aqara.control` of the playback session.
+Queries the local recording index and parses the `timestamp` in the index into recording file descriptions. This Command belongs to the Playback Function and is sent and received via `InvokeCommand` on `aqara.control` of the playback session.
 
-* Request OpCode `0x008D`. `objectIdentifier` carries the object hosting the Playback Function. `propertyIdentifier` is the Command ID of this Command. `propertyValue` is the [LocalRecordQuery Command Structure](#ref_LocalRecordQueryCommandStructure). `source` is the same as other Commands.
-* Response OpCode `0x038D`. `propertyValue` is the [LocalRecordQuery Response Command Structure](#ref_LocalRecordQueryResponseCommandStructure), and member 0 is `Status`. Invalid parameters, unavailable storage, and invalidated cursors all stay in this ComplexACK.
+* Request OpCode `0x008D`. Set `objectIdentifier` to the object that carries the Playback Function. `propertyIdentifier` is the Command ID of this Command. `propertyValue` is [LocalRecordQuery Command Structure](#ref_LocalRecordQueryCommandStructure). `source` is the same as for other commands.
+* Response OpCode `0x038D`. `propertyValue` is [LocalRecordQuery Response Command Structure](#ref_LocalRecordQueryResponseCommandStructure), whose member 0 is `Status`. Invalid parameters, unavailable storage and an invalid cursor are all returned in this ComplexACK.
 
-With `QueryLocalRecordType=LocalRecordIndex`, the member `LocalRecordIndex` is used, which is bounded (`MaxCount` + `Cursor`) and one-question-one-answer with no progress notifications. With `QueryLocalRecordType=LocalRecordSegment`, the member `LocalRecordSegment` is used, without a cursor: the request gives which `timestamp`s, and the response returns the file descriptors in the same order. Both queries return `TotalCount`.
+When `QueryLocalRecordType=LocalRecordIndex`, the `LocalRecordIndex` member is used; it is bounded (`MaxCount` + `Cursor`), request-response based, with no progress notification. When `QueryLocalRecordType=LocalRecordSegment`, the `LocalRecordSegment` member is used and there is no cursor: the response returns the file descriptions for the requested `timestamp` values in the same order. Both queries return `TotalCount`.
 
 ##### Parameters
 
@@ -142990,7 +144399,7 @@ With `QueryLocalRecordType=LocalRecordIndex`, the member `LocalRecordIndex` is u
 
 [LocalRecordQuery Response Command Structure](#ref_LocalRecordQueryResponseCommandStructure)
 
-See [Downloading the Local Recording Index File](#ref_LocalRecord_FlowDownloadIndex) and [Downloading Local Recording Files](#ref_LocalRecord_FlowDownloadFile) for the flows.
+For the flow, see [Download Recording Index File](#ref_LocalRecord_FlowDownloadIndex) and [Download Recording File](#ref_LocalRecord_FlowDownloadFile).
 
 ##### Pagination Rules
 
@@ -143007,8 +144416,8 @@ Pagination applies only to `LocalRecordIndex`. The range of `LocalRecordSegment`
   <tbody>
     <tr>
       <td>Range</td>
-      <td>The timestamp range of <code>LocalRecordIndex</code> (<code>StartTimestamp</code> / <code>EndTimestamp</code>)</td>
-      <td>Which days to query the index for</td>
+      <td>Timestamp range of <code>LocalRecordIndex</code> (<code>StartTimestamp</code> / <code>EndTimestamp</code>)</td>
+      <td>Which days' indexes are requested</td>
     </tr>
     <tr>
       <td>Pagination</td>
@@ -143018,19 +144427,19 @@ Pagination applies only to `LocalRecordIndex`. The range of `LocalRecordSegment`
   </tbody>
 </table>
 
-* `Cursor` and `NextCursor` are entry indexes into the matched results, starting from 0, not time. The App SHALL only echo the `NextCursor` of the previous response, and SHALL NOT compute it from `Date` or timestamps by itself.
-* `TotalCount` is returned by both queries. For the index query it is the number of matched entries in the time range; for the segment query it is the number of entries in this `Timestamps` request. With circular overwrite, a later page of an index query can differ from the previous page. Whether the query is finished is determined by `NextCursor`.
-* One response SHALL NOT exceed the limit of a single carried message. Beyond the given `MaxCount`, the device SHALL keep converging according to this limit.
-* An omitted `NextCursor` means the query has finished; an empty `LocalRecordIndex` with a `NextCursor` is legal (that page was filtered out).
-* When the cursor is invalidated, SHALL return `Status = DYNAMIC_CONSTRAINT_ERROR` and the App restarts the query from the beginning.
-* During pagination, circular recording may have overwritten old data, and entries may be duplicated or missing. The device SHOULD keep the result consistent within the cursor lifetime; if it cannot, the App deduplicates by `fileDesignator`.
-* Repeated queries of the hole-refetching kind SHOULD follow a minimum interval (500 ms is used for index queries in production).
+* `Cursor` and `NextCursor` are the entry sequence numbers in the match result, starting from 0, not time. The App SHALL only echo back the `NextCursor` from the previous response, and SHALL NOT calculate it by itself using `Date` or timestamps.
+* `TotalCount` is returned by both queries. For an index query it is the number of matches in the time range; for a segment query it is the number of `Timestamps` in this request. With loop overwrite, the value of the next page of an index query may differ from that of the previous page. Whether the query is finished is determined by `NextCursor`.
+* A single response SHALL NOT exceed the limit for carrying a single message. In addition to the given `MaxCount`, the device SHALL further converge according to this limit.
+* An omitted `NextCursor` indicates that the query has ended; an empty `LocalRecordIndex` with a `NextCursor` is valid (that page was emptied by the filter conditions).
+* When the cursor becomes invalid, `Status = DYNAMIC_CONSTRAINT_ERROR` SHALL be returned, and the App re-queries from the beginning.
+* During pagination, loop recording may have overwritten old data, so entries may be duplicated or missing. The device SHOULD keep the results consistent within the cursor lifetime; if it cannot, the App deduplicates by `fileDesignator`.
+* Repeated queries in the hole re-fetch style SHOULD observe a minimum interval (500 ms for index queries in the current live network).
 
 ## CloudRecording (Cloud Recording) {#ref_Aqara_Spec_CloudRecording}
 
 ### Introduction
 
-Controls the master switch of cloud recording, determining whether video content is uploaded to cloud storage.
+Controls the cloud recording master switch and determines whether video content is uploaded to cloud storage.
 
 ### Function Identifier
 
@@ -143069,12 +144478,18 @@ Controls the master switch of cloud recording, determining whether video content
       <td>Cloud video recording master enable</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5278</td>
+      <td><a href="#ref_FreeCloudRecordingUploadAllowed">FreeCloudRecordingUploadAllowed</a></td>
+      <td>Whether free cloud recording upload is allowed</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
 ### Command
 
-This Function does not contain any Commands.
+This Function does not contain Commands.
 
 ### Data Types
 
@@ -143096,12 +144511,17 @@ This Function has no custom data types.
       <td><a href="#ref_CloudRecordingEnable">CloudRecordingEnable</a></td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5278</td>
+      <td><a href="#ref_FreeCloudRecordingUploadAllowed">FreeCloudRecordingUploadAllowed</a></td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
 #### CloudRecordingEnable Trait (Cloud Video Recording Master Enable) {#ref_CloudRecordingEnable}
 
-The master switch to enable or disable event cloud recording.
+User-settable master switch for cloud video upload. When disabled, no recordings are uploaded to the cloud, including event recordings and local time-lapse videos.
 
 <table>
   <thead>
@@ -143154,9 +144574,66 @@ The master switch to enable or disable event cloud recording.
   </tbody>
 </table>
 
+#### FreeCloudRecordingUploadAllowed Trait {#ref_FreeCloudRecordingUploadAllowed}
+
+Indicates whether the device is currently allowed to upload cloud event recordings free of charge. This value is determined by the cloud based on the device model value and the user payment status and then delivered to the device; cloud recording upload is allowed only after the device has subscribed to the value-added service.
+
+A value of 0 (False) indicates that free upload of cloud event recordings is not allowed; a value of 1 (True) indicates that free upload of cloud event recordings is allowed. This Trait does not control the upload of other videos such as local time-lapse photography. [CloudRecordingEnable](#ref_CloudRecordingEnable) is the user-settable master switch for upload; when it is turned off, no recordings are uploaded to the cloud, regardless of the value of this Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5278</td>
+      <td>FreeCloudRecordingUploadAllowed</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Command Definitions
 
-This Function does not contain any Commands.
+This Function does not contain Commands.
 
 ## CameraSettings (More Settings) {#ref_Aqara_Spec_CameraSettings}
 
@@ -143427,7 +144904,7 @@ Device-side periodic snapshot capture interval. It can be configured and takes e
   <thead>
     <tr>
       <th>Trait ID</th>
-<th>Code</th>
+      <th>Code</th>
     </tr>
   </thead>
   <tbody>
@@ -146167,6 +147644,12 @@ Defines the camera power consumption strategy and work modes, adapting to differ
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5277</td>
+      <td><a href="#ref_AutoWakeupInterval">AutoWakeupInterval</a></td>
+      <td>Auto wake-up interval</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4FD8</td>
       <td><a href="#ref_CamWorkMode">CamWorkMode</a></td>
       <td>Camera work mode</td>
@@ -146243,6 +147726,11 @@ This enumeration defines the valid values of the Present Value for the CamWorkMo
     <tr>
       <td>0x4FD9</td>
       <td><a href="#ref_ActiveWakeupInterval">ActiveWakeupInterval</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5277</td>
+      <td><a href="#ref_AutoWakeupInterval">AutoWakeupInterval</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -146339,6 +147827,61 @@ Configures the active wake-up interval of the battery-powered camera when operat
       <td>uint32</td>
       <td></td>
       <td>3</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### AutoWakeupInterval Trait {#ref_AutoWakeupInterval}
+
+Indicates whether the proactive wakeup interval of the device uses automatic mode. When the value is 1 (True), the device dynamically determines the proactive wakeup interval based on its own wakeup capability, operating state, or policy instead of using a fixed time interval; when the value is 0 (False), the device uses the fixed wakeup interval configured by [ActiveWakeupInterval](#ref_ActiveWakeupInterval).
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5277</td>
+      <td>AutoWakeupInterval</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
       <td>RW</td>
       <td>O</td>
     </tr>
@@ -152939,10 +154482,10 @@ The request structure of `WebRTCTalk`.
   <thead>
     <tr>
       <th>Struct Member Index</th>
-<th>Field Name</th>
-<th>Type</th>
-<th>Mandatory</th>
-<th>Description</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
     </tr>
   </thead>
   <tbody>
@@ -152971,10 +154514,10 @@ The response structure of `WebRTCTalk`.
   <thead>
     <tr>
       <th>Struct Member Index</th>
-<th>Field Name</th>
-<th>Type</th>
-<th>Mandatory</th>
-<th>Description</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
     </tr>
   </thead>
   <tbody>
@@ -152996,8 +154539,8 @@ The request structure of `WebRTCSetResolution`.
   <thead>
     <tr>
       <th>Struct Member Index</th>
-<th>Field Name</th>
-<th>Type</th>
+      <th>Field Name</th>
+      <th>Type</th>
       <th>Mandatory</th>
       <th>Description</th>
     </tr>
@@ -153534,8 +155077,8 @@ The transport stack of the WebRTC DataChannel (RFC 8831) is SCTP over DTLS over 
     </tr>
     <tr>
       <td>DCEP (RFC 8832)</td>
-      <td>Opens channels on the association</td>
-      <td>label, Channel Type, and Priority live here and do not enter the SDP</td>
+      <td>Open a channel on the association</td>
+      <td>label, Channel Type and Priority are carried here, not in SDP</td>
     </tr>
   </tbody>
 </table>
@@ -153562,14 +155105,14 @@ A WebRTC session has at most one `m=application`. This media description carries
       <td>Business commands and responses, device status notifications. Recording queries and tier switching, and playback are also on this Data Channel</td>
       <td><code>0x00</code> reliable ordered</td>
       <td><code>1024</code></td>
-      <td><code>50</code> (JSON)</td>
+      <td><code>50</code>(JSON)</td>
     </tr>
     <tr>
       <td><code>aqara.download</code></td>
       <td>Fetch file bytes according to the file transfer business interaction protocol</td>
       <td><code>0x00</code> reliable ordered</td>
       <td><code>128</code></td>
-      <td><code>60</code> (CBOR)</td>
+      <td><code>60</code>(CBOR)</td>
     </tr>
   </tbody>
 </table>
@@ -153683,24 +155226,24 @@ The OpCodes of `0x00` follow the data model: the high byte is the PDU Type and t
   <tbody>
     <tr>
       <td><code>aqara.control</code></td>
-      <td>InvokeCommand (ProtocolID <code>0x00</code>)</td>
+      <td>InvokeCommand(ProtocolID <code>0x00</code>)</td>
       <td><code>0x008D</code> / <code>0x038D</code></td>
       <td>App -> Device / back</td>
-      <td><a href="#ref_WebRTCSetResolution">WebRTCSetResolution</a>, <a href="#ref_WebRTCTalk">WebRTCTalk</a>, <a href="#ref_LocalPlaybackControl">LocalPlaybackControl</a>, <a href="#ref_LocalRecordQuery">LocalRecordQuery</a></td>
+      <td><a href="#ref_WebRTCSetResolution">WebRTCSetResolution</a>,<a href="#ref_WebRTCTalk">WebRTCTalk</a>,<a href="#ref_LocalPlaybackControl">LocalPlaybackControl</a>,<a href="#ref_LocalRecordQuery">LocalRecordQuery</a></td>
     </tr>
     <tr>
       <td><code>aqara.control</code></td>
-      <td>UnconfirmedCOVNotificationMultiple (ProtocolID <code>0x00</code>)</td>
+      <td>UnconfirmedCOVNotificationMultiple(ProtocolID <code>0x00</code>)</td>
       <td><code>0x018A</code></td>
       <td>Device -> App</td>
-      <td><code>WebRTCStreamResolution</code>, <a href="#ref_LocalPlaybackStatus">LocalPlaybackStatus</a></td>
+      <td><code>WebRTCStreamResolution</code>,<a href="#ref_LocalPlaybackStatus">LocalPlaybackStatus</a></td>
     </tr>
     <tr>
       <td><code>aqara.download</code></td>
       <td>File transfer (ProtocolID <code>0x02</code>)</td>
       <td>0x0000-0x0008</td>
       <td>App requests, device responds</td>
-      <td>init, block, EOF, abort, error</td>
+      <td>init,block,EOF,abort,error</td>
     </tr>
   </tbody>
 </table>
@@ -153815,19 +155358,19 @@ SCTP User Message (PPID = 53)
   </thead>
   <tbody>
     <tr>
-      <td>Business commands (including recording queries)</td>
+      <td>Business commands (including recording query)</td>
       <td>Code <code>0.02</code>, non-empty Token</td>
-      <td><code>2.04 Changed</code>, echoing the same Token</td>
+      <td><code>2.04 Changed</code>, echoes the same Token</td>
     </tr>
     <tr>
       <td>File transfer</td>
       <td>Code <code>0.02</code>, non-empty Token</td>
-      <td><code>2.04 Changed</code>, echoing the same Token. Interactions follow the OpCode master table</td>
+      <td><code>2.04 Changed</code>, echoes the same Token. See the OpCode summary table for interactions</td>
     </tr>
     <tr>
-      <td>Resolution and playback status reports</td>
+      <td>Resolution and playback state reporting</td>
       <td>Code <code>0.02</code>, empty Token, OpCode <code>0x018A</code></td>
-      <td>No CoAP response</td>
+      <td>No CoAP response is returned</td>
     </tr>
     <tr>
       <td>Business failure of data model commands</td>
