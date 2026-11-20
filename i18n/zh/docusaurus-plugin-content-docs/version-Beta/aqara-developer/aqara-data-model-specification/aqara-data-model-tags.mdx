@@ -22228,6 +22228,18 @@ P2P动态趣图状态开关
   </thead>
   <tbody>
     <tr>
+      <td>0x9DC1</td>
+      <td><a href="#ref_ClearLimitPoint">ClearLimitPoint</a></td>
+      <td>清除行程</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC0</td>
+      <td><a href="#ref_ExecuteWindowCoveringEffect">ExecuteWindowCoveringEffect</a></td>
+      <td>执行窗帘场景</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x9D63</td>
       <td><a href="#ref_RemoveUserDefinedEffects">RemoveUserDefinedEffects</a></td>
       <td>批量删除自定义场景</td>
@@ -22799,7 +22811,7 @@ P2P动态趣图状态开关
 
 ##### MotorSpeedSettingEnum8 Type {#ref_MotorSpeedSettingEnum8}
 
-该枚举定义 MotorSpeedSetting Trait 的 Present Value 有效取值。
+该枚举定义 MotorSpeedSetting Trait 的 Present Value 和 ExecuteWindowCoveringEffect Command 的 SpeedLevel 有效取值。
 
 <table>
   <thead>
@@ -23511,6 +23523,45 @@ GoToPositionPercentage Command 的参数结构体。
       <td>uint32</td>
       <td>O</td>
       <td>时间。</td>
+    </tr>
+  </tbody>
+</table>
+
+##### ExecuteWindowCoveringEffect Command Structure Type {#ref_ExecuteWindowCoveringEffectCommandStructure}
+
+ExecuteWindowCoveringEffect Command 的参数结构体。
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Percentage</td>
+      <td>float</td>
+      <td>M</td>
+      <td>目标百分比，范围 0 ~ 100，步长为 1，单位为 %，默认值为 50。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>TransitionTime</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>渐变时间，范围 1 ~ 28800，步长为 1，单位为 s，默认值为 10。</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>SpeedLevel</td>
+      <td><a href="#ref_MotorSpeedSettingEnum8">MotorSpeedSettingEnum8</a></td>
+      <td>O</td>
+      <td>速度档位，默认值为 1（MediumSpeed）。</td>
     </tr>
   </tbody>
 </table>
@@ -27008,6 +27059,16 @@ CurrentPositionRotationPercentage 特征的当前值以百分比表示实际俯�
   </thead>
   <tbody>
     <tr>
+      <td>0x9DC1</td>
+      <td><a href="#ref_ClearLimitPoint">ClearLimitPoint</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC0</td>
+      <td><a href="#ref_ExecuteWindowCoveringEffect">ExecuteWindowCoveringEffect</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x9D63</td>
       <td><a href="#ref_RemoveUserDefinedEffects">RemoveUserDefinedEffects</a></td>
       <td>O</td>
@@ -27109,6 +27170,52 @@ CurrentPositionRotationPercentage 特征的当前值以百分比表示实际俯�
     </tr>
   </tbody>
 </table>
+
+#### ExecuteWindowCoveringEffect Command {#ref_ExecuteWindowCoveringEffect}
+
+用于控制窗帘电机执行特定的运行效果。命令包含目标位置百分比、渐变时间和速度档位。设备收到命令后，将按指定的速度档位，在设定的渐变时间内平滑运行到目标位置。
+
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9DC0</td>
+      <td>ExecuteWindowCoveringEffect</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+[ExecuteWindowCoveringEffect Command Structure](#ref_ExecuteWindowCoveringEffectCommandStructure)
+
+#### ClearLimitPoint Command {#ref_ClearLimitPoint}
+
+用于清除窗帘电机当前记忆的限位点数据，包括上限位和下限位。执行该命令后，电机将丢失当前位置参照，通常需要用户重新进行限位/行程校准（学习）操作，设备才能正常进行开合控制。
+
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9DC1</td>
+      <td>ClearLimitPoint</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+该 Command 无参数。
 
 #### RemoveUserDefinedEffects Command {#ref_RemoveUserDefinedEffects}
 
@@ -38886,6 +38993,12 @@ Loads home theater playback on the speaker.
       <td>充电状态</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5279</td>
+      <td><a href="#ref_BatChargeLimit">BatChargeLimit</a></td>
+      <td>充电上限</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -39070,6 +39183,52 @@ Loads home theater playback on the speaker.
   </tbody>
 </table>
 
+##### BatChargeLimitEnum8 Type {#ref_BatChargeLimitEnum8}
+
+该枚举定义 BatChargeLimit Trait 的 Present Value 有效取值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x50</td>
+      <td>Percent80</td>
+      <td>80%，充电至 80% 停止</td>
+    </tr>
+    <tr>
+      <td>0x55</td>
+      <td>Percent85</td>
+      <td>85%，充电至 85% 停止</td>
+    </tr>
+    <tr>
+      <td>0x5A</td>
+      <td>Percent90</td>
+      <td>90%，充电至 90% 停止</td>
+    </tr>
+    <tr>
+      <td>0x5F</td>
+      <td>Percent95</td>
+      <td>95%，充电至 95% 停止</td>
+    </tr>
+    <tr>
+      <td>0x64</td>
+      <td>Percent100</td>
+      <td>100%，充电至 100%（满电）</td>
+    </tr>
+    <tr>
+      <td>0xFF</td>
+      <td>Auto</td>
+      <td>自动：设备根据日常使用习惯动态调整充电上限</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait 定义
 
 <table>
@@ -39144,6 +39303,11 @@ Loads home theater playback on the speaker.
     <tr>
       <td>0x80CE</td>
       <td><a href="#ref_BatChargeState">BatChargeState</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5279</td>
+      <td><a href="#ref_BatChargeLimit">BatChargeLimit</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -39961,6 +40125,61 @@ Supported Value 参数提供设备支持的电池描述字符串列表；实现�
       <td>0x0006</td>
       <td>Supported Value</td>
       <td>list[<a href="#ref_BatChargeStateEnum8">BatChargeStateEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### BatChargeLimit Trait（充电上限） {#ref_BatChargeLimit}
+
+用于设置电池的充电上限，可减缓电池老化，延长使用寿命。选择 Auto 时，设备根据日常使用习惯动态调整充电上限。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5279</td>
+      <td>BatChargeLimit</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_BatChargeLimitEnum8">BatChargeLimitEnum8</a></td>
+      <td></td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_BatChargeLimitEnum8">BatChargeLimitEnum8</a>]</td>
       <td></td>
       <td></td>
       <td>R</td>
@@ -106202,6 +106421,20 @@ AddFace Command 的请求参数结构体。
       <td>M</td>
       <td>请求方指定的人脸唯一标识，必须在设备本地人脸库中唯一。</td>
     </tr>
+    <tr>
+      <td>1</td>
+      <td>ImageUrl</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>人脸图片网址。</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>ImageKey</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>图片加密密钥。</td>
+    </tr>
   </tbody>
 </table>
 
@@ -107269,7 +107502,7 @@ height（uint32）：指定单位下的区域总高度。
 
 #### AddFace Command {#ref_AddFace}
 
-新增一条人脸信息并同步到设备本地人脸库。请求方传入唯一的 64 位无符号 FaceId，设备使用该 ID 创建人脸记录，并在成功响应中返回。当人脸库已达到 FaceCountLimit 时返回 RESOURCE_EXHAUSTED。
+新增一条人脸信息并同步到设备本地人脸库。请求方传入唯一的 64 位无符号 FaceId、人脸图片网址 ImageUrl 和图片加密密钥 ImageKey，设备使用该 ID 创建人脸记录，并在成功响应中返回。当人脸库已达到 FaceCountLimit 时返回 RESOURCE_EXHAUSTED。
 
 ##### 参数
 
