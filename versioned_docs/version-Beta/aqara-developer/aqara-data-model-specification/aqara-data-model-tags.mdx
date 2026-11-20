@@ -10812,7 +10812,7 @@ Parameter structure of the StepBrightnessWithOnOff Command.
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
+      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>10000</code>, step <code>100 ms</code>.</td>
     </tr>
   </tbody>
 </table>
@@ -10844,7 +10844,7 @@ Parameter structure of the SetBrightnessWithOnOff Command.
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
+      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>10000</code>, step <code>100 ms</code>.</td>
     </tr>
   </tbody>
 </table>
@@ -10876,7 +10876,7 @@ Parameter structure of the SetBrightness Command.
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
+      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>10000</code>, step <code>100 ms</code>.</td>
     </tr>
     <tr>
       <td>2</td>
@@ -10915,7 +10915,7 @@ Parameter structure of the StepBrightness Command.
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
+      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>10000</code>, step <code>100 ms</code>.</td>
     </tr>
     <tr>
       <td>2</td>
@@ -11077,7 +11077,7 @@ On the Matter side (light-type devices), a level range of 1-254 is commonly used
 
 This Trait is used to indicate the power value of the dimming algorithm curve, which controls the change speed and dwell time of brightness in the low-brightness region (near the minimum brightness range).
 
-The value range is `0.1` to `10.0`. The device should apply curve mapping within this range and adjust the subjective visual rhythm of the brightness transition accordingly.
+The value range is `0.2` to `6.0`, with a step of `0.01` and a default value of `1.5`. The device should apply curve mapping within this range and adjust the subjective visual rhythm of the brightness transition accordingly.
 
 * When the value is `1.0`, it indicates a linear dimming curve, where brightness changes at an approximately uniform rate over time.
 * When the value is greater than `1.0`, the low-brightness region changes more slowly and dwells longer, making the overall visual effect closer to "slow start, then accelerating at the end".
@@ -11129,7 +11129,7 @@ The larger the value, the higher the proportion of transition time occupied by t
       <td>Maximum Value</td>
       <td>float</td>
       <td></td>
-      <td>10.0</td>
+      <td>6.0</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -11138,7 +11138,7 @@ The larger the value, the higher the proportion of transition time occupied by t
       <td>Minimum Value</td>
       <td>float</td>
       <td></td>
-      <td>0.1</td>
+      <td>0.2</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -11147,7 +11147,7 @@ The larger the value, the higher the proportion of transition time occupied by t
       <td>Step Value</td>
       <td>float</td>
       <td></td>
-      <td>0.1</td>
+      <td>0.01</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -13003,7 +13003,7 @@ Parameter structure of the MoveToXYColorBrightness Command.
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
+      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>10000</code>, step <code>100 ms</code>.</td>
     </tr>
     <tr>
       <td>4</td>
@@ -13049,7 +13049,7 @@ Parameter structure of the MoveToColorTemperatureBrightness Command.
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
+      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>10000</code>, step <code>100 ms</code>.</td>
     </tr>
     <tr>
       <td>3</td>
@@ -13102,7 +13102,7 @@ Parameter structure of the MoveToHueSaturationBrightness Command.
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
+      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>10000</code>, step <code>100 ms</code>.</td>
     </tr>
     <tr>
       <td>4</td>
@@ -13148,7 +13148,7 @@ Parameter structure of the MoveToXYColor Command.
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
+      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>10000</code>, step <code>100 ms</code>.</td>
     </tr>
     <tr>
       <td>3</td>
@@ -13194,7 +13194,7 @@ Parameter structure of the MoveToHueAndSaturation Command.
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
+      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>10000</code>, step <code>100 ms</code>.</td>
     </tr>
     <tr>
       <td>3</td>
@@ -13233,7 +13233,7 @@ Parameter structure of the MoveToColorTemperature Command.
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
+      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>10000</code>, step <code>100 ms</code>.</td>
     </tr>
     <tr>
       <td>2</td>
@@ -13272,7 +13272,7 @@ Parameter structure of the StepColorTemperature Command.
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
+      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>10000</code>, step <code>100 ms</code>.</td>
     </tr>
     <tr>
       <td>2</td>
@@ -13318,7 +13318,7 @@ Parameter structure of the MoveToHue Command.
       <td>TransitionTime</td>
       <td>uint16</td>
       <td>O</td>
-      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
+      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>10000</code>, step <code>100 ms</code>.</td>
     </tr>
     <tr>
       <td>3</td>
@@ -13357,7 +13357,7 @@ Parameter structure of the MoveToSaturation Command.
       <td>TransitionTime</td>
       <td>uint16</td>
       <td>O</td>
-      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>1000000</code>, step uniformly <code>500 ms</code>.</td>
+      <td>Transition time, unit <code>ms</code>; value range <code>0</code> ~ <code>10000</code>, step <code>100 ms</code>.</td>
     </tr>
     <tr>
       <td>2</td>
@@ -22228,6 +22228,18 @@ The client should determine the current controllability and operation stage of t
   </thead>
   <tbody>
     <tr>
+      <td>0x9DC1</td>
+      <td><a href="#ref_ClearLimitPoint">ClearLimitPoint</a></td>
+      <td>Clear travel</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC0</td>
+      <td><a href="#ref_ExecuteWindowCoveringEffect">ExecuteWindowCoveringEffect</a></td>
+      <td>Execute window covering effect</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x9D63</td>
       <td><a href="#ref_RemoveUserDefinedEffects">RemoveUserDefinedEffects</a></td>
       <td>Batch remove user defined effects</td>
@@ -22799,7 +22811,7 @@ This enumeration defines the valid values of the Present Value of the ObstacleLi
 
 ##### MotorSpeedSettingEnum8 Type {#ref_MotorSpeedSettingEnum8}
 
-This enumeration defines the valid values of the Present Value of the MotorSpeedSetting Trait.
+This enumeration defines the valid values of the Present Value of the MotorSpeedSetting Trait and the SpeedLevel of the ExecuteWindowCoveringEffect Command.
 
 <table>
   <thead>
@@ -23511,6 +23523,45 @@ Parameter structure of the GoToPositionPercentage Command.
       <td>uint32</td>
       <td>O</td>
       <td>Time.</td>
+    </tr>
+  </tbody>
+</table>
+
+##### ExecuteWindowCoveringEffect Command Structure Type {#ref_ExecuteWindowCoveringEffectCommandStructure}
+
+Parameter structure of the ExecuteWindowCoveringEffect Command.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Percentage</td>
+      <td>float</td>
+      <td>M</td>
+      <td>Target percentage, value range 0 ~ 100, step 1, unit %, default 50.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>TransitionTime</td>
+      <td>uint16</td>
+      <td>O</td>
+      <td>Gradient time, value range 1 ~ 28800, step 1, unit s, default 10.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>SpeedLevel</td>
+      <td><a href="#ref_MotorSpeedSettingEnum8">MotorSpeedSettingEnum8</a></td>
+      <td>O</td>
+      <td>Speed level, default 1 (MediumSpeed).</td>
     </tr>
   </tbody>
 </table>
@@ -27008,6 +27059,16 @@ This extended Trait is used to report the lift limit range.
   </thead>
   <tbody>
     <tr>
+      <td>0x9DC1</td>
+      <td><a href="#ref_ClearLimitPoint">ClearLimitPoint</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x9DC0</td>
+      <td><a href="#ref_ExecuteWindowCoveringEffect">ExecuteWindowCoveringEffect</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x9D63</td>
       <td><a href="#ref_RemoveUserDefinedEffects">RemoveUserDefinedEffects</a></td>
       <td>O</td>
@@ -27109,6 +27170,52 @@ This extended Trait is used to report the lift limit range.
     </tr>
   </tbody>
 </table>
+
+#### ExecuteWindowCoveringEffect Command {#ref_ExecuteWindowCoveringEffect}
+
+This command should request the window covering motor to execute a specific operating effect. The command contains the target position percentage, the gradient time and the speed level. After receiving the command, the device runs smoothly to the target position at the specified speed level within the configured gradient time.
+
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9DC0</td>
+      <td>ExecuteWindowCoveringEffect</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+[ExecuteWindowCoveringEffect Command Structure](#ref_ExecuteWindowCoveringEffectCommandStructure)
+
+#### ClearLimitPoint Command {#ref_ClearLimitPoint}
+
+This command should request the device to clear the limit point data currently memorized by the window covering motor, including the upper limit and the lower limit. After this command is executed, the motor loses its current position reference; the user usually needs to perform limit point/travel calibration (learning) again before the device can perform open/close control normally.
+
+<table>
+  <thead>
+    <tr>
+      <th>Command ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x9DC1</td>
+      <td>ClearLimitPoint</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+This Command has no parameters.
 
 #### RemoveUserDefinedEffects Command {#ref_RemoveUserDefinedEffects}
 
@@ -38886,6 +38993,12 @@ Describes the power supply source and battery status of the device, including ba
       <td>Battery charge state</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5279</td>
+      <td><a href="#ref_BatChargeLimit">BatChargeLimit</a></td>
+      <td>Charging limit</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -39070,6 +39183,52 @@ This enumeration defines the valid values of the Present Value of the BatChargeS
   </tbody>
 </table>
 
+##### BatChargeLimitEnum8 Type {#ref_BatChargeLimitEnum8}
+
+This enumeration defines the valid values of the Present Value of the BatChargeLimit Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x50</td>
+      <td>Percent80</td>
+      <td>80%; charging stops at 80%</td>
+    </tr>
+    <tr>
+      <td>0x55</td>
+      <td>Percent85</td>
+      <td>85%; charging stops at 85%</td>
+    </tr>
+    <tr>
+      <td>0x5A</td>
+      <td>Percent90</td>
+      <td>90%; charging stops at 90%</td>
+    </tr>
+    <tr>
+      <td>0x5F</td>
+      <td>Percent95</td>
+      <td>95%; charging stops at 95%</td>
+    </tr>
+    <tr>
+      <td>0x64</td>
+      <td>Percent100</td>
+      <td>100%; charging stops at 100% (fully charged)</td>
+    </tr>
+    <tr>
+      <td>0xFF</td>
+      <td>Auto</td>
+      <td>Auto: the device dynamically adjusts the charging limit based on daily usage habits</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait Definitions
 
 <table>
@@ -39144,6 +39303,11 @@ This enumeration defines the valid values of the Present Value of the BatChargeS
     <tr>
       <td>0x80CE</td>
       <td><a href="#ref_BatChargeState">BatChargeState</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5279</td>
+      <td><a href="#ref_BatChargeLimit">BatChargeLimit</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -39961,6 +40125,61 @@ Indicates the battery charging state. 0: Unknown, 1: Charging, 2: Full charge, 3
       <td>0x0006</td>
       <td>Supported Value</td>
       <td>list[<a href="#ref_BatChargeStateEnum8">BatChargeStateEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### BatChargeLimit Trait {#ref_BatChargeLimit}
+
+Used to set the charging limit of the battery, which can slow down battery aging and extend the service life. When Auto is selected, the device dynamically adjusts the charging limit based on daily usage habits.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5279</td>
+      <td>BatChargeLimit</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_BatChargeLimitEnum8">BatChargeLimitEnum8</a></td>
+      <td></td>
+      <td></td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_BatChargeLimitEnum8">BatChargeLimitEnum8</a>]</td>
       <td></td>
       <td></td>
       <td>R</td>
@@ -72804,6 +73023,15 @@ Indicates the currently selected general configuration sensitivity level.
       <td></td>
     </tr>
     <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[uint8]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x0007</td>
       <td>Default Value</td>
       <td>uint8</td>
@@ -99861,6 +100089,12 @@ Manages screen-side user interface configuration, including page layout, cards, 
       <td>Standby styles</td>
       <td>M</td>
     </tr>
+    <tr>
+      <td>0x4F12</td>
+      <td><a href="#ref_ThemePackUpgradeMethod">ThemePackUpgradeMethod</a></td>
+      <td>Theme pack upgrade method</td>
+      <td>M</td>
+    </tr>
   </tbody>
 </table>
 
@@ -100266,6 +100500,27 @@ This enumeration defines the valid values of the Present Value / Supported Value
   </tbody>
 </table>
 
+##### ThemePackUpgradeMethodEnum8 Type {#ref_ScreenUserInterfaceThemePackUpgradeMethodEnum8}
+
+This enumeration defines the valid values of the Present Value of the ThemePackUpgradeMethod Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x01</td>
+      <td>Interface</td>
+      <td>Upgrade the theme pack through the interface</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait Definitions
 
 <table>
@@ -100360,6 +100615,11 @@ This enumeration defines the valid values of the Present Value / Supported Value
     <tr>
       <td>0x4F0E</td>
       <td><a href="#ref_StandbyStyles">StandbyStyles</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4F12</td>
+      <td><a href="#ref_ThemePackUpgradeMethod">ThemePackUpgradeMethod</a></td>
       <td>M</td>
     </tr>
   </tbody>
@@ -101160,6 +101420,52 @@ This Trait is used to configure the current standby style and report the set of 
       <td></td>
       <td></td>
       <td>R</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ThemePackUpgradeMethod Trait {#ref_ThemePackUpgradeMethod}
+
+This Trait is used to indicate the upgrade method of the theme pack.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4F12</td>
+      <td>ThemePackUpgradeMethod</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_ScreenUserInterfaceThemePackUpgradeMethodEnum8">ThemePackUpgradeMethodEnum8</a></td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
       <td>M</td>
     </tr>
   </tbody>
@@ -106202,6 +106508,20 @@ Request parameter structure of the AddFace Command.
       <td>M</td>
       <td>Unique face identifier specified by the requester; it MUST be unique within the device-local face library.</td>
     </tr>
+    <tr>
+      <td>1</td>
+      <td>ImageUrl</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Face image URL.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>ImageKey</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Image encryption key.</td>
+    </tr>
   </tbody>
 </table>
 
@@ -107269,7 +107589,7 @@ Represents the maximum number of faces that the device local face library can ho
 
 #### AddFace Command {#ref_AddFace}
 
-Adds a face record and synchronizes it to the device local face library. The requester passes in a unique 64-bit unsigned FaceId, and the device creates the face record with that ID and returns it in the success response. When the face library has reached FaceCountLimit, RESOURCE_EXHAUSTED is returned.
+Adds a face record and synchronizes it to the device local face library. The requester passes in a unique 64-bit unsigned FaceId, the face image URL ImageUrl and the image encryption key ImageKey; the device creates the face record with that ID and returns it in the success response. When the face library has reached FaceCountLimit, RESOURCE_EXHAUSTED is returned.
 
 ##### Parameters
 
@@ -114647,6 +114967,15 @@ When this Trait is NULL, it indicates that the detection range is not configured
       <td>Can be NULL, up to 6 bytes</td>
       <td></td>
       <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x000D</td>
+      <td>Is Null</td>
+      <td>boolean</td>
+      <td></td>
+      <td>False</td>
+      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -128229,7 +128558,7 @@ Parameter structure of the PreviewTransition Command.
       <td>DimmingCurvature</td>
       <td>float</td>
       <td>M</td>
-      <td>Dimmer curve power value used for preview. The larger the value, the longer the stay in the low-brightness area.</td>
+      <td>Dimmer curve power value used for preview, with a value range of 0.2-6 and a step of 0.01. The larger the value, the longer the stay in the low-brightness area.</td>
     </tr>
     <tr>
       <td>3</td>
