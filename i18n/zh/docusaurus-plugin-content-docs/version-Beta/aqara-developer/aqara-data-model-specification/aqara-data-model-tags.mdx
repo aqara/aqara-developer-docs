@@ -10812,7 +10812,7 @@ StepBrightnessWithOnOff Command 的参数结构体。
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>10000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
   </tbody>
 </table>
@@ -10844,7 +10844,7 @@ SetBrightnessWithOnOff Command 的参数结构体。
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>10000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
   </tbody>
 </table>
@@ -10876,7 +10876,7 @@ SetBrightness Command 的参数结构体。
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>10000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>2</td>
@@ -10915,7 +10915,7 @@ StepBrightness Command 的参数结构体。
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>10000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>2</td>
@@ -11077,7 +11077,7 @@ StepBrightness Command 的参数结构体。
 
 该 Trait 用于指示调光算法曲线的幂值（Power），用于控制亮度在低亮区（接近最小亮度区间）内的变化速度与停留时长。
 
-本值范围为 `0.1` 至 `10.0`。设备应在该范围内应用曲线映射，并据此调整亮度过渡的主观视觉节奏。
+本值范围为 `0.2` 至 `6.0`，步进为 `0.01`，默认值为 `1.5`。设备应在该范围内应用曲线映射，并据此调整亮度过渡的主观视觉节奏。
 
 * 当取值为 `1.0` 时，表示线性调光曲线，亮度随时间近似匀速变化。
 * 当取值大于 `1.0` 时，低亮区变化更慢、停留更久，整体视觉效果更接近"慢起亮、后段加速"。
@@ -11129,7 +11129,7 @@ StepBrightness Command 的参数结构体。
       <td>Maximum Value</td>
       <td>float</td>
       <td></td>
-      <td>10.0</td>
+      <td>6.0</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -11138,7 +11138,7 @@ StepBrightness Command 的参数结构体。
       <td>Minimum Value</td>
       <td>float</td>
       <td></td>
-      <td>0.1</td>
+      <td>0.2</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -11147,7 +11147,7 @@ StepBrightness Command 的参数结构体。
       <td>Step Value</td>
       <td>float</td>
       <td></td>
-      <td>0.1</td>
+      <td>0.01</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -13003,7 +13003,7 @@ MoveToXYColorBrightness Command 的参数结构体。
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>10000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>4</td>
@@ -13049,7 +13049,7 @@ MoveToColorTemperatureBrightness Command 的参数结构体。
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>10000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>3</td>
@@ -13102,7 +13102,7 @@ MoveToHueSaturationBrightness Command 的参数结构体。
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>10000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>4</td>
@@ -13148,7 +13148,7 @@ MoveToXYColor Command 的参数结构体。
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>10000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>3</td>
@@ -13194,7 +13194,7 @@ MoveToHueAndSaturation Command 的参数结构体。
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>10000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>3</td>
@@ -13233,7 +13233,7 @@ MoveToColorTemperature Command 的参数结构体。
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>10000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>2</td>
@@ -13272,7 +13272,7 @@ StepColorTemperature Command 的参数结构体。
       <td>TransitionTime</td>
       <td>int32</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>10000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>2</td>
@@ -13318,7 +13318,7 @@ MoveToHue Command 的参数结构体。
       <td>TransitionTime</td>
       <td>uint16</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>10000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>3</td>
@@ -13357,7 +13357,7 @@ MoveToSaturation Command 的参数结构体。
       <td>TransitionTime</td>
       <td>uint16</td>
       <td>O</td>
-      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>20000</code>，步进值为 <code>100 ms</code>。</td>
+      <td>过渡时间，单位 <code>ms</code>；取值范围 <code>0</code> ~ <code>10000</code>，步进值为 <code>100 ms</code>。</td>
     </tr>
     <tr>
       <td>2</td>
@@ -73023,6 +73023,15 @@ LightingModeSetting trait 用于设置或查询照明设备的当前工作模式
       <td></td>
     </tr>
     <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[uint8]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x0007</td>
       <td>Default Value</td>
       <td>uint8</td>
@@ -100080,6 +100089,12 @@ MultiStateOutputPV 包含请求或当前活动的枚举输出状态。
       <td>待机样式</td>
       <td>M</td>
     </tr>
+    <tr>
+      <td>0x4F12</td>
+      <td><a href="#ref_ThemePackUpgradeMethod">ThemePackUpgradeMethod</a></td>
+      <td>主题包升级方式</td>
+      <td>M</td>
+    </tr>
   </tbody>
 </table>
 
@@ -100485,6 +100500,27 @@ RemovePage Command 的参数结构体。
   </tbody>
 </table>
 
+##### ThemePackUpgradeMethodEnum8 Type {#ref_ScreenUserInterfaceThemePackUpgradeMethodEnum8}
+
+该枚举定义 ThemePackUpgradeMethod Trait 的 Present Value 有效取值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x01</td>
+      <td>Interface</td>
+      <td>通过接口方式升级主题包</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Trait 定义
 
 <table>
@@ -100579,6 +100615,11 @@ RemovePage Command 的参数结构体。
     <tr>
       <td>0x4F0E</td>
       <td><a href="#ref_StandbyStyles">StandbyStyles</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x4F12</td>
+      <td><a href="#ref_ThemePackUpgradeMethod">ThemePackUpgradeMethod</a></td>
       <td>M</td>
     </tr>
   </tbody>
@@ -101379,6 +101420,52 @@ RemovePage Command 的参数结构体。
       <td></td>
       <td></td>
       <td>R</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ThemePackUpgradeMethod Trait（主题包升级方式） {#ref_ThemePackUpgradeMethod}
+
+该 Trait 用于指示主题包的升级方式。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4F12</td>
+      <td>ThemePackUpgradeMethod</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_ScreenUserInterfaceThemePackUpgradeMethodEnum8">ThemePackUpgradeMethodEnum8</a></td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
       <td>M</td>
     </tr>
   </tbody>
@@ -114880,6 +114967,15 @@ image::../images/aqara_Ambient_configuration_cluster/detection_range_bitmask.svg
       <td>可为 NULL，最多 6 字节</td>
       <td></td>
       <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x000D</td>
+      <td>Is Null</td>
+      <td>boolean</td>
+      <td></td>
+      <td>False</td>
+      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -128462,7 +128558,7 @@ PreviewTransition Command 的参数结构体。
       <td>DimmingCurvature</td>
       <td>float</td>
       <td>M</td>
-      <td>预览使用的调光曲线幂值。值越大，低亮区停留越久。</td>
+      <td>预览使用的调光曲线幂值，取值范围为 0.2-6，步进为 0.01。值越大，低亮区停留越久。</td>
     </tr>
     <tr>
       <td>3</td>
