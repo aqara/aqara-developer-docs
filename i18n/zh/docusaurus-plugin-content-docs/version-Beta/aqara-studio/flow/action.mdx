@@ -16,95 +16,248 @@ keywords: ["Aqara 文档", "Aqara Studio", "Flow", "执行", "action"]
 在 Flow 中，您可以执行以下动作：
 - [设备](#设备)：可对单个设备下发具体指令，如“打开灯”、“关闭空调”等，实现精准控制。
 - [批量执行](#批量执行)：支持对同类型的多个设备同时执行一致操作，如一键关闭多路开关，提升操作效率。
+- [场景](#场景)：执行已创建的场景，复用场景中的一组动作，无需在当前流程中重复配置设备。
 - [数据处理](#数据处理)：可在流程中实现数据的计算与统计，以及字符串的处理，便于后续逻辑使用。
 - [时间](#时间)：可延时执行下游判断或动作，灵活编排流程节奏。
 - [变量](#变量)：可修改变量值和切换布尔变量的值，实现数据的动态流转。
-- [流程](#流程)：可在当前流程中启用、停用其他 Flow，实现多流程联动与管理。
+- [自动化](#自动化)：可在当前自动化中启用、停用其他自动化，实现多自动化联动与管理。
+- [事件状态保持](#事件状态保持)
+- [循环管理](#循环管理)
+- [脚本](#脚本)
+- [消息推送](#消息推送)
 
 
 ## 设备
 
-设备执行卡片用于在自动化流程中对单个指定设备下发操作指令，实现如“打开/关闭灯”、“调整空调温度”、“切换开关”等实际动作。您可通过选择目标设备与其支持的控制能力（功能点），并配置相应参数，实现对设备的精准控制。
+设备执行卡片用于在自动化流程中对 **单个** 指定设备的属性写入自定义值、变量值或其他数据源的值，或切换布尔状态或携带配置参数执行设备命令，实现如“打开/关闭灯”、“调整空调温度”、“切换开关”等实际动作。
 
 ### 使用步骤
 
 1. 在画布的左侧边栏单击 **+** 按钮，在**执行**分类下选择**设备**。在设备列表中选择需要控制的设备。
 
-    ![选择设备执行卡片](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectDeviceAction.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectDeviceAction.png" alt="选择设备执行卡片" style={{ width: '70%' }} />
 
 2. 随后，您可以看到该设备可用的卡片列表，即可写功能点列表。单击所需卡片。即可将该卡片添加到画布。
 
-    ![选择设备执行卡片](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectADeviceActiontCard.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectADeviceActiontCard.png" alt="选择设备执行卡片" style={{ width: '70%' }} />
 
-    ![设备执行卡片已添加到画布](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-DeviceActionAdded.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-DeviceActionAdded.png" alt="设备执行卡片已添加到画布" style={{ width: '70%' }} />
 
 3. 点击卡片参数，选择或输入目标设备功能点的数值或状态，实现对设备的精准控制。
 
-    ![设置目标参数数值](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-DeviceControlParameterConfig.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-DeviceControlParameterConfig.png" alt="设置目标参数数值" style={{ width: '70%' }} />
 
-4. 完成卡片配置后，将其输入点连接到判断卡片或触发卡片，从而在前置条件满足时执行设备操作。
+4. 完成卡片配置后，将其输入点连接到 [判断](./condition.mdx) 卡片或 [触发](./trigger.mdx) 卡片，从而在前置条件满足时执行设备操作。
 
 ## 批量执行
 
-批量执行卡片用于在自动化流程中同时控制多个类型相同的设备功能点，实现一键下发相同操作。例如，可以同时关闭多个开关，或者将一组灯的亮度统一设置为 50。
+批量执行卡片用于向多个类型相同的设备功能点写入同一个值，或使用同一组参数调用设备命令，实现一键下发相同操作。例如，可以同时关闭多个开关，或者将一组灯的亮度统一设置为 50。
 
 ### 使用步骤
 
 1. 在画布左侧边栏点击 **+** 按钮，选择**执行**分类下的**批量执行**，并在弹出的列表中选择一个设备类型。
 
-    ![选择设备类型](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectBatchAction.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectBatchAction.png" alt="选择设备类型" style={{ width: '70%' }} />
 
 2. 随后，您可以看到该类型可用的卡片列表，即可写功能点列表。单击所需卡片。即可将该卡片添加到画布。
 
-    ![选择批量执行功能点卡片](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectABatchActionPointCard.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectABatchActionPointCard.png" alt="选择批量执行功能点卡片" style={{ width: '70%' }} />
 
-    ![批量执行卡片添加到画布](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-BatchAcrtionAdded.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-BatchAcrtionAdded.png" alt="批量执行卡片添加到画布" style={{ width: '70%' }} />
 
 3. 单击卡片上的参数，即可设置统一的目标参数值。如下图所示，选择“开”，即打开设备。
 
-    ![设置设备参数](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SetBatchActionParameter.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SetBatchActionParameter.png" alt="设置设备参数" style={{ width: '70%' }} />
 
     点击“+”按钮，可批量选择需要操作的目标设备。
 
-    ![选择设备](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectDevices.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectDevices.png" alt="选择设备" style={{ width: '70%' }} />
 
-4. 完成卡片配置后，将其输入点连接到判断卡片或触发卡片，从而在前置条件满足时执行设备操作。
+4. 完成卡片配置后，将其输入点连接到 [判断](./condition.mdx) 卡片或 [触发](./trigger.mdx) 卡片，从而在前置条件满足时执行设备操作。
+
+## 场景
+
+场景执行卡片用于在自动化中使用一个 [预设好的场景](./../automation/scenes.mdx)，触发该场景内的执行卡片，无需在当前流程中重复配置。
+
+### 使用步骤
+
+1. 在画布左侧边栏点击 **+** 按钮，选择**执行**分类下的**场景**，即可在画布上添加一个 **场景执行** 卡片。
+2. 在卡片上选择要复用的场景。
+3. 完成卡片配置后，将其输入点连接到 [判断](./condition.mdx) 卡片或 [触发](./trigger.mdx) 卡片，从而在前置条件满足时执行该场景。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/SceneAction-AddBlockAndSelectAScene.png" alt="选择场景执行卡片" style={{ width: '70%' }} />
+
 
 ## 数据处理
 
 数据处理卡片在自动化流程中主要用于对采集到的数值进行运算与统计聚合，以及处理字符串，是实现复杂逻辑和动态决策的关键工具。通过对变量、设备数据等进行灵活处理，可以满足自动化场景中的多样化数据需求，实现流程智能化。  
 
-Flow 支持三类常用的数据处理方式：[数学运算](#数学运算)、[字符串处理](#字符串处理) 和 [数据聚合](#数据聚合)，分别用于数值计算、文本操作与数据统计。
+Flow 支持以下 7 类常用的数据处理方式：[数学运算](#数学运算)、[字符串拼接](#字符串拼接)、[字符串截取](#字符串截取)、[字符串赋值](#字符串赋值)、[大小写转换](#大小写转换)、[数据聚合](#数据聚合) 和 [Random 随机数](#random-随机数)，分别用于数值计算、文本操作与数据统计。
 
 ### 数学运算
 
-数学运算卡片用于对输入的变量或设备数据进行加、减、乘、除、取整、绝对值等基本运算操作，可用于流程中的数值计算和动态赋值。通过配置输入参数和目标结果变量，可以实现自动化场景下的灵活数据运算和处理。
+数学运算卡片用于对设备数据、变量或自定义数值进行加减乘除、取余、取整、绝对值、幂、开方、对数、指数、最值、位运算或移位运算。结果可供后续卡片引用或写入指定变量。
 
 #### 使用步骤
 
-1. 在画布左侧边栏**执行**下选择**数据处理**，添加“数学运算”卡片。
+1. 在画布左侧边栏**执行**下选择**数据处理**，并选择“数学运算”卡片。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MathOperations-AddBlock.png" alt="添加数学运算卡片" style={{ width: '70%' }} />
+
 2. 单击卡片第一个参数，选择全局变量、局部变量、设备数据或自定义值作为“数字A”参与计算。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MathOperations-SetNumberA.png" alt="设置数字A" style={{ width: '70%' }} />
+
 3. 单击第二个参数，选择所需的数学运算符，如“加”、“减”、“乘”、“除”等。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MathOperations-SetFunction.png" alt="选择运算符" style={{ width: '70%' }} />
+
 4. 若选择的运算为加、减、乘、除、幂运算，则单击第三个参数，设置“数字B”。若为取整、绝对值或开方运算，无需设置此参数。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MathOperations-SetNumberB.png" alt="设置数字B" style={{ width: '70%' }} />
+
 5. 在最后一个参数中，选择将运算结果输出到指定的全局变量、局部变量，或直接赋值给设备功能点。
-6. 完成卡片配置后，将其输入点连接到判断卡片或触发卡片，从而在前置条件满足时进行计算。
 
-### 字符串处理
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/MathOperations-SetOutputPath.png" alt="选择输出为何种变量" style={{ width: '70%' }} />
 
-字符串处理卡片用于对流程中的文本型数据进行拼接、截取、替换、大小写转换和自由组合，支持变量、设备数据和自定义输入的灵活处理，助您生成所需的文本结果，实现更丰富的数据表达和自动化逻辑。
+6. 完成卡片配置后，将其输入点连接到 [判断](./condition.mdx) 卡片或 [触发](./trigger.mdx) 卡片，从而在前置条件满足时进行计算。
+
+### 字符串拼接
+
+字符串拼接卡片用于将两个数据源的值转换为文本后按顺序拼接，结果可供后续卡片引用或写入指定变量或设备属性。可用于组合固定文本与实时数据，例如把房间名称与当前温度拼成一条提示。
+
+#### 使用步骤
+
+1. 在画布左侧边栏**执行**下选择**数据处理**，并选择“字符串拼接”卡片。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/StringConcatenation-AddBlock.png" alt="添加字符串拼接卡片" style={{ width: '70%' }} />
+
+2. 单击卡片第一个参数，选择全局变量、局部变量、设备数据或自定义文本作为第一段文本。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/StringConcatenation-SetStringA.png" alt="设置字符串A" style={{ width: '70%' }} />
+
+3. 单击第二个参数，选择第二段文本的数据源，同样可以是变量、设备数据或自定义文本。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/StringConcatenation-SetStringB.png" alt="设置字符串B" style={{ width: '70%' }} />
+
+4. 在最后一个参数中，选择将拼接结果输出到指定的全局变量、局部变量，或直接赋值给设备功能点。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/StringConcatenation-SetOutputPath.png" alt="选择输出为何种变量" style={{ width: '70%' }} />
+
+5. 完成卡片配置后，将其输入点连接到 [判断](./condition.mdx) 卡片或 [触发](./trigger.mdx) 卡片，从而在前置条件满足时进行拼接。
+
+### 字符串截取
+
+字符串截取卡片用于按起始位置和长度截取文本。起始位置从 0 计数，负数从末尾计数。长度超过剩余文本时，取到末尾；长度为 0 或负数时，结果为空。结果可供后续卡片引用或写入指定变量或设备属性。
+
+#### 使用步骤
+
+1. 在画布左侧边栏**执行**下选择**数据处理**，并选择“字符串截取”卡片。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/StringSubstring-AddBlock.png" alt="添加字符串截取卡片" style={{ width: '70%' }} />
+
+2. 单击卡片第一个参数，选择全局变量、局部变量、设备数据或自定义文本作为待截取的源文本。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/StringSubstring-SetSourceString.png" alt="设置源文本" style={{ width: '70%' }} />
+
+3. 单击第二个参数，设置截取规则：
+    - 起始位置：从 0 计数，负数从末尾倒数。
+    - 截取长度：若截取长度长于剩余文本时，截取结果为完整剩余文本；长度为 0 或负数时，结果为空。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/StringSubstring-SetRule.png" alt="设置截取规则" style={{ width: '70%' }} />
+
+4. 在最后一个参数中，选择将截取结果输出到指定的全局变量、局部变量，或直接赋值给设备功能点。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/StringSubstring-SetOutputPath.png" alt="选择输出为何种变量" style={{ width: '70%' }} />
+
+5. 完成卡片配置后，将其输入点连接到 [判断](./condition.mdx) 卡片或 [触发](./trigger.mdx) 卡片，从而在前置条件满足时进行截取。
+
+### 字符串赋值
+
+字符串赋值卡片用于读取一个数据源的当前文本，将同一份文本赋值给一个或多个可写变量或设备属性。此处的替换是覆盖目标值，不是查找并替换文本片段。
+
+#### 使用步骤
+
+1. 在画布左侧边栏**执行**下选择**数据处理**，并选择“字符串赋值”卡片。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/StringAssignment-AddABlock.png" alt="添加字符串赋值卡片" style={{ width: '70%' }} />
+
+2. 单击卡片第一个参数，自定义一个字符串或者选择一个全局变量、局部变量、设备变量或 [触发值](./trigger.mdx#设备) 作为赋值后的值（替换后的值）。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/StringAssignment-SelectReplacement.png" alt="选择用于替换的值" style={{ width: '70%' }} />
+
+3. 单击第二个参数，选择一个可写的全局变量、局部变量或设备变量作为赋值前的值（被替换的值）。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/StringAssignment-SelectValueToBeReplaced.png" alt="选择被替换的值" style={{ width: '70%' }} />
+
+4. 完成卡片配置后，将其输入点连接到 [判断](./condition.mdx) 卡片或 [触发](./trigger.mdx) 卡片，从而在前置条件满足时覆盖目标文本。
+
+### 大小写转换
+
+大小写转换卡片用于将选中的一个或多个可写变量或设备属性的当前文本转换为大写或小写，并写回原目标；没有大小写变化的字符保持原样。
+
+#### 使用步骤
+
+1. 在画布左侧边栏**执行**下选择**数据处理**，并选择“大小写转换”卡片。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/CaseConversion-AddABlock.png" alt="添加大小写转换卡片" style={{ width: '70%' }} />
+
+2. 单击卡片参数，选择一个可写的全局变量、局部变量或设备变量作为转换目标。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/CaseConversion-SelectSourceString.png" alt="选择源文本" style={{ width: '70%' }} />
+
+3. 选择将文本转换为大写还是小写。转换结果写回原目标，无需另选输出位置。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/CaseConversion-SelectFunction.png" alt="选择大小写转换方式" style={{ width: '70%' }} />
+
+4. 完成卡片配置后，将其输入点连接到 [判断](./condition.mdx) 卡片或 [触发](./trigger.mdx) 卡片，从而在前置条件满足时进行转换。
+
 
 ### 数据聚合
 
-数据聚合卡片可对多个设备数据、变量和自定义数值进行批量统计，包括求和、平均值、最大值和最小值。统计结果可输出为变量，或直接赋值给设备，实现流程中的实时数据控制。
+数据聚合卡片可对一组数值数据求和、求平均值、最大值或最小值，结果可供后续卡片引用或写入指定变量。输入为空或无法完成聚合时报告执行错误。
 
 #### 使用步骤
 
 1. 在画布左侧边栏**执行**下选择**数据处理**，添加“数据聚合”卡片。
-2. 点击卡片上的第一个参数，弹出设备数据选择列表。如果需要选择变量，请点击 &#128279; 图标切换到变量列表。
-3. 可从设备数据、变量列表中任意选择数据，或直接在输入框中填写数字。每添加一个数据后，点击 **添加** 按钮即可将其纳入统计项。
-4. 点击卡片的第二个参数，选择所需的统计方式，包括“求和”、“平均值”、“最大值”或“最小值”。
-5. 在最后一个参数选择统计结果要输出到哪个目标，可为全局变量、局部变量，或直接写入设备功能点。
-6. 完成卡片配置后，将其输入点连接到判断卡片或触发卡片，从而在前置条件满足时执进行统计。
+    
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/DataAggregation-AddABlock.png" alt="添加数据聚合卡片" style={{ width: '70%' }} />
+
+2. 点击卡片上的第一个参数，选择 **添加** 按钮，以添加一个全局变量、局部变量、设备变量或 [触发值](./trigger.mdx#设备)。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/DataAggregation-AddVariables.png" alt="添加变量" style={{ width: '70%' }} />
+
+    重复上述步骤，可以添加多个变量。
+
+3. 点击卡片的第二个参数，选择所需的统计方式，包括“求和”、“平均值”、“最大值”或“最小值”。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/DataAggregation-SelectFunction.png" alt="选择统计方式" style={{ width: '70%' }} />
+
+4. 在最后一个参数选择统计结果要输出到哪个目标，可为全局变量、局部变量，或直接写入设备功能点。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/DataAggregation-SelectOutputTarget.png" alt="选择输出目标" style={{ width: '70%' }} />
+
+6. 完成卡片配置后，将其输入点连接到 [判断](./condition.mdx) 卡片或 [触发](./trigger.mdx) 卡片，从而在前置条件满足时执进行统计。
+
+### Random 随机数
+
+Random 随机数卡片用于在每次执行时采集一个数值，并写入指定变量。如需按间隔连续采集，请将输入点连接到 [循环触发](./trigger.mdx#时间)。
+
+#### 使用步骤
+
+1. 在画布左侧边栏**执行**下选择**数据处理**，并选择“Random 随机数”卡片。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Random-AddABlock.png" alt="添加随机数卡片" style={{ width: '70%' }} />
+
+2. 单击第一个参数，选择生成随机数的系数和偏移量。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Random-SetOutputPath.png" alt="选择输出目标" style={{ width: '70%' }} />
+
+3. 单击第二个参数，选择要将随机数写入的全局变量、局部变量或设备变量。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/Random-SetRule.png" alt="选择随机数范围" style={{ width: '70%' }} />
+
+4. 完成卡片配置后，将其输入点连接到 [判断](./condition.mdx) 卡片或 [触发](./trigger.mdx) 卡片。每次触发只采集一个数值。如需连续采集，请连接到 [循环触发](./trigger.mdx#时间)。
 
 ## 时间
 
@@ -113,6 +266,9 @@ Flow 支持三类常用的数据处理方式：[数学运算](#数学运算)、[
 ### 延时
 
 延时卡片用于在自动化流程中插入指定时长的等待，通过设置延迟时间，可以实现流程步骤间的缓冲、节奏控制或特定场景的定时触发，常见用法包括动作判断前后延时、执行前后延时等。
+
+收到上游触发后等待指定时长，再执行后续流程；时长为 0 时立即继续。用于为设备动作或后续判断设置等待时间。
+
 
 #### 使用步骤
 
@@ -128,73 +284,81 @@ Flow 支持三类常用的数据处理方式：[数学运算](#数学运算)、[
 
 ## 变量
 
-与变量相关的执行类卡片为 [变量修改](#变量修改) 和 [变量切换](#变量切换)。
+与变量相关的执行类卡片为 [变量修改](#变量修改) 和 [变量切换](#变量切换)。您可以将选中的流程变量、全局变量或设备属性变量设置为自定义值或数据源的当前值，用于保存中间结果或更新后续流程使用的状态。
+
  
 ### 变量修改
 
-变量修改卡片用于在自动化流程中灵活地修改变量的值。该卡片仅支持字符串、布尔值和数值类型的变量和设备数据。
+变量修改卡片用于将选中的流程变量、全局变量或设备属性变量设置为自定义值或数据源的当前值。可用于保存中间结果或更新后续流程使用的状态。
 
 #### 使用步骤
 
 1. 在画布左侧边栏**执行**下选择**变量**。单击**变量修改**，即可在画布上添加该卡片。
 
-    ![选择变量修改卡片](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-AddVariableModification.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-AddVariableModification.png" alt="选择变量修改卡片" style={{ width: '70%' }} />
 
 2. 单击卡片上第一个参数，即可选择任意字符串、布尔值和数值类型的全局变量、局部变量或设备数据。
 
-    ![选择待修改的变量](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectAVariable.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectAVariable.png" alt="选择待修改的变量" style={{ width: '70%' }} />
 
 3. 单击卡片上第二个参数，即可设置新值。
 4. 完成卡片配置后，将其输入点连接到其他卡片，从而在前置条件满足时修改变量。
 
 ### 变量切换
 
-变量切换卡片用于对指定的可写布尔类型变量或设备数据进行取反操作（即 true 变为 false，false 变为 true），常用于灯光开关等场景。通过该卡片，可一键实现变量状态的翻转，无需手动输入新值，简化操作流程。
+变量切换卡片用于读取选中的布尔变量或布尔设备属性的当前状态并取反，将 true 切换为 false，或将 false 切换为 true。适用于开关状态翻转。
 
 #### 使用步骤
 
 1. 在画布左侧边栏**执行**下选择**变量**。单击**变量切换**，即可在画布上添加该卡片。
 
-    ![选择变量切换卡片](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectBooleanSwitch.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectBooleanSwitch.png" alt="选择变量切换卡片" style={{ width: '70%' }} />
 
 2. 单击卡片上第一个参数，即可选择布尔型的变量或设备数据。
 
-    ![选择待修改的布尔变量](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectBooleanVariable.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectBooleanVariable.png" alt="选择待修改的布尔变量" style={{ width: '70%' }} />
 
 3. 完成卡片配置后，将其输入点连接到其他卡片，从而在前置条件满足时切换变量的布尔值。
 
-## 流程
+## 自动化
 
-与流程相关的执行类卡片有 [流程执行](#流程执行)、[流程管理·启用](#流程管理) 和 [流程管理·禁用](#流程管理)。
+启用或禁用选中的自动化流程，改变该流程是否响应触发事件。此卡片不直接执行目标流程，场景不支持启用或禁用。
 
-### 流程执行
+与自动化相关的执行类卡片有  [自动化启停·启用](#自动化启停启用) 和 [自动化启停·禁用](#自动化启停禁用)。
 
-流程执行卡片允许您主动触发任意 Flow 中已配置的 [手动触发](./trigger.mdx#手动触发) 卡片。从而，您可以灵活串联不同流程，实现流程间的联动和复用。
+### 自动化启停
 
-#### 使用步骤
-
-1. 在画布左侧边栏的**执行**模块下选择**流程**，单击**流程执行**，即可在画布中添加该卡片。
-
-    ![选择流程执行卡片](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectFlowExecute.png)
-
-2. 单击卡片参数，选择一个“手动触发”。
-
-    ![选择流程执行卡片](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectManualTrigger.png)
-
-3. 配置完成后，将流程执行卡片的输入点与其他卡片连接。满足条件时，即会主动触发所选的“手动调用”。
-
-### 流程管理
-
-您可以在 Flow 中动态启用或禁用其他已创建的Flow。
+您可以在当前自动化中动态启用或禁用其他已创建的自动化。
 
 #### 使用步骤
 
-1. 在画布左侧边栏的**执行**模块下选择**流程**，单击“流程管理”相关的卡片，即可在画布中添加该卡片。
+1. 在画布左侧边栏的**执行**模块下选择**自动化**，单击“自动化启停”相关的卡片，即可在画布中添加该卡片。
 
-    ![选择流程启用或禁用卡片](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-SelectFlowManagement.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AutomationEnableDisable-AddABlock.png" alt="添加自动化启停卡片" style={{ width: '70%' }} />
 
-2. 单击卡片上的 “Flow” 参数，即可选择目标 Flow。
+2. 单击卡片上的第一个参数，选择想要的状态，启用或禁用。
 
-    ![选择 Flow](https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AdvancedFlow-EnableFlow.png)
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AutomationEnableDisable-SetTheStatus.png" alt="设置自动化状态" style={{ width: '70%' }} />
 
-3. 配置完成后，将流程执行卡片的输入点与其他卡片连接。满足条件时，即会启用或禁用目标 Flow。
+3. 单击卡片上的第二个参数，选择想要启停的目标自动化。
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/AutomationEnableDisable-SelectAnAutomation.png" alt="选择目标自动化" style={{ width: '70%' }} />
+
+4. 配置完成后，将流程执行卡片的输入点与其他卡片连接。满足条件时，即会启用或禁用目标 Flow。
+
+## 事件状态保持
+
+每次事件将布尔变量或可写的布尔设备属性设为 true 并重新计时，最后一次事件后经过保持时长设为 false。启动时清为 false，停止时取消计时并清除本块保持的状态。
+
+## 循环管理
+
+运行或停止当前流程或其他流程中选定的循环触发卡片。从停止切换为运行时，循环计数清零，并等待一个完整间隔后开始触发；重复运行已运行的循环不会重置计数。
+
+## 脚本
+
+执行自定义 JavaScript 脚本，可通过 ctx.readVar 和 ctx.writeVar 读取或写入流程变量、全局变量及设备变量。最近一次执行结果可供后续卡片引用，执行异常会报告错误。
+
+
+## 消息推送
+
+将自定义文本或数据源的当前值作为文本消息，通过配置的 Webhook 推送到钉钉或企业微信群机器人；钉钉支持配置加签密钥。
