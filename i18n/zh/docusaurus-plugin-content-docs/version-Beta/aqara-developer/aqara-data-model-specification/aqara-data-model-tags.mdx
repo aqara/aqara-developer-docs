@@ -1411,9 +1411,9 @@ Present Value 不设默认读写权限，按具体 Trait 参数表的 `Access` �
       <td>描述发电设备的额定功率和运行状态，以及燃气热电联产相关的能量、功率和热回收数据。</td>
     </tr>
     <tr>
-      <td><a href="#ref_Aqara_Spec_TouchControl">0x013F</a></td>
-      <td>TouchControl</td>
-      <td>表示设备触控条的输入控制功能域，覆盖触控条手势识别与滑动量采集能力。</td>
+      <td><a href="#ref_Aqara_Spec_LightBoxManagement">0x0140</a></td>
+      <td>LightBoxManagement</td>
+      <td>灯箱管理：描述通道占用关系、拓展口使能、当前活动通道数，以及 Flash 剩余存储的监控。</td>
     </tr>
   </tbody>
 </table>
@@ -120722,6 +120722,328 @@ Device Exception Log Report. The hub or device reports exceptions, error logs, o
 灯箱设备配置信息下发命令。云端将智能灯箱设备的特定配置（例如灯光效果、配色方案、定时计划）下发至网关，网关随后转发或应用到目标灯箱设备。
 
 该 Command 无参数。
+
+## LightBoxManagement（灯箱管理） {#ref_Aqara_Spec_LightBoxManagement}
+
+:::note
+本 Function 的 Function ID 与 Trait ID 为暂定值，待登记后替换。
+:::
+
+### 简介
+
+LightBoxManagement 描述通道占用关系、拓展口使能、当前活动通道数，以及 Flash 剩余存储的监控。
+
+### 交互流程：拓展口使能 {#ref_LightBoxManagement_FlowExpansionPort}
+
+* Client：App / 云端。
+* Server：以太网灯控设备。灯控设备即子设备。
+* `ExpansionPortEnable` 置为 `true` 与 `false` 时的通道数由该子设备确定。写入后，Server SHALL 回复写入结果。成功时 SHALL 更新 [ActiveChannelCount](#ref_ActiveChannelCount) 并上报。
+
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Server as 灯控（子设备）
+
+    Client->>Server: Write ExpansionPortEnable
+    alt 写入成功
+        alt ExpansionPortEnable = true
+            Server->>Server: ActiveChannelCount = ExpansionPortEnable 置为 true 时的通道数
+        else ExpansionPortEnable = false
+            Server->>Server: ActiveChannelCount = ExpansionPortEnable 置为 false 时的通道数
+        end
+        Server-->>Client: Response(SUCCESS)
+        Server-->>Client: Report ActiveChannelCount
+    else 写入失败
+        Server-->>Client: Response(失败 Status)
+    end
+```
+
+### Function 标识
+
+<table>
+  <thead>
+    <tr>
+      <th>Function ID</th>
+      <th>Code</th>
+      <th>名称</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0140</td>
+      <td>LightBoxManagement</td>
+      <td>灯箱管理</td>
+    </tr>
+  </tbody>
+</table>
+
+### Trait
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+      <th>名称</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527B</td>
+      <td><a href="#ref_FlashRemainStorage">FlashRemainStorage</a></td>
+      <td>Flash 剩余存储</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x527A</td>
+      <td><a href="#ref_ChannelOccupancy">ChannelOccupancy</a></td>
+      <td>通道占用关系</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x527C</td>
+      <td><a href="#ref_ExpansionPortEnable">ExpansionPortEnable</a></td>
+      <td>拓展口使能</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x525C</td>
+      <td><a href="#ref_ActiveChannelCount">ActiveChannelCount</a></td>
+      <td>当前活动通道</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+### 数据类型
+
+##### ChannelOccupancyStructure Type {#ref_ChannelOccupancyStructure}
+
+<table>
+  <thead>
+    <tr>
+      <th>结构体成员序号</th>
+      <th>字段名</th>
+      <th>类型</th>
+      <th>必须</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>virtual.device_id</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>灯箱实例标识（DID 风格）。</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Channels</td>
+      <td>list[uint16]</td>
+      <td>M</td>
+      <td>该灯箱占用的逻辑通道列表。每个元素为通道号 <code>0..19</code>。</td>
+    </tr>
+  </tbody>
+</table>
+
+### Trait 定义
+
+#### FlashRemainStorage Trait（Flash 剩余存储） {#ref_FlashRemainStorage}
+
+表示灯箱实例可用的 Flash 剩余存储。单位：KB。Maximum Value 为该剩余存储的最大值。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527B</td>
+      <td>FlashRemainStorage</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint32</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint32</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ChannelOccupancy Trait（通道占用关系） {#ref_ChannelOccupancy}
+
+已组建灯箱到其占用逻辑通道列表的关系。每条记录对应一个 `virtual.device_id`。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527A</td>
+      <td>ChannelOccupancy</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_ChannelOccupancyStructure">ChannelOccupancyStructure</a>]</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ExpansionPortEnable Trait（拓展口使能） {#ref_ExpansionPortEnable}
+
+控制归零码输出拓展口是否启用。`true` 表示启用，`false` 表示关闭。默认关闭。
+
+写入 `true` 或 `false` 后，Server SHALL 回复写入结果。成功时 SHALL 将 [ActiveChannelCount](#ref_ActiveChannelCount) 更新为本灯控子设备在 `ExpansionPortEnable` 置为该值时的通道数，并 SHALL Report [ActiveChannelCount](#ref_ActiveChannelCount)。失败时 SHALL NOT 更新或上报该 Trait。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527C</td>
+      <td>ExpansionPortEnable</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ActiveChannelCount Trait（当前活动通道） {#ref_ActiveChannelCount}
+
+表示当前活动的归零码输出通道数。灯控设备即子设备。`ExpansionPortEnable` 置为 `true` 或 `false` 时都 SHALL 将本 Trait 更新为该取值对应的通道数。具体通道数由该子设备确定。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x525C</td>
+      <td>ActiveChannelCount</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
 
 ## IRCoordination（红外遥控协同） {#ref_Aqara_Spec_IRCoordination}
 
