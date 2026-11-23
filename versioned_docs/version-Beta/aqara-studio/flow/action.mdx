@@ -16,25 +16,30 @@ Action blocks typically serve as end points in an automation Flow. After a condi
 Within Flow, you can perform the following actions:
 - [Device](#device): Directly send specific instructions to a single device, such as "turn on the light" or "turn off the air conditioner" for precise control.
 - [Batch Execute](#batch-execute): Execute the same operation on multiple devices of the same type at once, such as one-tap turning off multiple switches, for increased efficiency.
+- [Scene](#scene): Execute an existing scene to reuse its actions, without reconfiguring each device in the current flow.
 - [Data Process](#data-process): Perform calculations, statistics, or string processing for use in subsequent logic.
-- [Time](#time): Delay downstream judgement or actions for flexible process pacing.
+- [Delay](#delay): Delay downstream judgement or actions for flexible process pacing.
 - [Variable](#variable): Modify or toggle variable values to enable dynamic data flow.
-- [Flow](#flow): Enable or disable other flows within the current process for coordination and management.
+- [Automation](#automation): Enable or disable other automations within the current automation for coordination and management.
+- [Event State Hold](#event-state-hold):
+- [Loop Manage](#loop-manage):
+- [Script](#script):
+- [Message Push](#message-push):
 
 ## Device
 
-The device action block is used to send operation commands to a specific device within an automation Flow. This enables actions such as "turn on/off a light", "adjust air conditioner temperature", or "toggle a switch". You select the target device and its controllable features (function points), configure relevant parameters, and thus achieve precise device control.
+The device action block is used to write a custom value, a variable value, or a value from another data source to a property of a **single** specified device, or to toggle a Boolean state or run a device command with configuration parameters. Typical actions include turning a light on or off, adjusting air conditioner temperature, and toggling a switch.
 
 ### How to Use
 
 1. Click the **+** button in the left sidebar of the canvas, and under the **Action** category, select **Device**. Choose the target device from the device list.
 2. Next, you'll see a list of available blocks for that device, each representing a writable function point. Click the required block to add it to the canvas.
 3. Click the block's parameter to select or input the value or state for the target device's function point.
-4. After configuring the block, connect its input point to a condition block or trigger block so that the operation will be performed when the preceding condition is satisfied.
+4. After configuring the block, connect its input point to a [condition](./condition.mdx) block or [trigger](./trigger.mdx) block so that the operation will be performed when the preceding condition is satisfied.
 
 ## Batch Execute
 
-The batch execute block is used to control the same function point on multiple devices of the same type simultaneously, allowing you to send the same command to several devices at once (e.g., turning off multiple switches in one step, or setting the brightness of several lights to 50).
+The batch execute block writes the same value to the same function point on multiple devices of the same type, or calls a device command with the same parameters, so you can send one operation in a single step. For example, you can turn off several switches at once, or set the brightness of a group of lights to 50.
 
 ### How to Use
 
@@ -42,53 +47,201 @@ The batch execute block is used to control the same function point on multiple d
 2. You will then see the available blocks for this type, each representing a writable function point. Click the required block to add it to the canvas.
 3. Click the block's parameter to set a unified target value.
 
-    点击“+”按钮，可批量选择需要操作的目标设备。
+    Click the **+** button to batch-select the target devices to operate.
 
-4. After configuring the block, connect its input point to a condition block or trigger block so that the batch operation will be performed when the preceding condition is satisfied.
+4. After configuring the block, connect its input point to a [condition](./condition.mdx) block or [trigger](./trigger.mdx) block so that the batch operation will be performed when the preceding condition is satisfied.
+
+## Scene
+
+The scene action block uses a [predefined scene](./../automation/scenes.mdx) in an automation to run the action blocks in that scene, without configuring them again in the current flow.
+
+### How to Use
+
+1. In the left sidebar of the canvas, click the **+** button, select **Scene** under the **Action** category to add a **Scene** action block to the canvas.
+2. On the block, select the scene to reuse.
+3. After configuring the block, connect its input point to a [condition](./condition.mdx) block or [trigger](./trigger.mdx) block so that the scene runs when the preceding condition is satisfied.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/SceneAction-AddBlockAndSelectAScene.png" alt="Select a scene action block" style={{ width: '70%' }} />
+
+
 
 ## Data Process
 
-A data process block is mainly used to perform calculations, statistical aggregation, or string processing on collected data. It is a key tool for complex logic and dynamic decision-making. By flexibly processing variables, device data, and more, you can address diverse data requirements in automation scenarios to make the flow more intelligent.
+A data process block is mainly used to perform calculations, statistical aggregation, or string processing on collected data. It is a key tool for complex logic and dynamic decision-making. By flexibly processing variables, device variable, and more, you can address diverse data requirements in automation scenarios to make the flow more intelligent.
 
-Flow supports three common data processing methods: [Math Operation](#math-operation), [String Processing](#string-processing), and [Data Aggregation](#data-aggregation), for numeric calculations, text processing, and data statistics, respectively.
+Flow supports seven common data processing methods: [Math Operation](#math-operation), [String Processing](#string-processing), [String Concatenation](#string-concatenation), [String Substring](#string-substring), [String Assignment](#string-assignment), [String Case Conversion](#string-case-conversion), [Data Aggregation](#data-aggregation) and [Random Number](#random-number), for numeric calculations, text processing, and data statistics, respectively.
 
 ### Math Operation
 
-The math operation block allows you to perform basic arithmetic operations (addition, subtraction, multiplication, division, rounding, absolute value, etc.) on input variables or device data. This is used for numeric calculation and dynamic assignment within a flow. By configuring input parameters and target result variables, you can flexibly process data in automated scenarios.
+
+A math operation block applies arithmetic, remainder, rounding, absolute value, power, square root, logarithm, exponential, min/max, bitwise or shift operations to device variable, variables or custom numbers. Reference the result in later cards or write it to a selected variable.
 
 #### How to Use
 
 1. In the left sidebar under **Action**, select **Data Process** and add a "Math Operation" block.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MathOperations-AddBlock.png" alt="Add a math operation block" style={{ width: '70%' }} />
+
 2. Click the first parameter on the block to choose a global variable, local variable, device variable, or custom value as "Number A" for the calculation.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MathOperations-SetNumberA.png" alt="Set number A" style={{ width: '70%' }} />
+
 3. Click the second parameter to choose the desired mathematical operator (e.g., add, substract, multiply, divide, etc.).
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MathOperations-SetFunction.png" alt="Set function" style={{ width: '70%' }} />
+
 4. If the operation is addition, subtraction, multiplication, division, or exponentiation, click the third parameter to set "Number B". For rounding, absolute value, or square root, this parameter is unnecessary.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MathOperations-SetNumberB.png" alt="Set number B" style={{ width: '70%' }} />
+
 5. In the final parameter, select where to output the result, i.e., a global variable, local variable, or device variable.
-6. Once configured, connect the block's input point to a condition or trigger block so the calculation runs when the preceding condition is met.
 
-### String Processing
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/MathOperations-SetOutputPath.png" alt="Set output path" style={{ width: '70%' }} />
 
-The string processing block handles text data in the Flow, permitting concatenation, substring, replacement, case conversion, and combination. It supports flexible use of variables, device data, and custom input, helping you generate required text results for richer data expression and automation logic.
+6. Once configured, connect the block's input point to a [condition](./condition.mdx) block or [trigger](./trigger.mdx) block so the calculation runs when the preceding condition is met.
+
+### String Concatenation
+
+The string concatenation block converts two source values to text and concatenates them in order. You can reference the result in later blocks or write it to a selected variable or device property. Use it to combine fixed text with live data, for example joining a room name with the current temperature into one message.
+
+#### How to Use
+
+1. In the left sidebar under **Action**, select **Data Process** and add a "String Concatenation" block.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/StringConcatenation-AddBlock.png" alt="Add a string concatenation block" style={{ width: '70%' }} />
+
+2. Click the first parameter to choose a global variable, local variable, device variable, or custom text as the first string.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/StringConcatenation-SetStringA.png" alt="Set string A" style={{ width: '70%' }} />
+
+3. Click the second parameter to choose the second string. This can also be a variable, device variable, or custom text.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/StringConcatenation-SetStringB.png" alt="Set string B" style={{ width: '70%' }} />
+
+4. In the final parameter, select where to output the result: a global variable, a local variable, or a device function point.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/StringConcatenation-SetOutputPath.png" alt="Set output path" style={{ width: '70%' }} />
+
+5. Once configured, connect the block's input point to a [condition](./condition.mdx) block or [trigger](./trigger.mdx) block so the concatenation runs when the preceding condition is met.
+
+### String Substring
+
+The string substring block extracts text by start position and length. Positions start at 0; negative positions count from the end. If the length is longer than the remaining text, the result goes to the end of the string. If the length is 0 or negative, the result is empty. You can reference the result in later blocks or write it to a selected variable or device property.
+
+#### How to Use
+
+1. In the left sidebar under **Action**, select **Data Process** and add a "String Substring" block.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/StringSubstring-AddBlock.png" alt="Add a string substring block" style={{ width: '70%' }} />
+
+2. Click the first parameter to choose a global variable, local variable, device variable, or custom text as the source string.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/StringSubstring-SetSourceString.png" alt="Set source string" style={{ width: '70%' }} />
+
+3. Click the second parameter to set the substring rule:
+    - Start position: counting starts at 0; a negative value counts from the end.
+    - Length: if the length is longer than the remaining text, the result is the full remaining text; if the length is 0 or negative, the result is empty.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/StringSubstring-SetRule.png" alt="Set rule" style={{ width: '70%' }} />
+
+4. In the final parameter, select where to output the result: a global variable, a local variable, or a device function point.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/StringSubstring-SetOutputPath.png" alt="Set output path" style={{ width: '70%' }} />
+
+5. Once configured, connect the block's input point to a [condition](./condition.mdx) block or [trigger](./trigger.mdx) block so the substring runs when the preceding condition is met.
+
+### String Assignment
+
+The string assignment block reads the current text from one source and assigns that same text to one or more writable variables or device properties. This overwrites the target value rather than finding and replacing a text fragment.
+
+#### How to Use
+
+1. In the left sidebar under **Action**, select **Data Process** and add a "String Assignment" block.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/StringAssignment-AddABlock.png" alt="Add a string assignment block" style={{ width: '70%' }} />
+
+2. Click the first parameter. Enter a custom string, or select a global variable, local variable, device variable, or [trigger value](./trigger.mdx#device) as the new value (the replacement).
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/StringAssignment-SelectReplacement.png" alt="Select the source string" style={{ width: '70%' }} />
+
+3. Click the second parameter and select a writable global variable, local variable, or device variable as the original value (the value to be replaced).
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/StringAssignment-SelectValueToBeReplaced.png" alt="Select the assignment target" style={{ width: '70%' }} />
+
+4. Once configured, connect the block's input point to a [condition](./condition.mdx) block or [trigger](./trigger.mdx) block so the target text is overwritten when the preceding condition is met.
+
+### Case Conversion
+
+The case conversion block converts the current text of one or more writable variables or device properties to uppercase or lowercase and writes it back to the same targets. Characters without a case distinction remain unchanged.
+
+#### How to Use
+
+1. In the left sidebar under **Action**, select **Data Process** and add a "Case Conversion" block.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/CaseConversion-AddABlock.png" alt="Add a case conversion block" style={{ width: '70%' }} />
+
+2. Click the block parameters to select one or more writable global variables, local variables, or device variables as conversion targets.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/CaseConversion-SelectSourceString.png" alt="Select source string" style={{ width: '70%' }} />
+
+3. Choose whether to convert the text to uppercase or lowercase. The result is written back to the original targets; you do not select a separate output.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/CaseConversion-SelectFunction.png" alt="Select function" style={{ width: '70%' }} />
+
+4. Once configured, connect the block's input point to a [condition](./condition.mdx) block or [trigger](./trigger.mdx) block so the conversion runs when the preceding condition is met.
 
 ### Data Aggregation
 
-The data aggregation block can statistically process multiple variables, and custom values, including summing, averaging, finding the maximum, and the minimum. The statistical result can be output as a global or local variable, or as a device data to enable real-time control in the process.
+The data aggregation block can calculate the sum, average, maximum or minimum of numeric inputs. The result can be referenced by later cards or written to a selected variable. Empty inputs or failed aggregation report an execution error.
 
 #### How to Use
 
 1. In the left sidebar under **Action**, select **Data Process** and add a "Data Aggregation" block.
-2. Click the first parameter to pop up the device data list. If you need to select a variable, click the &#128279; icon to switch to the variable list.
-3. Select items from the device data or variable list, or enter numbers directly. After adding each item, click the **Add** button to include it in the calculation.
-4. Click the second parameter of the block to select a statistical function ("Sum", "Average", "Maximum", or "minimum").
-5. For the final parameter, choose the output target for the result: this can be a global variable, local variable, or directly written to a device trait.
-6. Once the block is configured, connect its input point to a condition block or trigger block so that aggregation is performed when conditions are satisfied.
 
-## Time
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/DataAggregation-AddABlock.png" alt="Add a data aggregation block" style={{ width: '70%' }} />
 
-The action block related to time is the [Delay](#delay) block.
+2. Click the first parameter of the block to select the **Add** button to add a global variable, local variable, device variable, or [trigger value](./trigger.mdx#device).
 
-### Delay
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/DataAggregation-AddVariables.png" alt="Add A Variable" style={{ width: '70%' }} />
+
+    Repeat the above steps to add multiple variables.
+
+3. Click the second parameter of the block to select a statistical function ("Sum", "Average", "Maximum", or "minimum").
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/DataAggregation-SelectFunction.png" alt="Select function" style={{ width: '70%' }} />
+
+4. For the final parameter, choose the output target for the result: this can be a global variable, local variable, or directly written to a device trait.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/DataAggregation-SelectOutputTarget.png" alt="Select output target" style={{ width: '70%' }} />
+
+5. Once configured, connect the block's input point to a [condition](./condition.mdx) block or [trigger](./trigger.mdx) block so the conversion runs when the preceding condition is met.
+
+### Random Number
+
+The Random Number block samples one value per execution and writes it to a selected variable. For sampling at a fixed interval, connect the input to an [Interval Trigger](./trigger.mdx#time).
+
+#### How to Use
+
+1. In the left sidebar under **Action**, select **Data Process** and add a "Random Number" block.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Random-AddABlock.png" alt="Add a random number block" style={{ width: '70%' }} />
+
+2. Click the first parameter to set the coefficient and offset used to generate the random number.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Random-SetOutputPath.png" alt="Select the output target" style={{ width: '70%' }} />
+
+3. Click the second parameter and choose a global variable, local variable, or device variable to write the random number to.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/Random-SetRule.png" alt="Set the random number range" style={{ width: '70%' }} />
+
+4. Once configured, connect the block's input point to a [condition](./condition.mdx) block or [trigger](./trigger.mdx) block. Each trigger samples one value. For repeated sampling, connect an [Interval Trigger](./trigger.mdx#time).
+
+## Delay
 
 The delay block inserts a specified duration of waiting within the automation Flow. By setting a delay time, you can buffer between process steps, control the pacing, or achieve timing triggers for special scenarios (e.g., delay before/after an action or judgment).
+
+Wait for the configured duration after an upstream trigger, then continue the flow. A duration of 0 continues immediately. Use it to delay device actions or later checks.
+
 
 #### How to Use
 
@@ -98,49 +251,72 @@ The delay block inserts a specified duration of waiting within the automation Fl
 
 ## Variable
 
-Action blocks related to variables include [Set Variable](#set-variable) and [Toggle Variable](#toggle-variable).
+Action blocks related to variables include [Set Variable](#set-variable) and [Toggle Variable](#toggle-variable). You can set a selected flow, global, or device property variable to a custom value or a source's current value, to store intermediate results or update state used by later steps.
 
 ### Set Variable
 
-The set variable block is used to modify the value of a variable dynamically within an automation Flow. It only supports string, boolean, and number type variables and device data.
+The set variable block sets a selected flow, global or device property variable to a custom value or a source's current value. Use it to store intermediate results or update state used by later steps.
 
 #### How to Use
 
 1. In the left sidebar under **Action**, select **Variable** and click **Set Variable** to add the block to your canvas.
-2. Click the first parameter to select any global or local variable, or device data of type string, boolean, or number.
+2. Click the first parameter to select any global or local variable, or device variable of type string, boolean, or number.
 3. Click the second parameter to set the new value.
 4. Once configured, connect the block's input point to other blocks so that the variable will be modified when prior conditions are met.
 
 ### Toggle Variable
 
-The toggle variable block is used to invert (toggle) the value of a specified writable boolean variable or device data (i.e., true becomes false, false becomes true). This is often used for scenarios such as lighting switches. With this block, you can flip a variable's state in one step, without manually inputting a new value.
+The toggle variable block reads and invert a selected boolean variable or device property: true becomes false and false becomes true. Use it to toggle an on/off state.
+
 
 #### How to Use
 
 1. In the left sidebar under **Action**, select **Variable** and click **Toggle Variable** to add the block to your canvas.
-2. Click the first parameter to select a boolean variable or device data.
+2. Click the first parameter to select a boolean variable or device variable.
 3. Once configured, connect the block's input point to other blocks so that the Boolean value is toggled when conditions are met.
 
-## Flow
+## Automation
 
-Action blocks related to process control include [Flow Execution](#flow-execution), [Flow Management · Enable](#flow-management), and [Flow Management · Disable](#flow-management).
+Enable or disable a selected automation to control whether it responds to triggers. This card does not directly execute the target flow. Scenes cannot be enabled or disabled.
 
-### Flow Execution
+Action blocks related to process control include [Automation enable/disable · Enable](#automation-enable-disable), and [Automation enable/disable · Disable](#automation-enable-disable).
 
-The flow execution block allows you to actively trigger [manual trigger](./trigger.mdx#manual-trigger) blocks configured in any Flow. In this way, you can flexibly link different flows to implement process-level coordination and reuse.
 
-#### How to Use
 
-1. In the left sidebar under the **Action** module, select **Flow**, and click **Flow Execution** to add the block to your canvas.
-2. Click the parameter to select a "manual trigger".
-3. Once configured, connect the input of the flow execution block to other blocks. When conditions are satisfied, the selected manual trigger will be executed.
+### Automation Enable/Disable
 
-### Flow Management
-
-You can dynamically enable or disable other Flows that have already been created from within a Flow.
+You can dynamically enable or disable other automations that have already been created from within the current automation.
 
 #### How to Use
 
-1. In the left sidebar under the **Action** module, select **Flow**, and click any "Flow Management" block to add it to your canvas.
-2. Click the "Flow" parameter on the block to select the target flow.
-3. Once configured, connect the input of the flow management block to other blocks. When conditions are satisfied, the target flow will be enabled or disabled.
+1. In the left sidebar under **Action**, select **Automation**, then click an **Automation Enable/Disable** block to add it to the canvas.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/AutomationEnableDisable-AddABlock.png" alt="Add an automation enable/disable block" style={{ width: '70%' }} />
+
+2. Click the first parameter on the block and choose the desired status: enable or disable.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/AutomationEnableDisable-SetTheStatus.png" alt="Set the automation status" style={{ width: '70%' }} />
+
+3. Click the second parameter on the block and select the target automation to enable or disable.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/AutomationEnableDisable-SelectAnAutomation.png" alt="Select the target automation" style={{ width: '70%' }} />
+
+4. Once configured, connect the block's input point to other blocks. When the preceding condition is met, the target automation is enabled or disabled.
+
+## Event State Hold
+
+Set a boolean variable or writable boolean device property to true on every event and renew its timer. Clear it after the hold duration from the latest event. Clear on startup; cancel and clear an active hold on stop.
+
+## Loop Manage
+
+Start or stop a selected loop trigger in this or another flow. Starting a stopped loop resets its count and waits one full interval before triggering. Starting an already running loop does not reset its count.
+
+
+## Script
+
+Run custom JavaScript. Use ctx.readVar and ctx.writeVar to read or write flow, global and device variables. Later cards can reference the latest execution result; execution exceptions report an error.
+
+
+## Message Push
+
+Send custom text or a source's current value as a text message to a DingTalk or WeCom group bot through the configured webhook. DingTalk supports a signing secret.
