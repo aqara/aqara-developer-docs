@@ -1411,9 +1411,9 @@ This section summarizes all Function definitions in Aqara Spec. See the correspo
       <td>Describes the rated power and operation status of power generation equipment, as well as energy, power and heat recovery data related to gas cogeneration.</td>
     </tr>
     <tr>
-      <td><a href="#ref_Aqara_Spec_TouchControl">0x013F</a></td>
-      <td>TouchControl</td>
-      <td>Describes the input control function domain of the device touch bar, covering touch bar gesture recognition and slide amount collection capabilities.</td>
+      <td><a href="#ref_Aqara_Spec_LightBoxManagement">0x0140</a></td>
+      <td>LightBoxManagement</td>
+      <td>Light box management: describes the channel occupancy relationship, expansion port enablement, the current active channel count, and monitoring of the remaining Flash storage.</td>
     </tr>
   </tbody>
 </table>
@@ -120722,6 +120722,328 @@ This Function does not contain Traits.
 Light box device configuration info push Command. The cloud sends specific configurations of the smart light box device (e.g., lighting effects, color schemes, scheduled plans) to the gateway, which then forwards or applies them to the target light box device.
 
 This Command has no parameters.
+
+## LightBoxManagement {#ref_Aqara_Spec_LightBoxManagement}
+
+:::note
+The Function ID and Trait ID of this Function are provisional and will be replaced once they are registered.
+:::
+
+### Introduction
+
+LightBoxManagement describes the channel occupancy relationship, expansion port enablement, the current active channel count, and monitoring of the remaining Flash storage.
+
+### Interaction Flow: Expansion Port Enablement {#ref_LightBoxManagement_FlowExpansionPort}
+
+* Client: App / cloud.
+* Server: Ethernet light control device. The light control device is the sub-device.
+* The channel count when `ExpansionPortEnable` is set to `true` and when it is set to `false` is determined by the sub-device. After a write, the Server SHALL reply with the write result. On success, it SHALL update [ActiveChannelCount](#ref_ActiveChannelCount) and report it.
+
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Server as Light Controller (Sub-device)
+
+    Client->>Server: Write ExpansionPortEnable
+    alt Write succeeded
+        alt ExpansionPortEnable = true
+            Server->>Server: ActiveChannelCount = channel count when ExpansionPortEnable is set to true
+        else ExpansionPortEnable = false
+            Server->>Server: ActiveChannelCount = channel count when ExpansionPortEnable is set to false
+        end
+        Server-->>Client: Response(SUCCESS)
+        Server-->>Client: Report ActiveChannelCount
+    else Write failed
+        Server-->>Client: Response(failure Status)
+    end
+```
+
+### Function Identification
+
+<table>
+  <thead>
+    <tr>
+      <th>Function ID</th>
+      <th>Code</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0140</td>
+      <td>LightBoxManagement</td>
+      <td>Light box management</td>
+    </tr>
+  </tbody>
+</table>
+
+### Trait
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527B</td>
+      <td><a href="#ref_FlashRemainStorage">FlashRemainStorage</a></td>
+      <td>Flash remaining storage</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x527A</td>
+      <td><a href="#ref_ChannelOccupancy">ChannelOccupancy</a></td>
+      <td>Channel occupancy relationship</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x527C</td>
+      <td><a href="#ref_ExpansionPortEnable">ExpansionPortEnable</a></td>
+      <td>Expansion port enablement</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x525C</td>
+      <td><a href="#ref_ActiveChannelCount">ActiveChannelCount</a></td>
+      <td>Current active channel</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+### Data Types
+
+##### ChannelOccupancyStructure Type {#ref_ChannelOccupancyStructure}
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>virtual.device_id</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Light box instance identifier (DID style).</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Channels</td>
+      <td>list[uint16]</td>
+      <td>M</td>
+      <td>List of logical channels occupied by this light box. Each element is a channel number <code>0..19</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+### Trait Definitions
+
+#### FlashRemainStorage Trait (Flash Remaining Storage) {#ref_FlashRemainStorage}
+
+Represents the remaining Flash storage available to the light box instance. Unit: KB. Maximum Value is the maximum of this remaining storage.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527B</td>
+      <td>FlashRemainStorage</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint32</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint32</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ChannelOccupancy Trait (Channel Occupancy Relationship) {#ref_ChannelOccupancy}
+
+Establishes the relationship between a light box and the list of logical channels it occupies. Each record corresponds to one `virtual.device_id`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527A</td>
+      <td>ChannelOccupancy</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>list[<a href="#ref_ChannelOccupancyStructure">ChannelOccupancyStructure</a>]</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ExpansionPortEnable Trait (Expansion Port Enablement) {#ref_ExpansionPortEnable}
+
+Controls whether the return-to-zero code output expansion port is enabled. `true` means enabled, and `false` means disabled. Disabled by default.
+
+After `true` or `false` is written, the Server SHALL reply with the write result. On success, it SHALL update [ActiveChannelCount](#ref_ActiveChannelCount) to the channel count of this light control sub-device when `ExpansionPortEnable` is set to that value, and SHALL report [ActiveChannelCount](#ref_ActiveChannelCount). On failure, it SHALL NOT update or report this Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527C</td>
+      <td>ExpansionPortEnable</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ActiveChannelCount Trait (Current Active Channel) {#ref_ActiveChannelCount}
+
+Represents the number of currently active return-to-zero code output channels. The light control device is the sub-device. When `ExpansionPortEnable` is set to `true` or to `false`, this Trait SHALL be updated to the channel count corresponding to that value. The specific channel count is determined by the sub-device.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x525C</td>
+      <td>ActiveChannelCount</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
 
 ## IRCoordination {#ref_Aqara_Spec_IRCoordination}
 
