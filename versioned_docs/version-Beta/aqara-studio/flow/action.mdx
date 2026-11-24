@@ -21,7 +21,7 @@ Within Flow, you can perform the following actions:
 - [Delay](#delay): Delay downstream judgement or actions for flexible process pacing.
 - [Variable](#variable): Modify or toggle variable values to enable dynamic data flow.
 - [Automation](#automation): Enable or disable other automations within the current automation for coordination and management.
-- [Event State Hold](#event-state-hold):
+- [Event State Hold](#event-state-hold): After an event occurs, the block sets a boolean variable to `true`, holds it for a duration, then sets it to `false`.
 - [Loop Manage](#loop-manage):
 - [Script](#script):
 - [Message Push](#message-push):
@@ -69,7 +69,7 @@ The scene action block uses a [predefined scene](./../automation/scenes.mdx) in 
 
 A data process block is mainly used to perform calculations, statistical aggregation, or string processing on collected data. It is a key tool for complex logic and dynamic decision-making. By flexibly processing variables, device variable, and more, you can address diverse data requirements in automation scenarios to make the flow more intelligent.
 
-Flow supports seven common data processing methods: [Math Operation](#math-operation), [String Processing](#string-processing), [String Concatenation](#string-concatenation), [String Substring](#string-substring), [String Assignment](#string-assignment), [String Case Conversion](#string-case-conversion), [Data Aggregation](#data-aggregation) and [Random Number](#random-number), for numeric calculations, text processing, and data statistics, respectively.
+Flow supports seven common data processing methods: [Math Operation](#math-operation), [String Concatenation](#string-concatenation), [String Substring](#string-substring), [String Assignment](#string-assignment), [Case Conversion](#case-conversion), [Data Aggregation](#data-aggregation) and [Random Number](#random-number), for numeric calculations, text processing, and data statistics, respectively.
 
 ### Math Operation
 
@@ -279,7 +279,7 @@ The toggle variable block reads and invert a selected boolean variable or device
 
 Enable or disable a selected automation to control whether it responds to triggers. This card does not directly execute the target flow. Scenes cannot be enabled or disabled.
 
-Action blocks related to process control include [Automation enable/disable · Enable](#automation-enable-disable), and [Automation enable/disable · Disable](#automation-enable-disable).
+Action blocks related to process control include [Automation enable/disable · Enable](#automation-enabledisable), and [Automation enable/disable · Disable](#automation-enabledisable).
 
 
 
@@ -305,7 +305,23 @@ You can dynamically enable or disable other automations that have already been c
 
 ## Event State Hold
 
-Set a boolean variable or writable boolean device property to true on every event and renew its timer. Clear it after the hold duration from the latest event. Clear on startup; cancel and clear an active hold on stop.
+When the flow reaches this block, the block sets a selected writable boolean variable to `true` and starts the timer. If the block is triggered again before the hold duration ends, the block restarts the timer and the variable stays `true`. After the preset hold duration elapses from the last time the block was triggered, the variable is set to `false`.
+
+#### How to Use
+
+1. In the left sidebar under **Action**, select **Event State Hold** and add the block to the canvas.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/EventStateHold-AddABlock.png" alt="Add an event state hold block" style={{ width: '70%' }} />
+
+2. Select the boolean variable or writable boolean device property to write to.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/EventStateHold-SelectABooleanVariable.png" alt="Select a boolean variable" style={{ width: '70%' }} />
+
+3. Set how long the selected boolean variable stays `true`.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/en/EventStateHold-SetDuration.png" alt="Set the hold duration" style={{ width: '70%' }} />
+
+4. Connect the input to a [trigger](./trigger.mdx) or [condition](./condition.mdx) block. After a trigger occurs, the target boolean variable is set to `true`.
 
 ## Loop Manage
 
