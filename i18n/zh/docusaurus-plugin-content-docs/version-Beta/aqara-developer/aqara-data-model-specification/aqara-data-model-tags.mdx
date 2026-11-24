@@ -4822,13 +4822,6 @@ AirConditioner 与 SingleSetpointAC 都实现 `Output` 和 `HeaterCooler`，区�
     </tr>
     <tr>
       <td>17</td>
-      <td>Mini Split AC</td>
-      <td>0x0307</td>
-      <td>AirConditioner</td>
-      <td>0x000D</td>
-    </tr>
-    <tr>
-      <td>18</td>
       <td>In-Home Display</td>
       <td>0x0502</td>
       <td>Panel</td>
@@ -82101,7 +82094,7 @@ Zoom：目标光学变焦倍率。1.0 为最宽视野。
 
 管理屏幕显示相关硬件属性，如分辨率、亮度、背光、待机、屏保及显示状态。
 
-本 Function 还承载 Aqara Keypad Screen Configuration Cluster 的待机、屏保和暗屏配置。Function 中的 `O` 表示该能力可选；当 Zigbee 集群支持对应的 `STBY`、`SCRN` 或 `DARK` Feature 时，集群属性仍须满足设备端规范中的强制要求。集群 `StandbyTime` 属性复用 `StandbyTimeout` Trait，`0xFFFFFFFF` 映射为该 Trait 的 `0`（永不自动待机）；`DarkScreenOff` 属性复用 `DarkScreenOffEnable` Trait。键盘屏保样式复用 `ScreensaverStyle` Trait，枚举映射为 `General`、`Clock`、`Weather` 和 `Environment`，其中 `General` 和 `Clock` 为该 Trait 增补的枚举值。
+本 Function 还承载 Aqara Keypad Screen Configuration Cluster 的待机、屏保和暗屏配置。Function 中的 `O` 表示该能力可选；当 Zigbee 集群支持对应的 `STBY`、`SCRN` 或 `DARK` Feature 时，集群属性仍须满足设备端规范中的强制要求。集群 `StandbyTime` 属性复用 `StandbyTimeout` Trait，`0xFFFFFFFF` 映射为该 Trait 的 `0`（永不自动待机）；`DarkScreenOff` 属性复用 `DarkScreenOffEnable` Trait。键盘屏保样式复用 `ScreensaverStyle` Trait，枚举映射为 `Clock`、`Weather` 和 `Environment`，其中 `Clock` 为该 Trait 增补的枚举值。
 
 ### Function 标识
 
@@ -82266,6 +82259,12 @@ Zoom：目标光学变焦倍率。1.0 为最宽视野。
       <td>暗屏照度阈值</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5283</td>
+      <td><a href="#ref_IconResourceVersion">IconResourceVersion</a></td>
+      <td>图标资源版本</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -82392,11 +82391,6 @@ Zoom：目标光学变焦倍率。1.0 为最宽视野。
       <td>彩色数字</td>
     </tr>
     <tr>
-      <td>0x0A</td>
-      <td>General</td>
-      <td>通用待机样式</td>
-    </tr>
-    <tr>
       <td>0x0B</td>
       <td>Clock</td>
       <td>时钟</td>
@@ -82404,7 +82398,7 @@ Zoom：目标光学变焦倍率。1.0 为最宽视野。
   </tbody>
 </table>
 
-键盘屏保枚举映射为：`General` -> `General`（0x0A）、`Clock` -> `Clock`（0x0B）、`Weather` -> `Weather`（0x04）、`IndoorEnvironment` -> `Environment`（0x06）。
+键盘屏保枚举映射为：`Clock` -> `Clock`（0x0B）、`Weather` -> `Weather`（0x04）、`IndoorEnvironment` -> `Environment`（0x06）。
 
 ##### WakeDistanceSettingEnum32 Type {#ref_WakeDistanceSettingEnum32}
 
@@ -83022,6 +83016,11 @@ TriggerWeatherUpdate Command 的参数结构体。
     <tr>
       <td>0x526C</td>
       <td><a href="#ref_DarkScreenOffLuxThreshold">DarkScreenOffLuxThreshold</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5283</td>
+      <td><a href="#ref_IconResourceVersion">IconResourceVersion</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -85208,6 +85207,35 @@ TriggerWeatherUpdate Command 的参数结构体。
       <td>lux</td>
       <td></td>
       <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### IconResourceVersion Trait (0x5283)（图标资源版本） {#ref_IconResourceVersion}
+
+图标资源版本。
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint32</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
