@@ -4822,13 +4822,6 @@ This appendix defines the correspondence between Matter Device Types, Zigbee Dev
     </tr>
     <tr>
       <td>17</td>
-      <td>Mini Split AC</td>
-      <td>0x0307</td>
-      <td>AirConditioner</td>
-      <td>0x000D</td>
-    </tr>
-    <tr>
-      <td>18</td>
       <td>In-Home Display</td>
       <td>0x0502</td>
       <td>Panel</td>
@@ -82101,7 +82094,7 @@ This Function does not contain Commands.
 
 Manages screen display-related hardware attributes, such as resolution, brightness, backlight, standby, screensaver, and display state.
 
-This Function also carries the standby, screensaver and dark screen configuration of the Aqara Keypad Screen Configuration Cluster. `O` in the Function indicates that the capability is optional; when the Zigbee cluster supports the corresponding `STBY`, `SCRN` or `DARK` Feature, the cluster attributes shall still meet the mandatory requirements in the device-side specification. The cluster `StandbyTime` attribute reuses the `StandbyTimeout` Trait, and `0xFFFFFFFF` maps to `0` of this Trait (never enter standby automatically); the `DarkScreenOff` attribute reuses the `DarkScreenOffEnable` Trait. The keypad screensaver style reuses the `ScreensaverStyle` Trait, with the enumerations mapped to `General`, `Clock`, `Weather` and `Environment`, where `General` and `Clock` are enumeration values added for this Trait.
+This Function also carries the standby, screensaver and dark screen configuration of the Aqara Keypad Screen Configuration Cluster. `O` in the Function indicates that the capability is optional; when the Zigbee cluster supports the corresponding `STBY`, `SCRN` or `DARK` Feature, the cluster attributes shall still meet the mandatory requirements in the device-side specification. The cluster `StandbyTime` attribute reuses the `StandbyTimeout` Trait, and `0xFFFFFFFF` maps to `0` of this Trait (never enter standby automatically); the `DarkScreenOff` attribute reuses the `DarkScreenOffEnable` Trait. The keypad screensaver style reuses the `ScreensaverStyle` Trait, with the enumerations mapped to `Clock`, `Weather` and `Environment`, where `Clock` is the enumeration value added for this Trait.
 
 ### Function Identification
 
@@ -82266,6 +82259,12 @@ This Function also carries the standby, screensaver and dark screen configuratio
       <td>Lux threshold for screen off</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5283</td>
+      <td><a href="#ref_IconResourceVersion">IconResourceVersion</a></td>
+      <td>Icon resource version</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -82392,11 +82391,6 @@ This enumeration defines the valid values of the Present Value of the Screensave
       <td>Colorful digits</td>
     </tr>
     <tr>
-      <td>0x0A</td>
-      <td>General</td>
-      <td>General standby style</td>
-    </tr>
-    <tr>
       <td>0x0B</td>
       <td>Clock</td>
       <td>Clock</td>
@@ -82404,7 +82398,7 @@ This enumeration defines the valid values of the Present Value of the Screensave
   </tbody>
 </table>
 
-The keypad screensaver enumeration maps as follows: `General` -> `General` (0x0A), `Clock` -> `Clock` (0x0B), `Weather` -> `Weather` (0x04), `IndoorEnvironment` -> `Environment` (0x06).
+The keypad screensaver enumeration maps as follows: `Clock` -> `Clock` (0x0B), `Weather` -> `Weather` (0x04), `IndoorEnvironment` -> `Environment` (0x06).
 
 ##### WakeDistanceSettingEnum32 Type {#ref_WakeDistanceSettingEnum32}
 
@@ -83022,6 +83016,11 @@ This Zigbee structure is used to identify the target device associated with the 
     <tr>
       <td>0x526C</td>
       <td><a href="#ref_DarkScreenOffLuxThreshold">DarkScreenOffLuxThreshold</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5283</td>
+      <td><a href="#ref_IconResourceVersion">IconResourceVersion</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -85208,6 +85207,35 @@ Sets the dark-screen off threshold in lux. After dark-screen off is enabled, the
       <td>lux</td>
       <td></td>
       <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### IconResourceVersion Trait (0x5283) {#ref_IconResourceVersion}
+
+Icon resource version.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>uint32</td>
+      <td></td>
+      <td></td>
+      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
