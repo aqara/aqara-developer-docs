@@ -1413,7 +1413,7 @@ Present Value 不设默认读写权限，按具体 Trait 参数表的 `Access` �
     <tr>
       <td><a href="#ref_Aqara_Spec_LightBoxManagement">0x0140</a></td>
       <td>LightBoxManagement</td>
-      <td>灯箱管理：描述通道占用关系、拓展口使能、当前活动通道数，以及 Flash 剩余存储的监控。</td>
+      <td>灯箱管理：描述通道占用关系、拓展口使能、当前活动通道数、是否支持跨灯控组建灯箱，以及 Flash 剩余存储的监控。</td>
     </tr>
   </tbody>
 </table>
@@ -120759,7 +120759,7 @@ Device Exception Log Report. The hub or device reports exceptions, error logs, o
 
 ### 简介
 
-LightBoxManagement 描述通道占用关系、拓展口使能、当前活动通道数，以及 Flash 剩余存储的监控。
+LightBoxManagement 描述通道占用关系、拓展口使能、当前活动通道数、是否支持跨灯控组建灯箱，以及 Flash 剩余存储的监控。
 
 ### 交互流程：拓展口使能 {#ref_LightBoxManagement_FlowExpansionPort}
 
@@ -120839,6 +120839,12 @@ sequenceDiagram
       <td>0x525C</td>
       <td><a href="#ref_ActiveChannelCount">ActiveChannelCount</a></td>
       <td>当前活动通道</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x527D</td>
+      <td><a href="#ref_CrossControllerLightBoxSupported">CrossControllerLightBoxSupported</a></td>
+      <td>是否支持跨灯控组建灯箱</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -121067,6 +121073,52 @@ sequenceDiagram
       <td>uint8</td>
       <td></td>
       <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### CrossControllerLightBoxSupported Trait（是否支持跨灯控组建灯箱） {#ref_CrossControllerLightBoxSupported}
+
+表示设备是否支持跨灯控组建灯箱。`true` 表示支持，`false` 表示不支持。该 Trait 为只读、可上报，由灯控设备根据自身能力确定。
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527D</td>
+      <td>CrossControllerLightBoxSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### 参数
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
       <td>RV</td>
       <td>O</td>
     </tr>
