@@ -1413,7 +1413,7 @@ This section summarizes all Function definitions in Aqara Spec. See the correspo
     <tr>
       <td><a href="#ref_Aqara_Spec_LightBoxManagement">0x0140</a></td>
       <td>LightBoxManagement</td>
-      <td>Light box management: describes the channel occupancy relationship, expansion port enablement, the current active channel count, and monitoring of the remaining Flash storage.</td>
+      <td>Light box management: describes the channel occupancy relationship, expansion port enablement, the current active channel count, whether light box assembly across light control devices is supported, and monitoring of the remaining Flash storage.</td>
     </tr>
   </tbody>
 </table>
@@ -120759,7 +120759,7 @@ The Function ID and Trait ID of this Function are provisional and will be replac
 
 ### Introduction
 
-LightBoxManagement describes the channel occupancy relationship, expansion port enablement, the current active channel count, and monitoring of the remaining Flash storage.
+LightBoxManagement describes the channel occupancy relationship, expansion port enablement, the current active channel count, whether light box assembly across light control devices is supported, and monitoring of the remaining Flash storage.
 
 ### Interaction Flow: Expansion Port Enablement {#ref_LightBoxManagement_FlowExpansionPort}
 
@@ -120839,6 +120839,12 @@ sequenceDiagram
       <td>0x525C</td>
       <td><a href="#ref_ActiveChannelCount">ActiveChannelCount</a></td>
       <td>Current active channel</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x527D</td>
+      <td><a href="#ref_CrossControllerLightBoxSupported">CrossControllerLightBoxSupported</a></td>
+      <td>Whether light box assembly across light control devices is supported</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -121067,6 +121073,52 @@ Represents the number of currently active return-to-zero code output channels. T
       <td>uint8</td>
       <td></td>
       <td></td>
+      <td>RV</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### CrossControllerLightBoxSupported Trait (Whether Light Box Assembly Across Light Control Devices Is Supported) {#ref_CrossControllerLightBoxSupported}
+
+Indicates whether the device supports light box assembly across light control devices. `true` indicates support, and `false` indicates no support. This Trait is read-only and reportable, and is determined by the light control device based on its own capabilities.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527D</td>
+      <td>CrossControllerLightBoxSupported</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
       <td>RV</td>
       <td>O</td>
     </tr>
