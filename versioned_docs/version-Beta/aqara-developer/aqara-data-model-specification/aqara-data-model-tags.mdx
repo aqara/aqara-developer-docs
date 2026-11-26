@@ -1521,7 +1521,7 @@ Special types: Root, Public. They correspond to the Root Endpoint and Public End
       <td>Public (Public Node)</td>
       <td><a href="#ref_Aqara_Spec_GeneralConfiguration">GeneralConfiguration</a></td>
       <td>O</td>
-      <td></td>
+      <td>General device configuration; if a Trait is used for a specific business function (such as sensitivity settings), it can be placed under the Endpoint that the corresponding business Function belongs to.</td>
     </tr>
     <tr>
       <td>0x0001</td>
@@ -69563,12 +69563,6 @@ Provides general device configuration items, such as sensitivity, delay, default
       <td>Vibration intensity</td>
       <td>O</td>
     </tr>
-    <tr>
-      <td>0x5288</td>
-      <td><a href="#ref_Locale">Locale</a></td>
-      <td>Device region language</td>
-      <td>O</td>
-    </tr>
   </tbody>
 </table>
 
@@ -71068,11 +71062,6 @@ This enumeration defines the valid values of the Present Value of the PublicCapO
     <tr>
       <td>0x51ED</td>
       <td><a href="#ref_VibrationIntensity">VibrationIntensity</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5288</td>
-      <td><a href="#ref_Locale">Locale</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -73574,61 +73563,6 @@ Vibration intensity setting, used to adjust the vibration intensity of the linea
       <td></td>
       <td>50</td>
       <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### Locale Trait {#ref_Locale}
-
-Indicates the region language tag currently used by the device, following BCP 47. This Trait describes the device-level region language setting and does not specifically refer to the on-screen display language.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5288</td>
-      <td>Locale</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>characterString</td>
-      <td>BCP 47</td>
-      <td></td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0006</td>
-      <td>Supported Value</td>
-      <td>list[characterString]</td>
-      <td>List of BCP 47 tags</td>
-      <td></td>
-      <td>R</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -101789,18 +101723,6 @@ Continuously monitors device operating parameters, promptly detecting and report
       <td>Under-temperature alert enable</td>
       <td>O</td>
     </tr>
-    <tr>
-      <td>0x5285</td>
-      <td><a href="#ref_PowerVoltageAlarm">PowerVoltageAlarm</a></td>
-      <td>Voltage/power alarm</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5286</td>
-      <td><a href="#ref_ScreenFault">ScreenFault</a></td>
-      <td>Screen fault</td>
-      <td>O</td>
-    </tr>
   </tbody>
 </table>
 
@@ -101842,6 +101764,11 @@ This enumeration defines the valid values of the Present Value of the VoltageSaf
       <td>0x03</td>
       <td>UnderVoltageProtection</td>
       <td>Under-voltage protection</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>UnderVoltageAnomaly</td>
+      <td>Under-voltage anomaly</td>
     </tr>
   </tbody>
 </table>
@@ -102026,22 +101953,12 @@ This enumeration defines the valid values of the Present Value of the OverCurren
       <td><a href="#ref_UnderTemperatureAlertEnable">UnderTemperatureAlertEnable</a></td>
       <td>O</td>
     </tr>
-    <tr>
-      <td>0x5285</td>
-      <td><a href="#ref_PowerVoltageAlarm">PowerVoltageAlarm</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5286</td>
-      <td><a href="#ref_ScreenFault">ScreenFault</a></td>
-      <td>O</td>
-    </tr>
   </tbody>
 </table>
 
 #### VoltageSafetyManagement Trait {#ref_VoltageSafetyManagement}
 
-A safety mechanism used to monitor the power supply voltage and provide protection during over-voltage or under-voltage anomalies.
+A safety mechanism used to monitor the power supply voltage, and to report the normal, over-voltage or under-voltage anomaly and protection states.
 
 <table>
   <thead>
@@ -102601,116 +102518,6 @@ This Trait is used to carry the power value or threshold corresponding to the ov
       <td></td>
       <td>60</td>
       <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### PowerVoltageAlarm Trait {#ref_PowerVoltageAlarm}
-
-Indicates whether the device has a voltage or power supply anomaly alarm.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5285</td>
-      <td>PowerVoltageAlarm</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>enum8</td>
-      <td></td>
-      <td>0</td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0006</td>
-      <td>Supported Value</td>
-      <td>list[enum8]</td>
-      <td></td>
-      <td></td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>enum8</td>
-      <td></td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### ScreenFault Trait {#ref_ScreenFault}
-
-Indicates whether the device screen has a fault.
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5286</td>
-      <td>ScreenFault</td>
-    </tr>
-  </tbody>
-</table>
-
-##### Parameters
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td>0</td>
-      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
