@@ -1521,7 +1521,7 @@ Device Type 用于描述 Endpoint 的设备类型，一个 Device 可以由一�
       <td>Public（公共节点）</td>
       <td><a href="#ref_Aqara_Spec_GeneralConfiguration">GeneralConfiguration</a></td>
       <td>O</td>
-      <td></td>
+      <td>通用设备配置；若 Trait 用于特定业务功能（如灵敏度设置），可放在对应业务 Function 所属的 Endpoint 下。</td>
     </tr>
     <tr>
       <td>0x0001</td>
@@ -69563,12 +69563,6 @@ OpenMatterCommissioningWindow Command 的参数结构体。
       <td>震感强度</td>
       <td>O</td>
     </tr>
-    <tr>
-      <td>0x5288</td>
-      <td><a href="#ref_Locale">Locale</a></td>
-      <td>设备区域语言</td>
-      <td>O</td>
-    </tr>
   </tbody>
 </table>
 
@@ -71068,11 +71062,6 @@ WakeupDevice Command 的参数结构体。Server 下发该 Command，用于将�
     <tr>
       <td>0x51ED</td>
       <td><a href="#ref_VibrationIntensity">VibrationIntensity</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5288</td>
-      <td><a href="#ref_Locale">Locale</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -73574,61 +73563,6 @@ P2P动态趣图状态开关
       <td></td>
       <td>50</td>
       <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### Locale Trait（设备区域语言） {#ref_Locale}
-
-表示设备当前使用的区域语言标签，遵循 BCP 47。该 Trait 描述设备级区域语言设置，不专指屏幕显示语言。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5288</td>
-      <td>Locale</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>characterString</td>
-      <td>BCP 47</td>
-      <td></td>
-      <td>RVW</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0006</td>
-      <td>Supported Value</td>
-      <td>list[characterString]</td>
-      <td>BCP 47 标签列表</td>
-      <td></td>
-      <td>R</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -101789,18 +101723,6 @@ RemovePage Command 的参数结构体。
       <td>低温报警使能</td>
       <td>O</td>
     </tr>
-    <tr>
-      <td>0x5285</td>
-      <td><a href="#ref_PowerVoltageAlarm">PowerVoltageAlarm</a></td>
-      <td>电压/电源告警</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5286</td>
-      <td><a href="#ref_ScreenFault">ScreenFault</a></td>
-      <td>屏幕故障</td>
-      <td>O</td>
-    </tr>
   </tbody>
 </table>
 
@@ -101842,6 +101764,11 @@ RemovePage Command 的参数结构体。
       <td>0x03</td>
       <td>UnderVoltageProtection</td>
       <td>欠压保护</td>
+    </tr>
+    <tr>
+      <td>0x04</td>
+      <td>UnderVoltageAnomaly</td>
+      <td>欠压异常</td>
     </tr>
   </tbody>
 </table>
@@ -102026,22 +101953,12 @@ RemovePage Command 的参数结构体。
       <td><a href="#ref_UnderTemperatureAlertEnable">UnderTemperatureAlertEnable</a></td>
       <td>O</td>
     </tr>
-    <tr>
-      <td>0x5285</td>
-      <td><a href="#ref_PowerVoltageAlarm">PowerVoltageAlarm</a></td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x5286</td>
-      <td><a href="#ref_ScreenFault">ScreenFault</a></td>
-      <td>O</td>
-    </tr>
   </tbody>
 </table>
 
 #### VoltageSafetyManagement Trait（电压安全管理） {#ref_VoltageSafetyManagement}
 
-一种安全机制，用于监控电源电压，在过电压或欠电压异常期间进行保护。
+一种安全机制，用于监控电源电压，并报告正常、过压或欠压异常及保护状态。
 
 <table>
   <thead>
@@ -102601,116 +102518,6 @@ RemovePage Command 的参数结构体。
       <td></td>
       <td>60</td>
       <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### PowerVoltageAlarm Trait（电压/电源告警） {#ref_PowerVoltageAlarm}
-
-指示设备是否存在电压或电源异常告警。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5285</td>
-      <td>PowerVoltageAlarm</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>enum8</td>
-      <td></td>
-      <td>0</td>
-      <td>RV</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0006</td>
-      <td>Supported Value</td>
-      <td>list[enum8]</td>
-      <td></td>
-      <td></td>
-      <td>R</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <td>0x0007</td>
-      <td>Default Value</td>
-      <td>enum8</td>
-      <td></td>
-      <td>0</td>
-      <td>RW</td>
-      <td>O</td>
-    </tr>
-  </tbody>
-</table>
-
-#### ScreenFault Trait（屏幕故障） {#ref_ScreenFault}
-
-指示设备屏幕是否存在故障。
-
-<table>
-  <thead>
-    <tr>
-      <th>Trait ID</th>
-      <th>Code</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x5286</td>
-      <td>ScreenFault</td>
-    </tr>
-  </tbody>
-</table>
-
-##### 参数
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter ID</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Constraint</th>
-      <th>Default</th>
-      <th>Access</th>
-      <th>Conformance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0x0001</td>
-      <td>Present Value</td>
-      <td>boolean</td>
-      <td></td>
-      <td>0</td>
-      <td>RV</td>
       <td>O</td>
     </tr>
   </tbody>
