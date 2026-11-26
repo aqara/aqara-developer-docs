@@ -91,6 +91,7 @@
 - Hub M3 Pro: https://docs.aqara.com/docs/aqara-studio/product-knowledge/gateways/hub-m3-pro
 - Hub M100 Pro: https://docs.aqara.com/docs/aqara-studio/product-knowledge/gateways/hub-m100-pro
 - Edge Box GX500M: https://docs.aqara.com/docs/aqara-studio/product-knowledge/gateways/edge-box-gx500m
+- Presence Multi-Sensor FP300: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/presence-multi-sensor-fp300
 - Presence Sensor PR330P: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/presence-sensor-pr330p
 - Spatial Multi-Sensor FP400: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/spatial-multi-sensor-fp400
 - Spatial Multi-Sensor FP400 Pro: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/spatial-multi-sensor-fp400-pro

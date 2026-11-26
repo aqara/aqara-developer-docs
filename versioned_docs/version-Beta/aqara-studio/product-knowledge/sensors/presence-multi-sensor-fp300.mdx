@@ -1,0 +1,295 @@
+---
+title: "Presence Multi-Sensor FP300"
+description: "The Presence Multi-Sensor FP300 is a battery-powered sensor that combines millimeter-wave radar, infrared detection, and Aqara AI algorithms to detect human presence, even when a person is still. It also monitors temperature, humidity, and ambient light, and supports Thread and Zigbee."
+keywords: ["Aqara Documentation", "Aqara Studio", "Product Manual", "Presence Multi-Sensor FP300"]
+---
+# Presence Multi-Sensor FP300
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/presence-multi-sensor-fp300-fp300-cover.png" alt="Presence Multi-Sensor FP300" style={{width: '50%'}} />
+
+## Product Introduction
+
+The Presence Multi-Sensor FP300 is a battery-powered sensor that combines millimeter-wave radar, infrared detection, and Aqara AI algorithms to detect human presence, even when a person is still. With spatial learning and adaptive sensitivity, it adjusts to its surroundings while also monitoring temperature, humidity, and ambient light. It supports both Thread and Zigbee.
+
+Add the FP300 via the Aqara Studio web platform or the Aqara Life App. For Matter, use a compatible Matter controller or hub. For Zigbee, use a compatible Zigbee hub.
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/presence-multi-sensor-fp300-fp300-components.png" alt="FP300 components, numbered to match the legend below." style={{width: '80%'}} />
+
+1. Reset button  
+2. Light sensor  
+3. Infrared sensor  
+4. Millimeter-wave radar  
+5. Wall mounting plate
+
+## Device Pairing
+
+### Preparation
+
+1. Download the Aqara Life App
+
+    Scan the QR code below, or go to the Aqara website, the Apple App Store, or Google Play to download the latest version.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/presence-multi-sensor-fp300-aqara-life-qr.png" alt="QR code for downloading the Aqara Life App." style={{width: '50%'}} />
+
+2. Enter pairing mode
+
+    Remove the battery insulation tab. The device powers on and enters pairing mode. The indicator pulses or flashes continuously. It is blue for Thread and purple for Zigbee. If the device has exited pairing mode, press and hold the reset button for about 5 seconds. Release it when the indicator starts flashing rapidly to re-enter pairing mode.
+
+    If the insulation tab is difficult to remove, open the battery cover and pull it out.
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/presence-multi-sensor-fp300-remove-battery-tab.png" alt="Pull the battery insulation tab in the direction of the arrow." style={{width: '70%'}} />
+
+### Add via Aqara Life App
+
+Open the Aqara Life App and follow the in-app **Add Device** steps.
+
+### Add via the Aqara Studio Web Platform
+
+Log in to the Aqara Studio web platform. Go to **Devices**, select **Matter** or **Zigbee**, and click **Add device**. Follow the on-screen instructions to finish adding the device.
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/presence-multi-sensor-fp300-aqara-studio-onboarding.png" alt="Logging in and adding a device on the Aqara Studio web platform." style={{width: '70%'}} />
+
+### Firmware Update
+
+After adding the device in the Aqara Life App, update its firmware to the latest version on the device settings page before use.
+
+If a third-party Matter platform cannot obtain the latest firmware, add the device in Aqara Life and follow the prompts to switch protocols twice. For example, switch from Thread to Zigbee, then back to Thread to retrieve the latest firmware from the cloud.
+
+### Protocol Switching
+
+First remove the device from the platform where it was added. Press and hold the reset button for about 5 seconds to enter pairing mode. On the pairing screen in the Aqara Life App, tap **Switch Protocol**, select the protocol you want, and follow the in-app instructions to finish setup.
+
+Switching protocols clears all settings and data on the device. Record any settings you want to keep before switching.
+
+## Device Installation
+
+The device supports wall mounting, tabletop placement, and ceiling mounting. Choose a location for the area you want to monitor, then adjust the mounting angle and the device tilt. You can secure the device with adhesive, a magnetic mount, or screws. Use screws for installations above 2 m.
+
+### Installation Recommendations
+
+- When mounting the device on a wall, in a corner, or on a ceiling, point the front toward the area you want to monitor and adjust the angle as needed.
+- For wider coverage, install the device about 2 m above the floor and tilt it slightly downward toward the main activity area.
+- For side mounting on a wall or in a corner, a height of 1.4–1.8 m is recommended to cover both standing and seated occupants. If you install it at another height, adjust the bracket tilt to cover the activity area.
+- For corner mounting, point the front along the centerline of the corner to reduce blind spots on either side at longer distances. The base has an offset swivel joint. Rotate the base to increase the available tilt.
+- Avoid pointing the device directly at large reflective surfaces such as metal or glass. Keep it away from air conditioner vents, air purifiers, and fans.
+- Use adhesive or magnetic mounting below 2 m. Above 2 m, secure the device with screws.
+
+### Wall Mounting
+
+- Adhesive Mounting
+    
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/presence-multi-sensor-fp300-adhesive-mounting.png" alt="Adhesive mounting diagram." style={{width: '70%'}} />
+
+- Magnetic Mounting
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/presence-multi-sensor-fp300-magnetic-mounting.png" alt="Magnetic mounting diagram." style={{width: '70%'}} />
+
+- Screw Mounting
+
+    <img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/presence-multi-sensor-fp300-screw-mounting.png" alt="Four steps for screw mounting." style={{width: '70%'}} />
+
+    A screwdriver is required (not included). The screw kit is optional.
+
+## Setting the Radar Detection Range
+
+The device detects up to 6 m away at a detection angle of 120° under ideal laboratory conditions. Actual coverage depends on the room, mounting height, and angle. The maximum distance may be shorter toward the edges of the detection area, where the radar signal is weaker.
+
+Adjust the detection range in 0.25 m increments on the device settings page. You can exclude specific distance intervals within the range.
+
+The person icon in the settings shows a reference value for **Current Position**. This is the straight-line distance from the device to the point on the person giving the strongest radar return. Use it as a guide when setting the detection boundary. Beyond 6 m, the readout shows **Unknown**.
+
+To set the range, slowly approach the device and stop at the boundary of the area you want to monitor. Wait for the distance reading to stabilize. Set the range using that reading, then check the presence status and adjust the range as needed. Radar range settings require an active radar mode.
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/presence-multi-sensor-fp300-radar-coverage.png" alt="Radar detection coverage, up to 6 m at 120°." style={{width: '70%'}} />
+
+## Absence Confirmation Period
+
+The absence confirmation period is how long the device must continuously detect no presence before reporting absence. A shorter period reports absence sooner, but environmental interference is more likely to affect detection. In most cases, start with the default setting.
+
+If you set an absence confirmation period and an automation duration, they run one after the other. For example, set the period to 5 seconds and configure the lights to turn off after 10 seconds with no presence detected. The device first confirms and reports absence, then the automation waits another 10 seconds before turning off the lights.
+
+## AI Spatial Learning
+
+AI Spatial Learning helps the device adapt to interference from reflective surfaces such as large panes of glass, metal, and mirrors. After installation, run it manually once and keep the detection area unoccupied for about 30 seconds.
+
+The device continues to learn as you use it. If interference causes the device to keep reporting presence in an empty room, run AI Spatial Learning again with the room unoccupied.
+
+## Configuring Automations
+
+In the automation settings of your connected platform, create a rule using an FP300 detection state as the trigger, then set the action you want to run. Available triggers depend on the platform and the current detection mode.
+
+### Automation Conditions
+
+| Category | Automation Conditions |
+| --- | --- |
+| Presence | Presence detected |
+|  | No presence detected |
+|  | Presence detected for a certain duration |
+|  | No presence detected for a certain duration |
+|  | Infrared motion detected (not available in radar-only mode) |
+|  | No infrared motion detected (not available in radar-only mode) |
+|  | No infrared motion detected for a certain duration<br />(not available in radar-only mode) |
+| Ambient light | Illuminance rises to a set level |
+|  | Illuminance drops to a set level |
+|  | Above the specified light level |
+|  | Below the specified light level |
+| Temperature | Temperature rises to a set level |
+|  | Temperature drops to a set level |
+|  | Above the specified temperature |
+|  | Below the specified temperature |
+| Humidity | Humidity rises to a set level |
+|  | Humidity drops to a set level |
+|  | Above the specified humidity |
+|  | Below the specified humidity |
+
+## Recommended Automations
+
+- Turn on the lights when presence is detected.  
+- Turn off the lights or air conditioner when no presence is detected for a set duration.  
+- Turn on the lights when presence is detected and the light level is below a set threshold.  
+- When presence is detected and the temperature is above a set threshold, turn on the air conditioner in cooling mode and set it to 24 °C.
+
+## Tips
+
+- Point the device toward the front of the body to help it detect subtle movements such as breathing.
+- The device has a detection range of up to 6 m. Set the range for the area you want to monitor.
+- To keep the lights from switching on and off too often, adjust the Absence Confirmation Period or use **No presence detected for a certain duration** as your automation trigger.
+- If the device reports presence in an empty room, run AI Spatial Learning with the room unoccupied.
+- Keep the device away from air conditioner vents, air purifiers, and fans.
+- The device needs time to learn a new environment. If you notice occasional false reports after installation, leave the room unoccupied while it learns. If detection is still unreliable, adjust the mounting angle or move the device.
+
+## Battery Replacement
+
+<img src="https://itad-aqara-docs-1300889962.aqara.com/dev/img/aqara-studio/zh/presence-multi-sensor-fp300-battery-replacement.png" alt="Nine steps for opening the device, replacing the batteries, and reassembling it." style={{width: '70%'}} />
+
+A screwdriver is required (not included). The screw kit is optional.
+
+## Indicator Light
+
+| Indicator status | Device status |
+| --- | --- |
+| One quick blue flash | The reset button was pressed once. |
+| Three quick blue flashes | The device is powered on, has restarted, or has been reset to factory settings. The flashes indicate normal power. |
+| Pulses or flashes continuously (blue for Thread, purple for Zigbee) | The device is in pairing mode and ready to add. |
+| Flashes rapidly during reset | Release the reset button within 3 seconds after rapid flashing begins. |
+| Steady blue for 1 second | The device was added successfully. |
+
+## Reset Button
+
+| Button action | What it does |
+| --- | --- |
+| Press the reset button once | Checks the Zigbee hub connection and whether the device is within range. Applies when the device is connected to a Zigbee hub. |
+| Press and hold the reset button for about 5 seconds | Resets the device and starts pairing mode. |
+| Quickly press the reset button 10 times | Restores factory settings. |
+
+## Reset the Device
+
+A device reset clears network settings and returns the device to pairing mode while keeping local data. With the device powered on, press and hold the reset button for about 5 seconds. Release it when the indicator flashes rapidly.
+
+## Factory Reset
+
+A factory reset clears network settings and deletes all local and cloud data. With the device powered on, quickly press the reset button 10 times to restore factory settings.
+
+## Troubleshooting
+
+### The device reports presence after everyone has left or when the room is empty
+
+Possible causes and what to do:
+
+| Possible causes | What to do |
+| --- | --- |
+| <ul><li>Airflow from an air conditioner or fan can move curtains or other objects. The radar may pick up these movements, a swaying light fixture, or a pet moving in the detection area.</li><li>Large glass surfaces, metal, and mirrors can reflect radar signals. A longer absence confirmation period can also delay the switch to absence.</li><li>If the event log shows **Infrared motion detected**, the passive infrared (PIR) sensor may have been triggered by a temperature change, a draft, or direct sunlight.</li></ul> | <ol><li>Check the device status or event log to see whether the device still shows **Presence detected** or recorded only an **Infrared motion detected** event. For occupancy-based automations such as lighting, use **Presence detected** or **No presence detected** as the trigger.</li><li>Move objects that can sway and keep the device away from air vents and reflective surfaces. Lower sensitivity as appropriate for the room. For occasional PIR triggers, try the Low sensitivity setting.</li><li>If the room is empty and the device is simply slow to report absence, shorten the **Absence Confirmation Period** in the device settings. Try 5 seconds first, or select 1 second if the option is available. The device must detect no presence throughout that period before the status changes. If interference keeps triggering presence, address the source first.</li><li>Run **AI Spatial Learning** with the room unoccupied. If you use Zigbee, you can also narrow the detection range in **Real-time Debugging** to exclude areas you do not need to monitor.</li><li>Update the device to the latest firmware. If occasional false reports continue, check what was happening in the room when they occurred, then adjust the mounting angle or the detection range.</li></ol> |
+
+### The device reports absence when someone is present or detects a still person intermittently
+
+Possible causes and what to do:
+
+| Possible causes | What to do |
+| --- | --- |
+| <ul><li>The device may be aimed away from the activity area, or the person may be near the edge of the detection range or behind an obstruction. People sleeping or sitting still may make very little detectable movement.</li><li>Sensitivity may be too low or the absence confirmation period too short. The device also needs time to learn the room after installation or relocation.</li></ul> | <ol><li>Aim the front of the device toward the main activity area, preferably toward the person's chest, and remove obstructions. The recommended height for side mounting is 1.4–1.8 m.</li><li>Increase sensitivity and extend the absence confirmation period as needed. For bedrooms or other areas where people remain still for long periods, try High sensitivity first and check whether the device continues to report presence.</li><li>After installation or relocation, leave the room unoccupied for about 10 minutes so the device can learn its surroundings. You can also run **AI Spatial Learning** manually with the room unoccupied. It usually takes about 30 seconds.</li><li>Make sure the device has the latest firmware. If detection is still unreliable, move the device closer to the area where people stay or bring that area farther inside the detection range.</li></ol> |
+
+### The device is slow to detect someone entering
+
+Possible causes and what to do:
+
+| Possible causes | What to do |
+| --- | --- |
+| <ul><li>In Dual Presence Mode, the PIR sensor triggers first and wakes the radar. Walking straight toward the device can produce a smaller change in the infrared signal, which may delay detection.</li></ul> | <ol><li>Move or angle the device so people entering through a doorway or walking down a hall cross the PIR detection area from the side.</li><li>Walk through the area as you normally would and fine-tune the angle. If the device also needs to detect someone sitting or resting, make sure it still covers that area.</li></ol> |
+
+### The device will not pair or respond
+
+Possible causes and what to do:
+
+| Possible causes | What to do |
+| --- | --- |
+| <ul><li>The battery insulation tab may still be in place, or the batteries may be depleted or installed incorrectly. The device may also have exited pairing mode or be too far from the hub or controller.</li></ul> | <ol><li>Remove the insulation tab and check the orientation of both CR2450 batteries against the battery replacement diagram. If replacement is needed, replace both batteries. Press the reset button once and check for a single rapid blue flash.</li><li>Press and hold the reset button for about 5 seconds. Release it when the indicator flashes rapidly. When the indicator pulses or flashes continuously (blue for Thread, purple for Zigbee), add the device in the Aqara Life App or on the Aqara Studio web platform.</li><li>Move the device closer to the hub or controller. Check that it is online and supports the protocol in use. Use a compatible Zigbee hub for Zigbee or a compatible Matter controller or hub for Matter.</li><li>If pairing still fails, quickly press the reset button 10 times to restore factory settings, then try again. A factory reset deletes local and cloud data.</li></ol> |
+
+## Frequently Asked Questions
+
+### Detection and False Triggers
+
+#### Why does my FP300 still report presence after I leave?
+
+The device switches to absence after it continuously detects no presence for the entire confirmation period. If the room is quiet and the change is simply slow, try setting the period to 5 seconds, or 1 second if available. If the device still reports presence, check for swaying curtains, moving light fixtures, or drafts and follow the first set of steps in Troubleshooting.
+
+#### How can I tell a false infrared motion event from a false presence report?
+
+**Infrared motion detected** is a PIR event that can be triggered by temperature changes, drafts, or direct sunlight. **Presence detected** is the occupancy status. In Dual Presence Mode, if the device continues to show presence in an empty room, check the radar detection area for interference. For occupancy-based lighting, use the presence or absence status as the trigger. Occasional false PIR triggers usually have little effect on battery life.
+
+#### How can I reduce false absence reports when someone is sitting still or sleeping?
+
+Aim the device toward the person's chest and keep the person within the detection area with a clear line of sight. Try High sensitivity and extend the absence confirmation period as needed. Start with Medium sensitivity in regularly used rooms such as a living room or study, and try Low sensitivity in hallways or bathrooms where people tend to stay briefly.
+
+#### Does the FP300 support pet filtering?
+
+The FP300 has no dedicated pet filter or weight-based pet filtering. Adjust the mounting angle and detection range to avoid areas on the floor where pets often move. Medium or large pets may still trigger detection.
+
+#### What can the FP300 detect?
+
+The FP300 detects human presence, including people who are still. It also monitors temperature, humidity, and ambient light.
+
+### Installation and Placement
+
+#### Where should I install the FP300, and how high should it be?
+
+Place it on a tabletop or mount it on a wall or ceiling. For side mounting on a wall or in a corner, install it 1.4–1.8 m above the floor facing the main activity area. For wider coverage, mount it about 2 m high and tilt it slightly downward. Use screws above 2 m.
+
+#### Why does the actual detection range differ from the stated range?
+
+The stated range of up to 6 m at 120° was measured under ideal laboratory conditions. Mounting height and angle, posture, obstructions, and reflections can affect coverage. Test the paths people use and check that key areas such as doorways fall within the detection area.
+
+#### How can I mount the device so it detects someone entering sooner?
+
+In Dual Presence Mode, aim the device so people entering a doorway or passing through a hall cross the PIR detection area from the side. Test it on the paths people use and adjust the angle as needed.
+
+#### How can I reduce interference from glass, metal, or airflow?
+
+Avoid large glass, metal, or mirrored surfaces and keep the device away from air conditioner vents, fans, and air purifiers. Adjust the angle so the radar faces away from reflective surfaces. After moving the device, run AI Spatial Learning with the room unoccupied.
+
+### Pairing and Maintenance
+
+#### Which protocols does the FP300 support, and how do I add it?
+
+The FP300 supports Thread and Zigbee. With the device in pairing mode, use **Add Device** in the Aqara Life App. In Aqara Studio, go to **Devices** and select **Matter** or **Zigbee**, then follow the on-screen instructions. Use a hub or controller compatible with the selected protocol.
+
+#### How do I update the firmware?
+
+After adding the device in the Aqara Life App, check for updates on the device settings page. See **Device Pairing** for firmware update and protocol switching instructions.
+
+#### What are the operating temperature and humidity ranges?
+
+The operating temperature is -10 to 50 °C. The operating humidity is 0–95% RH, non-condensing.
+
+## Product Specifications
+
+| Parameter | Specification |
+| --- | --- |
+| Product name | Presence Multi-Sensor FP300 |
+| Wireless protocols | Thread, Zigbee |
+| Dimensions | 42 × 42 × 50 mm |
+| Operating temperature | -10 to 50 °C |
+| Operating humidity | 0–95% RH, non-condensing |
+| Power supply | Two CR2450 batteries |
+| FCC ID | 2AKIT-PSS04 |
+| IC | 22635-PSS04 |
+| KC ID | R-C-LUt-PSS04 |
