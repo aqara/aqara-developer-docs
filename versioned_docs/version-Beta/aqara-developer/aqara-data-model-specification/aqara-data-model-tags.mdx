@@ -8,7 +8,11 @@ keywords: ["Aqara Data Model Tags", "Aqara Data Model", "Aqara Data Model", "Dat
 
 This appendix defines the Function, Trait, and Command in the Aqara Spec data model tag system. These definitions serve as the business semantic layer, where Function and Trait map to Object/Property of the Aqara data model, and Command maps to the Service of the Aqara data model business interaction protocol.
 
+For device addressing, property read/write, command invocation, and reporting directly based on this tag system, see the Aqara Spec business interaction protocol (ProtocolID `0x03`). This appendix defines business semantics, while the interaction protocol defines the bearer and access methods.
+
 Aqara Spec defines the data model tag system for Aqara smart devices, used to describe what the device "can do". In this tag system, Function and Trait map to Object/Property of the Aqara data model, and Command maps to the Service of the Aqara data model business interaction protocol: Aqara Spec describes business semantics, while the data model and interaction protocol describe data structures and access methods respectively.
+
+The Aqara Spec business interaction protocol (ProtocolID `0x03`) identifies the device through a CoIP Option or context, and locates Trait parameters with the independent `endpointId` (Endpoint ID), `functionId` (Function ID), `traitId` (Trait ID), and `parameterId` (Parameter ID) fields; commands use `endpointId`, `functionId`, and `commandId` (Command ID), and do not carry `parameterId` or `traitId`. This protocol does not require converting to Object/Property on the wire; it distinguishes property read/write, command invocation, and reporting through independent OpCodes, and business values are encoded according to the actual Spec type; its fields, Null handling, and request/response rules are defined by the corresponding protocol specification.
 
 ## Data Model Architecture
 
