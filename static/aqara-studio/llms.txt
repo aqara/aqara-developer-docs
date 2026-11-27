@@ -91,11 +91,17 @@
 - Hub M3 Pro: https://docs.aqara.com/docs/aqara-studio/product-knowledge/gateways/hub-m3-pro
 - Hub M100 Pro: https://docs.aqara.com/docs/aqara-studio/product-knowledge/gateways/hub-m100-pro
 - Edge Box GX500M: https://docs.aqara.com/docs/aqara-studio/product-knowledge/gateways/edge-box-gx500m
+- Door and Window Sensor T1: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/door-and-window-sensor-t1
 - Presence Multi-Sensor FP300: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/presence-multi-sensor-fp300
 - Presence Sensor PR330P: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/presence-sensor-pr330p
+- Smoke Alarm PR170P: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/smoke-alarm-pr170p
 - Spatial Multi-Sensor FP400: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/spatial-multi-sensor-fp400
 - Spatial Multi-Sensor FP400 Pro: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/spatial-multi-sensor-fp400-pro
+- Temperature and Humidity Sensor T1: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/temperature-and-humidity-sensor-t1
+- Water Leak Sensor T1: https://docs.aqara.com/docs/aqara-studio/product-knowledge/sensors/water-leak-sensor-t1
 - DIN Rail Module (4 Channels) AW110K: https://docs.aqara.com/docs/aqara-studio/product-knowledge/controllers/din-rail-module-4-channels-aw110k
+- Valve Controller T1: https://docs.aqara.com/docs/aqara-studio/product-knowledge/controllers/valve-controller-t1
+- Wireless Mini Switch T1: https://docs.aqara.com/docs/aqara-studio/product-knowledge/controllers/wireless-mini-switch-t1
 - Panel Hub AX150S: https://docs.aqara.com/docs/aqara-studio/product-knowledge/screens/panel-hub-ax150s
 - Lighting Scene Controller AW100L: https://docs.aqara.com/docs/aqara-studio/product-knowledge/lighting/lighting-scene-controller-aw100l
 - Pastel Light Module H1: https://docs.aqara.com/docs/aqara-studio/product-knowledge/lighting/pastel-light-module-h1

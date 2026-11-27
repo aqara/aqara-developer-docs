@@ -238,10 +238,14 @@
         "tab": "product-knowledge"
       },
       "items": [
+        "aqara-studio/product-knowledge/sensors/door-and-window-sensor-t1",
         "aqara-studio/product-knowledge/sensors/presence-multi-sensor-fp300",
         "aqara-studio/product-knowledge/sensors/presence-sensor-pr330p",
+        "aqara-studio/product-knowledge/sensors/smoke-alarm-pr170p",
         "aqara-studio/product-knowledge/sensors/spatial-multi-sensor-fp400",
-        "aqara-studio/product-knowledge/sensors/spatial-multi-sensor-fp400-pro"
+        "aqara-studio/product-knowledge/sensors/spatial-multi-sensor-fp400-pro",
+        "aqara-studio/product-knowledge/sensors/temperature-and-humidity-sensor-t1",
+        "aqara-studio/product-knowledge/sensors/water-leak-sensor-t1"
       ]
     },
     {
@@ -251,7 +255,9 @@
         "tab": "product-knowledge"
       },
       "items": [
-        "aqara-studio/product-knowledge/controllers/din-rail-module-4-channels-aw110k"
+        "aqara-studio/product-knowledge/controllers/din-rail-module-4-channels-aw110k",
+        "aqara-studio/product-knowledge/controllers/valve-controller-t1",
+        "aqara-studio/product-knowledge/controllers/wireless-mini-switch-t1"
       ]
     },
     {
