@@ -1419,6 +1419,11 @@ This section summarizes all Function definitions in Aqara Spec. See the correspo
       <td>LightBoxManagement</td>
       <td>Light box management: describes the channel occupancy relationship, expansion port enablement, the current active channel count, whether light box assembly across light control devices is supported, and monitoring of the remaining Flash storage.</td>
     </tr>
+    <tr>
+      <td><a href="#ref_Aqara_Spec_Chime">0x0141</a></td>
+      <td>Chime</td>
+      <td>Provides chime control capability, supporting enabling/disabling the chime and optional volume settings.</td>
+    </tr>
   </tbody>
 </table>
 
@@ -3520,6 +3525,13 @@ AirConditioner and SingleSetpointAC both implement `Output` and `HeaterCooler`; 
       <td><a href="#ref_Aqara_Spec_VoiceAssistant">VoiceAssistant</a></td>
       <td>M</td>
       <td>Voice assistant device type.</td>
+    </tr>
+    <tr>
+      <td>0x0088</td>
+      <td>Chime</td>
+      <td><a href="#ref_Aqara_Spec_Chime">Chime</a></td>
+      <td>M</td>
+      <td></td>
     </tr>
   </tbody>
 </table>
@@ -10099,6 +10111,12 @@ Provides switch output control capability, supporting reading and controlling th
       <td>Switch interlock enable configuration flag</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x527A</td>
+      <td><a href="#ref_ChargeProtectionEnable">ChargeProtectionEnable</a></td>
+      <td>Charge protection enable</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -10284,6 +10302,11 @@ This enumeration defines the valid values of the Present Value of the OutputNode
     <tr>
       <td>0x4E85</td>
       <td><a href="#ref_OutputInterlockFlag">OutputInterlockFlag</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x527A</td>
+      <td><a href="#ref_ChargeProtectionEnable">ChargeProtectionEnable</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -10610,6 +10633,63 @@ When the values of two attributes are the same, the states corresponding to thes
       <td>0x0007</td>
       <td>Default Value</td>
       <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ChargeProtectionEnable Trait (Charge Protection Enable) {#ref_ChargeProtectionEnable}
+
+Used to enable or disable the charge protection function of the socket. `0` means disabled, `1` means enabled, and the default is `0`.
+
+When enabled, the socket adjusts the power supply policy according to the charging state of the connected device to slow down battery aging of the connected device. For example, after charging is determined to be complete, the socket is turned off to stop supplying power so as to reduce continuous charging. The specific policy depends on device capabilities; this Trait only controls charge protection on the socket side and does not directly set the charging current or the charging upper limit of the connected device.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527A</td>
+      <td>ChargeProtectionEnable</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
       <td></td>
       <td>0</td>
       <td>RW</td>
@@ -29242,6 +29322,11 @@ In a residential PV storage system, the PCC meter reports the import energy purc
       <td>O</td>
     </tr>
     <tr>
+      <td>0x527B</td>
+      <td><a href="#ref_MaxPowerThreshold">MaxPowerThreshold</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x80B0</td>
       <td><a href="#ref_CurrentVoltage">CurrentVoltage</a></td>
       <td>O</td>
@@ -29436,6 +29521,11 @@ This enumeration represents the grid connection state of the energy device. Curr
     <tr>
       <td>0x80B1</td>
       <td><a href="#ref_CurrentPower">CurrentPower</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x527B</td>
+      <td><a href="#ref_MaxPowerThreshold">MaxPowerThreshold</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -29745,6 +29835,79 @@ Indicates the current real-time power consumption. Unit: watt (W).
       <td>float</td>
       <td></td>
       <td>0.1</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### MaxPowerThreshold Trait {#ref_MaxPowerThreshold}
+
+Maximum power setting. Used to set the maximum power threshold that the device (such as a socket) is allowed to output, in watts (W). Both the factory default threshold and the maximum threshold supported by the device hardware are 3840 W. Users or installers can adjust the threshold within the range of 100-3840 W in steps of 1 W. When the load power exceeds the currently set threshold, the device triggers overload protection.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527B</td>
+      <td>MaxPowerThreshold</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>float</td>
+      <td>100-3840 W, step 1 W</td>
+      <td>3840</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>float</td>
+      <td></td>
+      <td>3840</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>float</td>
+      <td></td>
+      <td>100</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>Step Value</td>
+      <td>float</td>
+      <td></td>
+      <td>1</td>
       <td>R</td>
       <td>O</td>
     </tr>
@@ -31413,6 +31576,12 @@ Provides heating/cooling control capabilities, including HVAC parameters such as
       <td>O</td>
     </tr>
     <tr>
+      <td>0x4E7C</td>
+      <td><a href="#ref_CurrentTemperatureCalibration">CurrentTemperatureCalibration</a></td>
+      <td>Temperature compensation</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5050</td>
       <td><a href="#ref_TRVValvePosition">TRVValvePosition</a></td>
       <td>Valve opening</td>
@@ -32378,6 +32547,11 @@ Parameter structure of the SetActivePreset Command.
       <td>O</td>
     </tr>
     <tr>
+      <td>0x4E7C</td>
+      <td><a href="#ref_CurrentTemperatureCalibration">CurrentTemperatureCalibration</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5050</td>
       <td><a href="#ref_TRVValvePosition">TRVValvePosition</a></td>
       <td>O</td>
@@ -32716,6 +32890,70 @@ Indicates the current temperature. Unit: deg C.
       <td></td>
       <td>26</td>
       <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### CurrentTemperatureCalibration Trait (Temperature Compensation) {#ref_CurrentTemperatureCalibration}
+
+Used to calibrate the current temperature measured by the device. The compensation value is added to the measured value, in deg C. A positive value increases the calibrated temperature, a negative value decreases the calibrated temperature, and `0` means no compensation.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x4E7C</td>
+      <td>CurrentTemperatureCalibration</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>float</td>
+      <td>-12.7 ~ 12.7</td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>float</td>
+      <td></td>
+      <td>12.7</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>float</td>
+      <td></td>
+      <td>-12.7</td>
+      <td>R</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -35345,6 +35583,56 @@ This enumeration defines the valid values of the Present Value of the FanMode Tr
       <td>0x05</td>
       <td>Smart</td>
       <td>Smart</td>
+    </tr>
+    <tr>
+      <td>0xC9</td>
+      <td>CustomLabelMode1</td>
+      <td>Custom mode 1</td>
+    </tr>
+    <tr>
+      <td>0xCA</td>
+      <td>CustomLabelMode2</td>
+      <td>Custom mode 2</td>
+    </tr>
+    <tr>
+      <td>0xCB</td>
+      <td>CustomLabelMode3</td>
+      <td>Custom mode 3</td>
+    </tr>
+    <tr>
+      <td>0xCC</td>
+      <td>CustomLabelMode4</td>
+      <td>Custom mode 4</td>
+    </tr>
+    <tr>
+      <td>0xCD</td>
+      <td>CustomLabelMode5</td>
+      <td>Custom mode 5</td>
+    </tr>
+    <tr>
+      <td>0xCE</td>
+      <td>CustomLabelMode6</td>
+      <td>Custom mode 6</td>
+    </tr>
+    <tr>
+      <td>0xCF</td>
+      <td>CustomLabelMode7</td>
+      <td>Custom mode 7</td>
+    </tr>
+    <tr>
+      <td>0xD0</td>
+      <td>CustomLabelMode8</td>
+      <td>Custom mode 8</td>
+    </tr>
+    <tr>
+      <td>0xD1</td>
+      <td>CustomLabelMode9</td>
+      <td>Custom mode 9</td>
+    </tr>
+    <tr>
+      <td>0xD2</td>
+      <td>CustomLabelMode10</td>
+      <td>Custom mode 10</td>
     </tr>
   </tbody>
 </table>
@@ -63388,17 +63676,35 @@ This Trait indicates the doorbell sensing sensitivity level.
       <td>0x0001</td>
       <td>Present Value</td>
       <td>uint8</td>
-      <td></td>
-      <td>1</td>
+      <td>0 to Maximum Value</td>
+      <td>0</td>
       <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
       <td>O</td>
     </tr>
     <tr>
       <td>0x0007</td>
       <td>Default Value</td>
       <td>uint8</td>
-      <td></td>
-      <td>1</td>
+      <td>0 to Maximum Value</td>
+      <td>0</td>
       <td>RW</td>
       <td>O</td>
     </tr>
@@ -64978,6 +65284,230 @@ Parameter structure of the AddOrUpdateWiFiNetworkResponse Command.
       <td>uint8</td>
       <td>M</td>
       <td></td>
+    </tr>
+  </tbody>
+</table>
+
+`StatusCodes` is transmitted as `uint32`. The high 16 bits (bits 31-16) carry the detailed reason, binding code, or cloud return code; the low 16 bits (bits 15-0) carry the status code, and unmapped 802.11 disconnection reasons are filled into the low 16 bits with their original values. Negative numbers in parentheses in the tables are the values of the high 16 bits interpreted as signed 16-bit integers, and they do not change the `uint32` type of the whole field. When the low 16 bits are identical, the high 16 bits must be considered to distinguish the meanings.
+
+**StatusCodes Fixed Values**
+
+<table>
+  <thead>
+    <tr>
+      <th>StatusCodes</th>
+      <th>High 16 Bits</th>
+      <th>Low 16 Bits</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>0x00000000</code></td>
+      <td><code>0x0000</code></td>
+      <td><code>0x0000</code></td>
+      <td>Router connected.</td>
+    </tr>
+    <tr>
+      <td><code>0x00000006</code></td>
+      <td><code>0x0000</code></td>
+      <td><code>0x0006</code></td>
+      <td>Cloud binding succeeded.</td>
+    </tr>
+    <tr>
+      <td><code>0x00000007</code></td>
+      <td><code>0x0000</code></td>
+      <td><code>0x0007</code></td>
+      <td>Network change countdown expired and the device is still not connected to the cloud.</td>
+    </tr>
+    <tr>
+      <td><code>0x00440002</code></td>
+      <td><code>0x0044</code></td>
+      <td><code>0x0002</code></td>
+      <td>SAE authentication failed; treated as an incorrect password.</td>
+    </tr>
+    <tr>
+      <td><code>0x00F20002</code></td>
+      <td><code>0x00F2</code></td>
+      <td><code>0x0002</code></td>
+      <td>Authentication rejected.</td>
+    </tr>
+    <tr>
+      <td><code>0x00F30002</code></td>
+      <td><code>0x00F3</code></td>
+      <td><code>0x0002</code></td>
+      <td>STA connection timed out; association not completed.</td>
+    </tr>
+    <tr>
+      <td><code>0x00F50002</code></td>
+      <td><code>0x00F5</code></td>
+      <td><code>0x0002</code></td>
+      <td>Association rejected; rate or short preamble not supported.</td>
+    </tr>
+    <tr>
+      <td><code>0x00F90002</code></td>
+      <td><code>0x00F9</code></td>
+      <td><code>0x0002</code></td>
+      <td>The <code>wpa_ctrl</code> command timed out or failed.</td>
+    </tr>
+    <tr>
+      <td><code>0x00FA0002</code></td>
+      <td><code>0x00FA</code></td>
+      <td><code>0x0002</code></td>
+      <td>Failed to restart <code>wpa_supplicant</code>.</td>
+    </tr>
+    <tr>
+      <td><code>0x00FB0002</code></td>
+      <td><code>0x00FB</code></td>
+      <td><code>0x0002</code></td>
+      <td>Unable to connect to the <code>wpa_supplicant</code> control interface.</td>
+    </tr>
+    <tr>
+      <td><code>0x00FC0002</code></td>
+      <td><code>0x00FC</code></td>
+      <td><code>0x0002</code></td>
+      <td>AP not found.</td>
+    </tr>
+    <tr>
+      <td><code>0x00FD0002</code></td>
+      <td><code>0x00FD</code></td>
+      <td><code>0x0002</code></td>
+      <td>Association rejected.</td>
+    </tr>
+    <tr>
+      <td><code>0x00F1000A</code></td>
+      <td><code>0x00F1</code></td>
+      <td><code>0x000A</code></td>
+      <td>DHCP timed out.</td>
+    </tr>
+    <tr>
+      <td><code>0x00000003</code></td>
+      <td><code>0x0000</code></td>
+      <td><code>0x0003</code></td>
+      <td>Station left the network voluntarily.</td>
+    </tr>
+    <tr>
+      <td><code>0x00000008</code></td>
+      <td><code>0x0000</code></td>
+      <td><code>0x0008</code></td>
+      <td>Disassociated from the network; the low 16-bit value is the same as for binding timeout.</td>
+    </tr>
+    <tr>
+      <td><code>0x000000F0</code></td>
+      <td><code>0x0000</code></td>
+      <td><code>0x00F0</code></td>
+      <td>No network found in scan; the Wi-Fi module is determined to be faulty.</td>
+    </tr>
+    <tr>
+      <td><code>0x000000F4</code></td>
+      <td><code>0x0000</code></td>
+      <td><code>0x00F4</code></td>
+      <td>The driver has temporarily disabled this network.</td>
+    </tr>
+    <tr>
+      <td><code>0x000000F6</code></td>
+      <td><code>0x0000</code></td>
+      <td><code>0x00F6</code></td>
+      <td>Encryption too weak; skipped.</td>
+    </tr>
+    <tr>
+      <td><code>0x000000F7</code></td>
+      <td><code>0x0000</code></td>
+      <td><code>0x00F7</code></td>
+      <td>Not in STA mode when attempting to connect.</td>
+    </tr>
+    <tr>
+      <td><code>0x000000F8</code></td>
+      <td><code>0x0000</code></td>
+      <td><code>0x00F8</code></td>
+      <td>Target AP encryption too weak.</td>
+    </tr>
+    <tr>
+      <td><code>0x000000FE</code></td>
+      <td><code>0x0000</code></td>
+      <td><code>0x00FE</code></td>
+      <td>Network configuration state machine wait timed out.</td>
+    </tr>
+    <tr>
+      <td><code>0x000000FF</code></td>
+      <td><code>0x0000</code></td>
+      <td><code>0x00FF</code></td>
+      <td>No reason code parsed from the disconnection event.</td>
+    </tr>
+    <tr>
+      <td><code>0xFF9A0009</code></td>
+      <td><code>0xFF9A</code>（−102）</td>
+      <td><code>0x0009</code></td>
+      <td>Domain name resolution returned no address.</td>
+    </tr>
+    <tr>
+      <td><code>0xFF990009</code></td>
+      <td><code>0xFF99</code>（−103）</td>
+      <td><code>0x0009</code></td>
+      <td>Failed to query the country domain again after the device is cloud-connected. When the device is already cloud-connected, it only retries and does not report to Magic Pair.</td>
+    </tr>
+    <tr>
+      <td><code>0xFF980008</code></td>
+      <td><code>0xFF98</code>（−104）</td>
+      <td><code>0x0008</code></td>
+      <td>Not yet cloud-connected; no CoAP server found.</td>
+    </tr>
+    <tr>
+      <td><code>0xFF970008</code></td>
+      <td><code>0xFF97</code>（−105）</td>
+      <td><code>0x0008</code></td>
+      <td>The cloud host and port exist, but the AIoT connection failed.</td>
+    </tr>
+    <tr>
+      <td><code>0x07E9000B</code></td>
+      <td><code>0x07E9</code></td>
+      <td><code>0x000B</code></td>
+      <td>Device connection interface returned 680 (anti-loss).</td>
+    </tr>
+  </tbody>
+</table>
+
+**StatusCodes Dynamic Values**
+
+<table>
+  <thead>
+    <tr>
+      <th>StatusCodes</th>
+      <th>High 16 Bits</th>
+      <th>Low 16 Bits</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>reason</code> original value</td>
+      <td><code>0x0000</code></td>
+      <td><code>reason</code> original value</td>
+      <td>Other unmapped 802.11 disconnection reasons.</td>
+    </tr>
+    <tr>
+      <td><code>(Binding code &amp;lt;&amp;lt; 16) + 7</code></td>
+      <td>Binding code</td>
+      <td><code>0x0007</code></td>
+      <td>Cloud connection timer expired: 12 seconds when a CoAP agent is present, otherwise 6 seconds.</td>
+    </tr>
+    <tr>
+      <td><code>(Binding code &amp;lt;&amp;lt; 16) + 7</code></td>
+      <td>Binding code</td>
+      <td><code>0x0007</code></td>
+      <td>First AIoT link connection failed.</td>
+    </tr>
+    <tr>
+      <td><code>(cloud code &amp;lt;&amp;lt; 16) + 7</code></td>
+      <td>Cloud code</td>
+      <td><code>0x0007</code></td>
+      <td>Device connection interface failed and the code returned by the cloud is not 680.</td>
+    </tr>
+    <tr>
+      <td><code>(Binding code &amp;lt;&amp;lt; 16) + 7</code></td>
+      <td>Binding code</td>
+      <td><code>0x0007</code></td>
+      <td>Failed to obtain the token, or the local Thing connection failed.</td>
     </tr>
   </tbody>
 </table>
@@ -68511,6 +69041,12 @@ Provides wall switch configuration capability, including wiring mode, button mod
       <td>O</td>
     </tr>
     <tr>
+      <td>0x527C</td>
+      <td><a href="#ref_ButtonUsbControlEnable">ButtonUsbControlEnable</a></td>
+      <td>Button-controlled USB power enable</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5198</td>
       <td><a href="#ref_DeviceAssociationTarget">DeviceAssociationTarget</a></td>
       <td>Device association target</td>
@@ -68784,6 +69320,11 @@ This structure defines the field layout of the associated target device, used by
       <td>O</td>
     </tr>
     <tr>
+      <td>0x527C</td>
+      <td><a href="#ref_ButtonUsbControlEnable">ButtonUsbControlEnable</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x5198</td>
       <td><a href="#ref_DeviceAssociationTarget">DeviceAssociationTarget</a></td>
       <td>O</td>
@@ -69017,6 +69558,52 @@ This Trait is used for access to and reporting of "button mode" data.
       <td></td>
       <td>0</td>
       <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ButtonUsbControlEnable Trait (Button-Controlled USB Power Enable) {#ref_ButtonUsbControlEnable}
+
+Configures whether the physical button of the socket also controls the power supply of the USB port. `0x00` means the button only controls the relay and does not change the power supply state of the USB port; `0x01` means the button controls both the relay and the power supply of the USB port. This Trait does not control USB data communication.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527C</td>
+      <td>ButtonUsbControlEnable</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td></td>
+      <td>RVW</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -69334,6 +69921,18 @@ Provides general device configuration items, such as sensitivity, delay, default
   </thead>
   <tbody>
     <tr>
+      <td>0x527E</td>
+      <td><a href="#ref_DimmingEdgeMode">DimmingEdgeMode</a></td>
+      <td>Leading/trailing edge dimming switch</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x527D</td>
+      <td><a href="#ref_ButtonDimmingStep">ButtonDimmingStep</a></td>
+      <td>Button dimming step setting</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x524E</td>
       <td><a href="#ref_ACMateWorkMode">ACMateWorkMode</a></td>
       <td>AC mate work mode</td>
@@ -69592,6 +70191,68 @@ Provides general device configuration items, such as sensitivity, delay, default
 </table>
 
 ### Data Types
+
+#### ButtonDimmingStepEnum8 Type {#ref_ButtonDimmingStepEnum8}
+
+This enumeration defines the valid values of the Present Value for the ButtonDimmingStep Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x05</td>
+      <td>Percent5</td>
+      <td>5%</td>
+    </tr>
+    <tr>
+      <td>0x0A</td>
+      <td>Percent10</td>
+      <td>10%</td>
+    </tr>
+    <tr>
+      <td>0x14</td>
+      <td>Percent20</td>
+      <td>20%</td>
+    </tr>
+    <tr>
+      <td>0x19</td>
+      <td>Percent25</td>
+      <td>25%</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DimmingEdgeModeEnum8 Type {#ref_DimmingEdgeModeEnum8}
+
+This enumeration defines the valid values of the Present Value for the DimmingEdgeMode Trait. The underlying data type is uint8.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x00</td>
+      <td>TrailingEdge</td>
+      <td>Trailing edge dimming</td>
+    </tr>
+    <tr>
+      <td>0x01</td>
+      <td>LeadingEdge</td>
+      <td>Leading edge dimming</td>
+    </tr>
+  </tbody>
+</table>
 
 #### ACMateWorkModeEnum8 Type {#ref_ACMateWorkModeEnum8}
 
@@ -70874,6 +71535,16 @@ This enumeration defines the valid values of the Present Value of the PublicCapO
   </thead>
   <tbody>
     <tr>
+      <td>0x527E</td>
+      <td><a href="#ref_DimmingEdgeMode">DimmingEdgeMode</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x527D</td>
+      <td><a href="#ref_ButtonDimmingStep">ButtonDimmingStep</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x524E</td>
       <td><a href="#ref_ACMateWorkMode">ACMateWorkMode</a></td>
       <td>O</td>
@@ -71066,6 +71737,134 @@ This enumeration defines the valid values of the Present Value of the PublicCapO
     <tr>
       <td>0x51ED</td>
       <td><a href="#ref_VibrationIntensity">VibrationIntensity</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ButtonDimmingStep Trait (Button Dimming Step Setting) {#ref_ButtonDimmingStep}
+
+Used to set the brightness step changed by each button operation (such as a short press or a long press) when dimming with the local physical buttons of the device. Four step options are supported: 5%, 10%, 20% and 25%. The default value is 10%.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527D</td>
+      <td>ButtonDimmingStep</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_ButtonDimmingStepEnum8">ButtonDimmingStepEnum8</a></td>
+      <td></td>
+      <td>10</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_ButtonDimmingStepEnum8">ButtonDimmingStepEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_ButtonDimmingStepEnum8">ButtonDimmingStepEnum8</a></td>
+      <td></td>
+      <td>10</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### DimmingEdgeMode Trait (Leading/Trailing Edge Dimming Switch) {#ref_DimmingEdgeMode}
+
+Used to switch the dimming device between leading edge dimming and trailing edge dimming to be compatible with different types of load luminaires. When dimming with the dimming knob, the device adopts the corresponding phase-cut method according to this setting. `0` means trailing edge dimming, `1` means leading edge dimming, and the default value is `0`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x527E</td>
+      <td>DimmingEdgeMode</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_DimmingEdgeModeEnum8">DimmingEdgeModeEnum8</a></td>
+      <td>0..1</td>
+      <td>0</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_DimmingEdgeModeEnum8">DimmingEdgeModeEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_DimmingEdgeModeEnum8">DimmingEdgeModeEnum8</a></td>
+      <td>0..1</td>
+      <td>0</td>
+      <td>RW</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -115757,6 +116556,12 @@ Provides a unified aggregation interface for ambient sensing joint data, used to
       <td>Human exit count delta</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x514A</td>
+      <td><a href="#ref_DoorbellSensitivity">DoorbellSensitivity</a></td>
+      <td>Sensitivity</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -116366,6 +117171,11 @@ This structure defines the Present Value field layout of the HumanExitCountDelta
     <tr>
       <td>0x50E6</td>
       <td><a href="#ref_HumanExitCountDelta">HumanExitCountDelta</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x514A</td>
+      <td><a href="#ref_DoorbellSensitivity">DoorbellSensitivity</a></td>
       <td>O</td>
     </tr>
   </tbody>
@@ -120902,31 +121712,31 @@ sequenceDiagram
   </thead>
   <tbody>
     <tr>
-      <td>0x527B</td>
+      <td>0x527F</td>
       <td><a href="#ref_FlashRemainStorage">FlashRemainStorage</a></td>
       <td>Flash remaining storage</td>
       <td>O</td>
     </tr>
     <tr>
-      <td>0x527A</td>
+      <td>0x5280</td>
       <td><a href="#ref_ChannelOccupancy">ChannelOccupancy</a></td>
       <td>Channel occupancy relationship</td>
       <td>O</td>
     </tr>
     <tr>
-      <td>0x527C</td>
+      <td>0x5281</td>
       <td><a href="#ref_ExpansionPortEnable">ExpansionPortEnable</a></td>
       <td>Expansion port enablement</td>
       <td>O</td>
     </tr>
     <tr>
-      <td>0x525C</td>
+      <td>0x5282</td>
       <td><a href="#ref_ActiveChannelCount">ActiveChannelCount</a></td>
       <td>Current active channel</td>
       <td>O</td>
     </tr>
     <tr>
-      <td>0x527D</td>
+      <td>0x5286</td>
       <td><a href="#ref_CrossControllerLightBoxSupported">CrossControllerLightBoxSupported</a></td>
       <td>Whether light box assembly across light control devices is supported</td>
       <td>O</td>
@@ -120981,7 +121791,7 @@ Represents the remaining Flash storage available to the light box instance. Unit
   </thead>
   <tbody>
     <tr>
-      <td>0x527B</td>
+      <td>0x527F</td>
       <td>FlashRemainStorage</td>
     </tr>
   </tbody>
@@ -121006,7 +121816,7 @@ Represents the remaining Flash storage available to the light box instance. Unit
       <td>0x0001</td>
       <td>Present Value</td>
       <td>uint32</td>
-      <td></td>
+      <td>0..4294967295</td>
       <td></td>
       <td>RV</td>
       <td>O</td>
@@ -121016,8 +121826,17 @@ Represents the remaining Flash storage available to the light box instance. Unit
       <td>Maximum Value</td>
       <td>uint32</td>
       <td></td>
-      <td></td>
+      <td>4294967295</td>
       <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint32</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -121036,7 +121855,7 @@ Establishes the relationship between a light box and the list of logical channel
   </thead>
   <tbody>
     <tr>
-      <td>0x527A</td>
+      <td>0x5280</td>
       <td>ChannelOccupancy</td>
     </tr>
   </tbody>
@@ -121084,7 +121903,7 @@ After `true` or `false` is written, the Server SHALL reply with the write result
   </thead>
   <tbody>
     <tr>
-      <td>0x527C</td>
+      <td>0x5281</td>
       <td>ExpansionPortEnable</td>
     </tr>
   </tbody>
@@ -121130,7 +121949,7 @@ Represents the number of currently active return-to-zero code output channels. T
   </thead>
   <tbody>
     <tr>
-      <td>0x525C</td>
+      <td>0x5282</td>
       <td>ActiveChannelCount</td>
     </tr>
   </tbody>
@@ -121155,9 +121974,27 @@ Represents the number of currently active return-to-zero code output channels. T
       <td>0x0001</td>
       <td>Present Value</td>
       <td>uint8</td>
-      <td></td>
+      <td>0..255</td>
       <td></td>
       <td>RV</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>Maximum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>255</td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>Minimum Value</td>
+      <td>uint8</td>
+      <td></td>
+      <td>0</td>
+      <td>R</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -121176,7 +122013,7 @@ Indicates whether the device supports light box assembly across light control de
   </thead>
   <tbody>
     <tr>
-      <td>0x527D</td>
+      <td>0x5286</td>
       <td>CrossControllerLightBoxSupported</td>
     </tr>
   </tbody>
@@ -143738,6 +144575,12 @@ Controls the live video stream, supporting enhanced capabilities such as timelap
       <td>Smart event filter enable</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5284</td>
+      <td><a href="#ref_EventFilterIntensity">EventFilterIntensity</a></td>
+      <td>Event filter intensity</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -143763,6 +144606,37 @@ Controls the live video stream, supporting enhanced capabilities such as timelap
 </table>
 
 ### Data Types
+
+##### EventFilterIntensityEnum8 Type {#ref_EventFilterIntensityEnum8}
+
+This enumeration defines the valid values of the Present Value for the EventFilterIntensity Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x01</td>
+      <td>Low</td>
+      <td>Low</td>
+    </tr>
+    <tr>
+      <td>0x02</td>
+      <td>Medium</td>
+      <td>Medium</td>
+    </tr>
+    <tr>
+      <td>0x03</td>
+      <td>High</td>
+      <td>High</td>
+    </tr>
+  </tbody>
+</table>
 
 ##### CameraActiveToggle Command Structure Type {#ref_CameraActiveToggleCommandStructure}
 
@@ -143833,6 +144707,75 @@ Parameter structure of the CameraActiveToggle Command.
     <tr>
       <td>0x51EE</td>
       <td><a href="#ref_SmartEventFilterEnable">SmartEventFilterEnable</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5284</td>
+      <td><a href="#ref_EventFilterIntensity">EventFilterIntensity</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### EventFilterIntensity Trait (Event Filter Intensity) {#ref_EventFilterIntensity}
+
+Used to set the filtering intensity of the camera for similar events. The higher the filtering intensity, the more likely the device considers subsequent events similar to previous events and filters them out, thereby reducing duplicate recordings and reports; the lower the filtering intensity, the lower the tolerance of the device for similar events, and more events are recorded and reported independently.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5284</td>
+      <td>EventFilterIntensity</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_EventFilterIntensityEnum8">EventFilterIntensityEnum8</a></td>
+      <td>1..3</td>
+      <td>2</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>Supported Value</td>
+      <td>list[<a href="#ref_EventFilterIntensityEnum8">EventFilterIntensityEnum8</a>]</td>
+      <td></td>
+      <td></td>
+      <td>R</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td><a href="#ref_EventFilterIntensityEnum8">EventFilterIntensityEnum8</a></td>
+      <td>1..3</td>
+      <td>2</td>
+      <td>RW</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -148468,6 +149411,12 @@ Defines the camera power consumption strategy and work modes, adapting to differ
       <td>O</td>
     </tr>
     <tr>
+      <td>0x5288</td>
+      <td><a href="#ref_AOVLowBatteryPowerSavingEnable">AOVLowBatteryPowerSavingEnable</a></td>
+      <td>AOV low battery auto power saving enable</td>
+      <td>O</td>
+    </tr>
+    <tr>
       <td>0x4FD3</td>
       <td><a href="#ref_RangeTestMode">RangeTestMode</a></td>
       <td>Enter ranging test mode</td>
@@ -148547,6 +149496,11 @@ This enumeration defines the valid values of the Present Value for the CamWorkMo
     <tr>
       <td>0x4FD6</td>
       <td><a href="#ref_AOVRecordingEnable">AOVRecordingEnable</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5288</td>
+      <td><a href="#ref_AOVLowBatteryPowerSavingEnable">AOVLowBatteryPowerSavingEnable</a></td>
       <td>O</td>
     </tr>
     <tr>
@@ -148807,6 +149761,63 @@ Enables or disables the AOV (Always-On Video) recording function. When enabled, 
       <td>boolean</td>
       <td></td>
       <td>0</td>
+      <td>RW</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### AOVLowBatteryPowerSavingEnable Trait (AOV Low Battery Auto Power Saving Enable) {#ref_AOVLowBatteryPowerSavingEnable}
+
+Used to enable or disable the low battery auto power saving function in AOV low-power mode. When enabled, the device automatically applies a power saving policy when the battery is low in AOV low-power mode to extend battery life; when disabled, this auto power saving function is not enabled. The low battery threshold and the specific power saving policy are determined by the device. Clients display this option when [CamWorkMode](#ref_CamWorkMode) is 3, that is, AOV.
+
+The value `0` means disabled and `1` means enabled. The default value is `1`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5288</td>
+      <td>AOVLowBatteryPowerSavingEnable</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>1</td>
+      <td>RVW</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>Default Value</td>
+      <td>boolean</td>
+      <td></td>
+      <td>1</td>
       <td>RW</td>
       <td>O</td>
     </tr>
@@ -149548,6 +150559,12 @@ Manages event notification policies, supporting notification types, scheduled pe
       <td>Picture push enable</td>
       <td>O</td>
     </tr>
+    <tr>
+      <td>0x5285</td>
+      <td><a href="#ref_CameraNotifyInfo">CameraNotifyInfo</a></td>
+      <td>Camera push message event</td>
+      <td>O</td>
+    </tr>
   </tbody>
 </table>
 
@@ -149556,6 +150573,248 @@ Manages event notification policies, supporting notification types, scheduled pe
 This Function does not contain any Commands.
 
 ### Data Types
+
+##### CameraNotifyInfoTypeEnum16 Type {#ref_CameraNotifyInfoTypeEnum16}
+
+This enumeration defines the valid values of the Type field for the CameraNotifyInfo Trait. The underlying data type is uint16.
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>CameraArming</td>
+      <td>Camera arming</td>
+    </tr>
+    <tr>
+      <td>0x0002</td>
+      <td>CameraMessage</td>
+      <td>Camera message</td>
+    </tr>
+    <tr>
+      <td>0x0003</td>
+      <td>CameraTimeLapse</td>
+      <td>Camera time-lapse</td>
+    </tr>
+    <tr>
+      <td>0x0004</td>
+      <td>CameraIfttt</td>
+      <td>Camera IFTTT linkage</td>
+    </tr>
+    <tr>
+      <td>0x0005</td>
+      <td>CameraSoundDetection</td>
+      <td>Camera sound detection</td>
+    </tr>
+    <tr>
+      <td>0x0006</td>
+      <td>CameraMotionDetection</td>
+      <td>Camera motion detection</td>
+    </tr>
+    <tr>
+      <td>0x0007</td>
+      <td>CameraFaceRecognition</td>
+      <td>Camera face recognition</td>
+    </tr>
+    <tr>
+      <td>0x0008</td>
+      <td>CameraHumanoidRecognition</td>
+      <td>Camera humanoid recognition</td>
+    </tr>
+    <tr>
+      <td>0x0009</td>
+      <td>CameraPetRecognition</td>
+      <td>Camera pet recognition</td>
+    </tr>
+    <tr>
+      <td>0x000B</td>
+      <td>CameraCryRecognition</td>
+      <td>Camera cry recognition</td>
+    </tr>
+    <tr>
+      <td>0x000C</td>
+      <td>SomeoneHoveringDoorRecognition</td>
+      <td>Someone hovering at the door recognition</td>
+    </tr>
+    <tr>
+      <td>0x000D</td>
+      <td>SomeoneRingingDoorbellRecognition</td>
+      <td>Someone ringing the doorbell recognition</td>
+    </tr>
+    <tr>
+      <td>0x000E</td>
+      <td>LockPryRecognition</td>
+      <td>Lock pry recognition</td>
+    </tr>
+    <tr>
+      <td>0x0011</td>
+      <td>LockLeaveOpenRecognition</td>
+      <td>Unlocking indoors or with a key in away mode</td>
+    </tr>
+    <tr>
+      <td>0x0012</td>
+      <td>PackageDetection</td>
+      <td>Package detection</td>
+    </tr>
+    <tr>
+      <td>0x0013</td>
+      <td>BlockDetection</td>
+      <td>Picture blocking detection</td>
+    </tr>
+    <tr>
+      <td>0x0014</td>
+      <td>CarDetection</td>
+      <td>Vehicle detection</td>
+    </tr>
+    <tr>
+      <td>0x0015</td>
+      <td>FrameDetection</td>
+      <td>Frame extraction detection</td>
+    </tr>
+    <tr>
+      <td>0x0016</td>
+      <td>CameraLinkEvent</td>
+      <td>Camera linkage event</td>
+    </tr>
+    <tr>
+      <td>0x0017</td>
+      <td>AiCryDetection</td>
+      <td>AI cry detection</td>
+    </tr>
+    <tr>
+      <td>0x0018</td>
+      <td>AiAlarmSoundDetection</td>
+      <td>AI alarm sound detection</td>
+    </tr>
+    <tr>
+      <td>0x0019</td>
+      <td>AiPetSoundDetection</td>
+      <td>AI pet sound detection</td>
+    </tr>
+    <tr>
+      <td>0x001A</td>
+      <td>AiCoughDetection</td>
+      <td>AI cough detection</td>
+    </tr>
+    <tr>
+      <td>0x001B</td>
+      <td>AlertAlarmImg</td>
+      <td>Alarm image</td>
+    </tr>
+    <tr>
+      <td>0x001C</td>
+      <td>PackageDisappear</td>
+      <td>Package disappearance</td>
+    </tr>
+    <tr>
+      <td>0x001D</td>
+      <td>SmokeDetection</td>
+      <td>Smoke detection</td>
+    </tr>
+    <tr>
+      <td>0x001E</td>
+      <td>FireDetection</td>
+      <td>Fire detection</td>
+    </tr>
+    <tr>
+      <td>0x001F</td>
+      <td>CameraSmileDetection</td>
+      <td>Camera smile detection</td>
+    </tr>
+    <tr>
+      <td>0x0020</td>
+      <td>CameraFenceEnterDetection</td>
+      <td>Camera electronic fence entry</td>
+    </tr>
+    <tr>
+      <td>0x0021</td>
+      <td>CameraFenceLeaveDetection</td>
+      <td>Camera electronic fence exit</td>
+    </tr>
+    <tr>
+      <td>0x0022</td>
+      <td>CameraFaceMaskDetection</td>
+      <td>Face mask occlusion detection</td>
+    </tr>
+    <tr>
+      <td>0x0023</td>
+      <td>CameraFaceMaskOrLeaveDetection</td>
+      <td>Face mask occlusion detection or leaving the frame</td>
+    </tr>
+    <tr>
+      <td>0x0024</td>
+      <td>CameraLoudSoundDetection</td>
+      <td>Camera loud sound detection</td>
+    </tr>
+    <tr>
+      <td>0x0025</td>
+      <td>CameraSnoreDetection</td>
+      <td>Camera snore detection</td>
+    </tr>
+    <tr>
+      <td>0x0063</td>
+      <td>CameraAggrDetection</td>
+      <td>Camera aggregated push</td>
+    </tr>
+    <tr>
+      <td>0x0064</td>
+      <td>CameraAiSummaryInfo</td>
+      <td>Camera AI summary information</td>
+    </tr>
+  </tbody>
+</table>
+
+##### CameraNotifyInfoTraitPresentValueStructure Type {#ref_CameraNotifyInfoTraitPresentValueStructure}
+
+This structure defines the field layout of the Present Value for the CameraNotifyInfo Trait.
+
+<table>
+  <thead>
+    <tr>
+      <th>Struct Member No.</th>
+      <th>Field Name</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>TriggerTime</td>
+      <td>int64</td>
+      <td>M</td>
+      <td>Event trigger time, UTC Unix timestamp, in milliseconds.</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Type</td>
+      <td><a href="#ref_CameraNotifyInfoTypeEnum16">CameraNotifyInfoTypeEnum16</a></td>
+      <td>M</td>
+      <td>Camera event type.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>TriggerSource</td>
+      <td>characterString</td>
+      <td>M</td>
+      <td>Trigger source identifier, such as the device itself, a sub-device ID, or a specific sensor identifier.</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>IdList</td>
+      <td>list[characterString]</td>
+      <td>O</td>
+      <td>List of service object IDs associated with the event, such as face ID, license plate or vehicle ID. It can be an empty array when there is no associated object.</td>
+    </tr>
+  </tbody>
+</table>
 
 ##### CameraNotificationTypeEnum8 Type {#ref_CameraNotificationTypeEnum8}
 
@@ -149632,6 +150891,57 @@ This enumeration defines the valid values of the Present Value for the CameraNot
     <tr>
       <td>0x516A</td>
       <td><a href="#ref_PicturePushEnable">PicturePushEnable</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x5285</td>
+      <td><a href="#ref_CameraNotifyInfo">CameraNotifyInfo</a></td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+#### CameraNotifyInfo Trait (Camera Push Message Event) {#ref_CameraNotifyInfo}
+
+Used to describe the intelligent event information that the camera triggers and pushes to users or clients, including the event trigger time, the event type, the trigger source, and an optional list of associated service object IDs. This Trait is only reported proactively by the device, and clients can subscribe to receive real-time event notifications.
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5285</td>
+      <td>CameraNotifyInfo</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Parameters
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Constraint</th>
+      <th>Default</th>
+      <th>Access</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0001</td>
+      <td>Present Value</td>
+      <td><a href="#ref_CameraNotifyInfoTraitPresentValueStructure">CameraNotifyInfoTraitPresentValueStructure</a></td>
+      <td></td>
+      <td></td>
+      <td>V</td>
       <td>O</td>
     </tr>
   </tbody>
@@ -167242,6 +168552,97 @@ The cumulative sold energy represents the cumulative active energy sold external
       <td></td>
       <td>0.1</td>
       <td>R</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+## Chime {#ref_Aqara_Spec_Chime}
+
+### Introduction
+
+Provides the chime control capability, which is used to enable or disable the chime function and optionally set the chime volume. When the number of volume levels does not exceed 4, use `GeneralConfiguration/VoiceVolume`; when it exceeds 4, use the `Speaker/Volume` percentage.
+
+### Function Identification
+
+<table>
+  <thead>
+    <tr>
+      <th>Function ID</th>
+      <th>Code</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0141</td>
+      <td>Chime</td>
+      <td>Chime</td>
+    </tr>
+  </tbody>
+</table>
+
+### Trait
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Code</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5149</td>
+      <td><a href="#ref_DoorbellEnabled">DoorbellEnabled</a></td>
+      <td>Doorbell enabled</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x5054</td>
+      <td><a href="#ref_VoiceVolume">VoiceVolume</a></td>
+      <td>Voice volume</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x80C0</td>
+      <td><a href="#ref_Volume">Volume</a></td>
+      <td>Volume</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+
+### Command
+
+This Function does not contain any Commands.
+
+### Trait Definitions
+
+<table>
+  <thead>
+    <tr>
+      <th>Trait ID</th>
+      <th>Name</th>
+      <th>Conformance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x5149</td>
+      <td><a href="#ref_DoorbellEnabled">DoorbellEnabled</a></td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <td>0x5054</td>
+      <td><a href="#ref_VoiceVolume">VoiceVolume</a></td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <td>0x80C0</td>
+      <td><a href="#ref_Volume">Volume</a></td>
       <td>O</td>
     </tr>
   </tbody>
